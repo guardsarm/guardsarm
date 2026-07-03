@@ -1,5 +1,5 @@
 /*
- * Wazuh Vulnerability scanner
+ * GuardSarm Vulnerability scanner
  * Copyright (C) 2015, Wazuh Inc.
  * March 25, 2023.
  *

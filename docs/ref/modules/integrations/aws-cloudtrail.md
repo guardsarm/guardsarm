@@ -2,19 +2,19 @@
 
 ## Introduction
 
-The Wazuh AWS module can collect and analyze AWS CloudTrail logs stored in S3 buckets. CloudTrail records API calls and account activity across an AWS infrastructure, providing audit logs for governance, compliance, and security monitoring.
+The GuardSarm AWS module can collect and analyze AWS CloudTrail logs stored in S3 buckets. CloudTrail records API calls and account activity across an AWS infrastructure, providing audit logs for governance, compliance, and security monitoring.
 
-Wazuh retrieves CloudTrail logs from S3, analyzes them using the Wazuh rule engine, and generates alerts for events such as unauthorized API calls, IAM changes, security group modifications, and other suspicious activity.
+GuardSarm retrieves CloudTrail logs from S3, analyzes them using the GuardSarm rule engine, and generates alerts for events such as unauthorized API calls, IAM changes, security group modifications, and other suspicious activity.
 
 ## Prerequisites
 
 - An AWS account with CloudTrail enabled and configured to deliver logs to an S3 bucket.
 - AWS credentials (access key and secret key) or an IAM role with permissions to read from the S3 bucket.
-- Python 3 and the `boto3` library installed on the Wazuh agent.
+- Python 3 and the `boto3` library installed on the GuardSarm agent.
 
 ## Configuration
 
-Configure the AWS module in the Wazuh agent `ossec.conf` file:
+Configure the AWS module in the GuardSarm agent `ossec.conf` file:
 
 ```xml
   <wodle name="aws-s3">
@@ -70,7 +70,7 @@ Instead of using access keys, you can authenticate using an IAM role:
 <bucket type="cloudtrail">
   <name>my-cloudtrail-bucket</name>
   <aws_profile>default</aws_profile>
-  <iam_role_arn>arn:aws:iam::123456789012:role/WazuhRole</iam_role_arn>
+  <iam_role_arn>arn:aws:iam::123456789012:role/GuardSarmRole</iam_role_arn>
   <regions>us-east-1,eu-west-1</regions>
 </bucket>
 ```
@@ -85,7 +85,7 @@ Instead of using access keys, you can authenticate using an IAM role:
 
 ### IAM permissions
 
-The IAM user or role used by Wazuh needs the following permissions on the S3 bucket:
+The IAM user or role used by GuardSarm needs the following permissions on the S3 bucket:
 
 ```json
 {
@@ -110,10 +110,10 @@ If using `remove_from_bucket`, add the `s3:DeleteObject` permission.
 
 ## Verify the integration
 
-Restart the Wazuh agent after applying the configuration:
+Restart the GuardSarm agent after applying the configuration:
 
 ```bash
-systemctl restart wazuh-agent
+systemctl restart guardsarm-agent
 ```
 
 Check the module logs:

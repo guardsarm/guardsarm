@@ -17,7 +17,7 @@
 #include "db.h"
 #include "agent_sync_protocol_c_interface.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 /* Replace assert with mock_assert */
 extern void mock_assert(const int result, const char* const expression,
                         const char * const file, const int line);

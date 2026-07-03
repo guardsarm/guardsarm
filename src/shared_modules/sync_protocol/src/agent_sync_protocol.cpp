@@ -564,7 +564,7 @@ bool AgentSyncProtocol::sendStartAndWaitAck(Mode mode,
 
         auto indices = builder.CreateVector(index_vec);
 
-        Wazuh::SyncSchema::StartBuilder startBuilder(builder);
+        GuardSarm::SyncSchema::StartBuilder startBuilder(builder);
         startBuilder.add_module_(module);
         startBuilder.add_mode(protocolMode);
         startBuilder.add_size(static_cast<uint64_t>(dataSize));
@@ -594,7 +594,7 @@ bool AgentSyncProtocol::sendStartAndWaitAck(Mode mode,
 
         auto startOffset = startBuilder.Finish();
 
-        auto message = Wazuh::SyncSchema::CreateMessage(builder, Wazuh::SyncSchema::MessageType::Start, startOffset.Union());
+        auto message = GuardSarm::SyncSchema::CreateMessage(builder, GuardSarm::SyncSchema::MessageType::Start, startOffset.Union());
         builder.Finish(message);
 
         const uint8_t* buffer_ptr = builder.GetBufferPointer();
@@ -701,7 +701,7 @@ bool AgentSyncProtocol::sendDataMessages(uint64_t session,
         static constexpr size_t BATCH_MESSAGE_OVERHEAD = 128;
 
         flatbuffers::FlatBufferBuilder batchBuilder;
-        std::vector<flatbuffers::Offset<Wazuh::SyncSchema::DataValue>> batchOffsets;
+        std::vector<flatbuffers::Offset<GuardSarm::SyncSchema::DataValue>> batchOffsets;
         size_t batchEstimatedSize = BATCH_MESSAGE_OVERHEAD;
 
         auto flushBatch = [&]() -> bool
@@ -710,12 +710,12 @@ bool AgentSyncProtocol::sendDataMessages(uint64_t session,
                 return true;
 
             auto valuesVec = batchBuilder.CreateVector(batchOffsets);
-            Wazuh::SyncSchema::DataBatchBuilder dataBatchBuilder(batchBuilder);
+            GuardSarm::SyncSchema::DataBatchBuilder dataBatchBuilder(batchBuilder);
             dataBatchBuilder.add_values(valuesVec);
             auto dataBatchOffset = dataBatchBuilder.Finish();
 
-            auto message = Wazuh::SyncSchema::CreateMessage(
-                batchBuilder, Wazuh::SyncSchema::MessageType::DataBatch, dataBatchOffset.Union());
+            auto message = GuardSarm::SyncSchema::CreateMessage(
+                batchBuilder, GuardSarm::SyncSchema::MessageType::DataBatch, dataBatchOffset.Union());
             batchBuilder.Finish(message);
 
             const uint8_t* bufPtr = batchBuilder.GetBufferPointer();
@@ -760,7 +760,7 @@ bool AgentSyncProtocol::sendDataMessages(uint64_t session,
             auto dataVec = batchBuilder.CreateVector(
                                reinterpret_cast<const int8_t*>(item.data.data()), item.data.size());
 
-            Wazuh::SyncSchema::DataValueBuilder dataValueBuilder(batchBuilder);
+            GuardSarm::SyncSchema::DataValueBuilder dataValueBuilder(batchBuilder);
             dataValueBuilder.add_seq(item.seq);
             dataValueBuilder.add_session(session);
             dataValueBuilder.add_id(idStr);
@@ -769,8 +769,8 @@ bool AgentSyncProtocol::sendDataMessages(uint64_t session,
 
             // Translate DB operation to Schema operation
             const auto protocolOperation = (item.operation == Operation::DELETE_)
-                                           ? Wazuh::SyncSchema::Operation::Delete
-                                           : Wazuh::SyncSchema::Operation::Upsert;
+                                           ? GuardSarm::SyncSchema::Operation::Delete
+                                           : GuardSarm::SyncSchema::Operation::Upsert;
             dataValueBuilder.add_operation(protocolOperation);
             dataValueBuilder.add_data(dataVec);
             batchOffsets.push_back(dataValueBuilder.Finish());
@@ -806,7 +806,7 @@ bool AgentSyncProtocol::sendDataContextMessages(uint64_t session,
             auto idxStr = builder.CreateString(item.index);
             auto dataVec = builder.CreateVector(reinterpret_cast<const int8_t*>(item.data.data()), item.data.size());
 
-            Wazuh::SyncSchema::DataContextBuilder dataContextBuilder(builder);
+            GuardSarm::SyncSchema::DataContextBuilder dataContextBuilder(builder);
             dataContextBuilder.add_seq(item.seq);
             dataContextBuilder.add_session(session);
             dataContextBuilder.add_id(idStr);
@@ -814,7 +814,7 @@ bool AgentSyncProtocol::sendDataContextMessages(uint64_t session,
             dataContextBuilder.add_data(dataVec);
             auto dataContextOffset = dataContextBuilder.Finish();
 
-            auto message = Wazuh::SyncSchema::CreateMessage(builder, Wazuh::SyncSchema::MessageType::DataContext, dataContextOffset.Union());
+            auto message = GuardSarm::SyncSchema::CreateMessage(builder, GuardSarm::SyncSchema::MessageType::DataContext, dataContextOffset.Union());
             builder.Finish(message);
 
             const uint8_t* buffer_ptr = builder.GetBufferPointer();
@@ -848,13 +848,13 @@ bool AgentSyncProtocol::sendChecksumMessage(uint64_t session,
         auto indexStr = builder.CreateString(index);
         auto checksumStr = builder.CreateString(checksum);
 
-        Wazuh::SyncSchema::ChecksumModuleBuilder checksumBuilder(builder);
+        GuardSarm::SyncSchema::ChecksumModuleBuilder checksumBuilder(builder);
         checksumBuilder.add_session(session);
         checksumBuilder.add_index(indexStr);
         checksumBuilder.add_checksum(checksumStr);
         auto checksumOffset = checksumBuilder.Finish();
 
-        auto message = Wazuh::SyncSchema::CreateMessage(builder, Wazuh::SyncSchema::MessageType::ChecksumModule, checksumOffset.Union());
+        auto message = GuardSarm::SyncSchema::CreateMessage(builder, GuardSarm::SyncSchema::MessageType::ChecksumModule, checksumOffset.Union());
         builder.Finish(message);
 
         const uint8_t* buffer_ptr = builder.GetBufferPointer();
@@ -887,13 +887,13 @@ bool AgentSyncProtocol::sendDataCleanMessages(uint64_t session,
             flatbuffers::FlatBufferBuilder builder;
             auto indexStr = builder.CreateString(item.index);
 
-            Wazuh::SyncSchema::DataCleanBuilder dataCleanBuilder(builder);
+            GuardSarm::SyncSchema::DataCleanBuilder dataCleanBuilder(builder);
             dataCleanBuilder.add_seq(item.seq);
             dataCleanBuilder.add_session(session);
             dataCleanBuilder.add_index(indexStr);
             auto dataCleanOffset = dataCleanBuilder.Finish();
 
-            auto message = Wazuh::SyncSchema::CreateMessage(builder, Wazuh::SyncSchema::MessageType::DataClean, dataCleanOffset.Union());
+            auto message = GuardSarm::SyncSchema::CreateMessage(builder, GuardSarm::SyncSchema::MessageType::DataClean, dataCleanOffset.Union());
             builder.Finish(message);
 
             const uint8_t* buffer_ptr = builder.GetBufferPointer();
@@ -923,11 +923,11 @@ bool AgentSyncProtocol::sendEndAndWaitAck(uint64_t session,
     try
     {
         flatbuffers::FlatBufferBuilder builder;
-        Wazuh::SyncSchema::EndBuilder endBuilder(builder);
+        GuardSarm::SyncSchema::EndBuilder endBuilder(builder);
         endBuilder.add_session(session);
         auto endOffset = endBuilder.Finish();
 
-        auto message = Wazuh::SyncSchema::CreateMessage(builder, Wazuh::SyncSchema::MessageType::End, endOffset.Union());
+        auto message = GuardSarm::SyncSchema::CreateMessage(builder, GuardSarm::SyncSchema::MessageType::End, endOffset.Union());
         builder.Finish(message);
 
         const uint8_t* buffer_ptr = builder.GetBufferPointer();
@@ -1087,27 +1087,27 @@ bool AgentSyncProtocol::parseResponseBuffer(const uint8_t* data, size_t length)
     {
         flatbuffers::Verifier verifier(data, length);
 
-        if (!Wazuh::SyncSchema::VerifyMessageBuffer(verifier))
+        if (!GuardSarm::SyncSchema::VerifyMessageBuffer(verifier))
         {
             m_logger(LOG_ERROR, "Invalid FlatBuffer message");
             return false;
         }
 
-        const auto* message = Wazuh::SyncSchema::GetMessage(data);
+        const auto* message = GuardSarm::SyncSchema::GetMessage(data);
         const auto messageType = message->content_type();
 
         std::unique_lock<std::mutex> lock(m_syncState.mtx);
 
         switch (messageType)
         {
-            case Wazuh::SyncSchema::MessageType::StartAck:
+            case GuardSarm::SyncSchema::MessageType::StartAck:
                 {
                     if (m_syncState.phase == SyncPhase::WaitingStartAck)
                     {
                         const auto* startAck = message->content_as_StartAck();
 
-                        if (startAck->status() == Wazuh::SyncSchema::Status::Error ||
-                                startAck->status() == Wazuh::SyncSchema::Status::Offline)
+                        if (startAck->status() == GuardSarm::SyncSchema::Status::Error ||
+                                startAck->status() == GuardSarm::SyncSchema::Status::Offline)
                         {
                             m_logger(LOG_DEBUG, "Received StartAck with error status. Aborting synchronization.");
                             m_syncState.syncFailed = true;
@@ -1130,7 +1130,7 @@ bool AgentSyncProtocol::parseResponseBuffer(const uint8_t* data, size_t length)
                     break;
                 }
 
-            case Wazuh::SyncSchema::MessageType::EndAck:
+            case GuardSarm::SyncSchema::MessageType::EndAck:
                 {
                     const auto* endAck = message->content_as_EndAck();
                     const uint64_t incomingSession = endAck->session();
@@ -1141,22 +1141,22 @@ bool AgentSyncProtocol::parseResponseBuffer(const uint8_t* data, size_t length)
                         break;
                     }
 
-                    if (endAck->status() == Wazuh::SyncSchema::Status::Error ||
-                            endAck->status() == Wazuh::SyncSchema::Status::Offline ||
-                            endAck->status() == Wazuh::SyncSchema::Status::ChecksumMismatch)
+                    if (endAck->status() == GuardSarm::SyncSchema::Status::Error ||
+                            endAck->status() == GuardSarm::SyncSchema::Status::Offline ||
+                            endAck->status() == GuardSarm::SyncSchema::Status::ChecksumMismatch)
                     {
                         // Store the specific error type for detailed reporting
-                        if (endAck->status() == Wazuh::SyncSchema::Status::Offline)
+                        if (endAck->status() == GuardSarm::SyncSchema::Status::Offline)
                         {
                             m_syncState.lastSyncResult = SyncResult::COMMUNICATION_ERROR;
                             m_logger(LOG_DEBUG, "Received EndAck with Offline status. Aborting synchronization.");
                         }
-                        else if (endAck->status() == Wazuh::SyncSchema::Status::ChecksumMismatch)
+                        else if (endAck->status() == GuardSarm::SyncSchema::Status::ChecksumMismatch)
                         {
                             m_syncState.lastSyncResult = SyncResult::CHECKSUM_ERROR;
                             m_logger(LOG_DEBUG, "Checksum mismatch detected by manager, full resync will be triggered.");
                         }
-                        else if (endAck->status() == Wazuh::SyncSchema::Status::Error)
+                        else if (endAck->status() == GuardSarm::SyncSchema::Status::Error)
                         {
                             m_syncState.lastSyncResult = SyncResult::GENERIC_ERROR;
                             m_logger(LOG_DEBUG, "Received EndAck with Error status. Aborting synchronization.");
@@ -1167,7 +1167,7 @@ bool AgentSyncProtocol::parseResponseBuffer(const uint8_t* data, size_t length)
                         break;
                     }
 
-                    if (endAck->status() == Wazuh::SyncSchema::Status::Processing)
+                    if (endAck->status() == GuardSarm::SyncSchema::Status::Processing)
                     {
                         m_logger(LOG_DEBUG, "Manager is processing session '" + std::to_string(incomingSession) + "'. Waiting...");
                         m_syncState.processingAckReceived = true;
@@ -1183,7 +1183,7 @@ bool AgentSyncProtocol::parseResponseBuffer(const uint8_t* data, size_t length)
                     break;
                 }
 
-            case Wazuh::SyncSchema::MessageType::ReqRet:
+            case GuardSarm::SyncSchema::MessageType::ReqRet:
                 {
                     const auto* reqRet = message->content_as_ReqRet();
                     const uint64_t incomingSession = reqRet->session();
@@ -1284,17 +1284,17 @@ std::vector<PersistedData> AgentSyncProtocol::filterDataByRanges(
     return result;
 }
 
-Wazuh::SyncSchema::Mode AgentSyncProtocol::toProtocolMode(Mode mode) const
+GuardSarm::SyncSchema::Mode AgentSyncProtocol::toProtocolMode(Mode mode) const
 {
-    static const std::unordered_map<Mode, Wazuh::SyncSchema::Mode> modeMap =
+    static const std::unordered_map<Mode, GuardSarm::SyncSchema::Mode> modeMap =
     {
-        {Mode::FULL, Wazuh::SyncSchema::Mode::ModuleFull},
-        {Mode::DELTA, Wazuh::SyncSchema::Mode::ModuleDelta},
-        {Mode::CHECK, Wazuh::SyncSchema::Mode::ModuleCheck},
-        {Mode::METADATA_DELTA, Wazuh::SyncSchema::Mode::MetadataDelta},
-        {Mode::METADATA_CHECK, Wazuh::SyncSchema::Mode::MetadataCheck},
-        {Mode::GROUP_DELTA, Wazuh::SyncSchema::Mode::GroupDelta},
-        {Mode::GROUP_CHECK, Wazuh::SyncSchema::Mode::GroupCheck}
+        {Mode::FULL, GuardSarm::SyncSchema::Mode::ModuleFull},
+        {Mode::DELTA, GuardSarm::SyncSchema::Mode::ModuleDelta},
+        {Mode::CHECK, GuardSarm::SyncSchema::Mode::ModuleCheck},
+        {Mode::METADATA_DELTA, GuardSarm::SyncSchema::Mode::MetadataDelta},
+        {Mode::METADATA_CHECK, GuardSarm::SyncSchema::Mode::MetadataCheck},
+        {Mode::GROUP_DELTA, GuardSarm::SyncSchema::Mode::GroupDelta},
+        {Mode::GROUP_CHECK, GuardSarm::SyncSchema::Mode::GroupCheck}
     };
 
     if (const auto it = modeMap.find(mode); it != modeMap.end())
@@ -1305,13 +1305,13 @@ Wazuh::SyncSchema::Mode AgentSyncProtocol::toProtocolMode(Mode mode) const
     throw std::invalid_argument("Unknown Mode value: " + std::to_string(static_cast<int>(mode)));
 }
 
-Wazuh::SyncSchema::Option AgentSyncProtocol::toProtocolOption(Option option) const
+GuardSarm::SyncSchema::Option AgentSyncProtocol::toProtocolOption(Option option) const
 {
-    static const std::unordered_map<Option, Wazuh::SyncSchema::Option> optionMap =
+    static const std::unordered_map<Option, GuardSarm::SyncSchema::Option> optionMap =
     {
-        {Option::SYNC, Wazuh::SyncSchema::Option::Sync},
-        {Option::VDFIRST, Wazuh::SyncSchema::Option::VDFirst},
-        {Option::VDSYNC, Wazuh::SyncSchema::Option::VDSync},
+        {Option::SYNC, GuardSarm::SyncSchema::Option::Sync},
+        {Option::VDFIRST, GuardSarm::SyncSchema::Option::VDFirst},
+        {Option::VDSYNC, GuardSarm::SyncSchema::Option::VDSync},
     };
 
     if (const auto it = optionMap.find(option); it != optionMap.end())

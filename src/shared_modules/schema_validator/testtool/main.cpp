@@ -1,5 +1,5 @@
 /*
- * Wazuh Schema Validator Test tool
+ * GuardSarm Schema Validator Test tool
  *
  * Smoke test used by the RTR / ASAN checks. It exercises the process-wide
  * SchemaValidatorFactory singleton the same way the agent modules do
@@ -24,7 +24,7 @@ int main()
         auto& factory = SchemaValidatorFactory::getInstance();
 
         // Initialize the factory concurrently, mirroring the syscollector / sca /
-        // vulnerability_scanner startup in wazuh-modulesd (each runs the same
+        // vulnerability_scanner startup in guardsarm-modulesd (each runs the same
         // check-then-act guard against the shared singleton).
         constexpr int kThreads = 8;
         std::atomic<bool> go {false};
@@ -66,10 +66,10 @@ int main()
         // no extra fields present).
         const std::vector<std::string> candidates =
         {
-            "wazuh-states-inventory-hardware",
-            "wazuh-states-inventory-system",
-            "wazuh-states-fim-files",
-            "wazuh-states-sca",
+            "guardsarm-states-inventory-hardware",
+            "guardsarm-states-inventory-system",
+            "guardsarm-states-fim-files",
+            "guardsarm-states-sca",
         };
 
         for (const auto& index : candidates)

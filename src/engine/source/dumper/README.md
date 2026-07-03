@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **dumper** module provides an activatable event-dumping mechanism for the Wazuh engine. When active, it writes incoming event data to rotating log files via the `streamlog` subsystem. When inactive, all `dump()` calls are silently discarded (no-op). The module can be toggled at runtime through API endpoints, enabling on-demand event capture for debugging and diagnostics without restarting the engine.
+The **dumper** module provides an activatable event-dumping mechanism for the GuardSarm engine. When active, it writes incoming event data to rotating log files via the `streamlog` subsystem. When inactive, all `dump()` calls are silently discarded (no-op). The module can be toggled at runtime through API endpoints, enabling on-demand event capture for debugging and diagnostics without restarting the engine.
 
 ## Architecture
 
@@ -213,7 +213,7 @@ Test the dumper with mocked `ILogManager` and `WriterEvent`:
 Build tests with `ENGINE_TEST=y`:
 
 ```bash
-make --directory=$WAZUH_REPO/src -j TARGET=manager ENGINE_TEST=y DEBUG=yes
+make --directory=$GUARDSARM_REPO/src -j TARGET=manager ENGINE_TEST=y DEBUG=yes
 ```
 
 Run:

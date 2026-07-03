@@ -8,7 +8,7 @@ namespace api::status::handlers
 {
 
 namespace eStatus = adapter::eEngine::status;
-namespace eEngine = ::com::wazuh::api::engine;
+namespace eEngine = ::com::guardsarm::api::engine;
 
 adapter::RouteHandler getStatus(const std::shared_ptr<cm::sync::ICMSync>& cmSync,
                                 const std::shared_ptr<ioc::sync::IIocSync>& iocSync,

@@ -12,7 +12,7 @@
 #include <api/status/handlers.hpp>
 #include <base/eventParser.hpp>
 #include <base/json.hpp>
-#include <base/libwazuhshared.hpp>
+#include <base/libguardsarmshared.hpp>
 #include <base/logging.hpp>
 #include <base/process.hpp>
 #include <base/utils/singletonLocator.hpp>
@@ -146,21 +146,21 @@ int main(int argc, char* argv[])
     }
     else
     {
-        // Use wazuh-shared logging
+        // Use guardsarm-shared logging
         try
         {
-            base::libwazuhshared::init();
-            exitHandler.add([]() { base::libwazuhshared::shutdown(); });
+            base::libguardsarmshared::init();
+            exitHandler.add([]() { base::libguardsarmshared::shutdown(); });
         }
         catch (const std::exception& e)
         {
-            fprintf(stderr, "Error initializing wazuh-shared: %s\n", e.what());
+            fprintf(stderr, "Error initializing guardsarm-shared: %s\n", e.what());
             return EXIT_FAILURE;
         }
 
-        if (chdir(base::process::getWazuhHome().string().c_str()) == -1)
+        if (chdir(base::process::getGuardSarmHome().string().c_str()) == -1)
         {
-            fprintf(stderr, "chdir to Wazuh home failed: %s\n", strerror(errno));
+            fprintf(stderr, "chdir to GuardSarm home failed: %s\n", strerror(errno));
             return EXIT_FAILURE;
         }
 
@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
 
             try
             {
-                const auto ReadXML = base::libwazuhshared::getFunction<void (*)()>("os_logging_config");
+                const auto ReadXML = base::libguardsarmshared::getFunction<void (*)()>("os_logging_config");
                 ReadXML();
             }
             catch (const std::exception& e)
@@ -198,7 +198,7 @@ int main(int argc, char* argv[])
     }
 
     // Load the configuration
-    const auto confPath = base::process::getWazuhHome() / "etc/wazuh-manager-internal-options.conf";
+    const auto confPath = base::process::getGuardSarmHome() / "etc/guardsarm-manager-internal-options.conf";
     auto confManager = conf::Conf(std::make_shared<conf::FileLoader>(confPath));
     try
     {
@@ -280,7 +280,7 @@ int main(int argc, char* argv[])
             {
                 auto verbosity = confManager.get<int>(conf::key::LOGGING_LEVEL);
                 auto level = logging::verbosityToLevel(verbosity);
-                logging::applyLevelWazuh(level, opts.debugCount);
+                logging::applyLevelGuardSarm(level, opts.debugCount);
             }
         }
 
@@ -288,7 +288,7 @@ int main(int argc, char* argv[])
         if (!base::process::isStandaloneModeEnable())
         {
             // Get executable file name
-            std::string exePath {"wazuh-manager-analysisd"};
+            std::string exePath {"guardsarm-manager-analysisd"};
 
             const auto pidError =
                 base::process::createPID(confManager.get<std::string>(conf::key::PID_FILE_PATH), exePath, getpid());
@@ -368,7 +368,7 @@ int main(int argc, char* argv[])
                 confManager.get<bool>(conf::key::TZDB_AUTO_UPDATE),
                 confManager.get<std::string>(conf::key::TZDB_FORCE_VERSION_UPDATE));
 
-            base::Name logparFieldOverrides({"schema", "wazuh-logpar-overrides", "0"});
+            base::Name logparFieldOverrides({"schema", "guardsarm-logpar-overrides", "0"});
             auto res = store->readDoc(logparFieldOverrides);
             if (std::holds_alternative<base::Error>(res))
             {
@@ -414,10 +414,10 @@ int main(int argc, char* argv[])
 
             try
             {
-                // Get base configuration (from standalone or wazuh-manager.conf)
+                // Get base configuration (from standalone or guardsarm-manager.conf)
                 const auto baseJsonCnf = base::process::isStandaloneModeEnable()
                                              ? standAloneConfig()
-                                             : base::libwazuhshared::getJsonIndexerCnf();
+                                             : base::libguardsarmshared::getJsonIndexerCnf();
 
                 // Parse JSON and add max_queue_size from engine configuration
                 json::Json jsonCnf(baseJsonCnf);
@@ -732,7 +732,7 @@ int main(int argc, char* argv[])
             metricsManager =
                 std::shared_ptr<fastmetrics::IManager>(&fastmetrics::manager(), [](fastmetrics::IManager*) {});
             api::metrics::handlers::registerHandlers(
-                metricsManager, apiServer, "wazuh-manager-analysisd", engineUptimeISO);
+                metricsManager, apiServer, "guardsarm-manager-analysisd", engineUptimeISO);
             LOG_DEBUG("Metrics API registered");
 
             // Geo

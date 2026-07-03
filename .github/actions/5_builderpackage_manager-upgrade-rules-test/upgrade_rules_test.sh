@@ -30,17 +30,17 @@ fail() {
 configure_component() {
     case "$COMPONENT" in
         manager)
-            INSTALL_DIR="/var/wazuh-manager"
-            MARKER="WAZUH_UPGRADE_RULES_MARKER"
-            MARKED_FILES_LIST="/tmp/wazuh-manager-upgrade-rules-marked-files.list"
+            INSTALL_DIR="/var/guardsarm-manager"
+            MARKER="GUARDSARM_UPGRADE_RULES_MARKER"
+            MARKED_FILES_LIST="/tmp/guardsarm-manager-upgrade-rules-marked-files.list"
             DELETED_ETC_REL="etc/outputs/default/indexer.yml"
             DELETED_DATA_REL="data/store/schema/engine-schema/0"
-            BINARY_REL="bin/wazuh-manager-analysisd"
+            BINARY_REL="bin/guardsarm-manager-analysisd"
             COMMENT_MARKERS=(
-                "etc/wazuh-manager.conf|wazuh-manager.conf|<!-- | -->"
+                "etc/guardsarm-manager.conf|guardsarm-manager.conf|<!-- | -->"
                 "etc/shared/agent-template.conf|agent-template|<!-- | -->"
                 "etc/shared/default/agent.conf|shared-default-agent|<!-- | -->"
-                "etc/wazuh-manager-internal-options.conf|internal-options|# |"
+                "etc/guardsarm-manager-internal-options.conf|internal-options|# |"
                 "etc/client.keys|client-keys|# |"
             )
             CUSTOM_ETC_MARKERS=(
@@ -53,16 +53,16 @@ configure_component() {
                 "data/store/enrichment/ioc/0|store-enrichment-ioc"
                 "data/store/geo/mmdb/0|store-geo-mmdb"
                 "data/store/schema/allowed-fields/0|store-allowed-fields"
-                "data/store/schema/wazuh-logpar-overrides/0|store-logpar-overrides"
+                "data/store/schema/guardsarm-logpar-overrides/0|store-logpar-overrides"
                 "data/custom-upgrade-rules-marker|custom-data"
             )
             ;;
         agent)
             INSTALL_DIR="/var/ossec"
-            MARKER="WAZUH_AGENT_UPGRADE_RULES_MARKER"
+            MARKER="GUARDSARM_AGENT_UPGRADE_RULES_MARKER"
             DELETED_ETC_REL="etc/internal_options.conf"
             DELETED_DATA_REL=""
-            BINARY_REL="bin/wazuh-agentd"
+            BINARY_REL="bin/guardsarm-agentd"
             COMMENT_MARKERS=(
                 "etc/ossec.conf|ossec-conf|<!-- | -->"
                 "etc/local_internal_options.conf|local-internal-options|# |"
@@ -99,14 +99,14 @@ path_for() {
 stop_component_if_running() {
     case "$COMPONENT" in
         manager)
-            command -v systemctl >/dev/null 2>&1 && systemctl stop wazuh-manager >/dev/null 2>&1 || true
-            command -v service >/dev/null 2>&1 && service wazuh-manager stop >/dev/null 2>&1 || true
-            [ -x "${INSTALL_DIR}/bin/wazuh-manager-control" ] && "${INSTALL_DIR}/bin/wazuh-manager-control" stop >/dev/null 2>&1 || true
+            command -v systemctl >/dev/null 2>&1 && systemctl stop guardsarm-manager >/dev/null 2>&1 || true
+            command -v service >/dev/null 2>&1 && service guardsarm-manager stop >/dev/null 2>&1 || true
+            [ -x "${INSTALL_DIR}/bin/guardsarm-manager-control" ] && "${INSTALL_DIR}/bin/guardsarm-manager-control" stop >/dev/null 2>&1 || true
             ;;
         agent)
-            command -v systemctl >/dev/null 2>&1 && systemctl stop wazuh-agent >/dev/null 2>&1 || true
-            command -v service >/dev/null 2>&1 && service wazuh-agent stop >/dev/null 2>&1 || true
-            [ -x "${INSTALL_DIR}/bin/wazuh-control" ] && "${INSTALL_DIR}/bin/wazuh-control" stop >/dev/null 2>&1 || true
+            command -v systemctl >/dev/null 2>&1 && systemctl stop guardsarm-agent >/dev/null 2>&1 || true
+            command -v service >/dev/null 2>&1 && service guardsarm-agent stop >/dev/null 2>&1 || true
+            [ -x "${INSTALL_DIR}/bin/guardsarm-control" ] && "${INSTALL_DIR}/bin/guardsarm-control" stop >/dev/null 2>&1 || true
             ;;
     esac
 }

@@ -1,5 +1,5 @@
 /*
- * Wazuh content manager
+ * GuardSarm content manager
  * Copyright (C) 2015, Wazuh Inc.
  * March 25, 2023.
  *
@@ -18,7 +18,7 @@
 #include <functional>
 #include <string>
 
-#define WM_CONTENTUPDATER "wazuh-manager-modulesd:content-updater"
+#define WM_CONTENTUPDATER "guardsarm-manager-modulesd:content-updater"
 
 #include "loggerHelper.h"
 

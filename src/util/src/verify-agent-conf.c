@@ -25,7 +25,7 @@ static int verify_agent_conf(const char * path);
 
 static void helpmsg()
 {
-    printf("\n%s %s: Verify agent.conf syntax for errors.\n", __wazuh_name, ARGV0);
+    printf("\n%s %s: Verify agent.conf syntax for errors.\n", PRODUCT_NAME, ARGV0);
     printf("Usage:  %s [-f <agent.conf file>]\n\n", ARGV0);
     printf("Available options:\n");
     printf("\t-h          This help message.\n");
@@ -145,7 +145,7 @@ int main(int argc, char **argv)
     }
     printf("\n");
 
-    mdebug1(WAZUH_HOMEDIR, home_path);
+    mdebug1(GUARDSARM_HOMEDIR, home_path);
     os_free(home_path);
 
     return (error);

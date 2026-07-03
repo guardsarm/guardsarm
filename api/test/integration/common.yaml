@@ -11,8 +11,8 @@ variables:
   balanced_port: 55010
   master_port: 55000
   user: testing
-  user_auth_context: wazuh-wui
-  pass: wazuh
+  user_auth_context: guardsarm-wui
+  pass: guardsarm
   basic_auth: dGVzdGluZzp3YXp1aA== # b64 encoded user:pass, update if user or pass changes
   basic_auth_context: d2F6dWgtd3VpOndhenVoLXd1aQ== # b64 encoded user:pass, update if user or pass changes
   login_endpoint: security/user/authenticate
@@ -25,7 +25,7 @@ variables:
   global_db_delay: 30
   cluster_sync_delay: 20
 
-  custom_wpk_path: "/var/wazuh-manager/test.wpk"
+  custom_wpk_path: "/var/guardsarm-manager/test.wpk"
 
   invalid_file:
     "import os #:l\nos.system('do something bad') #:l"
@@ -104,8 +104,8 @@ variables:
     </localfile>
     </agent_config>
 
-  valid_wazuh_conf:
-    <wazuh_config>
+  valid_guardsarm_conf:
+    <guardsarm_config>
       <global>
         <agents_disconnection_time>20s</agents_disconnection_time>
         <agents_disconnection_alert_time>100s</agents_disconnection_alert_time>
@@ -128,10 +128,10 @@ variables:
         <enabled>no</enabled>
         <feed-update-interval>60m</feed-update-interval>
       </vulnerability-detection>
-    </wazuh_config>
+    </guardsarm_config>
 
-  invalid_wazuh_conf:
-    <wazuh_config>
+  invalid_guardsarm_conf:
+    <guardsarm_config>
       <global>
       </global>
 
@@ -141,4 +141,4 @@ variables:
       </vulnerability-detection>
 
       <remote>
-    </wazuh_config>
+    </guardsarm_config>

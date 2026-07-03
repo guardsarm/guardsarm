@@ -15,8 +15,8 @@ using namespace api::cmcrud;
 using namespace api::cmcrud::handlers;
 using namespace cm::crud;
 
-namespace eContent = ::com::wazuh::api::engine::content;
-namespace eEngine = ::com::wazuh::api::engine;
+namespace eContent = ::com::guardsarm::api::engine::content;
+namespace eEngine = ::com::guardsarm::api::engine;
 
 using CmCrudHandlerTest = BaseHandlerTest<cm::crud::ICrudService, cm::crud::MockCrudService>;
 using CmCrudHandlerT = Params<cm::crud::ICrudService, cm::crud::MockCrudService>;

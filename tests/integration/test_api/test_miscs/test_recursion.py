@@ -18,12 +18,12 @@ targets:
     - manager
 
 daemons:
-    - wazuh-apid
-    - wazuh-modulesd
-    - wazuh-analysisd
-    - wazuh-execd
-    - wazuh-db
-    - wazuh-remoted
+    - guardsarm-apid
+    - guardsarm-modulesd
+    - guardsarm-analysisd
+    - guardsarm-execd
+    - guardsarm-db
+    - guardsarm-remoted
 
 os_platform:
     - linux
@@ -39,13 +39,13 @@ import requests
 import sys
 from requests.adapters import HTTPAdapter, Retry
 
-from wazuh_testing.constants.daemons import API_DAEMONS_REQUIREMENTS
-from wazuh_testing.constants.api import (
-    WAZUH_API_PROTOCOL,
-    WAZUH_API_USER,
-    WAZUH_API_PASSWORD,
+from guardsarm_testing.constants.daemons import API_DAEMONS_REQUIREMENTS
+from guardsarm_testing.constants.api import (
+    GUARDSARM_API_PROTOCOL,
+    GUARDSARM_API_USER,
+    GUARDSARM_API_PASSWORD,
 )
-from wazuh_testing.modules.api.utils import get_base_url
+from guardsarm_testing.modules.api.utils import get_base_url
 
 
 pytestmark = pytest.mark.server
@@ -87,7 +87,7 @@ def test_json_nesting_depth(
     """
     description: Validate API behavior with different JSON nesting depths.
 
-    wazuh_min_version: 4.0.0
+    guardsarm_min_version: 4.0.0
 
     test_phases:
         - setup:
@@ -122,7 +122,7 @@ def test_json_nesting_depth(
     session = requests.Session()
     retry = Retry(total=None, connect=3, backoff_factor=0.5)
     adapter = HTTPAdapter(max_retries=retry)
-    session.mount(f"{WAZUH_API_PROTOCOL}://", adapter)
+    session.mount(f"{GUARDSARM_API_PROTOCOL}://", adapter)
 
     current_recursion_limit = sys.getrecursionlimit()
     recursion_margin = 100
@@ -133,7 +133,7 @@ def test_json_nesting_depth(
 
     response = session.post(
         url=url,
-        auth=(WAZUH_API_USER, WAZUH_API_PASSWORD),
+        auth=(GUARDSARM_API_USER, GUARDSARM_API_PASSWORD),
         json=payload,
         verify=False,
         timeout=30,

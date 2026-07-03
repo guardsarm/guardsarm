@@ -1,5 +1,5 @@
 /*
- * Wazuh cmdLineParser
+ * GuardSarm cmdLineParser
  * Copyright (C) 2015, Wazuh Inc.
  * September 12, 2023.
  *

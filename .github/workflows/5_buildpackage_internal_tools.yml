@@ -68,8 +68,8 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.CI_WAZUHCI_DOCKERHUB_USER }} 
-          password: ${{ secrets.CI_WAZUHCI_DOCKERHUB_TOKEN }}
+          username: ${{ secrets.CI_GUARDSARMCI_DOCKERHUB_USER }} 
+          password: ${{ secrets.CI_GUARDSARMCI_DOCKERHUB_TOKEN }}
 
       - name: Build package
         working-directory: ${{ env.PKG_TARGET_DIR }}
@@ -87,12 +87,12 @@ jobs:
           COMMIT="${GITHUB_SHA::7}"
 
           if [ "${{ matrix.system }}" == "deb" ]; then
-            PKG=$(ls ${{ env.OUTDIR }}/wazuh-internal-tools_*_${{ matrix.arch }}.deb | head -n 1)
+            PKG=$(ls ${{ env.OUTDIR }}/guardsarm-internal-tools_*_${{ matrix.arch }}.deb | head -n 1)
             BASE=$(basename "$PKG" .deb)
             NEW_PKG="${BASE}_${COMMIT}.deb"
           else
             if [ "${{ matrix.arch }}" == "amd64" ]; then ARCH_PAT="x86_64"; else ARCH_PAT="aarch64"; fi
-            PKG=$(ls ${{ env.OUTDIR }}/wazuh-internal-tools_*_${ARCH_PAT}.rpm | head -n 1)
+            PKG=$(ls ${{ env.OUTDIR }}/guardsarm-internal-tools_*_${ARCH_PAT}.rpm | head -n 1)
             BASE=$(basename "$PKG" .rpm)
             NEW_PKG="${BASE}_${COMMIT}.rpm"
           fi
@@ -147,5 +147,5 @@ jobs:
             cd ${{ env.PKG_TARGET_DIR }}
             chmod +x ./test_package.sh
             ./test_package.sh
-            sudo dpkg -r wazuh-internal-tools || true
+            sudo dpkg -r guardsarm-internal-tools || true
           fi

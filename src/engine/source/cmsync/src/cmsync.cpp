@@ -264,7 +264,7 @@ bool CMSync::existSpaceInRemote(std::string_view space)
 
     return base::utils::executeWithRetry([&indexerPtr, space]() { return indexerPtr->existsPolicy(space); },
                                          COMPONENT_NAME,
-                                         fmt::format("Check '{}' space in wazuh-indexer", space),
+                                         fmt::format("Check '{}' space in guardsarm-indexer", space),
                                          m_attempts,
                                          m_waitSeconds,
                                          m_shutdownRequested);
@@ -277,11 +277,11 @@ bool CMSync::downloadNamespace(std::string_view originSpace,
     auto indexerPtr = base::utils::lockWeakPtr(m_indexerPtr, "IndexerConnector");
     auto cmcrudPtr = base::utils::lockWeakPtr(m_cmcrudPtr, "CMCrudService");
 
-    // Download policy from wazuh-indexer (with optional consumer validation in PIT)
+    // Download policy from guardsarm-indexer (with optional consumer validation in PIT)
     auto policyResource = base::utils::executeWithRetry(
         [&indexerPtr, originSpace, &consumerId]() { return indexerPtr->getPolicy(originSpace, consumerId); },
         COMPONENT_NAME,
-        fmt::format("Download '{}' space from wazuh-indexer", originSpace),
+        fmt::format("Download '{}' space from guardsarm-indexer", originSpace),
         m_attempts,
         m_waitSeconds,
         m_shutdownRequested);
@@ -331,7 +331,7 @@ CMSync::getPolicyHashAndEnabledFromRemote(std::string_view space, const std::opt
     return base::utils::executeWithRetry(
         [&indexerPtr, space, &consumerId]() { return indexerPtr->getPolicyHashAndEnabled(space, consumerId); },
         COMPONENT_NAME,
-        fmt::format("Get policy hash and enabled status for '{}' space from wazuh-indexer", space),
+        fmt::format("Get policy hash and enabled status for '{}' space from guardsarm-indexer", space),
         m_attempts,
         m_waitSeconds,
         m_shutdownRequested);
@@ -571,7 +571,7 @@ void CMSync::synchronize()
 
             if (!existSpaceInRemote(nsState.getOriginSpace()))
             {
-                LOG_WARNING("[{}] Space '{}' does not exist in wazuh-indexer, skipping synchronization",
+                LOG_WARNING("[{}] Space '{}' does not exist in guardsarm-indexer, skipping synchronization",
                             LOG_MODULE_NAME,
                             nsState.getOriginSpace());
                 continue;
@@ -602,7 +602,7 @@ void CMSync::synchronize()
 
                 if (!ready)
                 {
-                    LOG_INFO("[{}] Synchronization skipped for space '{}' because wazuh-indexer consumer '{}' is "
+                    LOG_INFO("[{}] Synchronization skipped for space '{}' because guardsarm-indexer consumer '{}' is "
                              "not ready for sync (might be updating or no data)",
                              LOG_MODULE_NAME,
                              nsState.getOriginSpace(),
@@ -615,7 +615,7 @@ void CMSync::synchronize()
                 getPolicyHashAndEnabledFromRemote(nsState.getOriginSpace(), nsState.getConsumerId());
             if (!hashResult.has_value())
             {
-                LOG_INFO("[{}] Synchronization skipped for space '{}' because wazuh-indexer is updating the policy "
+                LOG_INFO("[{}] Synchronization skipped for space '{}' because guardsarm-indexer is updating the policy "
                          "or consumer is not ready (consumer ID: '{}')",
                          LOG_MODULE_NAME,
                          nsState.getOriginSpace(),

@@ -16,7 +16,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 from jsonschema import validate, ValidationError
 
-import wazuh.core.utils as core_utils
+import guardsarm.core.utils as core_utils
 from api.api_exception import APIError
 from api.constants import CONFIG_FILE_PATH, SECURITY_CONFIG_PATH, API_SSL_PATH
 from api.validator import api_config_schema, security_config_schema
@@ -103,8 +103,8 @@ def dict_to_lowercase(mydict: Dict, skip_keys: set = None, prefix: str = ""):
                 mydict[k] = val.lower()
 
 
-def append_wazuh_prefixes(dictionary: Dict, path_fields: Dict[Any, List[Tuple[str, str]]]) -> None:
-    """Append Wazuh prefix to all path fields in a dictionary.
+def append_guardsarm_prefixes(dictionary: Dict, path_fields: Dict[Any, List[Tuple[str, str]]]) -> None:
+    """Append GuardSarm prefix to all path fields in a dictionary.
     Parameters
     ----------
     dictionary : dict
@@ -220,8 +220,8 @@ def generate_self_signed_certificate(private_key: rsa.RSAPrivateKey, certificate
         x509.NameAttribute(NameOID.COUNTRY_NAME, u"US"),
         x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"California"),
         x509.NameAttribute(NameOID.LOCALITY_NAME, u"San Francisco"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"Wazuh"),
-        x509.NameAttribute(NameOID.COMMON_NAME, u"wazuh.com"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"GuardSarm"),
+        x509.NameAttribute(NameOID.COMMON_NAME, u"guardsarm.com"),
     ])
     cert = x509.CertificateBuilder().subject_name(
         subject
@@ -304,8 +304,8 @@ def read_yaml_config(config_file: str = CONFIG_FILE_PATH, default_conf: dict = N
         schema = security_config_schema if config_file == SECURITY_CONFIG_PATH else api_config_schema
         configuration = fill_dict(default_conf, configuration, schema)
 
-    # Append Wazuh prefixes to all relative paths in configuration
-    append_wazuh_prefixes(configuration, {API_SSL_PATH: [('https', 'key'), ('https', 'cert'), ('https', 'ca')]})
+    # Append GuardSarm prefixes to all relative paths in configuration
+    append_guardsarm_prefixes(configuration, {API_SSL_PATH: [('https', 'key'), ('https', 'cert'), ('https', 'ca')]})
 
     return configuration
 

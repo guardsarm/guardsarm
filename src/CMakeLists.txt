@@ -14,7 +14,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   set(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> <TARGET>")
 endif()
 
-project(Wazuh)
+project(GuardSarm)
 
 enable_testing()
 
@@ -68,13 +68,13 @@ endfunction()
 # SRC_FOLDER should point to the src/ directory Sub-modules will try to redefine
 # it, so we set a guard variable
 set(SRC_FOLDER ${CMAKE_SOURCE_DIR})
-set(WAZUH_MAIN_PROJECT
+set(GUARDSARM_MAIN_PROJECT
     ON
-    CACHE BOOL "Main Wazuh CMake project" FORCE)
+    CACHE BOOL "Main GuardSarm CMake project" FORCE)
 
 # Shared CMake helpers
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-include(WazuhRpath)
+include(GuardSarmRpath)
 
 # Define CLIENT for agent builds
 if("${TARGET}" STREQUAL "winagent" OR "${TARGET}" STREQUAL "agent")
@@ -140,16 +140,59 @@ if("${VERSION_FILE}" STREQUAL "")
 endif("${VERSION_FILE}" STREQUAL "")
 
 message("==============================================")
-message("Wazuh version: ${VERSION_FILE}")
-message("Wazuh revision: ${REVISION_FILE}")
+message("GuardSarm version: ${VERSION_FILE}")
+message("GuardSarm revision: ${REVISION_FILE}")
 message("==============================================")
+
+# Read the GuardSarm branding JSON file (display-only, user-visible values).
+# Mirrors the VERSION.json parse above. Values are injected as PRODUCT_* macros
+# consumed ONLY by user-visible surfaces (see src/shared/include/branding.h).
+# If branding.json is absent, the branding.h fallbacks reproduce GuardSarm branding,
+# so removing branding.json is a complete rollback of the user-visible rebrand.
+# NOTE: branding.json intentionally carries NO paths, users/groups, daemon names,
+# ports, index names, or protocol constants -- those are frozen elsewhere.
+set(BRANDING_JSON_PATH "${SRC_FOLDER}/../branding.json")
+if(EXISTS "${BRANDING_JSON_PATH}")
+  file(READ "${BRANDING_JSON_PATH}" BRANDING_JSON)
+
+  string(REGEX MATCH "\"product_name\"[ \t]*:[ \t]*\"([^\"]+)\"" _ ${BRANDING_JSON})
+  set(PRODUCT_NAME_FILE "${CMAKE_MATCH_1}")
+  string(REGEX MATCH "\"product_version\"[ \t]*:[ \t]*\"([^\"]+)\"" _ ${BRANDING_JSON})
+  set(PRODUCT_VERSION_FILE "${CMAKE_MATCH_1}")
+  string(REGEX MATCH "\"author\"[ \t]*:[ \t]*\"([^\"]+)\"" _ ${BRANDING_JSON})
+  set(PRODUCT_AUTHOR_FILE "${CMAKE_MATCH_1}")
+  string(REGEX MATCH "\"contact\"[ \t]*:[ \t]*\"([^\"]+)\"" _ ${BRANDING_JSON})
+  set(PRODUCT_CONTACT_FILE "${CMAKE_MATCH_1}")
+  string(REGEX MATCH "\"site\"[ \t]*:[ \t]*\"([^\"]+)\"" _ ${BRANDING_JSON})
+  set(PRODUCT_SITE_FILE "${CMAKE_MATCH_1}")
+
+  if(NOT "${PRODUCT_NAME_FILE}" STREQUAL "")
+    add_definitions(-DPRODUCT_NAME="${PRODUCT_NAME_FILE}")
+  endif()
+  if(NOT "${PRODUCT_VERSION_FILE}" STREQUAL "")
+    add_definitions(-DPRODUCT_VERSION="${PRODUCT_VERSION_FILE}")
+  endif()
+  if(NOT "${PRODUCT_AUTHOR_FILE}" STREQUAL "")
+    add_definitions(-DPRODUCT_AUTHOR="${PRODUCT_AUTHOR_FILE}")
+  endif()
+  if(NOT "${PRODUCT_CONTACT_FILE}" STREQUAL "")
+    add_definitions(-DPRODUCT_CONTACT="${PRODUCT_CONTACT_FILE}")
+  endif()
+  if(NOT "${PRODUCT_SITE_FILE}" STREQUAL "")
+    add_definitions(-DPRODUCT_SITE="${PRODUCT_SITE_FILE}")
+  endif()
+
+  message("==============================================")
+  message("GuardSarm branding: ${PRODUCT_NAME_FILE} ${PRODUCT_VERSION_FILE}")
+  message("==============================================")
+endif()
 
 set(BENCHMARK_ENABLE_TESTING "OFF")
 
 link_directories(${SRC_FOLDER})
 link_directories(${SRC_FOLDER}/build/lib)
 
-# Wazuh headers
+# GuardSarm headers
 include_directories(${SRC_FOLDER}/shared/include)
 
 # Shared modules includes
@@ -212,8 +255,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
                                                   ${WIN_PTHREAD_DLL_COPY})
 
   # Common Windows libraries that all Windows executables need
-  set(WAZUH_WINDOWS_LIBS
-      ${SRC_FOLDER}/build/lib/libwazuhext.lib ${PATCHED_PTHREAD_LIB} wintrust
+  set(GUARDSARM_WINDOWS_LIBS
+      ${SRC_FOLDER}/build/lib/libguardsarmext.lib ${PATCHED_PTHREAD_LIB} wintrust
       psapi crypt32 shlwapi
       CACHE INTERNAL "Common Windows libraries for all executables")
 endif()
@@ -231,11 +274,11 @@ add_subdirectory(external)
 add_subdirectory(config)
 add_subdirectory(shared)
 add_subdirectory(shared_modules/file_helper)
-set(CURL_DEP wazuhext)
+set(CURL_DEP guardsarmext)
 add_subdirectory(shared_modules/http-request)
 add_subdirectory(shared_modules/schema_validator)
 add_subdirectory(shared_modules/utils)
-add_subdirectory(wazuh_modules)
+add_subdirectory(guardsarm_modules)
 
 # Agent-only modules
 if(IS_AGENT)
@@ -267,7 +310,7 @@ if(NOT IS_AGENT)
   add_subdirectory(shared_modules/keystore)
   add_subdirectory(shared_modules/router)
   add_subdirectory(util)
-  add_subdirectory(wazuh_db)
+  add_subdirectory(guardsarm_db)
 endif()
 
 # Create flatbuffers alias if the real target wasn't created by subdirectories

@@ -100,8 +100,8 @@ def test_cisco_umbrella_load_information_from_file_handles_exceptions(mock_sts_c
     assert e.value.code == utils.INVALID_TYPE_ERROR_CODE
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
-@patch('wazuh_integration.WazuhAWSDatabase.__init__')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.__init__')
 def test_cisco_umbrella_marker_only_logs_after(mock_integration, mock_sts):
     """Test 'marker_only_logs_after' method returns the expected marker using the `only_logs_after` value."""
     test_only_logs_after = utils.TEST_ONLY_LOGS_AFTER

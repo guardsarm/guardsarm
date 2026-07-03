@@ -2,7 +2,7 @@
 
 ## Overview
 
-`iocsync` is the synchronization module that keeps local IOC databases up to date with the remote Wazuh Indexer. It implements a **hash-based change detection** strategy: for each IOC type, it compares a local hash against the remote hash and, when a change is detected, downloads the full dataset into a temporary database and performs an **atomic hot-swap** via `iockvdb`.
+`iocsync` is the synchronization module that keeps local IOC databases up to date with the remote GuardSarm Indexer. It implements a **hash-based change detection** strategy: for each IOC type, it compares a local hash against the remote hash and, when a change is detected, downloads the full dataset into a temporary database and performs an **atomic hot-swap** via `iockvdb`.
 
 The module runs as a periodic task and is designed so that readers of the IOC databases experience zero downtime during updates.
 
@@ -20,7 +20,7 @@ The module runs as a periodic task and is designed so that readers of the IOC da
               │  For each IOC  │
               │  type:         │
               │  ┌───────────┐ │    ┌───────────────────────┐
-              │  │ Compare   │─┼───►│  Wazuh Indexer         │
+              │  │ Compare   │─┼───►│  GuardSarm Indexer         │
               │  │ hashes    │ │    │  (IWIndexerConnector)  │
               │  └─────┬─────┘ │    └───────────────────────┘
               │        │       │
@@ -54,7 +54,7 @@ The module runs as a periodic task and is designed so that readers of the IOC da
 ### Synchronization Flow
 
 1. **Lock resources**: Acquire `IKVDBManager` and `IWIndexerConnector` from weak pointers
-2. **Check remote index**: Verify the IOC data index exists in the Wazuh Indexer
+2. **Check remote index**: Verify the IOC data index exists in the GuardSarm Indexer
 3. **Fetch remote hashes**: Get per-type hash map from the indexer
 4. **For each IOC type**:
    - Compare remote hash against locally stored hash
@@ -72,10 +72,10 @@ The module runs as a periodic task and is designed so that readers of the IOC da
 
 ### Consumer Validation for Consistency
 
-To prevent data inconsistency when the wazuh-indexer is mid-update, `iocsync` implements **consumer validation via Point-In-Time (PIT)**:
+To prevent data inconsistency when the guardsarm-indexer is mid-update, `iocsync` implements **consumer validation via Point-In-Time (PIT)**:
 
 1. **Hash check phase**: `getRemoteHashesFromRemote()` passes `IOC_ENRICHMENT_CONSUMER_ID` to the indexer connector.
-   - The connector creates a multi-index PIT (`wazuh-threatintel-enrichments` + `.wazuh-cti-consumers`).
+   - The connector creates a multi-index PIT (`guardsarm-threatintel-enrichments` + `.guardsarm-cti-consumers`).
    - It validates the consumer is in the `idle` status within that PIT snapshot.
    - If idle: returns the hashes (and the check is consistent).
    - If not idle: returns `std::nullopt` → sync cycle is skipped.
@@ -89,7 +89,7 @@ This two-phase validation ensures the indexer is NOT actively updating the IOCs 
 
 ### Hash-Based Change Detection
 
-Each IOC type has a remote hash maintained by the Wazuh Indexer. `IocSync` stores the last known hash per type in `SyncedIOCDatabase::m_lastDataHash`. A sync cycle only downloads data when the hashes differ, minimizing unnecessary network and disk I/O.
+Each IOC type has a remote hash maintained by the GuardSarm Indexer. `IocSync` stores the last known hash per type in `SyncedIOCDatabase::m_lastDataHash`. A sync cycle only downloads data when the hashes differ, minimizing unnecessary network and disk I/O.
 
 ### Weak Pointer Resource Model
 

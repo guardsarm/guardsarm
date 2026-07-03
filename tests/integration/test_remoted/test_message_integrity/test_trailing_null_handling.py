@@ -4,11 +4,11 @@ from pathlib import Path
 
 import pytest
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.modules.remoted.configuration import REMOTED_DEBUG
-from wazuh_testing.tools.simulators.agent_simulator import connect
-from wazuh_testing.utils import secure_message
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.modules.remoted.configuration import REMOTED_DEBUG
+from guardsarm_testing.tools.simulators.agent_simulator import connect
+from guardsarm_testing.utils import secure_message
+from guardsarm_testing.utils.configuration import get_test_cases_data, load_configuration_template
 
 from . import CONFIGS_PATH, TEST_CASES_PATH
 
@@ -33,14 +33,14 @@ def _build_raw_event(agent, payload: bytes) -> bytes:
 
 
 def _read_log_since(start_offset: int) -> str:
-    with open(WAZUH_LOG_PATH, 'rb') as fh:
+    with open(GUARDSARM_LOG_PATH, 'rb') as fh:
         fh.seek(start_offset)
         return fh.read().decode(errors='replace')
 
 
 def _log_size() -> int:
     try:
-        return Path(WAZUH_LOG_PATH).stat().st_size
+        return Path(GUARDSARM_LOG_PATH).stat().st_size
     except FileNotFoundError:
         return 0
 
@@ -50,7 +50,7 @@ def _log_size() -> int:
 def test_legacy_text_event_with_trailing_null_does_not_reach_engine_with_null(
         test_configuration, test_metadata,
         configure_local_internal_options, truncate_monitored_files,
-        set_wazuh_configuration, daemons_handler, simulate_agents):
+        set_guardsarm_configuration, daemons_handler, simulate_agents):
     agent = simulate_agents[0]
     sender, injector = connect(agent, manager_port='1514', protocol='tcp')
 

@@ -2,20 +2,20 @@
 
 ## Introduction
 
-The Wazuh AWS module can retrieve security data from Amazon Security Lake through an SQS subscriber. Amazon Security Lake automatically centralizes security data from AWS services, SaaS providers, and third-party sources into a purpose-built data lake stored in S3, using the Open Cybersecurity Schema Framework (OCSF).
+The GuardSarm AWS module can retrieve security data from Amazon Security Lake through an SQS subscriber. Amazon Security Lake automatically centralizes security data from AWS services, SaaS providers, and third-party sources into a purpose-built data lake stored in S3, using the Open Cybersecurity Schema Framework (OCSF).
 
-Wazuh subscribes to an SQS queue that receives notifications when new data is available in Security Lake, retrieves the corresponding log files from S3, and processes them through the Wazuh rule engine.
+GuardSarm subscribes to an SQS queue that receives notifications when new data is available in Security Lake, retrieves the corresponding log files from S3, and processes them through the GuardSarm rule engine.
 
 ## Prerequisites
 
 - An AWS account with Amazon Security Lake enabled.
 - An SQS queue configured as a subscriber source for Security Lake.
 - AWS credentials or an IAM role with permissions to read from the SQS queue and the Security Lake S3 bucket.
-- Python 3 and the `boto3` library installed on the Wazuh agent.
+- Python 3 and the `boto3` library installed on the GuardSarm agent.
 
 ## Configuration
 
-Configure the AWS module in the Wazuh agent `ossec.conf` file using the `subscriber` element with `type="security_lake"`:
+Configure the AWS module in the GuardSarm agent `ossec.conf` file using the `subscriber` element with `type="security_lake"`:
 
 ```xml
   <wodle name="aws-s3">
@@ -24,9 +24,9 @@ Configure the AWS module in the Wazuh agent `ossec.conf` file using the `subscri
     <run_on_start>yes</run_on_start>
     <skip_on_error>yes</skip_on_error>
     <subscriber type="security_lake">
-      <sqs_name>wazuh-security-lake-queue</sqs_name>
+      <sqs_name>guardsarm-security-lake-queue</sqs_name>
       <aws_profile>default</aws_profile>
-      <iam_role_arn>arn:aws:iam::123456789012:role/WazuhSecurityLakeRole</iam_role_arn>
+      <iam_role_arn>arn:aws:iam::123456789012:role/GuardSarmSecurityLakeRole</iam_role_arn>
     </subscriber>
   </wodle>
 ```
@@ -41,7 +41,7 @@ Alternatively, Security Lake data can be accessed via the S3 bucket type:
     <bucket type="security_lake">
       <name>aws-security-data-lake-bucket</name>
       <aws_profile>default</aws_profile>
-      <iam_role_arn>arn:aws:iam::123456789012:role/WazuhSecurityLakeRole</iam_role_arn>
+      <iam_role_arn>arn:aws:iam::123456789012:role/GuardSarmSecurityLakeRole</iam_role_arn>
       <regions>us-east-1</regions>
     </bucket>
   </wodle>
@@ -89,7 +89,7 @@ The IAM user or role needs the following permissions:
         "sqs:DeleteMessage",
         "sqs:GetQueueUrl"
       ],
-      "Resource": "arn:aws:sqs:*:*:wazuh-security-lake-queue"
+      "Resource": "arn:aws:sqs:*:*:guardsarm-security-lake-queue"
     },
     {
       "Effect": "Allow",
@@ -108,10 +108,10 @@ The IAM user or role needs the following permissions:
 
 ## Verify the integration
 
-Restart the Wazuh agent after applying the configuration:
+Restart the GuardSarm agent after applying the configuration:
 
 ```bash
-systemctl restart wazuh-agent
+systemctl restart guardsarm-agent
 ```
 
 Check the module logs:

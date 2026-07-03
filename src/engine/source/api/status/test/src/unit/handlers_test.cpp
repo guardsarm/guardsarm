@@ -10,7 +10,7 @@
 #include <geo/mockManager.hpp>
 #include <iocsync/mockIocSync.hpp>
 
-namespace eStatus = ::com::wazuh::api::engine::status;
+namespace eStatus = ::com::guardsarm::api::engine::status;
 
 using cm::sync::mocks::MockCMSync;
 using geo::mocks::MockManager;

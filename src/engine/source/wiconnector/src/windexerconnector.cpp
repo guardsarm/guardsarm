@@ -25,21 +25,21 @@ namespace
 /**
  * @brief List of policy resource aliases in the indexer
  */
-const std::vector<std::string> POLICY_ALIASES = {"wazuh-threatintel-kvdbs",
-                                                 "wazuh-threatintel-decoders",
-                                                 "wazuh-threatintel-filters",
-                                                 "wazuh-threatintel-integrations",
-                                                 "wazuh-threatintel-policies"};
+const std::vector<std::string> POLICY_ALIASES = {"guardsarm-threatintel-kvdbs",
+                                                 "guardsarm-threatintel-decoders",
+                                                 "guardsarm-threatintel-filters",
+                                                 "guardsarm-threatintel-integrations",
+                                                 "guardsarm-threatintel-policies"};
 
 constexpr std::string_view PIT_KEEP_ALIVE {"5m"};                       ///< Keep alive duration for Point In Time
-constexpr std::string_view POLICY_INDEX {"wazuh-threatintel-policies"}; ///< Policy index name
-constexpr std::string_view IOC_INDEX {"wazuh-threatintel-enrichments"}; ///< IOC index name
+constexpr std::string_view POLICY_INDEX {"guardsarm-threatintel-policies"}; ///< Policy index name
+constexpr std::string_view IOC_INDEX {"guardsarm-threatintel-enrichments"}; ///< IOC index name
 constexpr std::string_view IOC_HASHES_DOC_ID {"__ioc_type_hashes__"};   ///< IOC hash manifest document ID
 constexpr std::size_t SINGLE_RESULT_SIZE {1};                           ///< Size for single result queries
 constexpr std::size_t HASH_QUERY_SIZE {1};                        ///< Size for hash query (expecting single result)
 constexpr std::size_t SAFE_STREAM_PAGE_SIZE {1000};               ///< Hard cap for streaming page size
-constexpr std::string_view REMOTE_CONF_INDEX {".wazuh-settings"}; ///< remote conf index name
-constexpr std::string_view CTI_CONSUMERS_INDEX {".wazuh-cti-consumers"}; ///< CTI consumers index name
+constexpr std::string_view REMOTE_CONF_INDEX {".guardsarm-settings"}; ///< remote conf index name
+constexpr std::string_view CTI_CONSUMERS_INDEX {".guardsarm-cti-consumers"}; ///< CTI consumers index name
 const std::array<std::string_view, 12> IOC_SOURCE_FILTER_INCLUDES = {"document.name",
                                                                      "document.type",
                                                                      "document.id",
@@ -320,8 +320,8 @@ bool validateConsumerReadyInPit(IIndexerConnectorAsync& async, const PointInTime
  *   ],
  *   "ssl": {
  *     "certificate_authorities": [
- *       "/var/wazuh-manager/",
- *       "/var/wazuh-manager_cert/"
+ *       "/var/guardsarm-manager/",
+ *       "/var/guardsarm-manager_cert/"
  *     ],
  *     "certificate": "cert",
  *     "key": "key_example"

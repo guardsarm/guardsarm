@@ -12,7 +12,7 @@ Usage examples:
     python3 monitor.py -p 1234 -o output.csv -s 1
 
     # Monitor by process name
-    python3 monitor.py -n wazuh-engine -o output.csv -s 1
+    python3 monitor.py -n guardsarm-engine -o output.csv -s 1
 
     # Stop a running monitor whose PID file is monitor.pid
     kill $(cat monitor.pid)

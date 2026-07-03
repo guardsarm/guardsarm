@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
 
 firewall_result_t try_netsh(const char *srcip, int action, int ip_version, const char *argv0) {
     (void)ip_version;  // netsh handles both IPv4 and IPv6
-    static const char rule_name[] = "name=\"WAZUH ACTIVE RESPONSE BLOCKED IP\"";
+    static const char rule_name[] = "name=\"GUARDSARM ACTIVE RESPONSE BLOCKED IP\"";
     char log_msg[OS_MAXSTR];
     char *netsh_path = NULL;
     char *reg_path = NULL;

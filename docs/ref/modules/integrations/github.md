@@ -2,9 +2,9 @@
 
 ## Introduction
 
-The Wazuh GitHub module retrieves audit log events from GitHub organizations using the GitHub Audit Log API. This enables monitoring of organization activity, including repository management, team changes, member access, and other administrative actions.
+The GuardSarm GitHub module retrieves audit log events from GitHub organizations using the GitHub Audit Log API. This enables monitoring of organization activity, including repository management, team changes, member access, and other administrative actions.
 
-The module runs on the Wazuh agent and periodically queries the GitHub API for new audit events. Events are processed by the Wazuh rule engine to generate alerts for suspicious activity such as unauthorized repository access, permission changes, and authentication events.
+The module runs on the GuardSarm agent and periodically queries the GitHub API for new audit events. Events are processed by the GuardSarm rule engine to generate alerts for suspicious activity such as unauthorized repository access, permission changes, and authentication events.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ The module runs on the Wazuh agent and periodically queries the GitHub API for n
 
 ## Configuration
 
-Configure the GitHub module in the Wazuh agent `ossec.conf` file:
+Configure the GitHub module in the GuardSarm agent `ossec.conf` file:
 
 ```xml
   <github>
@@ -86,10 +86,10 @@ Configure the GitHub module in the Wazuh agent `ossec.conf` file:
 
 ## Verify the integration
 
-Restart the Wazuh agent after applying the configuration:
+Restart the GuardSarm agent after applying the configuration:
 
 ```bash
-systemctl restart wazuh-agent
+systemctl restart guardsarm-agent
 ```
 
 Check the module logs:

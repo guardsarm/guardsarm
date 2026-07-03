@@ -16,9 +16,9 @@ targets:
     - manager
 
 daemons:
-    - wazuh-manager-authd
-    - wazuh-manager-db
-    - wazuh-manager-modulesd
+    - guardsarm-manager-authd
+    - guardsarm-manager-db
+    - guardsarm-manager-modulesd
 
 os_platform:
     - linux
@@ -42,11 +42,11 @@ import time
 import pytest
 from pathlib import Path
 
-from wazuh_testing.utils.configuration import load_configuration_template, get_test_cases_data
-from wazuh_testing.constants.ports import DEFAULT_SSL_REMOTE_ENROLLMENT_PORT
-from wazuh_testing.constants.daemons import AUTHD_DAEMON, WAZUH_DB_DAEMON, MODULES_DAEMON
-from wazuh_testing.modules.authd.utils import validate_authd_response
-from wazuh_testing.modules.authd.configuration import AUTHD_DEBUG_CONFIG
+from guardsarm_testing.utils.configuration import load_configuration_template, get_test_cases_data
+from guardsarm_testing.constants.ports import DEFAULT_SSL_REMOTE_ENROLLMENT_PORT
+from guardsarm_testing.constants.daemons import AUTHD_DAEMON, GUARDSARM_DB_DAEMON, MODULES_DAEMON
+from guardsarm_testing.modules.authd.utils import validate_authd_response
+from guardsarm_testing.modules.authd.configuration import AUTHD_DEBUG_CONFIG
 
 from . import CONFIGURATIONS_FOLDER_PATH, TEST_CASES_FOLDER_PATH
 
@@ -62,7 +62,7 @@ test_configuration = load_configuration_template(test_configuration_path, test_c
 
 # Variables
 receiver_sockets_params = [(("localhost", DEFAULT_SSL_REMOTE_ENROLLMENT_PORT), 'AF_INET', 'SSL_TLSv1_2')]
-monitored_sockets_params = [(WAZUH_DB_DAEMON, None, True), (MODULES_DAEMON, None, True), (AUTHD_DAEMON, None, True)]
+monitored_sockets_params = [(GUARDSARM_DB_DAEMON, None, True), (MODULES_DAEMON, None, True), (AUTHD_DAEMON, None, True)]
 receiver_sockets, monitored_sockets = None, None  # Set in the fixtures
 hostname = socket.gethostname()
 
@@ -72,14 +72,14 @@ local_internal_options = {AUTHD_DEBUG_CONFIG: '2'}
 
 # Test
 @pytest.mark.parametrize('test_configuration,test_metadata', zip(test_configuration, test_metadata), ids=test_cases_ids)
-def test_authd_valid_name_ip(test_configuration, test_metadata, set_wazuh_configuration, configure_sockets_environment_module,
+def test_authd_valid_name_ip(test_configuration, test_metadata, set_guardsarm_configuration, configure_sockets_environment_module,
                              connect_to_sockets_module,
                              truncate_monitored_files, configure_local_internal_options, daemons_handler, wait_for_authd_startup):
     '''
     description:
         Checks that every input message in authd port generates the adequate output.
 
-    wazuh_min_version:
+    guardsarm_min_version:
         5.0.0
 
     tier: 0
@@ -91,15 +91,15 @@ def test_authd_valid_name_ip(test_configuration, test_metadata, set_wazuh_config
         - test_metadata:
             type: dict
             brief: Test case metadata.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
-            brief: Load basic wazuh configuration.
+            brief: Load basic guardsarm configuration.
         - configure_sockets_environment_module:
             type: fixture
             brief: Configure the socket listener to receive and send messages on the sockets.
         - daemons_handler:
             type: fixture
-            brief: Handler of Wazuh daemons.
+            brief: Handler of GuardSarm daemons.
         - wait_for_authd_startup:
             type: fixture
             brief: Waits until Authd is accepting connections.

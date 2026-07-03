@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-# Wazuh consolidated-dependency smoke build (container-side).
+# GuardSarm consolidated-dependency smoke build (container-side).
 #
-# Runs inside a Wazuh package builder image. Populates src/external/ from a
+# Runs inside a GuardSarm package builder image. Populates src/external/ from a
 # locally-staged consolidated dependency tree (the externals-all artifact
 # produced by 5_builderpackage_externals.yml's consolidate job) instead of
-# pulling from packages.wazuh.com, then builds the agent or the manager from
+# pulling from packages.guardsarm.com, then builds the agent or the manager from
 # source. No package is produced — this only confirms the freshly built
-# dependencies link into a working Wazuh build.
+# dependencies link into a working GuardSarm build.
 #
 # Inputs (env vars set by the workflow):
 #   BUILD_TARGET         agent | manager
@@ -15,8 +15,8 @@
 #   DEPS_DIR             absolute path to the dir that contains libraries/
 #                        (the extracted externals-all tree)
 #   JOBS                 parallel build jobs (defaults to nproc)
-#   WAZUH_SRC            working tree (default /wazuh-local-src)
-#   WAZUH_VERBOSE        "yes" enables `set -x`
+#   GUARDSARM_SRC            working tree (default /guardsarm-local-src)
+#   GUARDSARM_VERBOSE        "yes" enables `set -x`
 #
 # Exit status mirrors the `make` build so the workflow step fails on a
 # broken build; the dependency-usage analysis is left to the caller, which
@@ -24,12 +24,12 @@
 
 set -e
 
-WAZUH_SRC="${WAZUH_SRC:-/wazuh-local-src}"
-SRC_DIR="${WAZUH_SRC}/src"
+GUARDSARM_SRC="${GUARDSARM_SRC:-/guardsarm-local-src}"
+SRC_DIR="${GUARDSARM_SRC}/src"
 DEPS_DIR="${DEPS_DIR:?DEPS_DIR is required (path containing libraries/)}"
 JOBS="${JOBS:-$(nproc 2>/dev/null || echo 2)}"
 
-if [ "${WAZUH_VERBOSE}" = "yes" ]; then
+if [ "${GUARDSARM_VERBOSE}" = "yes" ]; then
     set -x
 fi
 
@@ -64,7 +64,7 @@ ls -la "${DEPS_DIR}/libraries" "${DEPS_DIR}/libraries"/* 2>/dev/null || true
 # absolute paths and breaks the next configure step.
 rm -rf "${SRC_DIR}/build"
 
-# Point `make deps` at the local tree instead of packages.wazuh.com.
+# Point `make deps` at the local tree instead of packages.guardsarm.com.
 # RESOURCES_URL is `:=`-assigned in src/Makefile, but a command-line override
 # still wins; the deps rules fetch with `curl`, which handles file:// URLs, so
 # each <dep>.tar.gz is "downloaded" straight off local disk. Only the external

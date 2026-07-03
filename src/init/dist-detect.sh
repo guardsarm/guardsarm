@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Wazuh Distribution Detector
+# GuardSarm Distribution Detector
 # Copyright (C) 2015, Wazuh Inc.
 # November 18, 2016.
 #

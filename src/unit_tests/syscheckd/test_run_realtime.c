@@ -21,17 +21,17 @@
 #include "../wrappers/posix/pthread_wrappers.h"
 #include "../wrappers/posix/unistd_wrappers.h"
 #include "../wrappers/linux/inotify_wrappers.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/shared/fs_op_wrappers.h"
-#include "../wrappers/wazuh/shared/hash_op_wrappers.h"
-#include "../wrappers/wazuh/shared/randombytes_wrappers.h"
-#include "../wrappers/wazuh/shared/syscheck_op_wrappers.h"
-#include "../wrappers/wazuh/shared/vector_op_wrappers.h"
-#include "../wrappers/wazuh/shared/file_op_wrappers.h"
-#include "../wrappers/wazuh/shared/utf8_winapi_wrapper_wrappers.h"
-#include "../wrappers/wazuh/syscheckd/create_db_wrappers.h"
-#include "../wrappers/wazuh/syscheckd/run_check_wrappers.h"
-#include "../wrappers/wazuh/syscheckd/win_whodata_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/fs_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/hash_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/randombytes_wrappers.h"
+#include "../wrappers/guardsarm/shared/syscheck_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/vector_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/file_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/utf8_winapi_wrapper_wrappers.h"
+#include "../wrappers/guardsarm/syscheckd/create_db_wrappers.h"
+#include "../wrappers/guardsarm/syscheckd/run_check_wrappers.h"
+#include "../wrappers/guardsarm/syscheckd/win_whodata_wrappers.h"
 
 #include "syscheck.h"
 #include "syscheck-config.h"
@@ -722,7 +722,7 @@ void test_realtime_process_overflow(void **state) {
     expect_string(__wrap__mwarn, formatted_msg, "Real-time inotify kernel queue is full. Some events may be lost. Next scheduled scan will recover lost data.");
     expect_function_call(__wrap_pthread_mutex_lock);
     expect_function_call(__wrap_pthread_mutex_unlock);
-    expect_string(__wrap_send_log_msg, msg, "wazuh: Real-time inotify kernel queue is full. Some events may be lost. Next scheduled scan will recover lost data.");
+    expect_string(__wrap_send_log_msg, msg, "guardsarm: Real-time inotify kernel queue is full. Some events may be lost. Next scheduled scan will recover lost data.");
     will_return(__wrap_send_log_msg, 1);
 
     char **paths = NULL;

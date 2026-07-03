@@ -71,7 +71,7 @@ static int teardown_test_read(void **state) {
 
 void test_success_valid_configuration_host_IP(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://10.2.20.2:9200</host>"
@@ -86,16 +86,16 @@ void test_success_valid_configuration_host_IP(void **state) {
                 "<key>key.pem</key>"
             "</ssl>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_SUCCESS);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_SUCCESS);
     char * json_result = cJSON_PrintUnformatted(indexer_config);
     assert_string_equal(json_result, "{\"hosts\":[\"http://10.2.20.2:9200\",\"https://10.2.20.42:9200\"],\"ssl\":{\"certificate_authorities\":[\"cacert1.pem\",\"cacert2.pem\"],\"certificate\":\"cert.pem\",\"key\":\"key.pem\"}}");
     cJSON_free(json_result);
@@ -103,7 +103,7 @@ void test_success_valid_configuration_host_IP(void **state) {
 
 void test_success_valid_configuration_host_hostname(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://hostname1:9200</host>"
@@ -118,16 +118,16 @@ void test_success_valid_configuration_host_hostname(void **state) {
                 "<key>key.pem</key>"
             "</ssl>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_SUCCESS);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_SUCCESS);
     char * json_result = cJSON_PrintUnformatted(indexer_config);
     assert_string_equal(json_result, "{\"hosts\":[\"http://hostname1:9200\",\"https://hostname2:9200\"],\"ssl\":{\"certificate_authorities\":[\"cacert1.pem\",\"cacert2.pem\"],\"certificate\":\"cert.pem\",\"key\":\"key.pem\"}}");
     cJSON_free(json_result);
@@ -135,7 +135,7 @@ void test_success_valid_configuration_host_hostname(void **state) {
 
 void test_success_valid_configuration_missing_certificate_key_settings(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://hostname1:9200</host>"
@@ -148,16 +148,16 @@ void test_success_valid_configuration_missing_certificate_key_settings(void **st
                 "</certificate_authorities>"
             "</ssl>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_SUCCESS);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_SUCCESS);
     char * json_result = cJSON_PrintUnformatted(indexer_config);
     assert_string_equal(json_result, "{\"hosts\":[\"http://hostname1:9200\",\"https://hostname2:9200\"],\"ssl\":{\"certificate_authorities\":[\"cacert1.pem\",\"cacert2.pem\"]}}");
     cJSON_free(json_result);
@@ -165,7 +165,7 @@ void test_success_valid_configuration_missing_certificate_key_settings(void **st
 
 void test_fail_invalid_enabled_setting(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<enabled>yes</enabled>"
             "<hosts>"
@@ -181,46 +181,46 @@ void test_fail_invalid_enabled_setting(void **state) {
                 "<key>key.pem</key>"
             "</ssl>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "Invalid element in the configuration: 'indexer.enabled'");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_fail_missing_ssl_section(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://hostname1:9200</host>"
                 "<host>https://hostname2:9200</host>"
             "</hosts>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "Missing required configuration in module 'indexer'. Check configuration");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_fail_missing_hosts_setting(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<ssl>"
                 "<certificate_authorities>"
@@ -231,177 +231,177 @@ void test_fail_missing_hosts_setting(void **state) {
                 "<key>key.pem</key>"
             "</ssl>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "Missing required configuration in module 'indexer'. Check configuration");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_fail_invalid_host_setting_value(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>https://invalid/hostname:9200</host>"
             "</hosts>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "Invalid host 'https://invalid/hostname:9200' in configuration array 'indexer.hosts' in module 'indexer'. Check configuration");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_fail_empty_host_setting_value(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host></host>"
             "</hosts>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "Invalid host '' in configuration array 'indexer.hosts' in module 'indexer'. Check configuration");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_fail_empty_hostname_setting_value(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://:9200</host>"
             "</hosts>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "Invalid host 'http://:9200' in configuration array 'indexer.hosts' in module 'indexer'. Check configuration");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_fail_missing_port_setting_value(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://hostname</host>"
             "</hosts>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "Invalid host 'http://hostname' in configuration array 'indexer.hosts' in module 'indexer'. Check configuration");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_fail_missing_port_setting_value_with_port_separator(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://hostname:</host>"
             "</hosts>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "Invalid host 'http://hostname:' in configuration array 'indexer.hosts' in module 'indexer'. Check configuration");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_fail_invalid_port_setting_value(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://hostname:port</host>"
             "</hosts>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "Invalid host 'http://hostname:port' in configuration array 'indexer.hosts' in module 'indexer'. Check configuration");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_fail_missing_protocol_setting_value(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>hostname:9200</host>"
             "</hosts>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "Invalid host 'hostname:9200' in configuration array 'indexer.hosts' in module 'indexer'. Check configuration");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_fail_empty_certificate_file_path(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://hostname1:9200</host>"
@@ -414,23 +414,23 @@ void test_fail_empty_certificate_file_path(void **state) {
                 "<key>key.pem</key>"
             "</ssl>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "File '' not found for 'indexer.ssl.certificate_authorities' in module 'indexer'. Check configuration");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_fail_non_existent_certificate_file(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://10.2.20.2:9200</host>"
@@ -438,29 +438,29 @@ void test_fail_non_existent_certificate_file(void **state) {
             "</hosts>"
             "<ssl>"
                 "<certificate_authorities>"
-                    "<ca>/var/wazuh-manager/cacert1.pem</ca>"
+                    "<ca>/var/guardsarm-manager/cacert1.pem</ca>"
                 "</certificate_authorities>"
                 "<certificate>cert.pem</certificate>"
                 "<key>key.pem</key>"
             "</ssl>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
-    expect_string(__wrap__merror, formatted_msg, "File '/var/wazuh-manager/cacert1.pem' not found for 'indexer.ssl.certificate_authorities' in module 'indexer'. Check configuration");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    expect_string(__wrap__merror, formatted_msg, "File '/var/guardsarm-manager/cacert1.pem' not found for 'indexer.ssl.certificate_authorities' in module 'indexer'. Check configuration");
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_success_duplicate_configuration_block(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://10.2.20.2:9200</host>"
@@ -489,16 +489,16 @@ void test_success_duplicate_configuration_block(void **state) {
                 "<key>key.pem</key>"
             "</ssl>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_SUCCESS);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_SUCCESS);
     char * json_result = cJSON_PrintUnformatted(indexer_config);
     assert_string_equal(json_result, "{\"hosts\":[\"http://10.2.20.2:9200\",\"https://10.2.20.42:9200\"],\"ssl\":{\"certificate_authorities\":[\"cacert1.pem\",\"cacert2.pem\"],\"certificate\":\"cert.pem\",\"key\":\"key.pem\"}}");
     cJSON_free(json_result);
@@ -506,7 +506,7 @@ void test_success_duplicate_configuration_block(void **state) {
 
 void test_success_multiple_configuration_blocks(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://10.1.10.1:9200</host>"
@@ -533,16 +533,16 @@ void test_success_multiple_configuration_blocks(void **state) {
                 "<key>key.pem</key>"
             "</ssl>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_SUCCESS);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_SUCCESS);
     char * json_result = cJSON_PrintUnformatted(indexer_config);
     assert_string_equal(json_result, "{\"hosts\":[\"http://10.2.20.2:9200\",\"https://10.2.20.42:9200\"],\"ssl\":{\"certificate_authorities\":[\"cacert2.pem\"],\"certificate\":\"cert.pem\",\"key\":\"key.pem\"}}");
     cJSON_free(json_result);
@@ -550,26 +550,26 @@ void test_success_multiple_configuration_blocks(void **state) {
 
 void test_fail_empty_indexer_configuration_block(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "Empty configuration for module 'indexer'");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_fail_empty_key_setting_value(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://10.2.20.2:9200</host>"
@@ -584,23 +584,23 @@ void test_fail_empty_key_setting_value(void **state) {
                 "<key></key>"
             "</ssl>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "Configuration field 'indexer.ssl.key' has an empty value in module 'indexer'. Check configuration");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_fail_host_0_entries(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
             "</hosts>"
@@ -613,23 +613,23 @@ void test_fail_host_0_entries(void **state) {
                 "<key>key.pem</key>"
             "</ssl>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "Configuration array 'indexer.hosts' is empty in module 'indexer'. Check configuration");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_success_host_1_entry(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://10.2.20.2:9200</host>"
@@ -643,16 +643,16 @@ void test_success_host_1_entry(void **state) {
                 "<key>key.pem</key>"
             "</ssl>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_SUCCESS);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_SUCCESS);
     char * json_result = cJSON_PrintUnformatted(indexer_config);
     assert_string_equal(json_result, "{\"hosts\":[\"http://10.2.20.2:9200\"],\"ssl\":{\"certificate_authorities\":[\"cacert1.pem\",\"cacert2.pem\"],\"certificate\":\"cert.pem\",\"key\":\"key.pem\"}}");
     cJSON_free(json_result);
@@ -660,7 +660,7 @@ void test_success_host_1_entry(void **state) {
 
 void test_fail_certificate_authorities_0_entries(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://10.2.20.2:9200</host>"
@@ -673,23 +673,23 @@ void test_fail_certificate_authorities_0_entries(void **state) {
                 "<key>key.pem</key>"
             "</ssl>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
     expect_string(__wrap__merror, formatted_msg, "Configuration array 'indexer.ssl.certificate_authorities' is empty in module 'indexer'. Check configuration");
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_INVALID);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_INVALID);
     assert_null(indexer_config);
 }
 
 void test_success_certificate_authorities_1_entry(void **state) {
     const char *string =
-    "<wazuh_config>"
+    "<guardsarm_config>"
         "<indexer>"
             "<hosts>"
                 "<host>http://10.2.20.2:9200</host>"
@@ -703,16 +703,16 @@ void test_success_certificate_authorities_1_entry(void **state) {
                 "<key>key.pem</key>"
             "</ssl>"
         "</indexer>"
-    "</wazuh_config>";
+    "</guardsarm_config>";
 
     FILE * output = fopen(test_path, "w");
     fwrite(string, 1, strlen(string), output);
     fclose(output);
 
-    expect_string(__wrap_Read_Indexer, config_file, WAZUHCONF);
+    expect_string(__wrap_Read_Indexer, config_file, GUARDSARMCONF);
     expect_string(__wrap_get_indexer_cnf, cnf_file, test_path);
 
-    assert_int_equal(Read_Indexer(WAZUHCONF), OS_SUCCESS);
+    assert_int_equal(Read_Indexer(GUARDSARMCONF), OS_SUCCESS);
     char * json_result = cJSON_PrintUnformatted(indexer_config);
     assert_string_equal(json_result, "{\"hosts\":[\"http://10.2.20.2:9200\",\"https://10.2.20.42:9200\"],\"ssl\":{\"certificate_authorities\":[\"cacert1.pem\"],\"certificate\":\"cert.pem\",\"key\":\"key.pem\"}}");
     cJSON_free(json_result);

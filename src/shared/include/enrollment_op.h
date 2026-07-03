@@ -12,11 +12,11 @@
  * @date 4 April 2020
  * @brief Library that handles the enrollment process of an agent
  *
- * Wazuh agents need to register to a manager before being able to start sending messages
+ * GuardSarm agents need to register to a manager before being able to start sending messages
  * There are several way of registering according to manager's configuration
  * This library receives a enrollment configuration and target especification and registers to the
  * manager or shows several messages in case of failure
- * For details on enrollment process @see https://documentation.wazuh.com/3.12/user-manual/registering/
+ * For details on enrollment process @see https://documentation.guardsarm.com/3.12/user-manual/registering/
  */
 #ifndef ENROLLMENT_CLIENT_H
 #define ENROLLMENT_CLIENT_H
@@ -74,7 +74,7 @@ typedef struct _enrollment_ctx {
     SSL *ssl;                           /**< will hold the connection instance with the manager */
     bool enabled;                       /**< enables / disables auto enrollment */
     time_t delay_after_enrollment;      /**< 20 by default, number of seconds to wait for enrollment */
-    char *agent_version;                /**< will hold the __wazuh_version value*/
+    char *agent_version;                /**< will hold the __guardsarm_version value*/
     int recv_timeout;                   /**< reception timeout, in seconds */
 } w_enrollment_ctx;
 

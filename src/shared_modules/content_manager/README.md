@@ -1,6 +1,6 @@
 # Content Manager
 
-The Content Manager is a module that is in charge of obtaining the Wazuh Content from the Wazuh Indexer and maintaining periodic updates.
+The Content Manager is a module that is in charge of obtaining the GuardSarm Content from the GuardSarm Indexer and maintaining periodic updates.
 
 ## Usage
 
@@ -10,10 +10,10 @@ The input configuration of the Content Manager is described below:
 - `interval`: Interval, in seconds, between each action execution.
 - `ondemand`: If `true`, the module will be executed on demand.
 - `configData`: Configuration data to create the orchestration of the module.
-  + `consumerName`: Name of the Content Manager caller (e.g. `Wazuh VulnerabilityDetector`).
+  + `consumerName`: Name of the Content Manager caller (e.g. `GuardSarm VulnerabilityDetector`).
   + `contentSource`: Source of the content. Must be `indexer`. See the [use cases section](#use-cases) for more information.
   + `databasePath`: Path for the RocksDB database. The database stores the last Indexer cursor used to resume incremental fetches across restarts.
-  + `indexer`: _(Required when `contentSource` is `indexer`)_ Wazuh Indexer connection sub-configuration. See the [Indexer Downloader documentation](./doc/components/INDEXER_DOWNLOADER.md) for details.
+  + `indexer`: _(Required when `contentSource` is `indexer`)_ GuardSarm Indexer connection sub-configuration. See the [Indexer Downloader documentation](./doc/components/INDEXER_DOWNLOADER.md) for details.
 
 > The Content Manager counts with a [test tool](./testtool/main.cpp) that can be used to perform tests, try out different configurations, and to better understand the module.
 
@@ -25,14 +25,14 @@ The Content Manager runs a two-stage pipeline for each scheduled or on-demand ex
 IndexerDownloader  →  UpdateIndexerCursor
 ```
 
-- **IndexerDownloader**: Fetches CVE documents from the Wazuh Indexer using Point-In-Time (PIT) pagination. Performs a full initial load on the first run and incremental updates on subsequent runs. Supports parallel fetching via sliced PIT (`numSlices` config). Delivers each page as a structured `nlohmann::json` object directly to the `fileProcessingCallback`. Sends an `indexer_complete` signal at the end of each cycle. See [INDEXER_DOWNLOADER.md](./doc/components/INDEXER_DOWNLOADER.md).
+- **IndexerDownloader**: Fetches CVE documents from the GuardSarm Indexer using Point-In-Time (PIT) pagination. Performs a full initial load on the first run and incremental updates on subsequent runs. Supports parallel fetching via sliced PIT (`numSlices` config). Delivers each page as a structured `nlohmann::json` object directly to the `fileProcessingCallback`. Sends an `indexer_complete` signal at the end of each cycle. See [INDEXER_DOWNLOADER.md](./doc/components/INDEXER_DOWNLOADER.md).
 - **UpdateIndexerCursor**: Persists the final cursor value from the `indexer_complete` signal to the updater RocksDB database so the next run resumes from where the previous one ended.
 
 ## Use cases
 
-### Download from Wazuh Indexer
+### Download from GuardSarm Indexer
 
-The Content Manager fetches CVE data directly from the Wazuh Indexer using Point-In-Time (PIT) pagination. This is the data source used by the Vulnerability Detection module.
+The Content Manager fetches CVE data directly from the GuardSarm Indexer using Point-In-Time (PIT) pagination. This is the data source used by the Vulnerability Detection module.
 
 The downloader automatically selects its mode based on the persisted cursor:
 
@@ -48,7 +48,7 @@ After all pages are processed, the downloader signals completion via `indexer_co
     "interval": 3600,
     "ondemand": true,
     "configData": {
-        "consumerName": "Wazuh VulnerabilityDetector",
+        "consumerName": "GuardSarm VulnerabilityDetector",
         "contentSource": "indexer",
         "databasePath": "queue/vd/vd_updater/rocksdb",
         "indexer": {
@@ -56,12 +56,12 @@ After all pages are processed, the downloader signals completion via `indexer_co
             "username": "admin",
             "password": "admin",
             "ssl": {
-                "certificate_authorities": ["/etc/wazuh-indexer/certs/root-ca.pem"],
+                "certificate_authorities": ["/etc/guardsarm-indexer/certs/root-ca.pem"],
                 "certificate": "",
                 "key": ""
             },
-            "index": ".wazuh-threatintel-vulnerabilities",
-            "consumerStatusIndex": ".wazuh-cti-consumers",
+            "index": ".guardsarm-threatintel-vulnerabilities",
+            "consumerStatusIndex": ".guardsarm-cti-consumers",
             "consumerStatusId": "cti:catalog:consumer:vulnerabilities",
             "pageSize": 250,
             "numSlices": 2

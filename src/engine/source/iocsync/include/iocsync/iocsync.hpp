@@ -52,7 +52,7 @@ private:
     void reportSyncFailure();
 
     /**
-     * @brief Check if IOC data index exists in wazuh-indexer
+     * @brief Check if IOC data index exists in guardsarm-indexer
      *
      * @return true if the IOC index exists, false otherwise
      * @throws std::runtime_error on errors.

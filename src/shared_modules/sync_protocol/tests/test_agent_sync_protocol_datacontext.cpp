@@ -149,12 +149,12 @@ TEST_F(AgentSyncProtocolDataContextTest, SynchronizeModuleWithOnlyDataValueItems
 
     // Send StartAck
     flatbuffers::FlatBufferBuilder startBuilder;
-    Wazuh::SyncSchema::StartAckBuilder startAckBuilder(startBuilder);
-    startAckBuilder.add_status(Wazuh::SyncSchema::Status::Ok);
+    GuardSarm::SyncSchema::StartAckBuilder startAckBuilder(startBuilder);
+    startAckBuilder.add_status(GuardSarm::SyncSchema::Status::Ok);
     startAckBuilder.add_session(session);
     auto startAckOffset = startAckBuilder.Finish();
-    auto startMessage = Wazuh::SyncSchema::CreateMessage(
-                            startBuilder, Wazuh::SyncSchema::MessageType::StartAck, startAckOffset.Union());
+    auto startMessage = GuardSarm::SyncSchema::CreateMessage(
+                            startBuilder, GuardSarm::SyncSchema::MessageType::StartAck, startAckOffset.Union());
     startBuilder.Finish(startMessage);
     protocol->parseResponseBuffer(startBuilder.GetBufferPointer(), startBuilder.GetSize());
 
@@ -163,12 +163,12 @@ TEST_F(AgentSyncProtocolDataContextTest, SynchronizeModuleWithOnlyDataValueItems
 
     // Send EndAck
     flatbuffers::FlatBufferBuilder endBuilder;
-    Wazuh::SyncSchema::EndAckBuilder endAckBuilder(endBuilder);
-    endAckBuilder.add_status(Wazuh::SyncSchema::Status::Ok);
+    GuardSarm::SyncSchema::EndAckBuilder endAckBuilder(endBuilder);
+    endAckBuilder.add_status(GuardSarm::SyncSchema::Status::Ok);
     endAckBuilder.add_session(session);
     auto endAckOffset = endAckBuilder.Finish();
     auto endMessage =
-        Wazuh::SyncSchema::CreateMessage(endBuilder, Wazuh::SyncSchema::MessageType::EndAck, endAckOffset.Union());
+        GuardSarm::SyncSchema::CreateMessage(endBuilder, GuardSarm::SyncSchema::MessageType::EndAck, endAckOffset.Union());
     endBuilder.Finish(endMessage);
     protocol->parseResponseBuffer(endBuilder.GetBufferPointer(), endBuilder.GetSize());
 
@@ -221,12 +221,12 @@ TEST_F(AgentSyncProtocolDataContextTest, SynchronizeModuleWithOnlyDataContextIte
 
     // Send StartAck
     flatbuffers::FlatBufferBuilder startBuilder;
-    Wazuh::SyncSchema::StartAckBuilder startAckBuilder(startBuilder);
-    startAckBuilder.add_status(Wazuh::SyncSchema::Status::Ok);
+    GuardSarm::SyncSchema::StartAckBuilder startAckBuilder(startBuilder);
+    startAckBuilder.add_status(GuardSarm::SyncSchema::Status::Ok);
     startAckBuilder.add_session(session);
     auto startAckOffset = startAckBuilder.Finish();
-    auto startMessage = Wazuh::SyncSchema::CreateMessage(
-                            startBuilder, Wazuh::SyncSchema::MessageType::StartAck, startAckOffset.Union());
+    auto startMessage = GuardSarm::SyncSchema::CreateMessage(
+                            startBuilder, GuardSarm::SyncSchema::MessageType::StartAck, startAckOffset.Union());
     startBuilder.Finish(startMessage);
     protocol->parseResponseBuffer(startBuilder.GetBufferPointer(), startBuilder.GetSize());
 
@@ -235,12 +235,12 @@ TEST_F(AgentSyncProtocolDataContextTest, SynchronizeModuleWithOnlyDataContextIte
 
     // Send EndAck
     flatbuffers::FlatBufferBuilder endBuilder;
-    Wazuh::SyncSchema::EndAckBuilder endAckBuilder(endBuilder);
-    endAckBuilder.add_status(Wazuh::SyncSchema::Status::Ok);
+    GuardSarm::SyncSchema::EndAckBuilder endAckBuilder(endBuilder);
+    endAckBuilder.add_status(GuardSarm::SyncSchema::Status::Ok);
     endAckBuilder.add_session(session);
     auto endAckOffset = endAckBuilder.Finish();
     auto endMessage =
-        Wazuh::SyncSchema::CreateMessage(endBuilder, Wazuh::SyncSchema::MessageType::EndAck, endAckOffset.Union());
+        GuardSarm::SyncSchema::CreateMessage(endBuilder, GuardSarm::SyncSchema::MessageType::EndAck, endAckOffset.Union());
     endBuilder.Finish(endMessage);
     protocol->parseResponseBuffer(endBuilder.GetBufferPointer(), endBuilder.GetSize());
 
@@ -262,18 +262,18 @@ TEST_F(AgentSyncProtocolDataContextTest, SynchronizeModuleWithMixedDataValueAndD
         [](int, const void* data, size_t, const char*, char)
     {
         // Inspect message type from flatbuffer
-        auto message = Wazuh::SyncSchema::GetMessage(data);
+        auto message = GuardSarm::SyncSchema::GetMessage(data);
 
-        if (message->content_type() == Wazuh::SyncSchema::MessageType::DataBatch)
+        if (message->content_type() == GuardSarm::SyncSchema::MessageType::DataBatch)
         {
-            auto batch = message->content_as<Wazuh::SyncSchema::DataBatch>();
+            auto batch = message->content_as<GuardSarm::SyncSchema::DataBatch>();
 
             if (batch && batch->values())
             {
                 dataValuesInBatch += static_cast<int>(batch->values()->size());
             }
         }
-        else if (message->content_type() == Wazuh::SyncSchema::MessageType::DataContext)
+        else if (message->content_type() == GuardSarm::SyncSchema::MessageType::DataContext)
         {
             dataContextMessagesSent++;
         }
@@ -319,12 +319,12 @@ TEST_F(AgentSyncProtocolDataContextTest, SynchronizeModuleWithMixedDataValueAndD
 
     // Send StartAck
     flatbuffers::FlatBufferBuilder startBuilder;
-    Wazuh::SyncSchema::StartAckBuilder startAckBuilder(startBuilder);
-    startAckBuilder.add_status(Wazuh::SyncSchema::Status::Ok);
+    GuardSarm::SyncSchema::StartAckBuilder startAckBuilder(startBuilder);
+    startAckBuilder.add_status(GuardSarm::SyncSchema::Status::Ok);
     startAckBuilder.add_session(session);
     auto startAckOffset = startAckBuilder.Finish();
-    auto startMessage = Wazuh::SyncSchema::CreateMessage(
-                            startBuilder, Wazuh::SyncSchema::MessageType::StartAck, startAckOffset.Union());
+    auto startMessage = GuardSarm::SyncSchema::CreateMessage(
+                            startBuilder, GuardSarm::SyncSchema::MessageType::StartAck, startAckOffset.Union());
     startBuilder.Finish(startMessage);
     protocol->parseResponseBuffer(startBuilder.GetBufferPointer(), startBuilder.GetSize());
 
@@ -333,12 +333,12 @@ TEST_F(AgentSyncProtocolDataContextTest, SynchronizeModuleWithMixedDataValueAndD
 
     // Send EndAck
     flatbuffers::FlatBufferBuilder endBuilder;
-    Wazuh::SyncSchema::EndAckBuilder endAckBuilder(endBuilder);
-    endAckBuilder.add_status(Wazuh::SyncSchema::Status::Ok);
+    GuardSarm::SyncSchema::EndAckBuilder endAckBuilder(endBuilder);
+    endAckBuilder.add_status(GuardSarm::SyncSchema::Status::Ok);
     endAckBuilder.add_session(session);
     auto endAckOffset = endAckBuilder.Finish();
     auto endMessage =
-        Wazuh::SyncSchema::CreateMessage(endBuilder, Wazuh::SyncSchema::MessageType::EndAck, endAckOffset.Union());
+        GuardSarm::SyncSchema::CreateMessage(endBuilder, GuardSarm::SyncSchema::MessageType::EndAck, endAckOffset.Union());
     endBuilder.Finish(endMessage);
     protocol->parseResponseBuffer(endBuilder.GetBufferPointer(), endBuilder.GetSize());
 
@@ -361,10 +361,10 @@ TEST_F(AgentSyncProtocolDataContextTest, SynchronizeModuleDataContextFailureDoes
         [](int, const void* data, size_t, const char*, char)
     {
         messageCount++;
-        auto message = Wazuh::SyncSchema::GetMessage(data);
+        auto message = GuardSarm::SyncSchema::GetMessage(data);
 
         // Fail on DataContext messages
-        if (message->content_type() == Wazuh::SyncSchema::MessageType::DataContext)
+        if (message->content_type() == GuardSarm::SyncSchema::MessageType::DataContext)
         {
             return 0; // Failure
         }
@@ -407,12 +407,12 @@ TEST_F(AgentSyncProtocolDataContextTest, SynchronizeModuleDataContextFailureDoes
 
     // Send StartAck
     flatbuffers::FlatBufferBuilder startBuilder;
-    Wazuh::SyncSchema::StartAckBuilder startAckBuilder(startBuilder);
-    startAckBuilder.add_status(Wazuh::SyncSchema::Status::Ok);
+    GuardSarm::SyncSchema::StartAckBuilder startAckBuilder(startBuilder);
+    startAckBuilder.add_status(GuardSarm::SyncSchema::Status::Ok);
     startAckBuilder.add_session(session);
     auto startAckOffset = startAckBuilder.Finish();
-    auto startMessage = Wazuh::SyncSchema::CreateMessage(
-                            startBuilder, Wazuh::SyncSchema::MessageType::StartAck, startAckOffset.Union());
+    auto startMessage = GuardSarm::SyncSchema::CreateMessage(
+                            startBuilder, GuardSarm::SyncSchema::MessageType::StartAck, startAckOffset.Union());
     startBuilder.Finish(startMessage);
     protocol->parseResponseBuffer(startBuilder.GetBufferPointer(), startBuilder.GetSize());
 
@@ -442,19 +442,19 @@ TEST_F(AgentSyncProtocolDataContextTest, DataBatch_DataValuesAreBatchedTogether)
     .send_binary =
         [](int, const void* data, size_t, const char*, char)
     {
-        auto message = Wazuh::SyncSchema::GetMessage(data);
+        auto message = GuardSarm::SyncSchema::GetMessage(data);
 
-        if (message->content_type() == Wazuh::SyncSchema::MessageType::DataBatch)
+        if (message->content_type() == GuardSarm::SyncSchema::MessageType::DataBatch)
         {
             dataBatchMessagesSent++;
-            auto batch = message->content_as<Wazuh::SyncSchema::DataBatch>();
+            auto batch = message->content_as<GuardSarm::SyncSchema::DataBatch>();
 
             if (batch && batch->values())
             {
                 totalDataValuesInBatches += static_cast<int>(batch->values()->size());
             }
         }
-        else if (message->content_type() == Wazuh::SyncSchema::MessageType::DataValue)
+        else if (message->content_type() == GuardSarm::SyncSchema::MessageType::DataValue)
         {
             dataValueMessagesSent++; // should stay zero
         }
@@ -494,24 +494,24 @@ TEST_F(AgentSyncProtocolDataContextTest, DataBatch_DataValuesAreBatchedTogether)
     std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 
     flatbuffers::FlatBufferBuilder startBuilder;
-    Wazuh::SyncSchema::StartAckBuilder startAckBuilder(startBuilder);
-    startAckBuilder.add_status(Wazuh::SyncSchema::Status::Ok);
+    GuardSarm::SyncSchema::StartAckBuilder startAckBuilder(startBuilder);
+    startAckBuilder.add_status(GuardSarm::SyncSchema::Status::Ok);
     startAckBuilder.add_session(session);
     auto startAckOffset = startAckBuilder.Finish();
-    auto startMessage = Wazuh::SyncSchema::CreateMessage(
-                            startBuilder, Wazuh::SyncSchema::MessageType::StartAck, startAckOffset.Union());
+    auto startMessage = GuardSarm::SyncSchema::CreateMessage(
+                            startBuilder, GuardSarm::SyncSchema::MessageType::StartAck, startAckOffset.Union());
     startBuilder.Finish(startMessage);
     protocol->parseResponseBuffer(startBuilder.GetBufferPointer(), startBuilder.GetSize());
 
     std::this_thread::sleep_for(std::chrono::milliseconds(delay * 2));
 
     flatbuffers::FlatBufferBuilder endBuilder;
-    Wazuh::SyncSchema::EndAckBuilder endAckBuilder(endBuilder);
-    endAckBuilder.add_status(Wazuh::SyncSchema::Status::Ok);
+    GuardSarm::SyncSchema::EndAckBuilder endAckBuilder(endBuilder);
+    endAckBuilder.add_status(GuardSarm::SyncSchema::Status::Ok);
     endAckBuilder.add_session(session);
     auto endAckOffset = endAckBuilder.Finish();
     auto endMessage =
-        Wazuh::SyncSchema::CreateMessage(endBuilder, Wazuh::SyncSchema::MessageType::EndAck, endAckOffset.Union());
+        GuardSarm::SyncSchema::CreateMessage(endBuilder, GuardSarm::SyncSchema::MessageType::EndAck, endAckOffset.Union());
     endBuilder.Finish(endMessage);
     protocol->parseResponseBuffer(endBuilder.GetBufferPointer(), endBuilder.GetSize());
 
@@ -535,11 +535,11 @@ TEST_F(AgentSyncProtocolDataContextTest, DataBatch_BatchContainsExpectedDataValu
     .send_binary =
         [](int, const void* data, size_t, const char*, char)
     {
-        auto message = Wazuh::SyncSchema::GetMessage(data);
+        auto message = GuardSarm::SyncSchema::GetMessage(data);
 
-        if (message->content_type() == Wazuh::SyncSchema::MessageType::DataBatch)
+        if (message->content_type() == GuardSarm::SyncSchema::MessageType::DataBatch)
         {
-            auto batch = message->content_as<Wazuh::SyncSchema::DataBatch>();
+            auto batch = message->content_as<GuardSarm::SyncSchema::DataBatch>();
 
             if (batch && batch->values())
             {
@@ -587,24 +587,24 @@ TEST_F(AgentSyncProtocolDataContextTest, DataBatch_BatchContainsExpectedDataValu
     std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 
     flatbuffers::FlatBufferBuilder startBuilder;
-    Wazuh::SyncSchema::StartAckBuilder startAckBuilder(startBuilder);
-    startAckBuilder.add_status(Wazuh::SyncSchema::Status::Ok);
+    GuardSarm::SyncSchema::StartAckBuilder startAckBuilder(startBuilder);
+    startAckBuilder.add_status(GuardSarm::SyncSchema::Status::Ok);
     startAckBuilder.add_session(session);
     auto startAckOffset = startAckBuilder.Finish();
-    auto startMessage = Wazuh::SyncSchema::CreateMessage(
-                            startBuilder, Wazuh::SyncSchema::MessageType::StartAck, startAckOffset.Union());
+    auto startMessage = GuardSarm::SyncSchema::CreateMessage(
+                            startBuilder, GuardSarm::SyncSchema::MessageType::StartAck, startAckOffset.Union());
     startBuilder.Finish(startMessage);
     protocol->parseResponseBuffer(startBuilder.GetBufferPointer(), startBuilder.GetSize());
 
     std::this_thread::sleep_for(std::chrono::milliseconds(delay * 2));
 
     flatbuffers::FlatBufferBuilder endBuilder;
-    Wazuh::SyncSchema::EndAckBuilder endAckBuilder(endBuilder);
-    endAckBuilder.add_status(Wazuh::SyncSchema::Status::Ok);
+    GuardSarm::SyncSchema::EndAckBuilder endAckBuilder(endBuilder);
+    endAckBuilder.add_status(GuardSarm::SyncSchema::Status::Ok);
     endAckBuilder.add_session(session);
     auto endAckOffset = endAckBuilder.Finish();
     auto endMessage =
-        Wazuh::SyncSchema::CreateMessage(endBuilder, Wazuh::SyncSchema::MessageType::EndAck, endAckOffset.Union());
+        GuardSarm::SyncSchema::CreateMessage(endBuilder, GuardSarm::SyncSchema::MessageType::EndAck, endAckOffset.Union());
     endBuilder.Finish(endMessage);
     protocol->parseResponseBuffer(endBuilder.GetBufferPointer(), endBuilder.GetSize());
 

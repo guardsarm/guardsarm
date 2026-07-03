@@ -1,4 +1,4 @@
-# Wazuh external dependency source manifest.
+# GuardSarm external dependency source manifest.
 #
 # This file is sourced by packages/externals/build_external.sh inside the package
 # builder containers. Each entry below registers one dependency and tells the
@@ -43,7 +43,7 @@
 #     src/Makefile (lines 535-567) and install.sh (OPTIMIZE_CPYTHON); add it
 #     here only after that handling is generalized.
 #   - geo_db is a MaxMind GeoLite2 binary database, not buildable source. Its
-#     URL is left TBD; populate it once the Wazuh-curated location is known.
+#     URL is left TBD; populate it once the GuardSarm-curated location is known.
 #   - URL templates were chosen to favor official release tarballs where they
 #     exist (curl.se, openssl.org, IANA) and fall back to GitHub source archives
 #     (`/archive/refs/tags/...`) otherwise. Tag conventions vary per project; if

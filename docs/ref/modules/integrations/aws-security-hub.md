@@ -2,20 +2,20 @@
 
 ## Introduction
 
-The Wazuh AWS module can ingest findings from AWS Security Hub through an SQS (Simple Queue Service) subscriber. AWS Security Hub aggregates security findings from multiple AWS services (such as GuardDuty, Inspector, and Macie) and third-party tools into a centralized dashboard.
+The GuardSarm AWS module can ingest findings from AWS Security Hub through an SQS (Simple Queue Service) subscriber. AWS Security Hub aggregates security findings from multiple AWS services (such as GuardDuty, Inspector, and Macie) and third-party tools into a centralized dashboard.
 
-Wazuh subscribes to an SQS queue that receives Security Hub findings notifications, processes them through the Wazuh rule engine, and generates alerts with enriched security context.
+GuardSarm subscribes to an SQS queue that receives Security Hub findings notifications, processes them through the GuardSarm rule engine, and generates alerts with enriched security context.
 
 ## Prerequisites
 
 - An AWS account with Security Hub enabled.
 - An SQS queue configured to receive Security Hub findings (via EventBridge or direct integration).
 - AWS credentials (access key and secret key) or an IAM role with permissions to read from the SQS queue and associated S3 buckets.
-- Python 3 and the `boto3` library installed on the Wazuh agent.
+- Python 3 and the `boto3` library installed on the GuardSarm agent.
 
 ## Configuration
 
-Configure the AWS module in the Wazuh agent `ossec.conf` file using the `subscriber` element with `type="security_hub"`:
+Configure the AWS module in the GuardSarm agent `ossec.conf` file using the `subscriber` element with `type="security_hub"`:
 
 ```xml
   <wodle name="aws-s3">
@@ -24,9 +24,9 @@ Configure the AWS module in the Wazuh agent `ossec.conf` file using the `subscri
     <run_on_start>yes</run_on_start>
     <skip_on_error>yes</skip_on_error>
     <subscriber type="security_hub">
-      <sqs_name>wazuh-security-hub-queue</sqs_name>
+      <sqs_name>guardsarm-security-hub-queue</sqs_name>
       <aws_profile>default</aws_profile>
-      <iam_role_arn>arn:aws:iam::123456789012:role/WazuhRole</iam_role_arn>
+      <iam_role_arn>arn:aws:iam::123456789012:role/GuardSarmRole</iam_role_arn>
     </subscriber>
   </wodle>
 ```
@@ -59,7 +59,7 @@ Configure the AWS module in the Wazuh agent `ossec.conf` file using the `subscri
 
 ### Configure event forwarding to SQS
 
-1. Create an SQS queue (for example, `wazuh-security-hub-queue`).
+1. Create an SQS queue (for example, `guardsarm-security-hub-queue`).
 2. Create an EventBridge rule that forwards Security Hub findings to the SQS queue:
    - **Event source**: AWS services > Security Hub
    - **Event type**: Security Hub Findings - Imported
@@ -80,7 +80,7 @@ The IAM user or role needs the following permissions:
         "sqs:DeleteMessage",
         "sqs:GetQueueUrl"
       ],
-      "Resource": "arn:aws:sqs:*:*:wazuh-security-hub-queue"
+      "Resource": "arn:aws:sqs:*:*:guardsarm-security-hub-queue"
     }
   ]
 }
@@ -88,10 +88,10 @@ The IAM user or role needs the following permissions:
 
 ## Verify the integration
 
-Restart the Wazuh agent after applying the configuration:
+Restart the GuardSarm agent after applying the configuration:
 
 ```bash
-systemctl restart wazuh-agent
+systemctl restart guardsarm-agent
 ```
 
 Check the module logs:

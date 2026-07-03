@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: wazuh/unit-tests
+  IMAGE_NAME: guardsarm/unit-tests
 
 jobs:
   deprecated:

@@ -1,5 +1,5 @@
 /*
- * Wazuh Certificate creation.
+ * GuardSarm Certificate creation.
  *
  * Copyright (C) 2015, Wazuh Inc.
  * May 16, 2021.

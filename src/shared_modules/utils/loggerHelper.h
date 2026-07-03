@@ -1,5 +1,5 @@
 /*
- * Wazuh logging helper
+ * GuardSarm logging helper
  * Copyright (C) 2015, Wazuh Inc.
  * September 15, 2022.
  *

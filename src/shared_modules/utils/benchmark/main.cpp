@@ -1,5 +1,5 @@
 /*
- * Wazuh - Content Migration tests
+ * GuardSarm - Content Migration tests
  * Copyright (C) 2015, Wazuh Inc.
  * March 03, 2023.
  *

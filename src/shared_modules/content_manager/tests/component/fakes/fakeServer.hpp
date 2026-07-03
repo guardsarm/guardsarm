@@ -1,5 +1,5 @@
 /*
- * Wazuh Indexer Connector - Fake Server
+ * GuardSarm Indexer Connector - Fake Server
  * Copyright (C) 2015, Wazuh Inc.
  * September 15, 2023.
  *

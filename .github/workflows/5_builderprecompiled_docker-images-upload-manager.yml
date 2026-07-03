@@ -35,7 +35,7 @@ on:
           - rpm
         required: true
       source_reference:
-        description: "Branch from wazuh/wazuh repository to use."
+        description: "Branch from guardsarm/guardsarm repository to use."
         required: true
 
 concurrency:
@@ -58,10 +58,10 @@ jobs:
         arch: ${{ github.event_name == 'push' && fromJSON('["amd64", "arm64"]') || fromJSON(format('["{0}"]', inputs.architecture)) }}
 
     steps:
-      - name: Checkout wazuh/wazuh repository
+      - name: Checkout guardsarm/guardsarm repository
         uses: actions/checkout@v6
         with:
-          repository: wazuh/wazuh
+          repository: guardsarm/guardsarm
           ref: ${{ inputs.source_reference || github.ref }}
 
       - name: Set environment variables

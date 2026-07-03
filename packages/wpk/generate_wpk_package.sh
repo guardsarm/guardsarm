@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Program to build the Wazuh WPK packages
-# Wazuh package generator
+# Program to build the GuardSarm WPK packages
+# GuardSarm package generator
 # Copyright (C) 2015, Wazuh Inc.
 #
 # This program is a free software; you can redistribute it
@@ -32,7 +32,7 @@ function pack_wpk() {
         CHECKSUM_FLAG="-c"
     fi
     if [ -n "${KEYDIR}" ]; then
-        MOUNT_KEYDIR_FLAG="-v ${KEYDIR}:/etc/wazuh:Z"
+        MOUNT_KEYDIR_FLAG="-v ${KEYDIR}:/etc/guardsarm:Z"
     fi
     if [ -n "${WPK_KEY}" ]; then
         WPK_KEY_FLAG="--aws-wpk-key ${WPK_KEY}"
@@ -41,7 +41,7 @@ function pack_wpk() {
         WPK_CERT_FLAG="--aws-wpk-cert ${WPK_CERT}"
     fi
 
-    docker run -t --rm ${MOUNT_KEYDIR_FLAG} -v ${DESTINATION}:/var/local/wazuh:Z -v ${PKG_PATH}:/var/pkg:Z -v ${DESTINATION}:/var/local/checksum:Z \
+    docker run -t --rm ${MOUNT_KEYDIR_FLAG} -v ${DESTINATION}:/var/local/guardsarm:Z -v ${PKG_PATH}:/var/pkg:Z -v ${DESTINATION}:/var/local/checksum:Z \
         -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
         ${CONTAINER_NAME}:${DOCKER_TAG} -b ${BRANCH} -o ${OUT_NAME} --aws-wpk-key-region ${AWS_REGION} ${WPK_KEY_FLAG} ${WPK_CERT_FLAG} -pn ${PACKAGE_NAME} ${CHECKSUM_FLAG}
 

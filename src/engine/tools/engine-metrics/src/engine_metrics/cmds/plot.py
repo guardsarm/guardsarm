@@ -15,7 +15,7 @@ PLOT_HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Wazuh Engine Metrics - Static Report</title>
+    <title>GuardSarm Engine Metrics - Static Report</title>
     <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
     <style>
         body {{
@@ -57,7 +57,7 @@ PLOT_HTML_TEMPLATE = """
 </head>
 <body>
 <div class="container">
-    <h1>Wazuh Engine Metrics Report</h1>
+    <h1>GuardSarm Engine Metrics Report</h1>
     <div class="subtitle">{subtitle}</div>
 
     <div class="summary">

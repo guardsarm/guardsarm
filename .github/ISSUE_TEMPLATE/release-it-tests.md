@@ -2,10 +2,10 @@
 | :--                                   | :--                                                       |
 | **Main release issue**                | RELEASE_ISSUE                                             |
 | **Main release candidate issue**      | RELEASE_CANDIDATE_ISSUE_URL                               |
-| **Version**                           | WAZUH_VERSION                                             |
+| **Version**                           | GUARDSARM_VERSION                                             |
 | **Release candidate**                 | RC_VERSION                                                |
-| **wazuh/wazuh tag**                   | https://github.com/wazuh/wazuh/tree/vWAZUH_VERSION-TAG    |
-| **wazuh/wazuh-qa tag**                | https://github.com/wazuh/wazuh-qa/tree/vWAZUH_VERSION-TAG |
+| **guardsarm/guardsarm tag**                   | https://github.com/guardsarm/guardsarm/tree/vGUARDSARM_VERSION-TAG    |
+| **guardsarm/guardsarm-qa tag**                | https://github.com/guardsarm/guardsarm-qa/tree/vGUARDSARM_VERSION-TAG |
 | **Previous release testing issue**    | PREVIOUS_IT                                               |
 | **Build**                             | COMPLETE_THIS_FIELD :warning: :warning: :warning:         |
 
@@ -38,4 +38,4 @@
 
 ## Description
 
-The objective of this issue is to check that the integration tests pass successfully against the version `WAZUH_VERSION` of Wazuh.
+The objective of this issue is to check that the integration tests pass successfully against the version `GUARDSARM_VERSION` of GuardSarm.

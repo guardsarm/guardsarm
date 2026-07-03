@@ -12,10 +12,10 @@ from os.path import dirname, realpath
 from sys import path
 
 path.append(dirname(realpath(__file__)))  # noqa: E501
-from bucket import WazuhGCloudBucket
+from bucket import GuardSarmGCloudBucket
 
 
-class GCSAccessLogs(WazuhGCloudBucket):
+class GCSAccessLogs(GuardSarmGCloudBucket):
     """Class for getting Google Cloud Storage Access Logs logs"""
     def __init__(self, credentials_file: str, logger: logging.Logger, **kwargs):
         """Class constructor.
@@ -27,7 +27,7 @@ class GCSAccessLogs(WazuhGCloudBucket):
         logger : logging.Logger
             Logger to use.
         kwargs : any
-            Additional named arguments for WazuhGCloudBucket.
+            Additional named arguments for GuardSarmGCloudBucket.
         """
         super().__init__(credentials_file, logger, **kwargs)
         self.db_table_name = "access_logs"

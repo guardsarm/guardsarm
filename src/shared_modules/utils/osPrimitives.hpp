@@ -1,5 +1,5 @@
 /*
- * Wazuh - OS primitives
+ * GuardSarm - OS primitives
  * Copyright (C) 2015, Wazuh Inc.
  * May 1, 2023.
  *

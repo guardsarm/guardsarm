@@ -22,7 +22,7 @@ on:
       - "framework/.python-version"
       - "framework/requirements*.txt"
       - "framework/scripts/**"
-      - "framework/wazuh/**"
+      - "framework/guardsarm/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
@@ -155,7 +155,7 @@ jobs:
           # cached images. Otherwise stale agent images built from a previous version are reused
           # while the manager is rebuilt, causing an agent/manager version skew that breaks the
           # version-sort and /agents/outdated checks in test_agent_GET_endpoints. VERSION.json
-          # drives the manager/API version; src/shared/include/defs.h (__wazuh_version) drives
+          # drives the manager/API version; src/shared/include/defs.h (__guardsarm_version) drives
           # the version the agent reports.
           checksum=$(find api/test/integration/env/ VERSION.json src/shared/include/defs.h -type f -print0 | xargs -0 sha256sum | sha256sum | awk '{print $1}')
           echo "Checksum: $checksum"
@@ -178,7 +178,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           cd api/test/integration/env
-          docker compose build --build-arg WAZUH_BRANCH=${{ github.head_ref || github.ref_name }} --no-cache
+          docker compose build --build-arg GUARDSARM_BRANCH=${{ github.head_ref || github.ref_name }} --no-cache
           mkdir -p /tmp/docker-images
           readarray -t images < <(docker images | awk '/integration/ {print $1}')
           for image in "${images[@]}"; do

@@ -36,7 +36,7 @@ static constexpr const char* kPolicyJson = R"({
   "title": "Development 0.0.1",
   "hash": "cmcrud-component-test-hash",
   "default_parent": "decoder/integration/0",
-  "root_decoder": "decoder/wazuh-core-message/0",
+  "root_decoder": "decoder/guardsarm-core-message/0",
   "integrations": [
     "42e28392-4f5e-473d-89e8-c9030e6fedc2",
     "a7fe64a2-0a03-414f-8692-8441bdfe6f69",

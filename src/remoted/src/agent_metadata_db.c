@@ -1,5 +1,5 @@
 #include "agent_metadata_db.h"
-#include "wazuhdb_queries_op.h"
+#include "guardsarmdb_queries_op.h"
 #include "remoted.h"
 #include "batch_queue_op.h"
 

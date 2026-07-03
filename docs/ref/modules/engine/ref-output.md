@@ -16,17 +16,17 @@ outputs:
   - first_of:
     - check: A
       then:
-        - wazuh-indexer:
+        - guardsarm-indexer:
             index: "A"
 
     - check: B
       then:
-        - wazuh-indexer:
+        - guardsarm-indexer:
             index: "B"
 
     - check: true
       then:
-        - wazuh-indexer:
+        - guardsarm-indexer:
             file: "C"
 ```
 
@@ -40,36 +40,36 @@ Accepts any array of `check` `then` blocks in each item the order is mandatory a
 name: output/indexer/0
 
 metadata:
-  module: wazuh
+  module: guardsarm
   title: Indexer data stream outputs
-  description: Output integrations events to wazuh-indexer
+  description: Output integrations events to guardsarm-indexer
 
 outputs:
   - first_of:
     - check: >-
-        $wazuh.integration.category != "cloud-services" OR
-        (NOT starts_with($wazuh.integration.name, "aws")
-        AND NOT starts_with($wazuh.integration.name, "azure")
-        AND NOT starts_with($wazuh.integration.name, "gcp"))
+        $guardsarm.integration.category != "cloud-services" OR
+        (NOT starts_with($guardsarm.integration.name, "aws")
+        AND NOT starts_with($guardsarm.integration.name, "azure")
+        AND NOT starts_with($guardsarm.integration.name, "gcp"))
 
       then:
-        - wazuh-indexer:
-            index: "wazuh-events-v5-${wazuh.integration.category}"
+        - guardsarm-indexer:
+            index: "guardsarm-events-v5-${guardsarm.integration.category}"
 
-    - check: starts_with($wazuh.integration.name, "gcp")
+    - check: starts_with($guardsarm.integration.name, "gcp")
       then:
-        - wazuh-indexer:
-            index: "wazuh-events-v5-${wazuh.integration.category}-gcp"
+        - guardsarm-indexer:
+            index: "guardsarm-events-v5-${guardsarm.integration.category}-gcp"
 
-    - check: starts_with($wazuh.integration.name, "azure")
+    - check: starts_with($guardsarm.integration.name, "azure")
       then:
-        - wazuh-indexer:
-            index: "wazuh-events-v5-${wazuh.integration.category}-azure"
+        - guardsarm-indexer:
+            index: "guardsarm-events-v5-${guardsarm.integration.category}-azure"
 
-    - check: starts_with($wazuh.integration.name, "aws")
+    - check: starts_with($guardsarm.integration.name, "aws")
       then:
-        - wazuh-indexer:
-            index: "wazuh-events-v5-${wazuh.integration.category}-aws"
+        - guardsarm-indexer:
+            index: "guardsarm-events-v5-${guardsarm.integration.category}-aws"
 
 ```
 
@@ -78,12 +78,12 @@ outputs:
 
 The `file` output sends events to a file. This output supports compression and rotation.
 Each policy's `originSpace` is prepended to the channel name so that different spaces
-write to isolated streamlog channels (e.g., `standard-wazuh-events-v5`).
+write to isolated streamlog channels (e.g., `standard-guardsarm-events-v5`).
 
 ### Signature
 
 ```yaml
-file: "wazuh-events-v5"
+file: "guardsarm-events-v5"
 ```
 
 ### Parameters
@@ -97,11 +97,11 @@ The parameter is a base channel name. The effective streamlog channel is derived
 name: output/file-output-integrations/0
 
 metadata:
-  module: wazuh
+  module: guardsarm
   title: file output event
   description: Output integrations events to a file
   compatibility: >
-    This decoder has been tested on Wazuh version 5.x
+    This decoder has been tested on GuardSarm version 5.x
   versions:
     - 5.x
   author:
@@ -111,17 +111,17 @@ metadata:
     - ""
 
 outputs:
-  - file: "wazuh-events-v5"
+  - file: "guardsarm-events-v5"
 ```
 
 ## Indexer
 
-The `indexer` output sends alerts to `wazuh-indexer` for indexing.
+The `indexer` output sends alerts to `guardsarm-indexer` for indexing.
 
 ### Signature
 
 ```yaml
-wazuh-indexer:
+guardsarm-indexer:
     index: ${INDEX}
 ```
 
@@ -129,7 +129,7 @@ wazuh-indexer:
 
 | Name | type | required | Description |
 |------|------|----------|-------------|
-| index | string | yes | Data Stream name where the alerts will be indexed. Should be a valid wazuh-indexer data stream name and start with `wazuh-events-v5-`. |
+| index | string | yes | Data Stream name where the alerts will be indexed. Should be a valid guardsarm-indexer data stream name and start with `guardsarm-events-v5-`. |
 
 Index name can be expanded with placeholders like `index-name-${PH1}-${PH2}`. If PHX results in an existing string reference to the event it will be replaced in runtime if not will be fail and the alert will not be sent to the indexer.
 The replacement text is not sanitized, so referenced field values must already contain only valid index characters.
@@ -140,11 +140,11 @@ The replacement text is not sanitized, so referenced field values must already c
 name: output/indexer/0
 
 metadata:
-  module: wazuh
+  module: guardsarm
   title: Indexer output event
-  description: Output integrations events to wazuh-indexer
+  description: Output integrations events to guardsarm-indexer
   compatibility: >
-    This decoder has been tested on Wazuh version 5.0
+    This decoder has been tested on GuardSarm version 5.0
   versions:
     - ""
   author:
@@ -154,8 +154,8 @@ metadata:
     - ""
 
 outputs:
-  - wazuh-indexer:
-      index: "wazuh-events-v5-${wazuh.integration.category}"
+  - guardsarm-indexer:
+      index: "guardsarm-events-v5-${guardsarm.integration.category}"
 ```
 
 > [!TIP]

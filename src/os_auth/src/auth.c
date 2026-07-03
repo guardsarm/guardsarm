@@ -14,15 +14,15 @@
 #include "defs.h"
 #include "os_err.h"
 #include "string_op.h"
-#include "wazuhdb_queries_op.h"
+#include "guardsarmdb_queries_op.h"
 #include "wdb.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 #define static
 
-// Redefine wazuh_version
-#undef __wazuh_version
-#define __wazuh_version "v5.0.0"
+// Redefine guardsarm_version
+#undef __guardsarm_version
+#define __guardsarm_version "v5.0.0"
 #endif
 
 keystore keys;
@@ -145,7 +145,7 @@ w_err_t w_auth_parse_data(const char* buf,
             return OS_INVALID;
         }
 
-        if (!config.allow_higher_versions && compare_wazuh_versions(__wazuh_version, version, false) < 0) {
+        if (!config.allow_higher_versions && compare_guardsarm_versions(__guardsarm_version, version, false) < 0) {
             merror("Incompatible version for new agent from: %s", ip);
             snprintf(response, OS_SIZE_2048, "ERROR: %s", HC_INVALID_VERSION_RESPONSE);
             return OS_INVALID;

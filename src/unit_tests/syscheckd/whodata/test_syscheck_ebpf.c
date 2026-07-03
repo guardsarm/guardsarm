@@ -15,7 +15,7 @@
 #include "syscheck.h"
 #include "../../../syscheckd/src/ebpf/include/ebpf_whodata.h"
 #include "wrappers/linux/ebpf_wrappers.h"
-#include "wrappers/wazuh/shared/debug_op_wrappers.h"
+#include "wrappers/guardsarm/shared/debug_op_wrappers.h"
 
 /* setup/teardown */
 static int setup_group(void **state) {

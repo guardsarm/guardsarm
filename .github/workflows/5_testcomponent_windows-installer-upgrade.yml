@@ -15,12 +15,12 @@ on:
       # Only src/ for these server trees: agent modules compile against their include/
       - "!src/monitord/src/**"
       - "!src/os_auth/src/**"
-      - "!src/wazuh_db/src/**"
-      - "!src/wazuh_db/schemas/**"
+      - "!src/guardsarm_db/src/**"
+      - "!src/guardsarm_db/schemas/**"
       - "!src/shared_modules/content_manager/src/**"
       - "!src/shared_modules/router/src/**"
-      - "!src/wazuh_modules/vulnerability_scanner/src/**"
-      - "!src/wazuh_modules/inventory_sync/src/**"
+      - "!src/guardsarm_modules/vulnerability_scanner/src/**"
+      - "!src/guardsarm_modules/inventory_sync/src/**"
       # Test trees: UNIT_TEST-gated, never built by this workflow
       - "!src/unit_tests/**"
       - "!src/**/tests/**"
@@ -29,8 +29,8 @@ on:
       - "!src/data_provider/qa/**"
       - "!src/shared_modules/indexer_connector/qa/**"
       - "!src/shared_modules/keystore/qa/**"
-      - "!src/wazuh_modules/inventory_sync/qa/**"
-      - "!src/wazuh_modules/vulnerability_scanner/qa/**"
+      - "!src/guardsarm_modules/inventory_sync/qa/**"
+      - "!src/guardsarm_modules/vulnerability_scanner/qa/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -55,8 +55,8 @@ jobs:
         run: make -C src TARGET=winagent -j2
       - name: Avoid signing files and pause
         run: |
-          sed -i 's+signtool+::signtool+g' src/win32/wazuh-installer-build-msi.bat
-          sed -i 's+pause+::pause+g' src/win32/wazuh-installer-build-msi.bat
+          sed -i 's+signtool+::signtool+g' src/win32/guardsarm-installer-build-msi.bat
+          sed -i 's+pause+::pause+g' src/win32/guardsarm-installer-build-msi.bat
       - name: Removing not required files
         run: rm -rf src/external/* .git/
       - name: Compress folder
@@ -70,7 +70,7 @@ jobs:
   check_upgrade_result:
     strategy:
           matrix:
-              wazuh_version: [4.14.0-1]
+              guardsarm_version: [4.14.0-1]
     runs-on:
       - codebuild-github-actions-codebuild-runner-agent-windows-amd-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 30
@@ -85,7 +85,7 @@ jobs:
           architecture: x64
       - name: Set up WiX Toolset (MSI build)
         # TODO(codebuild-temp): Remove once the CodeBuild Windows image ships the WiX Toolset.
-        # wazuh-installer-build-msi.bat builds the MSI with candle.exe/light.exe (WiX v3).
+        # guardsarm-installer-build-msi.bat builds the MSI with candle.exe/light.exe (WiX v3).
         # GitHub-hosted images bundled WiX (exposed via $WIX); the CodeBuild image does not.
         shell: pwsh
         run: |
@@ -126,7 +126,7 @@ jobs:
       - name: Download released .msi
         run: |
           mkdir C:\win-agent-released
-          python -m wget https://packages.wazuh.com/4.x/windows/wazuh-agent-${{ matrix.wazuh_version }}.msi -o C:\win-agent-released
+          python -m wget https://packages.guardsarm.com/4.x/windows/guardsarm-agent-${{ matrix.guardsarm_version }}.msi -o C:\win-agent-released
       - name: Download base folder
         uses: actions/download-artifact@v4
         with:
@@ -145,7 +145,7 @@ jobs:
               Write-Host "Error: VERSION.json not found."
               exit 1
           }
-          .\wazuh-installer-build-msi.bat $VERSION 0
+          .\guardsarm-installer-build-msi.bat $VERSION 0
           cp *.msi C:\win-agent-base\
       - name: Run tests
         run: |

@@ -37,7 +37,7 @@ __attribute__((noreturn)) static void help_syscheckd()
     print_out("                to increase the debug level.");
     print_out("    -t          Test configuration");
     print_out("    -f          Run in foreground");
-    print_out("    -c <config> Configuration file to use (default: %s)", WAZUHCONF);
+    print_out("    -c <config> Configuration file to use (default: %s)", GUARDSARMCONF);
     print_out(" ");
     exit(1);
 }
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
     int c, r;
     int debug_level = 0;
     int test_config = 0, run_foreground = 0;
-    const char *cfg = WAZUHCONF;
+    const char *cfg = GUARDSARMCONF;
     gid_t gid;
     const char *group = QUOTE(GROUPGLOBAL);
     directory_t *dir_it = NULL;
@@ -115,7 +115,7 @@ int main(int argc, char **argv)
         merror_exit(CHDIR_ERROR, home_path, errno, strerror(errno));
     }
 
-    mdebug1(WAZUH_HOMEDIR, home_path);
+    mdebug1(GUARDSARM_HOMEDIR, home_path);
     os_free(home_path);
 
     /* Check if the group given is valid */
@@ -194,7 +194,7 @@ int main(int argc, char **argv)
     startup_gate_wait_for_ready(ARGV0);
 
     // Rootcheck initialization is deferred until after the startup hash
-    // gate releases. rootcheck_init() emits STARTUP_MSG ("wazuh-rootcheck:
+    // gate releases. rootcheck_init() emits STARTUP_MSG ("guardsarm-rootcheck:
     // INFO: Started"); running it before the gate would make rootcheck
     // appear as "Started" while every module is in fact still blocked
     // waiting for the manager's merged.mg hash to validate (issue 36239).

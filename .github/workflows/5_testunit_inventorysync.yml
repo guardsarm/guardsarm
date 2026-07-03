@@ -7,7 +7,7 @@ on:
       - ".github/workflows/5_testunit_inventorysync.yml"
       - ".github/actions/cpp_test_pipeline/**"
       - "src/shared_modules/utils/**"
-      - "src/wazuh_modules/inventory_sync/**"
+      - "src/guardsarm_modules/inventory_sync/**"
       - ".github/actions/build_external_deps/**"
       - ".github/actions/build_target_cpp/**"
       - ".github/actions/coverage_cpp/**"
@@ -35,7 +35,7 @@ jobs:
           target: "inventory_sync_utest"
           asan: "false"
           with_coverage: "true"
-          coverage_path: src/wazuh_modules/inventory_sync
+          coverage_path: src/guardsarm_modules/inventory_sync
           coverage_id: inventory_sync
           validate_function_coverage: "false"
 

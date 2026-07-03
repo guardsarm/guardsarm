@@ -7,11 +7,11 @@
 import pytest
 
 from pathlib import Path
-from wazuh_testing.constants.paths.logs import ALERTS_JSON_PATH
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.tools.simulators.agent_simulator import connect
-from wazuh_testing.tools.thread_executor import ThreadExecutor
-from wazuh_testing.utils import callbacks
+from guardsarm_testing.constants.paths.logs import ALERTS_JSON_PATH
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.tools.simulators.agent_simulator import connect
+from guardsarm_testing.tools.thread_executor import ThreadExecutor
+from guardsarm_testing.utils import callbacks
 
 # SSH public-key auth event — triggers rule 5715 "Authentication success" if it reaches the engine.
 _SSH_AUTH_EVENT = (

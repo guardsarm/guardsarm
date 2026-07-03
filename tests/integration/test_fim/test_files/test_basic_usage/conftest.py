@@ -7,12 +7,12 @@ import pytest
 
 from pathlib import Path
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.constants.platforms import WINDOWS
-from wazuh_testing.modules.fim.patterns import EVENT_TYPE_ADDED, PATH_MONITORED_REALTIME
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils import file
-from wazuh_testing.utils.callbacks import generate_callback
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.constants.platforms import WINDOWS
+from guardsarm_testing.modules.fim.patterns import EVENT_TYPE_ADDED, PATH_MONITORED_REALTIME
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.utils import file
+from guardsarm_testing.utils.callbacks import generate_callback
 
 
 @pytest.fixture()
@@ -22,7 +22,7 @@ def path_to_edit(test_metadata: dict) -> str:
 
     fim_mode = test_metadata.get('fim_mode', '')
     if sys.platform == WINDOWS and fim_mode == 'realtime':
-        FileMonitor(WAZUH_LOG_PATH).start(
+        FileMonitor(GUARDSARM_LOG_PATH).start(
             callback=generate_callback(PATH_MONITORED_REALTIME),
             timeout=60
         )
@@ -35,7 +35,7 @@ def path_to_edit(test_metadata: dict) -> str:
     else:
         file.write_file(to_edit, 'test')
 
-    FileMonitor(WAZUH_LOG_PATH).start(generate_callback(EVENT_TYPE_ADDED))
+    FileMonitor(GUARDSARM_LOG_PATH).start(generate_callback(EVENT_TYPE_ADDED))
 
     yield to_edit
 

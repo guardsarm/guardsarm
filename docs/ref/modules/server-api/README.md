@@ -1,6 +1,6 @@
 # Server API
 
-The **Server API** is the REST interface used to manage and interact with the Wazuh manager. It is backed by a **Python Framework** that implements all business logic, RBAC enforcement, and communication with internal daemons.
+The **Server API** is the REST interface used to manage and interact with the GuardSarm manager. It is backed by a **Python Framework** that implements all business logic, RBAC enforcement, and communication with internal daemons.
 
 The API exposes endpoints for agent management, security configuration, cluster operations, file integrity monitoring, and more. All requests are authenticated via **JWT tokens** and authorized through a **Role-Based Access Control (RBAC)** system.
 
@@ -41,7 +41,7 @@ The API exposes endpoints for agent management, security configuration, cluster 
 | API Specification | OpenAPI 3.0 (`spec.yaml`) |
 | Authentication | PyJWT with EC keys |
 | Async HTTP | aiohttp (for WDB HTTP client) |
-| Database | Wazuh DB (SQLite via Unix sockets) |
+| Database | GuardSarm DB (SQLite via Unix sockets) |
 | Security Headers | secure (Python library) |
 | File Watching | asyncio + inotify |
 | XML Parsing | lxml + defusedxml |
@@ -49,7 +49,7 @@ The API exposes endpoints for agent management, security configuration, cluster 
 
 ## Related Modules
 
-- **wazuh-db**: Stores agent, group, and security data queried by the framework
+- **guardsarm-db**: Stores agent, group, and security data queried by the framework
 - **authd**: Handles agent registration triggered via `/agents` endpoints
 - **remoted**: Agent communication managed through the API
-- **Wazuh Dashboard**: Consumes the same Server API for its UI
+- **GuardSarm Dashboard**: Consumes the same Server API for its UI

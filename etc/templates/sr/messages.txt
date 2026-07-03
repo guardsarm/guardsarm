@@ -9,9 +9,9 @@ help="pomoć"
 
 # Global
 moreinfo="Vise informacija na: "
-starting="Zapocinje Wazuh"
+starting="Zapocinje GuardSarm"
 systemis="Sistem je"
-modifiedinit="Init skript je modifikovan da započne Wazuh za vreme startovanja ."
+modifiedinit="Init skript je modifikovan da započne GuardSarm za vreme startovanja ."
 noboot="Nepoznat sistem. Init skript nije dodat."
 
 # Part 1
@@ -26,7 +26,7 @@ clientchose="Izabrana instalacija agent (klijent)"
 
 # Part 2
 settingupenv="Postavljanje instalacionog okruženja"
-wheretoinstall="Izaberi gde želiš da instaliraš Wazuh"
+wheretoinstall="Izaberi gde želiš da instaliraš GuardSarm"
 installat="Instalacija će biti izvršena na "
 deletedir="Instalacioni direktorij već postoji. Da li da ga obrišem?"
 
@@ -41,8 +41,8 @@ usingsmtp="Koristi SMTP server: "
 whatsmtp="Koji je tvoj SMTP server IP/host?"
 
 # Part 3.1/agent
-serverip="Koja je IP adresa Wazuh managera?"
-serveraddr="Koja je IP adresa/host Wazuh managera?"
+serverip="Koja je IP adresa GuardSarm managera?"
+serveraddr="Koja je IP adresa/host GuardSarm managera?"
 addingip="Dodaje serverov IP"
 addingname="Dodaje serverov hostname"
 
@@ -79,22 +79,22 @@ yesrunauthd="Pokretanje Auth usluge"
 
 # Part 4
 installing="Instalira sistem"
-startwazuh="Želite li pokrenuti Wazuh nakon instalacije?"
-nowazuhstart="Wazuh neće početi na kraju instalacije."
-yeswazuhstart="Wazuh će započeti na kraju instalacije."
+startguardsarm="Želite li pokrenuti GuardSarm nakon instalacije?"
+noguardsarmstart="GuardSarm neće početi na kraju instalacije."
+yesguardsarmstart="GuardSarm će započeti na kraju instalacije."
 runningmake="Vrši Makefile"
 
 # Final
 configurationdone="Konfiguracija je dobro završena"
-tostart="Da se započne Wazuh"
-tostop="Da se zaustavi Wazuh"
+tostart="Da se započne GuardSarm"
+tostop="Da se zaustavi GuardSarm"
 configat="Konfiguracija se može videti ili modifikovati na"
 addserveragent="Da bi se agent povezao sa serverom, treba da dodaš svakog od tvojih agenata
 serveru."
 presskey="Pritisni ENTER da nastaviš"
 
 # Update
-wanttoupdate="Već imaš instaliran Wazuh. Da li želiš da ga ažuriraš?"
+wanttoupdate="Već imaš instaliran GuardSarm. Da li želiš da ga ažuriraš?"
 mustuninstall="Instalacija se ne može nastaviti bez deinstalacije starih verzija. Izlaz."
 unabletoupdate="U nemogućnosti da izvrši ažuriranje. Potrebna je potpuna nova instalacija."
 updatecompleted="Ažuriranje završeno."

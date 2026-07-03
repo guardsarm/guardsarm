@@ -2,15 +2,15 @@
 
 ## Overview
 
-The **confremote** module manages runtime remote configuration for the Wazuh engine. It periodically fetches settings from `wazuh-indexer`, applies them to registered modules via callbacks, and persists the accepted state to the internal store for crash/restart resilience.
+The **confremote** module manages runtime remote configuration for the GuardSarm engine. It periodically fetches settings from `guardsarm-indexer`, applies them to registered modules via callbacks, and persists the accepted state to the internal store for crash/restart resilience.
 
 The module follows an observer pattern: other modules register per-key callbacks (`addTrigger`), and the manager invokes them whenever the remote value changes. Callbacks can reject values by throwing an exception, in which case the previous value is preserved.
 
 ## Architecture
 
 ```
-                     wazuh-indexer
-                    (.wazuh-settings)
+                     guardsarm-indexer
+                    (.guardsarm-settings)
                           │
                  getEngineRemoteConfig()
                           │
@@ -56,7 +56,7 @@ Defined in `interface/confremote/iconfremote.hpp`. Exposes two methods:
 
 | Method | Description |
 |--------|-------------|
-| `synchronize()` | Fetches settings from wazuh-indexer and applies changes. Non-throwing: failures are handled internally |
+| `synchronize()` | Fetches settings from guardsarm-indexer and applies changes. Non-throwing: failures are handled internally |
 | `requestShutdown()` | Signals graceful shutdown; aborts in-flight or future sync operations |
 
 ### Trigger Registration (`addTrigger`)
@@ -121,7 +121,7 @@ This ensures prompt cancellation without leaving partial state.
 |------------|-------------|------|
 | `base` | `base` | Logging, JSON, error handling, `executeWithRetry` |
 | `store` | `store::istore` | Persisting/loading cached settings (`IStore`) |
-| `wiconnector` | `wIndexerConnector::iwIndexerConnector` | Fetching remote config from wazuh-indexer (`IWIndexerConnector`) |
+| `wiconnector` | `wIndexerConnector::iwIndexerConnector` | Fetching remote config from guardsarm-indexer (`IWIndexerConnector`) |
 
 ## Configuration
 
@@ -129,9 +129,9 @@ Controlled by three configuration keys (defined in `conf/include/conf/keys.hpp`)
 
 | Key | Env Override | Default | Description |
 |-----|-------------|---------|-------------|
-| `analysisd.remote_conf_indexer_connector_max_retries` | `WAZUH_REMOTE_CONF_INDEXER_CONNECTOR_MAX_RETRIES` | `3` | Max retry attempts when fetching remote config |
-| `analysisd.remote_conf_indexer_connector_retry_interval` | `WAZUH_REMOTE_CONF_INDEXER_CONNECTOR_RETRY_INTERVAL` | `5` | Seconds between retry attempts |
-| `analysisd.remote_conf_sync_interval` | `WAZUH_REMOTE_CONF_SYNC_INTERVAL` | `120` | Seconds between periodic synchronization calls |
+| `analysisd.remote_conf_indexer_connector_max_retries` | `GUARDSARM_REMOTE_CONF_INDEXER_CONNECTOR_MAX_RETRIES` | `3` | Max retry attempts when fetching remote config |
+| `analysisd.remote_conf_indexer_connector_retry_interval` | `GUARDSARM_REMOTE_CONF_INDEXER_CONNECTOR_RETRY_INTERVAL` | `5` | Seconds between retry attempts |
+| `analysisd.remote_conf_sync_interval` | `GUARDSARM_REMOTE_CONF_SYNC_INTERVAL` | `120` | Seconds between periodic synchronization calls |
 
 ## Integration in `main.cpp`
 
@@ -219,7 +219,7 @@ Test integration with the real `RawEventIndexer` module:
 Build tests with `ENGINE_TEST=y`:
 
 ```bash
-make --directory=$WAZUH_REPO/src -j TARGET=manager ENGINE_TEST=y DEBUG=yes
+make --directory=$GUARDSARM_REPO/src -j TARGET=manager ENGINE_TEST=y DEBUG=yes
 ```
 
 Run:

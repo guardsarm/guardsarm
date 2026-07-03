@@ -1,5 +1,5 @@
 /*
- * Wazuh Indexer Connector - Monitoring tests
+ * GuardSarm Indexer Connector - Monitoring tests
  * Copyright (C) 2015, Wazuh Inc.
  * September 08, 2023.
  *

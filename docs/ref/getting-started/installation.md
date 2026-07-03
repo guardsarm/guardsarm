@@ -1,6 +1,6 @@
 # Installation
 
-This guide provides instructions for installing Wazuh server and agent components. Before proceeding, verify that your system meets the requirements listed in the [Packages](packages.md) page.
+This guide provides instructions for installing GuardSarm server and agent components. Before proceeding, verify that your system meets the requirements listed in the [Packages](packages.md) page.
 
 ## Server
 
@@ -8,60 +8,60 @@ This section covers single-node and multi-node server installation.
 
 ### Download package
 
-Download the Wazuh manager package for your platform and version. See the [Package Download](packages.md#package-download) section for available repositories and download instructions.
+Download the GuardSarm manager package for your platform and version. See the [Package Download](packages.md#package-download) section for available repositories and download instructions.
 
 ### Installation
 
-Install the downloaded Wazuh manager package for your platform:
+Install the downloaded GuardSarm manager package for your platform:
 
 **Debian-based platforms:**
 
 ```bash
-sudo dpkg -i wazuh-manager_*.deb
+sudo dpkg -i guardsarm-manager_*.deb
 ```
 
 **Red Hat-based platforms:**
 
 ```bash
-sudo rpm -ivh wazuh-manager-*.rpm
+sudo rpm -ivh guardsarm-manager-*.rpm
 ```
 
 ### Configuration
 
 #### Deploy certificates
 
-Deploy the SSL certificates for secure communication between the Wazuh server and indexer. These certificates should be extracted from the `wazuh-certificates.tar` file generated during the certificate creation process.
+Deploy the SSL certificates for secure communication between the GuardSarm server and indexer. These certificates should be extracted from the `guardsarm-certificates.tar` file generated during the certificate creation process.
 
 ```bash
 NODE_NAME=node-1
 
 # Create certificates directory
-sudo mkdir -p /var/wazuh-manager/etc/certs
+sudo mkdir -p /var/guardsarm-manager/etc/certs
 
 # Extract and deploy certificates
-sudo tar -xf wazuh-certificates.tar -C /var/wazuh-manager/etc/certs/ ./$NODE_NAME.pem ./$NODE_NAME-key.pem ./root-ca.pem
-sudo mv /var/wazuh-manager/etc/certs/$NODE_NAME.pem /var/wazuh-manager/etc/certs/manager.pem
-sudo mv /var/wazuh-manager/etc/certs/$NODE_NAME-key.pem /var/wazuh-manager/etc/certs/manager-key.pem
+sudo tar -xf guardsarm-certificates.tar -C /var/guardsarm-manager/etc/certs/ ./$NODE_NAME.pem ./$NODE_NAME-key.pem ./root-ca.pem
+sudo mv /var/guardsarm-manager/etc/certs/$NODE_NAME.pem /var/guardsarm-manager/etc/certs/manager.pem
+sudo mv /var/guardsarm-manager/etc/certs/$NODE_NAME-key.pem /var/guardsarm-manager/etc/certs/manager-key.pem
 
 # Set proper permissions
-sudo chmod 500 /var/wazuh-manager/etc/certs
-sudo chmod 400 /var/wazuh-manager/etc/certs/*
-sudo chown -R wazuh-manager:wazuh-manager /var/wazuh-manager/etc/certs
+sudo chmod 500 /var/guardsarm-manager/etc/certs
+sudo chmod 400 /var/guardsarm-manager/etc/certs/*
+sudo chown -R guardsarm-manager:guardsarm-manager /var/guardsarm-manager/etc/certs
 ```
 
 **Note:** Replace `node-1` with the name you used when generating the certificates.
 
 #### Configure indexer connection
 
-Configure the Wazuh server to connect to the Wazuh indexer using the secure keystore:
+Configure the GuardSarm server to connect to the GuardSarm indexer using the secure keystore:
 
 ```bash
-# Set indexer credentials (default: wazuh-server/wazuh-server)
-sudo /var/wazuh-manager/bin/wazuh-manager-keystore -f indexer -k username -v wazuh-server
-sudo /var/wazuh-manager/bin/wazuh-manager-keystore -f indexer -k password -v wazuh-server
+# Set indexer credentials (default: guardsarm-server/guardsarm-server)
+sudo /var/guardsarm-manager/bin/guardsarm-manager-keystore -f indexer -k username -v guardsarm-server
+sudo /var/guardsarm-manager/bin/guardsarm-manager-keystore -f indexer -k password -v guardsarm-server
 ```
 
-Update the indexer configuration in `/var/wazuh-manager/etc/wazuh-manager.conf` to specify the indexer IP address:
+Update the indexer configuration in `/var/guardsarm-manager/etc/guardsarm-manager.conf` to specify the indexer IP address:
 
 ```xml
 <indexer>
@@ -70,10 +70,10 @@ Update the indexer configuration in `/var/wazuh-manager/etc/wazuh-manager.conf` 
   </hosts>
   <ssl>
     <certificate_authorities>
-      <ca>/var/wazuh-manager/etc/certs/root-ca.pem</ca>
+      <ca>/var/guardsarm-manager/etc/certs/root-ca.pem</ca>
     </certificate_authorities>
-    <certificate>/var/wazuh-manager/etc/certs/manager.pem</certificate>
-    <key>/var/wazuh-manager/etc/certs/manager-key.pem</key>
+    <certificate>/var/guardsarm-manager/etc/certs/manager.pem</certificate>
+    <key>/var/guardsarm-manager/etc/certs/manager-key.pem</key>
   </ssl>
 </indexer>
 ```
@@ -86,23 +86,23 @@ Start and enable the server service:
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable wazuh-manager
-sudo systemctl start wazuh-manager
+sudo systemctl enable guardsarm-manager
+sudo systemctl start guardsarm-manager
 ```
 
 Verify the server is running:
 
 ```bash
-sudo systemctl status wazuh-manager
+sudo systemctl status guardsarm-manager
 ```
 
 ### Cluster configuration
 
-The Wazuh server cluster allows you to scale horizontally by distributing the load across multiple nodes. The cluster comes enabled by default with the following configuration in `/var/wazuh-manager/etc/wazuh-manager.conf`:
+The GuardSarm server cluster allows you to scale horizontally by distributing the load across multiple nodes. The cluster comes enabled by default with the following configuration in `/var/guardsarm-manager/etc/guardsarm-manager.conf`:
 
 ```xml
 <cluster>
-  <name>wazuh</name>
+  <name>guardsarm</name>
   <node_name>node01</node_name>
   <node_type>master</node_type>
   <key>fd3350b86d239654e34866ab3c4988a8</key>
@@ -119,11 +119,11 @@ The Wazuh server cluster allows you to scale horizontally by distributing the lo
 
 For a multi-node cluster deployment, you need to configure one master node and one or more worker nodes. Follow these steps on each node:
 
-1. **On the master node**, edit `/var/wazuh-manager/etc/wazuh-manager.conf`:
+1. **On the master node**, edit `/var/guardsarm-manager/etc/guardsarm-manager.conf`:
 
 ```xml
 <cluster>
-  <name>wazuh</name>
+  <name>guardsarm</name>
   <node_name>master-node</node_name>
   <node_type>master</node_type>
   <key>fd3350b86d239654e34866ab3c4988a8</key>
@@ -138,11 +138,11 @@ For a multi-node cluster deployment, you need to configure one master node and o
 
 Replace `MASTER_NODE_IP` with the actual IP address of the master node.
 
-2. **On each worker node**, edit `/var/wazuh-manager/etc/wazuh-manager.conf`:
+2. **On each worker node**, edit `/var/guardsarm-manager/etc/guardsarm-manager.conf`:
 
 ```xml
 <cluster>
-  <name>wazuh</name>
+  <name>guardsarm</name>
   <node_name>worker-node-01</node_name>
   <node_type>worker</node_type>
   <key>fd3350b86d239654e34866ab3c4988a8</key>
@@ -157,16 +157,16 @@ Replace `MASTER_NODE_IP` with the actual IP address of the master node.
 
 Replace `MASTER_NODE_IP` with the actual IP address of the master node, and use a unique `node_name` for each worker.
 
-3. **Restart the Wazuh manager service** on all nodes after making configuration changes:
+3. **Restart the GuardSarm manager service** on all nodes after making configuration changes:
 
 ```bash
-sudo systemctl restart wazuh-manager
+sudo systemctl restart guardsarm-manager
 ```
 
 4. **Verify the cluster status** from any node:
 
 ```bash
-sudo /var/wazuh-manager/bin/cluster_control -l
+sudo /var/guardsarm-manager/bin/cluster_control -l
 ```
 
 ### Configuration parameters
@@ -199,44 +199,44 @@ Whether the node is hidden from the cluster. Default: `no`.
 
 ### Download package
 
-Download the Wazuh agent package for your platform and version. See the [Package Download](packages.md#package-download) section for available repositories and download instructions.
+Download the GuardSarm agent package for your platform and version. See the [Package Download](packages.md#package-download) section for available repositories and download instructions.
 
 ### Linux
 
 #### Debian-based platforms
 
 ```bash
-sudo dpkg -i wazuh-agent_*.deb
+sudo dpkg -i guardsarm-agent_*.deb
 ```
 
 You can optionally specify configuration parameters:
 
 ```bash
-sudo WAZUH_MANAGER='10.0.0.2' WAZUH_AGENT_NAME='web-server-01' dpkg -i wazuh-agent_*.deb
+sudo GUARDSARM_MANAGER='10.0.0.2' GUARDSARM_AGENT_NAME='web-server-01' dpkg -i guardsarm-agent_*.deb
 ```
 
 #### Red Hat-based platforms
 
 ```bash
-sudo rpm -ivh wazuh-agent-*.rpm
+sudo rpm -ivh guardsarm-agent-*.rpm
 ```
 
 You can optionally specify configuration parameters:
 
 ```bash
-sudo WAZUH_MANAGER='10.0.0.2' WAZUH_AGENT_NAME='web-server-01' rpm -ivh wazuh-agent-*.rpm
+sudo GUARDSARM_MANAGER='10.0.0.2' GUARDSARM_AGENT_NAME='web-server-01' rpm -ivh guardsarm-agent-*.rpm
 ```
 
 #### SUSE-based platforms
 
 ```bash
-sudo rpm -ivh wazuh-agent-*.rpm
+sudo rpm -ivh guardsarm-agent-*.rpm
 ```
 
 You can optionally specify configuration parameters:
 
 ```bash
-sudo WAZUH_MANAGER='10.0.0.2' WAZUH_AGENT_NAME='web-server-01' rpm -ivh wazuh-agent-*.rpm
+sudo GUARDSARM_MANAGER='10.0.0.2' GUARDSARM_AGENT_NAME='web-server-01' rpm -ivh guardsarm-agent-*.rpm
 ```
 
 #### Starting the agent
@@ -245,14 +245,14 @@ After installation, start and enable the agent service:
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable wazuh-agent
-sudo systemctl start wazuh-agent
+sudo systemctl enable guardsarm-agent
+sudo systemctl start guardsarm-agent
 ```
 
 Verify the agent is running:
 
 ```bash
-sudo systemctl status wazuh-agent
+sudo systemctl status guardsarm-agent
 ```
 
 ### macOS
@@ -260,25 +260,25 @@ sudo systemctl status wazuh-agent
 Install the agent:
 
 ```bash
-sudo installer -pkg wazuh-agent-*.pkg -target /
+sudo installer -pkg guardsarm-agent-*.pkg -target /
 ```
 
-You can optionally specify configuration parameters by writing them to `/tmp/wazuh_envs` before running the installer:
+You can optionally specify configuration parameters by writing them to `/tmp/guardsarm_envs` before running the installer:
 
 ```bash
-echo "WAZUH_MANAGER='10.0.0.2'" > /tmp/wazuh_envs && echo "WAZUH_AGENT_NAME='macbook-01'" >> /tmp/wazuh_envs && sudo installer -pkg wazuh-agent-*.pkg -target /
+echo "GUARDSARM_MANAGER='10.0.0.2'" > /tmp/guardsarm_envs && echo "GUARDSARM_AGENT_NAME='macbook-01'" >> /tmp/guardsarm_envs && sudo installer -pkg guardsarm-agent-*.pkg -target /
 ```
 
 Start the agent service:
 
 ```bash
-sudo launchctl bootstrap system /Library/LaunchDaemons/com.wazuh.agent.plist
+sudo launchctl bootstrap system /Library/LaunchDaemons/com.guardsarm.agent.plist
 ```
 
 Verify the agent is running:
 
 ```bash
-sudo /Library/Ossec/bin/wazuh-control status
+sudo /Library/Ossec/bin/guardsarm-control status
 ```
 
 ### Windows
@@ -286,73 +286,73 @@ sudo /Library/Ossec/bin/wazuh-control status
 Install the agent silently:
 
 ```powershell
-wazuh-agent-*.msi /q
+guardsarm-agent-*.msi /q
 ```
 
 You can optionally specify configuration parameters:
 
 ```powershell
-wazuh-agent-*.msi /q WAZUH_MANAGER="10.0.0.2" WAZUH_AGENT_NAME="windows-server-01"
+guardsarm-agent-*.msi /q GUARDSARM_MANAGER="10.0.0.2" GUARDSARM_AGENT_NAME="windows-server-01"
 ```
 
 For interactive installation, double-click the MSI file and follow the installation wizard.
 
-Start the Wazuh Agent service:
+Start the GuardSarm Agent service:
 
 ```powershell
-Start-Service -Name wazuh
+Start-Service -Name guardsarm
 ```
 
 Verify the agent is running:
 
 ```powershell
-Get-Service -Name wazuh
+Get-Service -Name guardsarm
 ```
 
 ### Options
 
 #### Server connection
 
-**`WAZUH_MANAGER`**\
-Specifies the IP address or hostname of the Wazuh server. The agent uses this to establish communication with the server.
+**`GUARDSARM_MANAGER`**\
+Specifies the IP address or hostname of the GuardSarm server. The agent uses this to establish communication with the server.
 
-**`WAZUH_MANAGER_PORT`**\
-Defines the port used to communicate with the Wazuh server. Default: `1514`.
+**`GUARDSARM_MANAGER_PORT`**\
+Defines the port used to communicate with the GuardSarm server. Default: `1514`.
 
 #### Enrollment configuration
 
-**`WAZUH_REGISTRATION_SERVER`**\
-Specifies the IP address or hostname of the enrollment server. When not specified, the value of `WAZUH_MANAGER` is used.
+**`GUARDSARM_REGISTRATION_SERVER`**\
+Specifies the IP address or hostname of the enrollment server. When not specified, the value of `GUARDSARM_MANAGER` is used.
 
-**`WAZUH_REGISTRATION_PORT`**\
+**`GUARDSARM_REGISTRATION_PORT`**\
 Defines the port used for agent enrollment. Default: `1515`.
 
-**`WAZUH_REGISTRATION_PASSWORD`**\
+**`GUARDSARM_REGISTRATION_PASSWORD`**\
 Sets the password required for agent enrollment. This password must match the one configured on the server.
 
-**`WAZUH_REGISTRATION_CA`**\
+**`GUARDSARM_REGISTRATION_CA`**\
 Specifies the path to the CA certificate used to verify the manager's identity during enrollment.
 
-**`WAZUH_REGISTRATION_CERTIFICATE`**\
+**`GUARDSARM_REGISTRATION_CERTIFICATE`**\
 Specifies the path to the agent's certificate for enrollment authentication.
 
-**`WAZUH_REGISTRATION_KEY`**\
+**`GUARDSARM_REGISTRATION_KEY`**\
 Specifies the path to the agent's private key for enrollment authentication.
 
 #### Agent identity
 
-**`WAZUH_AGENT_NAME`**\
-Sets the agent's name for identification in the Wazuh server. Default: system hostname.
+**`GUARDSARM_AGENT_NAME`**\
+Sets the agent's name for identification in the GuardSarm server. Default: system hostname.
 
-**`WAZUH_AGENT_GROUP`**\
+**`GUARDSARM_AGENT_GROUP`**\
 Assigns the agent to a specific group upon enrollment. Default: `default`.
 
 #### Advanced options
 
-**`WAZUH_KEEP_ALIVE_INTERVAL`**\
+**`GUARDSARM_KEEP_ALIVE_INTERVAL`**\
 Defines the interval in seconds between keep-alive messages sent to the server. When not specified, system defaults apply.
 
-**`WAZUH_TIME_RECONNECT`**\
+**`GUARDSARM_TIME_RECONNECT`**\
 Forces the agent to reconnect to the server every N seconds. Default: disabled.
 
 **`ENROLLMENT_DELAY`**\

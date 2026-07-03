@@ -12,7 +12,7 @@
 #include "localfile-config.h"
 #include "config.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 // Remove STATIC qualifier from tests
 #define STATIC
 #else
@@ -361,7 +361,7 @@ int Read_Localfile(XML_NODE node, void *d1, __attribute__((unused)) void *d2)
             } else if (strcmp(logf[pl].logformat, "squid") == 0) {
             } else if (strcmp(logf[pl].logformat, "nmapg") == 0) {
             } else if (strcmp(logf[pl].logformat, "mysql_log") == 0) {
-            } else if (strcmp(logf[pl].logformat, "wazuhalert") == 0) {
+            } else if (strcmp(logf[pl].logformat, "guardsarmalert") == 0) {
             } else if (strcmp(logf[pl].logformat, "mssql_log") == 0) {
             } else if (strcmp(logf[pl].logformat, "postgresql_log") == 0) {
             } else if (strcmp(logf[pl].logformat, "djb-multilog") == 0) {
@@ -395,7 +395,7 @@ int Read_Localfile(XML_NODE node, void *d1, __attribute__((unused)) void *d2)
             } else if (strcmp(logf[pl].logformat, EVENTLOG) == 0) {
             } else if (strcmp(logf[pl].logformat, EVENTCHANNEL) == 0) {
             } else if (strcmp(logf[pl].logformat, MACOS) == 0) {
-#if defined(Darwin) || (defined(__linux__) && defined(WAZUH_UNIT_TESTING))
+#if defined(Darwin) || (defined(__linux__) && defined(GUARDSARM_UNIT_TESTING))
                 os_calloc(1, sizeof(w_macos_log_config_t), logf[pl].macos_log);
                 w_calloc_expression_t(&logf[pl].macos_log->log_start_regex, EXP_TYPE_OSREGEX);
                 if (!w_expression_compile(logf[pl].macos_log->log_start_regex, MACOS_LOG_START_REGEX, 0)) {

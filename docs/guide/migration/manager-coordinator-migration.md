@@ -1,13 +1,13 @@
 # Migrating Manager Coordinator from 4.x to 5.x
 
-Coordinator migration requires almost no steps, as the coordinator only runs HAProxy and the dataplaneapi — there is no Wazuh manager package installed on it to upgrade. The migration mainly consists of refreshing the HAProxy and dataplaneapi configuration so they work with the 5.0 HAProxy helper.
+Coordinator migration requires almost no steps, as the coordinator only runs HAProxy and the dataplaneapi — there is no GuardSarm manager package installed on it to upgrade. The migration mainly consists of refreshing the HAProxy and dataplaneapi configuration so they work with the 5.0 HAProxy helper.
 
 ## Migration procedure
 
 ### 1. Prepare HAProxy migration
 
 > [!IMPORTANT]
-> Make sure to have HAProxy installed on a dedicated machine, not alongside a Wazuh manager (master or worker). HAProxy binds ports `1514` and `1515`, the same ports the manager's `remoted` and `authd` use, so sharing a host causes a port conflict that stops `remoted` and breaks the HAProxy helper.
+> Make sure to have HAProxy installed on a dedicated machine, not alongside a GuardSarm manager (master or worker). HAProxy binds ports `1514` and `1515`, the same ports the manager's `remoted` and `authd` use, so sharing a host causes a port conflict that stops `remoted` and breaks the HAProxy helper.
 
 #### 1.1. HAProxy configuration changes
 
@@ -29,27 +29,27 @@ defaults
   timeout server 1m
 
 # Enrollment (authd) — static, NOT managed by the HAProxy helper
-frontend wazuh_register
+frontend guardsarm_register
   bind :1515
-  default_backend wazuh_register
+  default_backend guardsarm_register
 
-backend wazuh_register
+backend guardsarm_register
   balance leastconn
   server master <MASTER_NODE>:1515 check
   server worker1 <WORKER_NODE>:1515 check
   # add one 'server worker<n> <WORKER_NODE>:1515 check' line per extra worker
 
 # Reporting/connection (remoted) — managed by the HAProxy helper.
-# The helper creates the frontend (wazuh_reporting_front) bound to 1514 and
+# The helper creates the frontend (guardsarm_reporting_front) bound to 1514 and
 # populates this backend with the cluster nodes at runtime. Do NOT define a
 # frontend here or list servers statically, or the helper will add its own
 # frontend and servers on top, causing a duplicate 1514 bind and stale servers.
-backend wazuh_reporting
+backend guardsarm_reporting
   balance leastconn
 ```
 
 > [!NOTE]
-> The HAProxy helper requires a runtime `stats socket` (defined in the `global` section above) and it manages port `1514` itself. If your 4.x coordinator already ran the HAProxy helper, its configuration already omits the `wazuh_reporting` frontend and works under 5.0 unchanged. If it used a **static** `wazuh_reporting` frontend instead (helper disabled), remove that frontend and its static servers before enabling the helper, or HAProxy will end up with a duplicate frontend on port `1514`.
+> The HAProxy helper requires a runtime `stats socket` (defined in the `global` section above) and it manages port `1514` itself. If your 4.x coordinator already ran the HAProxy helper, its configuration already omits the `guardsarm_reporting` frontend and works under 5.0 unchanged. If it used a **static** `guardsarm_reporting` frontend instead (helper disabled), remove that frontend and its static servers before enabling the helper, or HAProxy will end up with a duplicate frontend on port `1514`.
 
 #### 1.2. Dataplaneapi configuration changes
 
@@ -112,17 +112,17 @@ defaults
   timeout client 1m
   timeout server 1m
 
-frontend wazuh_register
+frontend guardsarm_register
   bind :1515
-  default_backend wazuh_register
+  default_backend guardsarm_register
 
-backend wazuh_register
+backend guardsarm_register
   balance leastconn
   server master <MASTER_NODE>:1515 check
   server worker1 <WORKER_NODE>:1515 check
   # add one 'server worker<n> <WORKER_NODE>:1515 check' line per extra worker
 
-backend wazuh_reporting
+backend guardsarm_reporting
   balance leastconn
 EOF
 
@@ -195,7 +195,7 @@ You will see a response similar to this if everything works correctly:
 Then restart each manager so the HAProxy helper reconnects:
 
 ```bash
-sudo systemctl restart wazuh-manager
+sudo systemctl restart guardsarm-manager
 ```
 
 #### 2.3. Verify the HAProxy helper
@@ -203,24 +203,24 @@ sudo systemctl restart wazuh-manager
 On the master node, check the cluster log:
 
 ```bash
-tail -f /var/wazuh-manager/logs/cluster.log
+tail -f /var/guardsarm-manager/logs/cluster.log
 ```
 
 A successful migration shows the helper creating the reporting frontend and balancing the backend:
 
 ```
 INFO: [HAPHelper] [Main] Proxy was initialized
-INFO: [HAPHelper] [Main] Added Wazuh frontend
-INFO: [HAPHelper] [Main] Detected changes in Wazuh cluster nodes. Current cluster: {'master-node': '...', 'worker-node': '...'}
+INFO: [HAPHelper] [Main] Added GuardSarm frontend
+INFO: [HAPHelper] [Main] Detected changes in GuardSarm cluster nodes. Current cluster: {'master-node': '...', 'worker-node': '...'}
 INFO: [HAPHelper] [Main] Load balancer backend is up to date
 INFO: [HAPHelper] [Main] Load balancer backend is balanced
 ```
 
 > [!NOTE]
-> The HAProxy helper rewrites `/etc/haproxy/haproxy.cfg` at runtime: it adds the `wazuh_reporting_front` frontend on port `1514` and the cluster nodes (e.g. `master-node`, `worker-node`) to the `wazuh_reporting` backend. This is expected, so the on-disk file will not stay byte-for-byte identical to what you wrote.
+> The HAProxy helper rewrites `/etc/haproxy/haproxy.cfg` at runtime: it adds the `guardsarm_reporting_front` frontend on port `1514` and the cluster nodes (e.g. `master-node`, `worker-node`) to the `guardsarm_reporting` backend. This is expected, so the on-disk file will not stay byte-for-byte identical to what you wrote.
 
-If you see `Error 3045 - Could not connect to HAProxy: runtime: option is not available`, the `stats socket` is missing from the `global` section of `haproxy.cfg` (or `/run/haproxy` does not exist). If you see `Several frontends exist binding the port "1514"`, you still have a static `wazuh_reporting` frontend that must be removed.
+If you see `Error 3045 - Could not connect to HAProxy: runtime: option is not available`, the `stats socket` is missing from the `global` section of `haproxy.cfg` (or `/run/haproxy` does not exist). If you see `Several frontends exist binding the port "1514"`, you still have a static `guardsarm_reporting` frontend that must be removed.
 
 #### 2.4. HAProxy helper variables
 
-No HAProxy helper variables have changed in 5.0, so you do not need to modify the `<haproxy_helper>` block in the manager configuration. Any value you do not set falls back to its default (for example, `haproxy_backend` defaults to `wazuh_reporting`).
+No HAProxy helper variables have changed in 5.0, so you do not need to modify the `<haproxy_helper>` block in the manager configuration. Any value you do not set falls back to its default (for example, `haproxy_backend` defaults to `guardsarm_reporting`).

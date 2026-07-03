@@ -9,8 +9,8 @@ This module will contain all cases for the remove from bucket test suite
 import pytest
 
 # qa-integration-framework imports
-from wazuh_testing.modules.aws.utils import log_stream_exists, file_exists
-from wazuh_testing.modules.aws.patterns import REMOVE_S3_FILE
+from guardsarm_testing.modules.aws.utils import log_stream_exists, file_exists
+from guardsarm_testing.modules.aws.patterns import REMOVE_S3_FILE
 
 # Local module imports
 from . import event_monitor
@@ -35,25 +35,25 @@ configurator.configure_test(configuration_file='configuration_remove_from_bucket
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_remove_from_bucket(
-        test_configuration, metadata, mark_cases_as_skipped, create_test_bucket, manage_bucket_files, s3_client, set_wazuh_configuration, clean_s3_cloudtrail_db,
+        test_configuration, metadata, mark_cases_as_skipped, create_test_bucket, manage_bucket_files, s3_client, set_guardsarm_configuration, clean_s3_cloudtrail_db,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler, file_monitoring
 ):
     """
     description: The uploaded file was removed after the execution.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has appeared calling the module with correct parameters.
             - Check that the uploaded log was removed by the module after the execution.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -73,7 +73,7 @@ def test_remove_from_bucket(
         - s3_client:
             type: fixture
             brief: S3 client to access AWS.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - clean_s3_cloudtrail_db:
@@ -84,10 +84,10 @@ def test_remove_from_bucket(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
-        - restart_wazuh_daemon_function:
+            brief: Truncate guardsarm logs.
+        - restart_guardsarm_daemon_function:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -158,25 +158,25 @@ configurator.configure_test(configuration_file='configuration_remove_log_stream.
                          ids=configurator.cases_ids)
 def test_remove_log_stream(
         test_configuration, metadata, create_test_log_group, create_test_log_stream, manage_log_group_events,
-        logs_clients, set_wazuh_configuration, clean_aws_services_db,
+        logs_clients, set_guardsarm_configuration, clean_aws_services_db,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler, file_monitoring
 ):
     """
     description: The created log stream was removed after the execution.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has appeared calling the module with correct parameters.
             - Check that the created log stream was removed by the module after the execution.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -196,7 +196,7 @@ def test_remove_log_stream(
         - logs_clients:
             type: fixture
             brief: CloudWatch Logs client to check the log stream existence.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - clean_aws_services_db:
@@ -207,10 +207,10 @@ def test_remove_log_stream(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
-        - restart_wazuh_daemon_function:
+            brief: Truncate guardsarm logs.
+        - restart_guardsarm_daemon_function:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.

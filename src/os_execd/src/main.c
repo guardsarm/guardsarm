@@ -32,14 +32,14 @@ static void help_execd(char * home_path)
     print_out("    -t          Test configuration");
     print_out("    -f          Run in foreground");
     print_out("    -g <group>  Group to run as (default: %s)", GROUPGLOBAL);
-    print_out("    -c <config> Configuration file to use (default: %s)", WAZUHCONF);
+    print_out("    -c <config> Configuration file to use (default: %s)", GUARDSARMCONF);
     print_out(" ");
     os_free(home_path);
     exit(1);
 }
 
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 __attribute((weak))
 #endif
 int main(int argc, char **argv)
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     }
 
     const char *group = GROUPGLOBAL;
-    const char *cfg = WAZUHCONF;
+    const char *cfg = GUARDSARMCONF;
 
 
     while ((c = getopt(argc, argv, "Vtdhfg:c:")) != -1) {
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
         }
     }
 
-    mdebug1(WAZUH_HOMEDIR, home_path);
+    mdebug1(GUARDSARM_HOMEDIR, home_path);
     os_free(home_path);
 
     /* Check if the group given is valid */
@@ -175,7 +175,7 @@ int main(int argc, char **argv)
     startup_gate_wait_for_ready(ARGV0);
 
     // STARTUP_MSG is emitted after the startup hash gate releases. The
-    // previous order logged "wazuh-execd: INFO: Started" before the gate
+    // previous order logged "guardsarm-execd: INFO: Started" before the gate
     // could even be queried, making execd appear "Started" while every
     // module was in fact still blocked waiting for the manager's
     // merged.mg hash to validate (issue 36239).

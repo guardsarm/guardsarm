@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **rawevtindexer** module provides a thin, thread-safe abstraction for indexing raw (unprocessed) security events into the Wazuh Indexer before they pass through the engine's policy pipelines. This gives operators access to the original event data for forensic analysis and debugging, independent of the processed output.
+The **rawevtindexer** module provides a thin, thread-safe abstraction for indexing raw (unprocessed) security events into the GuardSarm Indexer before they pass through the engine's policy pipelines. This gives operators access to the original event data for forensic analysis and debugging, independent of the processed output.
 
 The module is designed as a simple on/off gate around an `IWIndexerConnector`, with atomic enable/disable toggling and runtime hot-reload support for remote configuration changes.
 
@@ -37,7 +37,7 @@ The module is designed as a simple on/off gate around an `IWIndexerConnector`, w
 | **Enable Gate** | An `atomic<bool>` flag that controls whether `index()` calls are forwarded to the connector. Starts disabled. |
 | **Weak Connector** | The indexer holds a `weak_ptr` to the `IWIndexerConnector`. If the connector is destroyed, indexing silently becomes a no-op. |
 | **Hot Reload** | The `hotReloadConf()` method allows remote configuration to toggle indexing on/off at runtime, accepting a JSON boolean value. |
-| **Default Index** | Raw events are written to the `wazuh-events-raw-v5` index by default, configurable at construction time. |
+| **Default Index** | Raw events are written to the `guardsarm-events-raw-v5` index by default, configurable at construction time. |
 
 ## Directory Structure
 
@@ -80,7 +80,7 @@ rawevtindexer/
 ```cpp
 explicit RawEventIndexer(
     std::weak_ptr<wiconnector::IWIndexerConnector> connector,
-    std::string_view indexName = DEFAULT_INDEX_NAME  // "wazuh-events-raw-v5"
+    std::string_view indexName = DEFAULT_INDEX_NAME  // "guardsarm-events-raw-v5"
 );
 ```
 

@@ -32,7 +32,7 @@ for arg in "$@"; do
       cat <<EOF
 Usage: $0 [--force]
 
-Downloads the four Wazuh agent installers used by docker-compose:
+Downloads the four GuardSarm agent installers used by docker-compose:
   - 4.x .deb (Debian/Ubuntu)
   - 4.x .rpm (CentOS/Rocky/RHEL)
   - 5.x .deb (Debian/Ubuntu) [from staging nightly]
@@ -58,13 +58,13 @@ done
 # ------------------------------------------------------------------------------
 # Configuration
 # ------------------------------------------------------------------------------
-WAZUH_4X_VERSION="${WAZUH_4X_VERSION:-4.14.3-1}"
+GUARDSARM_4X_VERSION="${GUARDSARM_4X_VERSION:-4.14.3-1}"
 
-WAZUH_4X_DEB_URL="https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${WAZUH_4X_VERSION}_amd64.deb"
-WAZUH_4X_RPM_URL="https://packages.wazuh.com/4.x/yum/wazuh-agent-${WAZUH_4X_VERSION}.x86_64.rpm"
+GUARDSARM_4X_DEB_URL="https://packages.guardsarm.com/4.x/apt/pool/main/w/guardsarm-agent/guardsarm-agent_${GUARDSARM_4X_VERSION}_amd64.deb"
+GUARDSARM_4X_RPM_URL="https://packages.guardsarm.com/4.x/yum/guardsarm-agent-${GUARDSARM_4X_VERSION}.x86_64.rpm"
 
-#  WAZUH_5X_YAML_URL="https://packages-staging.xdrsiem.wazuh.info/nightly/5.0.0/artifact-urls/artifact_urls_5.0.0-latest.yaml"
-WAZUH_5X_YAML_URL="https://packages-staging.xdrsiem.wazuh.info/nightly-backup/artifact_urls_5.0.0-latest.yaml"
+#  GUARDSARM_5X_YAML_URL="https://packages-staging.xdrsiem.guardsarm.info/nightly/5.0.0/artifact-urls/artifact_urls_5.0.0-latest.yaml"
+GUARDSARM_5X_YAML_URL="https://packages-staging.xdrsiem.guardsarm.info/nightly-backup/artifact_urls_5.0.0-latest.yaml"
 PKGS_DIR="${SCRIPT_DIR}/pkgs"
 mkdir -p "$PKGS_DIR"
 
@@ -97,10 +97,10 @@ function download_to() {
 # 4.x (production repos)
 # ------------------------------------------------------------------------------
 function download_4x_packages() {
-  echo "==> Downloading Wazuh agent ${WAZUH_4X_VERSION} (4.x) packages..."
+  echo "==> Downloading GuardSarm agent ${GUARDSARM_4X_VERSION} (4.x) packages..."
 
-  download_to "$WAZUH_4X_DEB_URL" "${PKGS_DIR}/wazuh-agent_${WAZUH_4X_VERSION}_amd64.deb"
-  download_to "$WAZUH_4X_RPM_URL" "${PKGS_DIR}/wazuh-agent-${WAZUH_4X_VERSION}.x86_64.rpm"
+  download_to "$GUARDSARM_4X_DEB_URL" "${PKGS_DIR}/guardsarm-agent_${GUARDSARM_4X_VERSION}_amd64.deb"
+  download_to "$GUARDSARM_4X_RPM_URL" "${PKGS_DIR}/guardsarm-agent-${GUARDSARM_4X_VERSION}.x86_64.rpm"
   echo ""
 }
 
@@ -108,25 +108,25 @@ function download_4x_packages() {
 # 5.x (staging nightly, URLs read from YAML manifest)
 # ------------------------------------------------------------------------------
 function download_5x_packages() {
-  echo "==> Resolving Wazuh agent 5.x package URLs from manifest..."
-  echo "    Manifest: $WAZUH_5X_YAML_URL"
+  echo "==> Resolving GuardSarm agent 5.x package URLs from manifest..."
+  echo "    Manifest: $GUARDSARM_5X_YAML_URL"
 
   local tmp_yaml
   tmp_yaml="$(mktemp)"
   trap 'rm -f "$tmp_yaml"' RETURN
 
-  curl -fsSL "$WAZUH_5X_YAML_URL" -o "$tmp_yaml"
+  curl -fsSL "$GUARDSARM_5X_YAML_URL" -o "$tmp_yaml"
 
   local deb_url rpm_url
-  deb_url="$(yq -r '.wazuh_agent_amd64_deb' "$tmp_yaml")"
-  rpm_url="$(yq -r '.wazuh_agent_x86_64_rpm' "$tmp_yaml")"
+  deb_url="$(yq -r '.guardsarm_agent_amd64_deb' "$tmp_yaml")"
+  rpm_url="$(yq -r '.guardsarm_agent_x86_64_rpm' "$tmp_yaml")"
 
   if [[ -z "$deb_url" || "$deb_url" == "null" ]]; then
-    echo "ERROR: key 'wazuh_agent_amd64_deb' not found in manifest" >&2
+    echo "ERROR: key 'guardsarm_agent_amd64_deb' not found in manifest" >&2
     return 1
   fi
   if [[ -z "$rpm_url" || "$rpm_url" == "null" ]]; then
-    echo "ERROR: key 'wazuh_agent_x86_64_rpm' not found in manifest" >&2
+    echo "ERROR: key 'guardsarm_agent_x86_64_rpm' not found in manifest" >&2
     return 1
   fi
 
@@ -134,7 +134,7 @@ function download_5x_packages() {
   echo "    rpm URL: $rpm_url"
   echo ""
 
-  echo "==> Downloading Wazuh agent 5.x packages..."
+  echo "==> Downloading GuardSarm agent 5.x packages..."
   download_to "$deb_url" "${PKGS_DIR}/$(basename "$deb_url")" 1
   download_to "$rpm_url" "${PKGS_DIR}/$(basename "$rpm_url")" 1
   echo ""

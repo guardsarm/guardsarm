@@ -17,7 +17,7 @@
 #include <openssl/evp.h>
 
 // Remove STATIC qualifier from tests
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 #define STATIC
 #else
 #define STATIC static
@@ -140,7 +140,7 @@ static OSHash *excluded_binaries = NULL;
 
 STATIC atomic_int_t _startup_completed = ATOMIC_INT_INITIALIZER(0);
 
-#if defined(Darwin) || (defined(__linux__) && defined(WAZUH_UNIT_TESTING))
+#if defined(Darwin) || (defined(__linux__) && defined(GUARDSARM_UNIT_TESTING))
 
 STATIC w_macos_log_procceses_t * macos_processes = NULL;
 
@@ -186,7 +186,7 @@ void LogCollectorStart()
     IT_control duplicates_removed = 0;
     logreader *current;
 
-#if defined(Darwin) || (defined(__linux__) && defined(WAZUH_UNIT_TESTING))
+#if defined(Darwin) || (defined(__linux__) && defined(GUARDSARM_UNIT_TESTING))
     w_sysinfo_helpers_t * sysinfo = NULL;
     os_calloc(1, sizeof(w_sysinfo_helpers_t), sysinfo);
     if (!w_sysinfo_init(sysinfo)) {
@@ -379,7 +379,7 @@ void LogCollectorStart()
         }
 
         else if (strcmp(current->logformat, MACOS) == 0) {
-#if defined(Darwin) || (defined(__linux__) && defined(WAZUH_UNIT_TESTING))
+#if defined(Darwin) || (defined(__linux__) && defined(GUARDSARM_UNIT_TESTING))
             /* Get macOS version */
             w_macos_create_log_env(current, sysinfo);
             current->read = read_macos;
@@ -738,7 +738,7 @@ void LogCollectorStart()
 
                         char msg_alert[512 + 1];
 
-                        snprintf(msg_alert, 512, "wazuh: File rotated (inode "
+                        snprintf(msg_alert, 512, "guardsarm: File rotated (inode "
                                  "changed): '%s'.",
                                  current->file);
 
@@ -771,7 +771,7 @@ void LogCollectorStart()
                         current->exists = 1;
                         char msg_alert[512 + 1];
 
-                        snprintf(msg_alert, 512, "wazuh: File size reduced "
+                        snprintf(msg_alert, 512, "guardsarm: File size reduced "
                                  "(inode remained): '%s'.",
                                  current->file);
 
@@ -1236,8 +1236,8 @@ void set_read(logreader *current, int i, int j) {
         current->read = read_snortfull;
     }
 #ifndef WIN32
-    if (strcmp("wazuhalert", current->logformat) == 0) {
-        current->read = read_wazuhalert;
+    if (strcmp("guardsarmalert", current->logformat) == 0) {
+        current->read = read_guardsarmalert;
     }
 #endif
     else if (strcmp("nmapg", current->logformat) == 0) {
@@ -1937,7 +1937,7 @@ void * w_output_thread(void * args){
                                   message->queue_mq, message->log_target);
             if (result != 0) {
                 if (result != 1) {
-                    mdebug1("Unable to send message to '%s' (wazuh-agentd might be down). Attempting to reconnect.", DEFAULTQUEUE);
+                    mdebug1("Unable to send message to '%s' (guardsarm-agentd might be down). Attempting to reconnect.", DEFAULTQUEUE);
                 }
                 // Retry to connect infinitely.
                 logr_queue = StartMQ(DEFAULTQUEUE, WRITE, INFINITE_OPENQ_ATTEMPTS);
@@ -2078,7 +2078,7 @@ void * w_input_thread(__attribute__((unused)) void * t_id){
                             current->read(current, &r, 0);
                         }
                     }
-#if defined(Darwin) || (defined(__linux__) && defined(WAZUH_UNIT_TESTING))
+#if defined(Darwin) || (defined(__linux__) && defined(GUARDSARM_UNIT_TESTING))
                     /* Read the macOS `log` process output */
                     else if (current->macos_log != NULL && current->macos_log->state != LOG_NOT_RUNNING) {
                         current->read(current, &r, 0);
@@ -2728,7 +2728,7 @@ STATIC void w_load_files_status(cJSON * global_json) {
             }
         }
     }
-#if defined(Darwin) || (defined(__linux__) && defined(WAZUH_UNIT_TESTING))
+#if defined(Darwin) || (defined(__linux__) && defined(GUARDSARM_UNIT_TESTING))
 
    w_macos_set_status_from_JSON(global_json);
 
@@ -2777,7 +2777,7 @@ STATIC char * w_save_files_status_to_cJSON() {
     }
     w_rwlock_unlock(&files_status->mutex);
 
-#if defined(Darwin) || (defined(__linux__) && defined(WAZUH_UNIT_TESTING))
+#if defined(Darwin) || (defined(__linux__) && defined(GUARDSARM_UNIT_TESTING))
 
     cJSON * macos_status = w_macos_get_status_as_JSON();
     if (macos_status != NULL && macos_processes != NULL) {
@@ -2939,7 +2939,7 @@ bool w_get_hash_context(logreader *lf, EVP_MD_CTX ** context, int64_t position) 
     return true;
 }
 
-#if defined(Darwin) || (defined(__linux__) && defined(WAZUH_UNIT_TESTING))
+#if defined(Darwin) || (defined(__linux__) && defined(GUARDSARM_UNIT_TESTING))
 void w_macos_release_log_show(void) {
 
     if (macos_processes != NULL && macos_processes->show.wfd != NULL) {

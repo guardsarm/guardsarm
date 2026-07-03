@@ -22,7 +22,7 @@ int ExecdConfig(const char *cfgfile)
 {
     is_disabled = 0;
 
-    const char *(xmlf[]) = {WAZUHCONFIG, "active-response", "disabled", NULL};
+    const char *(xmlf[]) = {GUARDSARMCONFIG, "active-response", "disabled", NULL};
     char *disable_entry;
     char *repeated_t = NULL;
     char **repeated_a;
@@ -211,7 +211,7 @@ cJSON *getClusterConfig(void) {
 
     strcpy(sockname, CLUSTER_SOCK);
 
-    if (sock = external_socket_connect(sockname, WAZUH_IPC_TIMEOUT), sock < 0) {
+    if (sock = external_socket_connect(sockname, GUARDSARM_IPC_TIMEOUT), sock < 0) {
         switch (errno) {
         case ECONNREFUSED:
             merror("At getClusterConfig(): Could not connect to socket '%s': %s (%d).", sockname, strerror(errno), errno);

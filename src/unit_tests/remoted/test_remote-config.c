@@ -17,9 +17,9 @@
 #include "remoted.h"
 #include "shared.h"
 #include "../wrappers/common.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/shared/validate_op_wrappers.h"
-#include "../wrappers/wazuh/shared/cluster_utils_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/validate_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/cluster_utils_wrappers.h"
 #include "../../external/cJSON/cJSON.h"
 
 int w_remoted_get_net_protocol(const char * content);

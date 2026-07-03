@@ -1,6 +1,6 @@
 # Router
 
-The **Router** module implements the Publish-Subscribe messaging pattern for inter-module communication within Wazuh. It separates message producers (publishers) and message consumers (subscribers) by allowing them to communicate indirectly through a central `RouterFacade` singleton that acts as the message broker.
+The **Router** module implements the Publish-Subscribe messaging pattern for inter-module communication within GuardSarm. It separates message producers (publishers) and message consumers (subscribers) by allowing them to communicate indirectly through a central `RouterFacade` singleton that acts as the message broker.
 
 ## Key Features
 

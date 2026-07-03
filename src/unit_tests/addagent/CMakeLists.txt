@@ -24,10 +24,10 @@ set_target_properties(
     LINKER_LANGUAGE C
 )
 
-target_link_libraries(ADDAGENT_O ${WAZUHLIB} ${WAZUHEXT} -lpthread)
+target_link_libraries(ADDAGENT_O ${GUARDSARMLIB} ${GUARDSARMEXT} -lpthread)
 
 #include wrappers
-include(${SRC_FOLDER}/unit_tests/wrappers/wazuh/shared/shared.cmake)
+include(${SRC_FOLDER}/unit_tests/wrappers/guardsarm/shared/shared.cmake)
 
 list(APPEND addagent_names "test_manage_keys")
 list(APPEND addagent_flags "${DEBUG_OP_WRAPPERS} ${STDIO_OP_WRAPPERS} \
@@ -48,8 +48,8 @@ foreach(counter RANGE ${count})
 
     target_link_libraries(
         ${addagent_test_name}
-        ${WAZUHLIB}
-        ${WAZUHEXT}
+        ${GUARDSARMLIB}
+        ${GUARDSARMEXT}
         ADDAGENT_O
         ${TEST_DEPS}
     )

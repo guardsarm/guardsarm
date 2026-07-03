@@ -439,7 +439,7 @@ At least one specified element ("dracut") is present in the target array.
 
 ```yaml
 check:
-  - target_field: array_contains_any($element, 'hello', 'wazuh')
+  - target_field: array_contains_any($element, 'hello', 'guardsarm')
 ```
 
 #### Input Event
@@ -1056,7 +1056,7 @@ At least one specified element ("dracut") is present in the target array.
 
 ```yaml
 check:
-  - target_field: array_not_contains_any($element, 'hello', 'wazuh')
+  - target_field: array_not_contains_any($element, 'hello', 'guardsarm')
 ```
 
 #### Input Event
@@ -1309,7 +1309,7 @@ check:
 
 ```json
 {
-  "target_field": "hello wazuh!"
+  "target_field": "hello guardsarm!"
 }
 ```
 
@@ -1331,7 +1331,7 @@ check:
 ```json
 {
   "searched_value": "hello!",
-  "target_field": "hello wazuh!"
+  "target_field": "hello guardsarm!"
 }
 ```
 
@@ -1352,7 +1352,7 @@ check:
 
 ```json
 {
-  "target_field": "hello wazuh!"
+  "target_field": "hello guardsarm!"
 }
 ```
 
@@ -1404,14 +1404,14 @@ Success ends with
 
 ```yaml
 check:
-  - target_field: ends_with('wazuh!!')
+  - target_field: ends_with('guardsarm!!')
 ```
 
 #### Input Event
 
 ```json
 {
-  "target_field": "hello wazuh!!"
+  "target_field": "hello guardsarm!!"
 }
 ```
 
@@ -1432,8 +1432,8 @@ check:
 
 ```json
 {
-  "conteined": "wazuh",
-  "target_field": "hello wazuh!!!"
+  "conteined": "guardsarm",
+  "target_field": "hello guardsarm!!!"
 }
 ```
 
@@ -1454,7 +1454,7 @@ check:
 
 ```json
 {
-  "target_field": "hello wazuh!"
+  "target_field": "hello guardsarm!"
 }
 ```
 
@@ -1614,7 +1614,7 @@ field: index_unclassified_events()
 
 | Path | Type | Possible values |
 | ---- | ---- | --------------- |
-| wazuh.integration.category | string | Any string |
+| guardsarm.integration.category | string | Any string |
 
 
 ## Description
@@ -1622,8 +1622,8 @@ field: index_unclassified_events()
 Determines whether unclassified events should be indexed based on policy configuration.
 This filter returns true if and only if:
 1. The policy flag 'indexUnclassifiedEvents' is enabled (configured at build time)
-2. The target field is exactly 'wazuh.integration.category'
-3. 'wazuh.integration.category' equals the string "unclassified"
+2. The target field is exactly 'guardsarm.integration.category'
+3. 'guardsarm.integration.category' equals the string "unclassified"
 
 This helper is used in output routing to decide whether to index events that the
 root decoder tagged as unclassified (no integration decoder matched) when the
@@ -1631,7 +1631,7 @@ policy allows it. If the policy flag is disabled, the category differs from
 "unclassified", or the field is missing / not a string, the validation fails.
 
 Note: This helper does not accept any arguments, rejects any target field other than
-'wazuh.integration.category', and depends on the policy context configured at build time.
+'guardsarm.integration.category', and depends on the policy context configured at build time.
 
 
 ## Keywords
@@ -1650,14 +1650,14 @@ Category equals "unclassified" (event tagged by the root decoder)
 
 ```yaml
 check:
-  - wazuh.integration.category: index_unclassified_events()
+  - guardsarm.integration.category: index_unclassified_events()
 ```
 
 #### Input Event
 
 ```json
 {
-  "wazuh.integration.category": "unclassified"
+  "guardsarm.integration.category": "unclassified"
 }
 ```
 
@@ -1671,14 +1671,14 @@ Category is a known one different from "unclassified"
 
 ```yaml
 check:
-  - wazuh.integration.category: index_unclassified_events()
+  - guardsarm.integration.category: index_unclassified_events()
 ```
 
 #### Input Event
 
 ```json
 {
-  "wazuh.integration.category": "security"
+  "guardsarm.integration.category": "security"
 }
 ```
 
@@ -1692,14 +1692,14 @@ Category is a known one different from "unclassified"
 
 ```yaml
 check:
-  - wazuh.integration.category: index_unclassified_events()
+  - guardsarm.integration.category: index_unclassified_events()
 ```
 
 #### Input Event
 
 ```json
 {
-  "wazuh.integration.category": "system-activity"
+  "guardsarm.integration.category": "system-activity"
 }
 ```
 
@@ -1713,7 +1713,7 @@ Category is an empty string
 
 ```yaml
 check:
-  - wazuh.integration.category: index_unclassified_events()
+  - guardsarm.integration.category: index_unclassified_events()
 ```
 
 #### Input Event
@@ -1732,14 +1732,14 @@ Target field is a number, not a string
 
 ```yaml
 check:
-  - wazuh.integration.category: index_unclassified_events()
+  - guardsarm.integration.category: index_unclassified_events()
 ```
 
 #### Input Event
 
 ```json
 {
-  "wazuh.integration.category": 42
+  "guardsarm.integration.category": 42
 }
 ```
 
@@ -1753,14 +1753,14 @@ Target field is an array, not a string
 
 ```yaml
 check:
-  - wazuh.integration.category: index_unclassified_events()
+  - guardsarm.integration.category: index_unclassified_events()
 ```
 
 #### Input Event
 
 ```json
 {
-  "wazuh.integration.category": [
+  "guardsarm.integration.category": [
     "unclassified"
   ]
 }
@@ -4788,7 +4788,7 @@ check:
   "array": [
     "hello"
   ],
-  "target_field": "wazuh"
+  "target_field": "guardsarm"
 }
 ```
 
@@ -6026,7 +6026,7 @@ check:
 
 ```json
 {
-  "target_field": "hello wazuh!"
+  "target_field": "hello guardsarm!"
 }
 ```
 
@@ -6048,7 +6048,7 @@ check:
 ```json
 {
   "conteined": "hello!",
-  "target_field": "hello wazuh!"
+  "target_field": "hello guardsarm!"
 }
 ```
 
@@ -6062,14 +6062,14 @@ Failure start with
 
 ```yaml
 check:
-  - target_field: starts_with('wazuh!')
+  - target_field: starts_with('guardsarm!')
 ```
 
 #### Input Event
 
 ```json
 {
-  "target_field": "hello wazuh!"
+  "target_field": "hello guardsarm!"
 }
 ```
 
@@ -6215,7 +6215,7 @@ check:
 
 ```json
 {
-  "target_field": "wazuh"
+  "target_field": "guardsarm"
 }
 ```
 
@@ -6236,7 +6236,7 @@ check:
 
 ```json
 {
-  "any_string": "wazuh",
+  "any_string": "guardsarm",
   "target_field": "hello world!"
 }
 ```
@@ -6440,7 +6440,7 @@ Success string less
 
 ```yaml
 check:
-  - target_field: string_less('wazuh')
+  - target_field: string_less('guardsarm')
 ```
 
 #### Input Event
@@ -6469,7 +6469,7 @@ check:
 ```json
 {
   "any_string": "hello world!",
-  "target_field": "wazuh"
+  "target_field": "guardsarm"
 }
 ```
 
@@ -6545,7 +6545,7 @@ Success string less or equal
 
 ```yaml
 check:
-  - target_field: string_less_or_equal('wazuh')
+  - target_field: string_less_or_equal('guardsarm')
 ```
 
 #### Input Event
@@ -6574,7 +6574,7 @@ check:
 ```json
 {
   "any_string": "hello world!",
-  "target_field": "wazuh"
+  "target_field": "guardsarm"
 }
 ```
 
@@ -7324,7 +7324,7 @@ normalize:
   "target_field": {
     "number": 1234,
     "organization": {
-      "name": " Wazuh Organization"
+      "name": " GuardSarm Organization"
     }
   }
 }
@@ -9515,11 +9515,11 @@ normalize:
 {
   "ip": "1.2.3.4",
   "target_field": {
-    "city_name": "Wazuh city",
-    "timezone": "Wazuh/Timezone",
-    "country_name": "Wazuh Country",
+    "city_name": "GuardSarm city",
+    "timezone": "GuardSarm/Timezone",
+    "country_name": "GuardSarm Country",
     "continent_code": "WC",
-    "continent_name": "Wazuh Continent",
+    "continent_name": "GuardSarm Continent",
     "country_iso_code": "WCtry",
     "postal_code": "7777",
     "location": {
@@ -11130,7 +11130,7 @@ normalize:
 ```json
 {
   "array": [
-    "Hi Wazuh!",
+    "Hi GuardSarm!",
     "It is",
     "the",
     "year",
@@ -11144,13 +11144,13 @@ normalize:
 ```json
 {
   "array": [
-    "Hi Wazuh!",
+    "Hi GuardSarm!",
     "It is",
     "the",
     "year",
     "2024"
   ],
-  "target_field": "Hi Wazuh! It is the year 2024"
+  "target_field": "Hi GuardSarm! It is the year 2024"
 }
 ```
 
@@ -11173,7 +11173,7 @@ normalize:
 ```json
 {
   "array": [
-    "Hi Wazuh!",
+    "Hi GuardSarm!",
     "It is",
     "the",
     "year",
@@ -11187,13 +11187,13 @@ normalize:
 ```json
 {
   "array": [
-    "Hi Wazuh!",
+    "Hi GuardSarm!",
     "It is",
     "the",
     "year",
     "2024"
   ],
-  "target_field": "Hi Wazuh!separatorIt isseparatortheseparatoryearseparator2024"
+  "target_field": "Hi GuardSarm!separatorIt isseparatortheseparatoryearseparator2024"
 }
 ```
 
@@ -11746,7 +11746,7 @@ normalize:
 
 ```json
 {
-  "any_string": "Hi Wazuh!"
+  "any_string": "Hi GuardSarm!"
 }
 ```
 
@@ -11754,7 +11754,7 @@ normalize:
 
 ```json
 {
-  "any_string": "Hi Wazuh!",
+  "any_string": "Hi GuardSarm!",
   "target_field": "c4e30dbc1b87ba8f29b24a74dba2f006be2a709e"
 }
 ```
@@ -13700,7 +13700,7 @@ normalize:
 
 ```json
 {
-  "target_field": "-- Hi wazuh! --"
+  "target_field": "-- Hi guardsarm! --"
 }
 ```
 
@@ -14194,7 +14194,7 @@ Behavior depends on policy configuration (index_discarded_events):
 - If true: All event fields will be erased (only the discard flag remains). This ensures that the event reaching the indexer will be almost empty.
 
 Usage Rules:
-- Must be used with the exact target field 'wazuh.space.event_discarded'
+- Must be used with the exact target field 'guardsarm.space.event_discarded'
 - Cannot accept any parameters
 - Should be called in the normalization/map stage when a discard condition is met
 
@@ -14248,7 +14248,7 @@ normalize:
 
 ```json
 {
-  "target_field": "-- Hi wazuh! --"
+  "target_field": "-- Hi guardsarm! --"
 }
 ```
 
@@ -19976,7 +19976,7 @@ normalize:
 
 ```json
 {
-  "input_field": "\"Hello, my name is 'Wazuh'.\"",
+  "input_field": "\"Hello, my name is 'GuardSarm'.\"",
   "target_field": "any_value"
 }
 ```
@@ -19985,8 +19985,8 @@ normalize:
 
 ```json
 {
-  "input_field": "\"Hello, my name is 'Wazuh'.\"",
-  "target_field": "Hello, my name is 'Wazuh'."
+  "input_field": "\"Hello, my name is 'GuardSarm'.\"",
+  "target_field": "Hello, my name is 'GuardSarm'."
 }
 ```
 
@@ -21831,7 +21831,7 @@ normalize:
 
 ```json
 {
-  "target_field": "-- Hi wazuh! --"
+  "target_field": "-- Hi guardsarm! --"
 }
 ```
 
@@ -21839,7 +21839,7 @@ normalize:
 
 ```json
 {
-  "target_field": "-- Hi wazuh! "
+  "target_field": "-- Hi guardsarm! "
 }
 ```
 
@@ -21861,7 +21861,7 @@ normalize:
 
 ```json
 {
-  "target_field": "-- Hi wazuh! --"
+  "target_field": "-- Hi guardsarm! --"
 }
 ```
 
@@ -21869,7 +21869,7 @@ normalize:
 
 ```json
 {
-  "target_field": " Hi wazuh! --"
+  "target_field": " Hi guardsarm! --"
 }
 ```
 
@@ -21891,7 +21891,7 @@ normalize:
 
 ```json
 {
-  "target_field": "-- Hi wazuh! --"
+  "target_field": "-- Hi guardsarm! --"
 }
 ```
 
@@ -21899,7 +21899,7 @@ normalize:
 
 ```json
 {
-  "target_field": " Hi wazuh! "
+  "target_field": " Hi guardsarm! "
 }
 ```
 

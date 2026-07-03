@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `defs` module provides a **variable definition and substitution system** for the Wazuh engine. It manages a set of named definitions (key-value pairs stored as JSON) and performs variable replacement in strings using the `$variable` syntax.
+The `defs` module provides a **variable definition and substitution system** for the GuardSarm engine. It manages a set of named definitions (key-value pairs stored as JSON) and performs variable replacement in strings using the `$variable` syntax.
 
 Its primary purpose is to allow policies and assets to declare reusable values (constants, paths, URLs, etc.) that are resolved at build time. Definitions can reference other definitions, forming dependency chains that are automatically resolved with cycle detection.
 

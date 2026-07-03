@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 import api_communication.proto.engine_pb2 as _engine_pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12\x65vent_dumper.proto\x12!com.wazuh.api.engine.event_dumper\x1a\x0c\x65ngine.proto\"\x1d\n\x1b\x45ventDumperActivate_Request\"\x1f\n\x1d\x45ventDumperDeactivate_Request\"\x1b\n\x19\x45ventDumperStatus_Request\"~\n\x1a\x45ventDumperStatus_Response\x12\x32\n\x06status\x18\x01 \x01(\x0e\x32\".com.wazuh.api.engine.ReturnStatus\x12\x12\n\x05\x65rror\x18\x02 \x01(\tH\x00\x88\x01\x01\x12\x0e\n\x06\x61\x63tive\x18\x03 \x01(\x08\x42\x08\n\x06_errorb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12\x65vent_dumper.proto\x12!com.guardsarm.api.engine.event_dumper\x1a\x0c\x65ngine.proto\"\x1d\n\x1b\x45ventDumperActivate_Request\"\x1f\n\x1d\x45ventDumperDeactivate_Request\"\x1b\n\x19\x45ventDumperStatus_Request\"~\n\x1a\x45ventDumperStatus_Response\x12\x32\n\x06status\x18\x01 \x01(\x0e\x32\".com.guardsarm.api.engine.ReturnStatus\x12\x12\n\x05\x65rror\x18\x02 \x01(\tH\x00\x88\x01\x01\x12\x0e\n\x06\x61\x63tive\x18\x03 \x01(\x08\x42\x08\n\x06_errorb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'event_dumper_pb2', globals())

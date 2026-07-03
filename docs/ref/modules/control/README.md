@@ -1,15 +1,15 @@
 # Control Module (wm_control)
 
-The **Control Module** provides control operations for both the Wazuh manager and agents, handling restart and reload requests through a Unix domain socket interface. It is implemented in a single source file (`wm_control.c`) that compiles differently depending on the build target:
+The **Control Module** provides control operations for both the GuardSarm manager and agents, handling restart and reload requests through a Unix domain socket interface. It is implemented in a single source file (`wm_control.c`) that compiles differently depending on the build target:
 
-- **Manager build** (`TARGET=manager`): `process_control()` runs directly in the main thread, binding to the manager control socket. Commands are dispatched to `wm_control_dispatch()` with `"wazuh-manager"` as the service name.
-- **Agent build** (`CLIENT` defined, Unix): `process_control()` is spawned as a thread within `wazuh-modulesd`, binding to the agent control socket. Commands are dispatched to `wm_control_dispatch()` with `"wazuh-agent"` as the service name.
+- **Manager build** (`TARGET=manager`): `process_control()` runs directly in the main thread, binding to the manager control socket. Commands are dispatched to `wm_control_dispatch()` with `"guardsarm-manager"` as the service name.
+- **Agent build** (`CLIENT` defined, Unix): `process_control()` is spawned as a thread within `guardsarm-modulesd`, binding to the agent control socket. Commands are dispatched to `wm_control_dispatch()` with `"guardsarm-agent"` as the service name.
 
 On **Windows agents**, the equivalent logic is implemented in `control_dispatch()` within `client-agent/src/control.c`. The Windows path is called directly in-process by `request.c` rather than via a separate socket listener.
 
 ## Key Features
 
-- **Manager Restart/Reload**: Graceful manager restart or config reload via systemctl or wazuh-control
+- **Manager Restart/Reload**: Graceful manager restart or config reload via systemctl or guardsarm-control
 - **Remote Agent Restart/Reload**: Manager can send restart/reload commands to individual agents via the control channel
 - **Systemd Integration**: Automatic detection and use of systemd when available
 - **Socket-Based Control**: Unix domain socket for inter-process communication
@@ -20,10 +20,10 @@ On **Windows agents**, the equivalent logic is implemented in `control_dispatch(
 
 The control module serves as the control plane for operational commands. It:
 
-1. **Manager**: Listens on `$WAZUH_HOME/queue/sockets/control` (default: `/var/wazuh-manager/queue/sockets/control`)
-2. **Agent (Unix)**: Listens on `$WAZUH_HOME/queue/sockets/control` (default: `/var/ossec/queue/sockets/control`)
+1. **Manager**: Listens on `$GUARDSARM_HOME/queue/sockets/control` (default: `/var/guardsarm-manager/queue/sockets/control`)
+2. **Agent (Unix)**: Listens on `$GUARDSARM_HOME/queue/sockets/control` (default: `/var/ossec/queue/sockets/control`)
 3. **Receives control commands** from the API, framework, or remoted
-4. **Executes system operations** (restart/reload) via systemctl or wazuh-control
+4. **Executes system operations** (restart/reload) via systemctl or guardsarm-control
 5. **Returns operation status** to the caller
 
 Manager-side is enabled for manager builds (`TARGET=manager`) on Unix-like systems.
@@ -36,14 +36,14 @@ Agent-side (Unix) is the same `wm_control.c` compiled with `CLIENT` defined; Win
 
 | Component | Socket Path |
 |-----------|-------------|
-| Manager | `$WAZUH_HOME/queue/sockets/control` (default: `/var/wazuh-manager/queue/sockets/control`) |
-| Agent (Unix) | `$WAZUH_HOME/queue/sockets/control` (default: `/var/ossec/queue/sockets/control`) |
+| Manager | `$GUARDSARM_HOME/queue/sockets/control` (default: `/var/guardsarm-manager/queue/sockets/control`) |
+| Agent (Unix) | `$GUARDSARM_HOME/queue/sockets/control` (default: `/var/ossec/queue/sockets/control`) |
 
 ### Manager-Side Commands
 
 | Command | Description | Response |
 |---------|-------------|----------|
-| `restart` | Restart the Wazuh manager | `ok ` (immediate) |
+| `restart` | Restart the GuardSarm manager | `ok ` (immediate) |
 | `reload` | Reload manager configuration | `ok ` (immediate) |
 | *(other)* | Any unrecognized command | `Err` |
 
@@ -51,7 +51,7 @@ Agent-side (Unix) is the same `wm_control.c` compiled with `CLIENT` defined; Win
 
 | Command | Description | Response |
 |---------|-------------|----------|
-| `restart` | Restart the Wazuh agent | `ok ` (immediate) |
+| `restart` | Restart the GuardSarm agent | `ok ` (immediate) |
 | `reload` | Reload agent configuration | `ok ` (immediate) |
 | *(other)* | Any unrecognized command | `Err` (Unix) / `err Unrecognized command` (Windows) |
 
@@ -62,8 +62,8 @@ Agent-side (Unix) is the same `wm_control.c` compiled with `CLIENT` defined; Win
 1. **Request Received**: Client (API/framework) sends command to the manager control socket
 2. **Systemd Detection**: Module checks if systemd is available
 3. **Command Selection**:
-   - **With systemd**: `systemctl restart/reload wazuh-manager`
-   - **Without systemd**: `bin/wazuh-control restart/reload`
+   - **With systemd**: `systemctl restart/reload guardsarm-manager`
+   - **Without systemd**: `bin/guardsarm-control restart/reload`
 4. **Fork and Execute**: Spawns child process to execute command
 5. **Immediate Response**: Returns success immediately (non-blocking)
 
@@ -72,17 +72,17 @@ Agent-side (Unix) is the same `wm_control.c` compiled with `CLIENT` defined; Win
 1. **API Request**: Client calls `PUT /agents/{agent_id}/restart` or reload equivalent
 2. **Framework**: Sends `"{agent_id} control restart"` or `"{agent_id} control reload"` to the remoted socket
 3. **Remoted**: Forwards the control message to the target agent
-4. **Agent Dispatch**: `wazuh-agentd`'s `request.c` receives the `"control"` target and forwards it to the agent's control Unix socket (`CONTROL_SOCK`)
-5. **wm_control thread**: `process_control()` (running as a thread in `wazuh-modulesd`) receives the command and dispatches to `wm_control_dispatch()` with `"wazuh-agent"` as the service name
-6. **Execution**: The agent runs restart/reload via systemctl or wazuh-control
+4. **Agent Dispatch**: `guardsarm-agentd`'s `request.c` receives the `"control"` target and forwards it to the agent's control Unix socket (`CONTROL_SOCK`)
+5. **wm_control thread**: `process_control()` (running as a thread in `guardsarm-modulesd`) receives the command and dispatches to `wm_control_dispatch()` with `"guardsarm-agent"` as the service name
+6. **Execution**: The agent runs restart/reload via systemctl or guardsarm-control
 
 ### Remote Agent Control (Windows)
 
 1. **API Request**: Client calls `PUT /agents/{agent_id}/restart` or reload equivalent
 2. **Framework**: Sends `"{agent_id} control restart"` to the remoted socket
 3. **Remoted**: Forwards the control message to the target agent
-4. **Agent Dispatch**: `wazuh-agentd`'s `request.c` calls `control_dispatch()` in-process
-5. **Execution**: `control_run_detached()` spawns a detached copy of `wazuh-agent.exe service-restart` that stops and restarts the service from outside WazuhSvc
+4. **Agent Dispatch**: `guardsarm-agentd`'s `request.c` calls `control_dispatch()` in-process
+5. **Execution**: `control_run_detached()` spawns a detached copy of `guardsarm-agent.exe service-restart` that stops and restarts the service from outside GuardSarmSvc
 
 ### Systemd Detection
 
@@ -101,7 +101,7 @@ For reload operations with systemd, the module:
 
 ### API Usage
 
-The Wazuh RESTful API uses the control channel for:
+The GuardSarm RESTful API uses the control channel for:
 - `PUT /manager/restart` — Manager restart
 - `PUT /agents/restart` / `PUT /agents/{agent_id}/restart` — Agent restart (requires agent v5.0.0+)
 - `PUT /agents/reload` / `PUT /agents/{agent_id}/reload` — Agent reload (requires agent v5.0.0+)
@@ -109,8 +109,8 @@ The Wazuh RESTful API uses the control channel for:
 - `PUT /agents/node/{node_id}/reload` — Reload agents on a cluster node
 
 **Framework Code**:
-- Manager: `framework/wazuh/core/cluster/utils.py::manager_restart()`
-- Agents: `framework/wazuh/core/agent.py::send_restart_command()` / `send_reload_command()`
+- Manager: `framework/guardsarm/core/cluster/utils.py::manager_restart()`
+- Agents: `framework/guardsarm/core/agent.py::send_restart_command()` / `send_reload_command()`
 
 ### Agent Version Requirement
 
@@ -124,7 +124,7 @@ import socket
 
 def send_control_command(command):
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    sock.connect('/var/wazuh-manager/queue/sockets/control')
+    sock.connect('/var/guardsarm-manager/queue/sockets/control')
     sock.send(command.encode())
     response = sock.recv(1024).decode().strip()
     sock.close()
@@ -141,29 +141,29 @@ result = send_control_command('restart')  # Returns: "ok "
 
 ## Related Modules
 
-- **wazuh-manager-modulesd / wazuh-modulesd**: Host daemon for `wm_control` (manager and agent Unix builds, respectively)
-- **wazuh-manager-remoted**: Forwards control messages from manager to agents
-- **wazuh-agentd**: Routes incoming `"control"` requests — forwards to control socket (Unix) or calls `control_dispatch()` directly (Windows)
-- **wazuh-manager-apid**: Calls control socket/framework for restart and reload API endpoints
+- **guardsarm-manager-modulesd / guardsarm-modulesd**: Host daemon for `wm_control` (manager and agent Unix builds, respectively)
+- **guardsarm-manager-remoted**: Forwards control messages from manager to agents
+- **guardsarm-agentd**: Routes incoming `"control"` requests — forwards to control socket (Unix) or calls `control_dispatch()` directly (Windows)
+- **guardsarm-manager-apid**: Calls control socket/framework for restart and reload API endpoints
 
 ## Architecture Changes
 
 **Previous Architecture (v4.x)**:
-- Control functionality in `wazuh-execd` daemon
+- Control functionality in `guardsarm-execd` daemon
 - Socket: `/var/ossec/queue/sockets/com`
-- Agent restart/reload triggered via Active Response scripts (`restart.sh`, `restart-wazuh.exe`)
+- Agent restart/reload triggered via Active Response scripts (`restart.sh`, `restart-guardsarm.exe`)
 
 **Current Architecture (v5.0)**:
-- Manager control in `wm_control` (within modulesd); socket: `$WAZUH_HOME/queue/sockets/control`
-- Agent control (Unix): same `wm_control.c` compiled with `CLIENT`, running as a thread in `wazuh-modulesd`; socket: `$WAZUH_HOME/queue/sockets/control`
+- Manager control in `wm_control` (within modulesd); socket: `$GUARDSARM_HOME/queue/sockets/control`
+- Agent control (Unix): same `wm_control.c` compiled with `CLIENT`, running as a thread in `guardsarm-modulesd`; socket: `$GUARDSARM_HOME/queue/sockets/control`
 - Agent control (Windows): `control_dispatch()` in `client-agent`, called in-process by `request.c`
 - Agent restart/reload via direct control channel — no Active Response scripts required
-- `wcom_restart()` and `wcom_reload()` removed from `wazuh-execd`
+- `wcom_restart()` and `wcom_reload()` removed from `guardsarm-execd`
 
 ## Security Considerations
 
 - **Socket Permissions**: The control socket is created with `0660` permissions
-- **Group Access**: Socket owned by wazuh group for API/framework access
+- **Group Access**: Socket owned by guardsarm group for API/framework access
 - **No Authentication**: Local Unix socket provides implicit authentication via filesystem permissions
 - **Immediate Response**: Operations return immediately before completion to prevent timeout issues
 

@@ -27,9 +27,9 @@
 #define MAX_GROUP_NAME_LEN 256  // 255 + 1 for null terminator
 
 #ifdef _WIN32
-#define SHM_PATH "Global\\WazuhAgentMetadata"
+#define SHM_PATH "Global\\GuardSarmAgentMetadata"
 #else
-#define SHM_PATH "var/run/.wazuh_agent_metadata"
+#define SHM_PATH "var/run/.guardsarm_agent_metadata"
 #endif
 
 namespace

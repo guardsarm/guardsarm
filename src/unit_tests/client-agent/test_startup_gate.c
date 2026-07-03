@@ -16,7 +16,7 @@
 #include <stdlib.h>
 
 #include "../wrappers/common.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
 
 #include "agentd.h"
 #include "../os_crypto/md5/md5_op.h"

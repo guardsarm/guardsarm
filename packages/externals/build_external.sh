@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Wazuh external dependency builder (container-side).
+# GuardSarm external dependency builder (container-side).
 #
 # Runs inside one of the package builder Docker images (e.g.
 # packages/debs/amd64/manager:<tag>). Driven by
@@ -12,19 +12,19 @@
 #   SYSTEM              deb | rpm | macos | windows  (used in artifact filenames)
 #   DEPS_TO_UPDATE      "name:version;name:version;..." (may be empty)
 #   JOBS                parallel build jobs (defaults to nproc)
-#   WAZUH_VERBOSE       "yes" enables `set -x`
+#   GUARDSARM_VERBOSE       "yes" enables `set -x`
 #
 # Sources (location varies by mode):
-#   ${WAZUH_SRC}                  the working tree (default /wazuh-local-src
+#   ${GUARDSARM_SRC}                  the working tree (default /guardsarm-local-src
 #                                 — the path the Linux/Windows builder
 #                                 containers see; macOS native runs override
 #                                 it to the actual checkout path).
-#   ${WAZUH_SRC}/packages/externals/external_sources.sh   the manifest
+#   ${GUARDSARM_SRC}/packages/externals/external_sources.sh   the manifest
 #
 # Output:
 #   ${ARTIFACTS_DIR}/<dep>_src.zip
 #   ${ARTIFACTS_DIR}/<dep>_<system>_<architecture>.zip
-#   (defaults to /var/local/wazuh/external_artifacts inside containers; on
+#   (defaults to /var/local/guardsarm/external_artifacts inside containers; on
 #    macOS native runs the host script overrides it to a path on the runner.)
 
 set -e
@@ -41,15 +41,15 @@ if [[ "${BASH_VERSINFO[0]}" -lt 4 && "$(uname -s)" == "Darwin" ]]; then
     exit 1
 fi
 
-WAZUH_SRC="${WAZUH_SRC:-/wazuh-local-src}"
-SRC_DIR="${WAZUH_SRC}/src"
+GUARDSARM_SRC="${GUARDSARM_SRC:-/guardsarm-local-src}"
+SRC_DIR="${GUARDSARM_SRC}/src"
 EXTERNAL_DIR="${SRC_DIR}/external"
-ARTIFACTS_DIR="${ARTIFACTS_DIR:-/var/local/wazuh/external_artifacts}"
+ARTIFACTS_DIR="${ARTIFACTS_DIR:-/var/local/guardsarm/external_artifacts}"
 DOWNLOAD_DIR="${DOWNLOAD_DIR:-/tmp/external_upstream}"
 
 JOBS="${JOBS:-$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2)}"
 
-if [ "${WAZUH_VERBOSE}" = "yes" ]; then
+if [ "${GUARDSARM_VERBOSE}" = "yes" ]; then
     set -x
 fi
 
@@ -135,7 +135,7 @@ if [ -f /usr/include/expat.h ] && ! pkg-config --exists expat 2>/dev/null; then
 fi
 
 # shellcheck disable=SC1091
-source "${WAZUH_SRC}/packages/externals/external_sources.sh"
+source "${GUARDSARM_SRC}/packages/externals/external_sources.sh"
 
 # Substitute {version}, {version_us}, and {version_concat} in a URL template.
 # {version_concat} maps a dotted version like "3.51.1" to sqlite's
@@ -319,7 +319,7 @@ replace_dep_source() {
 # Per-dep download failures are logged and skipped so the run can produce a
 # full validation report of the manifest's URL templates instead of aborting
 # on the first bad URL. Skipped deps fall back to the version `make deps`
-# already extracted from the Wazuh source mirror.
+# already extracted from the GuardSarm source mirror.
 apply_updates() {
     if [ -z "${DEPS_TO_UPDATE:-}" ]; then
         log "no DEPS_TO_UPDATE provided; rebuilding everything from currently vendored sources"
@@ -423,14 +423,14 @@ done
 log "running 'make deps' (EXTERNAL_SRC_ONLY=yes) to populate dep sources"
 make -C "${SRC_DIR}" EXTERNAL_SRC_ONLY=yes deps TARGET="${MAKE_TARGET}"
 
-# Some cached source tarballs at packages.wazuh.com (notably the openssl one)
+# Some cached source tarballs at packages.guardsarm.com (notably the openssl one)
 # were originally packed with bsdtar on macOS, so every file has a
 # `com.apple.provenance` xattr and the archive carries an AppleDouble `._<file>`
 # sibling for each. GNU tar on the Linux runners extracts those AppleDouble
 # files as regular files; without this step they flow through snapshot_src and
 # snapshot_built into every per-leg tarball (6149 `._*` entries in the openssl
 # leg output, confirmed by raw byte-walk of the cached tarball at
-# `packages.wazuh.com/deps/99-29585/libraries/sources/openssl.tar.gz`).
+# `packages.guardsarm.com/deps/99-29585/libraries/sources/openssl.tar.gz`).
 log "stripping AppleDouble (._*) files from extracted source trees"
 find "${SRC_DIR}/external" -name '._*' -delete
 
@@ -468,7 +468,7 @@ if [ "${BUILD_TARGET}" = "manager" ]; then
         *)     cpython_arch="" ;;
     esac
     if [ -n "${cpython_arch}" ]; then
-        cpython_url="https://packages.wazuh.com/deps/${DEPS_VERSION}/libraries/sources/cpython_${cpython_arch}.tar.gz"
+        cpython_url="https://packages.guardsarm.com/deps/${DEPS_VERSION}/libraries/sources/cpython_${cpython_arch}.tar.gz"
         cpython_out="${ARTIFACTS_DIR}/cpython_${cpython_arch}.passthrough.tar.gz"
         log "fetching cpython pass-through from ${cpython_url}"
         if curl -fsSL "${cpython_url}" -o "${cpython_out}"; then
@@ -498,16 +498,16 @@ done
 # Stage precompiled binaries for deps whose source-rebuild path is broken
 # in the legacy builder images. src/external/CMakeLists.txt has if(EXISTS)
 # short-circuits that pick precompiled .a files when present, skipping the
-# from-source ExternalProject_Add. Wazuh's normal CI always has these
+# from-source ExternalProject_Add. GuardSarm's normal CI always has these
 # precompiled tarballs (downloaded by `make deps` without EXTERNAL_SRC_ONLY)
 # so the from-source path is rarely exercised and has known issues:
 #   - libbpf-bootstrap: needs clang ≥7 with BPF backend and kernel UAPI
-#     headers ≥4.13. Wazuh team builds it in dedicated centos:7 +
+#     headers ≥4.13. GuardSarm team builds it in dedicated centos:7 +
 #     clang-15-from-source images (issue 28626) and uploads the result.
 #   - libffi: ExternalProject_Add's BUILD_BYPRODUCTS doesn't translate to
 #     a working make rule under the Make generator with BUILD_IN_SOURCE TRUE.
-#     wazuhext's link step then fails with "No rule to make target".
-# We reuse the existing precompiled tarballs from packages.wazuh.com.
+#     guardsarmext's link step then fails with "No rule to make target".
+# We reuse the existing precompiled tarballs from packages.guardsarm.com.
 # Done after the source-snapshot loop so the *_src.zip artifacts stay clean.
 # Future bumps of these specific deps would need the original build env
 # (per-image toolchain or external CI), so they're out of scope here.
@@ -523,7 +523,7 @@ stage_precompiled() {
         arm64)  arch_path="aarch64" ;;
         *)      log "stage_precompiled: unsupported arch ${ARCHITECTURE_TARGET}; skipping ${name}"; return 0 ;;
     esac
-    local url="https://packages.wazuh.com/deps/${DEPS_VERSION}/libraries/linux/${arch_path}/${name}.tar.gz"
+    local url="https://packages.guardsarm.com/deps/${DEPS_VERSION}/libraries/linux/${arch_path}/${name}.tar.gz"
     local tar="${DOWNLOAD_DIR}/${name}-precompiled.tar.gz"
     log "staging precompiled ${name} from ${url}"
     if ! curl -fsSL "${url}" -o "${tar}"; then
@@ -546,7 +546,7 @@ if { [ "${SYSTEM}" = "deb" ] || [ "${SYSTEM}" = "rpm" ]; }; then
     # UAPI headers >= 4.13 (linux/bpf_perf_event.h) and a BPF-capable
     # clang, neither of which the legacy agent builder image provides — a
     # from-source attempt fails with "linux/bpf_perf_event.h: No such file
-    # or directory". Wazuh builds it in a dedicated centos:7 +
+    # or directory". GuardSarm builds it in a dedicated centos:7 +
     # clang-15-from-source image (issue 28626); here we reuse that
     # precompiled tarball. Staged on every Linux leg regardless of
     # BUILD_TARGET so the per-leg output is binary-complete; the
@@ -557,7 +557,7 @@ fi
 
 log "building externals via 'make build-external TARGET=${MAKE_TARGET}'"
 # `build-external` (defined at src/Makefile:372) configures cmake then builds
-# only build/external — exactly the subset we want, no Wazuh modules.
+# only build/external — exactly the subset we want, no GuardSarm modules.
 # Wipe any stale build/ dir first: a CMakeCache.txt left over from a local
 # host build will pin paths to the host filesystem and break the in-container
 # configure step ("source ... does not match the source ... used to generate
@@ -587,7 +587,7 @@ fi
 # source tree where the precompiled-detection arm looks on the next run /
 # in a downstream consumer. snapshot_built() zips the source tree only, so
 # without this step the produced tarball is source-only and the downstream
-# Wazuh build re-compiles from source instead of consuming the precompiled
+# GuardSarm build re-compiles from source instead of consuming the precompiled
 # archive we just produced. Copy each build-tree output to the path the
 # detection arm reads from.
 #

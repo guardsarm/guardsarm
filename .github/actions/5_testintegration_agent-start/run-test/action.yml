@@ -1,5 +1,5 @@
 name: 'Run agent startup smoke test'
-description: 'Installs the Wazuh agent package and verifies it starts correctly'
+description: 'Installs the GuardSarm agent package and verifies it starts correctly'
 
 inputs:
   platform:
@@ -26,10 +26,10 @@ runs:
       shell: bash
       run: |
         if [ "${{ inputs.platform }}" == "linux-deb" ]; then
-          PACKAGE=$(find "${{ inputs.packages-path }}" -type f -name "wazuh-agent*amd64*.deb" ! -name "*dbg*" -exec basename {} \; | head -n1)
+          PACKAGE=$(find "${{ inputs.packages-path }}" -type f -name "guardsarm-agent*amd64*.deb" ! -name "*dbg*" -exec basename {} \; | head -n1)
           echo "CONTAINER_NAME=pkg_deb_agent_builder_amd64" >> "$GITHUB_ENV"
         else
-          PACKAGE=$(find "${{ inputs.packages-path }}" -type f -name "wazuh-agent*x86_64*.rpm" ! -name "*dbg*" ! -name "*debug*" ! -name "*debuginfo*" -exec basename {} \; | head -n1)
+          PACKAGE=$(find "${{ inputs.packages-path }}" -type f -name "guardsarm-agent*x86_64*.rpm" ! -name "*dbg*" ! -name "*debug*" ! -name "*debuginfo*" -exec basename {} \; | head -n1)
           echo "CONTAINER_NAME=pkg_rpm_agent_builder_amd64" >> "$GITHUB_ENV"
         fi
         if [ -z "$PACKAGE" ]; then
@@ -68,7 +68,7 @@ runs:
       if: inputs.platform == 'windows'
       shell: pwsh
       run: |
-        $PACKAGE = Get-ChildItem -Path "${{ inputs.packages-path }}" -Filter "wazuh-agent*windows*.msi" -File -Recurse `
+        $PACKAGE = Get-ChildItem -Path "${{ inputs.packages-path }}" -Filter "guardsarm-agent*windows*.msi" -File -Recurse `
           | Where-Object { $_.Name -notmatch 'debug' } `
           | Select-Object -First 1 -ExpandProperty FullName
         if (-not $PACKAGE) {
@@ -87,12 +87,12 @@ runs:
           "/i"
           "`"${{ env.PACKAGE_PATH }}`""
           "/q"
-          "WAZUH_MANAGER=`"1.2.3.4`""
+          "GUARDSARM_MANAGER=`"1.2.3.4`""
           "/l installer.log"
         )
         Start-Process msiexec.exe -ArgumentList $arguments -Wait -NoNewWindow
         $installerfile = Get-Content installer.log
-        if ($installerfile -match "Wazuh Agent -- Installation completed successfully") {
+        if ($installerfile -match "GuardSarm Agent -- Installation completed successfully") {
           Write-Output "Installation successfully."
         } else {
           Write-Output "The installation could not be completed."
@@ -102,7 +102,7 @@ runs:
     - name: Start Windows agent service
       if: inputs.platform == 'windows'
       shell: pwsh
-      run: Start-Service wazuhsvc
+      run: Start-Service guardsarmsvc
 
     - name: Wait for Windows agent to initialize
       if: inputs.platform == 'windows'
@@ -113,7 +113,7 @@ runs:
       if: inputs.platform == 'windows'
       shell: pwsh
       run: |
-        $service = Get-Service wazuhsvc
+        $service = Get-Service guardsarmsvc
         if ($service.Status -ne 'Running') {
           Write-Host "ERROR: Service is not running. Status: $($service.Status)"
           exit 1
@@ -124,8 +124,8 @@ runs:
       if: inputs.platform == 'windows'
       shell: pwsh
       run: |
-        Stop-Service -Name wazuhsvc
-        $service = Get-Service -Name wazuhsvc
+        Stop-Service -Name guardsarmsvc
+        $service = Get-Service -Name guardsarmsvc
         if ($service.Status -ne 'Stopped') {
           Write-Host "WARNING: Service did not stop cleanly. Status: $($service.Status)"
           exit 1
@@ -139,7 +139,7 @@ runs:
       if: inputs.platform == 'macos'
       shell: bash
       run: |
-        PACKAGE=$(find "${{ inputs.packages-path }}" -type f -name "wazuh-agent*.pkg" ! -name "*dbg*" ! -name "*debug*" | head -n1)
+        PACKAGE=$(find "${{ inputs.packages-path }}" -type f -name "guardsarm-agent*.pkg" ! -name "*dbg*" ! -name "*debug*" | head -n1)
         if [ -z "$PACKAGE" ]; then
           echo "ERROR: No PKG package found in ${{ inputs.packages-path }}"
           exit 1
@@ -151,7 +151,7 @@ runs:
       if: inputs.platform == 'macos'
       shell: bash
       run: |
-        echo "WAZUH_MANAGER='1.2.3.4'" > /tmp/wazuh_envs
+        echo "GUARDSARM_MANAGER='1.2.3.4'" > /tmp/guardsarm_envs
         set -o pipefail
         sudo installer -pkg "${{ env.PACKAGE_PATH }}" -target / | sudo tee installer.log
         if grep -q "The install was successful" "installer.log"; then
@@ -165,7 +165,7 @@ runs:
       if: inputs.platform == 'macos'
       shell: bash
       run: |
-        DAEMONS="wazuh-modulesd wazuh-logcollector wazuh-syscheckd wazuh-agentd wazuh-execd"
+        DAEMONS="guardsarm-modulesd guardsarm-logcollector guardsarm-syscheckd guardsarm-agentd guardsarm-execd"
         echo "Testing daemons with -t flag..."
         for daemon in $DAEMONS; do
           echo "Testing ${daemon}..."
@@ -179,7 +179,7 @@ runs:
     - name: Start macOS agent
       if: inputs.platform == 'macos'
       shell: bash
-      run: sudo /Library/Ossec/bin/wazuh-control start
+      run: sudo /Library/Ossec/bin/guardsarm-control start
 
     - name: Wait for macOS agent to initialize
       if: inputs.platform == 'macos'
@@ -190,7 +190,7 @@ runs:
       if: inputs.platform == 'macos'
       shell: bash
       run: |
-        if ! sudo /Library/Ossec/bin/wazuh-control status; then
+        if ! sudo /Library/Ossec/bin/guardsarm-control status; then
           echo "ERROR: Agent status check failed"
           exit 1
         fi
@@ -200,5 +200,5 @@ runs:
       if: inputs.platform == 'macos'
       shell: bash
       run: |
-        sudo /Library/Ossec/bin/wazuh-control stop
+        sudo /Library/Ossec/bin/guardsarm-control stop
         echo "Agent stopped successfully"

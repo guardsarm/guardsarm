@@ -49,8 +49,8 @@ jobs:
           DEB=$(jq -cn '{
             runner: "codebuild-github-actions-codebuild-runner-server-amd-${{ github.run_id }}-${{ github.run_attempt }}", platform: "linux-deb",
             "display-name": "Linux DEB (amd64)",
-            "artifact-pattern": "wazuh-agent*amd64*.deb",
-            "artifact-regexp": "wazuh-agent.*amd64.*\\.deb",
+            "artifact-pattern": "guardsarm-agent*amd64*.deb",
+            "artifact-regexp": "guardsarm-agent.*amd64.*\\.deb",
             "build-workflow": "5_builderpackage_agent-linux.yml",
             "packages-path": "/tmp/packages"
           }')
@@ -58,23 +58,23 @@ jobs:
             runner: "codebuild-github-actions-codebuild-runner-server-amd-${{ github.run_id }}-${{ github.run_attempt }}", platform: "linux-rpm",
             "display-name": "Linux RPM (x86_64)",
             "artifact-pattern": "*x86_64*.rpm",
-            "artifact-regexp": "wazuh-agent.*x86_64.*\\.rpm",
+            "artifact-regexp": "guardsarm-agent.*x86_64.*\\.rpm",
             "build-workflow": "5_builderpackage_agent-linux.yml",
             "packages-path": "/tmp/packages"
           }')
           WIN=$(jq -cn '{
             runner: "codebuild-github-actions-codebuild-runner-agent-windows-amd-${{ github.run_id }}-${{ github.run_attempt }}", platform: "windows",
             "display-name": "Windows",
-            "artifact-pattern": "wazuh-agent*windows*.msi",
-            "artifact-regexp": "wazuh-agent.*windows.*\\.msi",
+            "artifact-pattern": "guardsarm-agent*windows*.msi",
+            "artifact-regexp": "guardsarm-agent.*windows.*\\.msi",
             "build-workflow": "5_builderpackage_agent-windows.yml",
             "packages-path": "C:\\packages"
           }')
           MAC=$(jq -cn '{
             runner: "macos-15", platform: "macos",
             "display-name": "macOS (arm64)",
-            "artifact-pattern": "wazuh-agent*arm64*.pkg",
-            "artifact-regexp": "wazuh-agent.*arm64.*\\.pkg",
+            "artifact-pattern": "guardsarm-agent*arm64*.pkg",
+            "artifact-regexp": "guardsarm-agent.*arm64.*\\.pkg",
             "build-workflow": "5_builderpackage_agent-macos.yml",
             "packages-path": "/tmp/packages"
           }')
@@ -144,5 +144,5 @@ jobs:
         with:
           platform: ${{ matrix.platform }}
           packages-path: ${{ matrix.packages-path }}
-          ghcr-token: ${{ secrets.CI_WAZUH_AGENT_PACKAGES_CLASSIC }}
+          ghcr-token: ${{ secrets.CI_GUARDSARM_AGENT_PACKAGES_CLASSIC }}
           actor: ${{ github.actor }}

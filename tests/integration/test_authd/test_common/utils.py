@@ -4,8 +4,8 @@
 import os
 import time
 
-from wazuh_testing.constants.paths.sockets import QUEUE_AGENTS_TIMESTAMP_PATH, QUEUE_DIFF_PATH, QUEUE_RIDS_PATH
-from wazuh_testing.utils.file import truncate_file, remove_file, recursive_directory_creation
+from guardsarm_testing.constants.paths.sockets import QUEUE_AGENTS_TIMESTAMP_PATH, QUEUE_DIFF_PATH, QUEUE_RIDS_PATH
+from guardsarm_testing.utils.file import truncate_file, remove_file, recursive_directory_creation
 
 
 def clean_diff():

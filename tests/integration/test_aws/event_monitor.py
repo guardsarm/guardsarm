@@ -9,7 +9,7 @@ This module will contain all callback methods to monitor and event
 import re
 
 # # qa-integration-framework imports
-from wazuh_testing.modules.aws.patterns import (AWS_MODULE_STARTED_PARAMETRIZED,
+from guardsarm_testing.modules.aws.patterns import (AWS_MODULE_STARTED_PARAMETRIZED,
                                                 AWS_UNDEFINED_SERVICE_TYPE, AWS_DEPRECATED_CONFIG_DEFINED,
                                                 AWS_NO_SERVICE_WARNING, AWS_MODULE_STARTED, INVALID_EMPTY_TYPE_ERROR,
                                                 EMPTY_CONTENT_ERROR, EMPTY_CONTENT_WARNING,
@@ -19,7 +19,7 @@ from wazuh_testing.modules.aws.patterns import (AWS_MODULE_STARTED_PARAMETRIZED,
                                                 MODULE_START, PARSER_ERROR, MODULE_ERROR, NEW_LOG_FOUND, DEBUG_MESSAGE,
                                                 EVENTS_COLLECTED, DEBUG_ANALYSISD_MESSAGE, ANALYSISD_EVENT,
                                                 AWS_EVENT_HEADER, NO_LOG_PROCESSED, NO_BUCKET_LOG_PROCESSED)
-from wazuh_testing.constants.aws import INSPECTOR_TYPE
+from guardsarm_testing.constants.aws import INSPECTOR_TYPE
 
 
 def make_aws_callback(pattern, prefix=''):

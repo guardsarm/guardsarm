@@ -20,9 +20,9 @@
 #include "sec.h"
 
 #include "../wrappers/common.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/shared/wazuhdb_queries_op_wrappers.h"
-#include "../wrappers/wazuh/os_net/os_net_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/guardsarmdb_queries_op_wrappers.h"
+#include "../wrappers/guardsarm/os_net/os_net_wrappers.h"
 #include "../wrappers/libc/string_wrappers.h"
 #include "../wrappers/posix/unistd_wrappers.h"
 #include "../wrappers/libc/stdio_wrappers.h"
@@ -30,7 +30,7 @@
 #include "cJSON.h"
 
 #ifndef WIN32
-#include "../wrappers/wazuh/data_provider/sysInfo_wrappers.h"
+#include "../wrappers/guardsarm/data_provider/sysInfo_wrappers.h"
 #include "../../data_provider/include/sysInfo.h"
 #endif
 

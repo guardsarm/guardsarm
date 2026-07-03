@@ -1,5 +1,5 @@
 /*
- * Wazuh - Indexer connector.
+ * GuardSarm - Indexer connector.
  * Copyright (C) 2015, Wazuh Inc.
  * June 2, 2023.
  *

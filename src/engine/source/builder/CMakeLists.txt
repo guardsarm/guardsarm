@@ -184,7 +184,7 @@ add_executable(builder_utest
 	${UNIT_SRC_DIR}/builders/stage/parse_test.cpp
 	${UNIT_SRC_DIR}/builders/stage/outputs_test.cpp
 	${UNIT_SRC_DIR}/builders/stage/fileOutput_test.cpp
-	# TODO: Until the indexer connector is unified with the rest of wazuh-manager
+	# TODO: Until the indexer connector is unified with the rest of guardsarm-manager
 	${UNIT_SRC_DIR}/builders/stage/indexerOutput_test.cpp
 	${UNIT_SRC_DIR}/builders/stage/first_of_test.cpp
 )

@@ -20,11 +20,11 @@
 #include "../wrappers/linux/socket_wrappers.h"
 #include "../wrappers/posix/pthread_wrappers.h"
 #include "../wrappers/posix/unistd_wrappers.h"
-#include "../wrappers/wazuh/os_net/os_net_wrappers.h"
-#include "../wrappers/wazuh/shared/bqueue_op_wrappers.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/shared/notify_op_wrappers.h"
-#include "../wrappers/wazuh/remoted/queue_wrappers.h"
+#include "../wrappers/guardsarm/os_net/os_net_wrappers.h"
+#include "../wrappers/guardsarm/shared/bqueue_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/notify_op_wrappers.h"
+#include "../wrappers/guardsarm/remoted/queue_wrappers.h"
 
 extern wnotify_t * notify;
 extern unsigned int send_chunk;

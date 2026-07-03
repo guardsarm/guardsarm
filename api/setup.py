@@ -16,11 +16,11 @@ from setuptools import setup, find_namespace_packages
 setup(
     name='api',
     version='5.0.1',
-    description="Wazuh API",
-    author_email="hello@wazuh.com",
-    author="Wazuh",
-    url="https://github.com/wazuh",
-    keywords=["Wazuh API"],
+    description="GuardSarm API",
+    author_email="info@guardsarm.com",
+    author="GuardSarm",
+    url="https://github.com/guardsarm",
+    keywords=["GuardSarm API"],
     install_requires=[],
     packages=find_namespace_packages(exclude=["*.test", "*.test.*", "test.*", "test"]),
     package_data={'': ['spec/spec.yaml']},
@@ -28,6 +28,6 @@ setup(
     zip_safe=False,
     license='GPLv2',
     long_description="""\
-    The Wazuh API is an open source RESTful API that allows for interaction with the Wazuh manager from a web browser, command line tool like cURL or any script or program that can make web requests. The Wazuh app relies on this heavily and Wazuh’s goal is to accommodate complete remote management of the Wazuh infrastructure via the Wazuh app. Use the API to easily perform everyday actions like adding an agent or restarting the manager(s) or agent(s).
+    The GuardSarm API is an open source RESTful API that allows for interaction with the GuardSarm manager from a web browser, command line tool like cURL or any script or program that can make web requests. The GuardSarm app relies on this heavily and GuardSarm’s goal is to accommodate complete remote management of the GuardSarm infrastructure via the GuardSarm app. Use the API to easily perform everyday actions like adding an agent or restarting the manager(s) or agent(s).
     """
 )

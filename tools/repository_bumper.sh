@@ -175,20 +175,20 @@ update_file_sources() {
     if [[ -n "$new_version" ]]; then
         local defs_file="$DIR_SRC/shared/include/defs.h"
         local current_defs_version
-        current_defs_version=$(grep -E '^#define __wazuh_version' "$defs_file" \
-            | sed -E 's/^#define __wazuh_version\s+"v([0-9]+\.[0-9]+\.[0-9]+)".*/\1/')
+        current_defs_version=$(grep -E '^#define __guardsarm_version' "$defs_file" \
+            | sed -E 's/^#define __guardsarm_version\s+"v([0-9]+\.[0-9]+\.[0-9]+)".*/\1/')
 
         if [[ "$current_defs_version" != "$new_version" ]]; then
-            sed -i -E "s|(^#define __wazuh_version\s+\"v)[0-9]+\.[0-9]+\.[0-9]+(\")|\1${new_version}\2|" "$defs_file"
+            sed -i -E "s|(^#define __guardsarm_version\s+\"v)[0-9]+\.[0-9]+\.[0-9]+(\")|\1${new_version}\2|" "$defs_file"
             log_action "Modified $defs_file with new version: $new_version"
         fi
     fi
 
-    # Update wazuh-*.sh scripts
+    # Update guardsarm-*.sh scripts
     for script in \
-        "$DIR_SRC/init/wazuh-server.sh" \
-        "$DIR_SRC/init/wazuh-client.sh" \
-        "$DIR_SRC/init/wazuh-local.sh"
+        "$DIR_SRC/init/guardsarm-server.sh" \
+        "$DIR_SRC/init/guardsarm-client.sh" \
+        "$DIR_SRC/init/guardsarm-local.sh"
     do
         if [[ -n "$new_version" ]]; then
             local current_script_version
@@ -218,15 +218,15 @@ update_file_sources() {
     done
 
 
-    # Update wazuh-installer.wxs
+    # Update guardsarm-installer.wxs
     if [[ -n "$new_version" ]]; then
-        local wxs_file="$DIR_SRC/win32/wazuh-installer.wxs"
+        local wxs_file="$DIR_SRC/win32/guardsarm-installer.wxs"
         local current_wxs_version
         current_wxs_version=$(grep -E '<Product ' "$wxs_file" \
             | sed -E 's/.*Version="([^"]+)".*/\1/')
 
         if [[ "$current_wxs_version" != "$new_version" ]]; then
-            sed -i -E "s|(<Product Id=\"\*\" Name=\"Wazuh Agent\" Language=\"1033\" Version=\")[^\"]+(\" Manufacturer=)|\1${new_version}\2|" "$wxs_file"
+            sed -i -E "s|(<Product Id=\"\*\" Name=\"GuardSarm Agent\" Language=\"1033\" Version=\")[^\"]+(\" Manufacturer=)|\1${new_version}\2|" "$wxs_file"
             log_action "Modified $wxs_file with new version: $new_version"
         fi
     fi
@@ -284,8 +284,8 @@ update_file_framework() {
 
     [[ -z "$new_version" && -z "$new_stage" ]] && return
 
-    local init_file="$DIR_FRAMEWORK/wazuh/__init__.py"
-    local cluster_file="$DIR_FRAMEWORK/wazuh/core/cluster/__init__.py"
+    local init_file="$DIR_FRAMEWORK/guardsarm/__init__.py"
+    local cluster_file="$DIR_FRAMEWORK/guardsarm/core/cluster/__init__.py"
 
     if [[ -n "$new_version" ]]; then
         local current_version_init
@@ -369,9 +369,9 @@ update_file_api() {
             sed -i -E \
                 "s~(blob/)(v?main|v[0-9]+\.[0-9]+\.[0-9]+(-[a-z]+[0-9]+)?|[0-9]+\.[0-9]+\.[0-9]+)(/)~\1${url_ref}\4~g" \
                 "$spec_file"
-            # documentation URLs use 2-part version without v prefix (e.g. wazuh.com/5.0/)
+            # documentation URLs use 2-part version without v prefix (e.g. guardsarm.com/5.0/)
             sed -i -E \
-                "s~(wazuh\.com/)(main|[0-9]+\.[0-9]+)(/)~\1${version_short}\3~g" \
+                "s~(guardsarm\.com/)(main|[0-9]+\.[0-9]+)(/)~\1${version_short}\3~g" \
                 "$spec_file"
         fi
     fi
@@ -435,10 +435,10 @@ update_file_packages() {
     # Update .spec files - always update the first changelog entry in place
     for spec_file in $(find "$DIR_PACKAGE" -type f -name "*.spec"); do
         sed -i -E \
-            "0,/^\* .+ support <info@wazuh\.com> - [0-9]+\.[0-9]+\.[0-9]+$/s|^\* .+ support <info@wazuh\.com> - [0-9]+\.[0-9]+\.[0-9]+$|* ${spec_date} support <info@wazuh.com> - ${final_version}|" \
+            "0,/^\* .+ support <info@guardsarm\.com> - [0-9]+\.[0-9]+\.[0-9]+$/s|^\* .+ support <info@guardsarm\.com> - [0-9]+\.[0-9]+\.[0-9]+$|* ${spec_date} support <info@guardsarm.com> - ${final_version}|" \
             "$spec_file"
         sed -i -E \
-            "0,/^- More info: https:\/\/documentation\.wazuh\.com\/current\/release-notes\/release-[0-9]+-[0-9]+-[0-9]+\.html$/s|^- More info: .*$|- More info: https://documentation.wazuh.com/current/release-notes/release-${version_dashed}.html|" \
+            "0,/^- More info: https:\/\/documentation\.guardsarm\.com\/current\/release-notes\/release-[0-9]+-[0-9]+-[0-9]+\.html$/s|^- More info: .*$|- More info: https://documentation.guardsarm.com/current/release-notes/release-${version_dashed}.html|" \
             "$spec_file"
         log_action "Updated changelog entry for version ${final_version} in: $spec_file"
     done
@@ -448,7 +448,7 @@ update_file_packages() {
         local INSTALL_TYPE
         INSTALL_TYPE=$(basename "$(dirname "$(dirname "$changelog_file")")")
 
-        awk -v pkg="$INSTALL_TYPE" -v new_ver="$final_version" -v new_url="https://documentation.wazuh.com/current/release-notes/release-${version_dashed}.html" -v new_date="$formatted_date" '
+        awk -v pkg="$INSTALL_TYPE" -v new_ver="$final_version" -v new_url="https://documentation.guardsarm.com/current/release-notes/release-${version_dashed}.html" -v new_date="$formatted_date" '
         BEGIN { header_done = 0; url_done = 0; date_done = 0 }
         {
             if (!header_done && $0 ~ ("^" pkg " \\([0-9]+\\.[0-9]+\\.[0-9]+-RELEASE\\) stable; urgency=low$")) {
@@ -456,7 +456,7 @@ update_file_packages() {
                 header_done = 1
                 next
             }
-            if (!url_done && $0 ~ /^  \* More info: https:\/\/documentation\.wazuh\.com\/current\/release-notes\/release-[0-9]+-[0-9]+-[0-9]+\.html$/) {
+            if (!url_done && $0 ~ /^  \* More info: https:\/\/documentation\.guardsarm\.com\/current\/release-notes\/release-[0-9]+-[0-9]+-[0-9]+\.html$/) {
                 print "  * More info: " new_url
                 url_done = 1
                 next

@@ -1,11 +1,11 @@
-# Migrating Manager Configuration to Wazuh 5.0
+# Migrating Manager Configuration to GuardSarm 5.0
 
-Wazuh 5.0 introduces breaking changes to the manager configuration that require manual migration. **There is no in-place upgrade path from a 4.x manager to 5.0.** You must uninstall the 4.x manager, perform a fresh Wazuh 5.0 installation, and then restore your customizations from a pre-migration backup.
+GuardSarm 5.0 introduces breaking changes to the manager configuration that require manual migration. **There is no in-place upgrade path from a 4.x manager to 5.0.** You must uninstall the 4.x manager, perform a fresh GuardSarm 5.0 installation, and then restore your customizations from a pre-migration backup.
 
 This guide covers the four configuration files that changed between versions:
 
-- [`ossec.conf`](#osseconf--wazuh-managerconf) → `wazuh-manager.conf`
-- [`internal_options.conf`](#internal_optionsconf--wazuh-manager-internal-optionsconf) → `wazuh-manager-internal-options.conf`
+- [`ossec.conf`](#osseconf--guardsarm-managerconf) → `guardsarm-manager.conf`
+- [`internal_options.conf`](#internal_optionsconf--guardsarm-manager-internal-optionsconf) → `guardsarm-manager-internal-options.conf`
 - [`api.yaml`](#apiyaml)
 - [`cluster.json`](#clusterjson)
 
@@ -13,13 +13,13 @@ This guide covers the four configuration files that changed between versions:
 
 | Area | 4.x | 5.0 |
 |------|-----|-----|
-| Installation path | `/var/ossec/` | `/var/wazuh-manager/` |
-| Main configuration file | `etc/ossec.conf` | `etc/wazuh-manager.conf` |
-| Root XML element | `<ossec_config>` | `<wazuh_config>` |
-| Internal options file | `etc/internal_options.conf` + `etc/local_internal_options.conf` | `etc/wazuh-manager-internal-options.conf` |
-| System user / group | `wazuh` | `wazuh-manager` |
-| Manager log file | `logs/ossec.log` | `logs/wazuh-manager.log` |
-| Manager JSON log file | `logs/ossec.json` | `logs/wazuh-manager.json` |
+| Installation path | `/var/ossec/` | `/var/guardsarm-manager/` |
+| Main configuration file | `etc/ossec.conf` | `etc/guardsarm-manager.conf` |
+| Root XML element | `<ossec_config>` | `<guardsarm_config>` |
+| Internal options file | `etc/internal_options.conf` + `etc/local_internal_options.conf` | `etc/guardsarm-manager-internal-options.conf` |
+| System user / group | `guardsarm` | `guardsarm-manager` |
+| Manager log file | `logs/ossec.log` | `logs/guardsarm-manager.log` |
+| Manager JSON log file | `logs/ossec.json` | `logs/guardsarm-manager.json` |
 
 ## Migration procedure
 
@@ -28,17 +28,17 @@ This guide covers the four configuration files that changed between versions:
 On the running **4.x manager**, export the configuration files you will need to adapt:
 
 ```bash
-mkdir -p /tmp/wazuh-4x-backup
-cp /var/ossec/etc/ossec.conf                    /tmp/wazuh-4x-backup/
-cp /var/ossec/etc/internal_options.conf         /tmp/wazuh-4x-backup/
-cp /var/ossec/etc/local_internal_options.conf   /tmp/wazuh-4x-backup/
-cp /var/ossec/api/configuration/api.yaml        /tmp/wazuh-4x-backup/
+mkdir -p /tmp/guardsarm-4x-backup
+cp /var/ossec/etc/ossec.conf                    /tmp/guardsarm-4x-backup/
+cp /var/ossec/etc/internal_options.conf         /tmp/guardsarm-4x-backup/
+cp /var/ossec/etc/local_internal_options.conf   /tmp/guardsarm-4x-backup/
+cp /var/ossec/api/configuration/api.yaml        /tmp/guardsarm-4x-backup/
 ```
 
 Also back up any custom rules, decoders, and lists:
 
 ```bash
-tar -czf /tmp/wazuh-4x-backup/custom-ruleset.tar.gz \
+tar -czf /tmp/guardsarm-4x-backup/custom-ruleset.tar.gz \
     /var/ossec/etc/rules/ \
     /var/ossec/etc/decoders/ \
     /var/ossec/etc/lists/
@@ -48,11 +48,11 @@ Keep these files somewhere that survives the reinstall (external storage or a re
 
 ### 2. Uninstall the 4.x manager
 
-Follow the official Wazuh documentation to uninstall the 4.x manager package for your distribution. This removes the 4.x binaries and the `/var/ossec/` directory.
+Follow the official GuardSarm documentation to uninstall the 4.x manager package for your distribution. This removes the 4.x binaries and the `/var/ossec/` directory.
 
 ### 3. Install the 5.0 manager
 
-Follow the official Wazuh 5.0 installation documentation for your distribution. The manager installs to `/var/wazuh-manager/` and generates a fresh `wazuh-manager.conf` with default settings.
+Follow the official GuardSarm 5.0 installation documentation for your distribution. The manager installs to `/var/guardsarm-manager/` and generates a fresh `guardsarm-manager.conf` with default settings.
 
 ### 4. Apply configuration changes
 
@@ -60,13 +60,13 @@ Do not copy the 4.x configuration files directly into the 5.0 installation. Inst
 
 ---
 
-## `ossec.conf` → `wazuh-manager.conf`
+## `ossec.conf` → `guardsarm-manager.conf`
 
 The main configuration file is renamed and its XML root element changed. Several sections that were manager-side in 4.x have been removed; their functionality either moved to the agent, was replaced by a new subsystem, or was deprecated.
 
 ### Root element
 
-Replace `<ossec_config>` with `<wazuh_config>` throughout the file.
+Replace `<ossec_config>` with `<guardsarm_config>` throughout the file.
 
 **4.x:**
 ```xml
@@ -77,9 +77,9 @@ Replace `<ossec_config>` with `<wazuh_config>` throughout the file.
 
 **5.0:**
 ```xml
-<wazuh_config>
+<guardsarm_config>
   ...
-</wazuh_config>
+</guardsarm_config>
 ```
 
 ### `<global>` section
@@ -110,9 +110,9 @@ In 5.0 the `<global>` parser only accepts `<agents_disconnection_time>` and `<ag
   <logall>no</logall>
   <logall_json>no</logall_json>
   <email_notification>no</email_notification>
-  <smtp_server>smtp.example.wazuh.com</smtp_server>
-  <email_from>wazuh@example.wazuh.com</email_from>
-  <email_to>recipient@example.wazuh.com</email_to>
+  <smtp_server>smtp.example.guardsarm.com</smtp_server>
+  <email_from>guardsarm@example.guardsarm.com</email_from>
+  <email_to>recipient@example.guardsarm.com</email_to>
   <email_maxperhour>12</email_maxperhour>
   <email_log_source>alerts.log</email_log_source>
   <agents_disconnection_time>15m</agents_disconnection_time>
@@ -175,13 +175,13 @@ The section is preserved. Update the certificate paths to reflect the new instal
 ```xml
 <auth>
   ...
-  <ssl_manager_cert>/var/wazuh-manager/etc/sslmanager.cert</ssl_manager_cert>
-  <ssl_manager_key>/var/wazuh-manager/etc/sslmanager.key</ssl_manager_key>
+  <ssl_manager_cert>/var/guardsarm-manager/etc/sslmanager.cert</ssl_manager_cert>
+  <ssl_manager_key>/var/guardsarm-manager/etc/sslmanager.key</ssl_manager_key>
   ...
 </auth>
 ```
 
-### Sections to remove from `wazuh-manager.conf`
+### Sections to remove from `guardsarm-manager.conf`
 
 The following sections from 4.x must be removed. The table indicates the consequence of leaving each one in place.
 
@@ -197,7 +197,7 @@ The following sections from 4.x must be removed. The table indicates the consequ
 | `<wodle name="open-scap">` | Silently accepted by parser | Replaced by SCA — see [CIS-CAT/OpenSCAP to SCA migration](ciscat-openscap-to-sca.md) |
 
 > [!IMPORTANT]
-> Custom rules and decoders from 4.x **cannot** be migrated by copying XML files to the manager. Content is managed through the engine's content management system. Refer to the Wazuh 5.0 engine documentation for the procedure to create and publish custom rules and decoders.
+> Custom rules and decoders from 4.x **cannot** be migrated by copying XML files to the manager. Content is managed through the engine's content management system. Refer to the GuardSarm 5.0 engine documentation for the procedure to create and publish custom rules and decoders.
 
 
 ### `<vulnerability-detection>` section
@@ -246,8 +246,8 @@ In 4.x the certificates pointed to Filebeat's certificate directory. In 5.0, Fil
     <certificate_authorities>
       <ca>/etc/filebeat/certs/root-ca.pem</ca>
     </certificate_authorities>
-    <certificate>/etc/filebeat/certs/wazuh-server.pem</certificate>
-    <key>/etc/filebeat/certs/wazuh-server-key.pem</key>
+    <certificate>/etc/filebeat/certs/guardsarm-server.pem</certificate>
+    <key>/etc/filebeat/certs/guardsarm-server-key.pem</key>
   </ssl>
 </indexer>
 ```
@@ -260,20 +260,20 @@ In 4.x the certificates pointed to Filebeat's certificate directory. In 5.0, Fil
   </hosts>
   <ssl>
     <certificate_authorities>
-      <ca>/var/wazuh-manager/etc/certs/root-ca.pem</ca>
+      <ca>/var/guardsarm-manager/etc/certs/root-ca.pem</ca>
     </certificate_authorities>
-    <certificate>/var/wazuh-manager/etc/certs/manager.pem</certificate>
-    <key>/var/wazuh-manager/etc/certs/manager-key.pem</key>
+    <certificate>/var/guardsarm-manager/etc/certs/manager.pem</certificate>
+    <key>/var/guardsarm-manager/etc/certs/manager-key.pem</key>
   </ssl>
 </indexer>
 ```
 
 > [!NOTE]
-> The 5.0 installer generates the `<indexer>` section with the correct certificate paths for your environment. If you are applying the configuration manually, update the paths to match your actual certificate locations under `/var/wazuh-manager/etc/certs/`.
+> The 5.0 installer generates the `<indexer>` section with the correct certificate paths for your environment. If you are applying the configuration manually, update the paths to match your actual certificate locations under `/var/guardsarm-manager/etc/certs/`.
 
 ---
 
-## `internal_options.conf` → `wazuh-manager-internal-options.conf`
+## `internal_options.conf` → `guardsarm-manager-internal-options.conf`
 
 In 4.x, internal options were split across two files with a priority system:
 
@@ -282,9 +282,9 @@ In 4.x, internal options were split across two files with a priority system:
 
 When a daemon needed an internal option value, it checked `local_internal_options.conf` first; if the key was absent, it fell back to `internal_options.conf`.
 
-**In 5.0, this two-file system is gone for the manager.** There is now a single file: `wazuh-manager-internal-options.conf`. It inherits the role of the old `local_internal_options.conf` — it is the user-editable file where overrides are placed — while the system defaults are hardcoded directly in the engine. There is no longer a system-level file to fall back to. Agents continue to use the 4.x two-file system (`internal_options.conf` + `local_internal_options.conf`).
+**In 5.0, this two-file system is gone for the manager.** There is now a single file: `guardsarm-manager-internal-options.conf`. It inherits the role of the old `local_internal_options.conf` — it is the user-editable file where overrides are placed — while the system defaults are hardcoded directly in the engine. There is no longer a system-level file to fall back to. Agents continue to use the 4.x two-file system (`internal_options.conf` + `local_internal_options.conf`).
 
-Migrate your customizations from `local_internal_options.conf` (or from `internal_options.conf` if you edited it directly) to `wazuh-manager-internal-options.conf`, keeping only the options that remain valid in 5.0. Many options have been removed as part of the engine rewrite; carrying them forward will cause startup errors.
+Migrate your customizations from `local_internal_options.conf` (or from `internal_options.conf` if you edited it directly) to `guardsarm-manager-internal-options.conf`, keeping only the options that remain valid in 5.0. Many options have been removed as part of the engine rewrite; carrying them forward will cause startup errors.
 
 ### Removed options
 
@@ -292,7 +292,7 @@ The following options were present in 4.x and have been removed in 5.0. Do not c
 
 **analysisd (entire section removed)**
 
-The analysis daemon has been replaced by the Wazuh engine. All `analysisd.*` options are no longer valid:
+The analysis daemon has been replaced by the GuardSarm engine. All `analysisd.*` options are no longer valid:
 
 ```
 analysisd.default_timeframe
@@ -345,7 +345,7 @@ remoted.guess_agent_group
 ```
 
 > [!NOTE]
-> `remoted.guess_agent_group` has been explicitly removed. The checksum-based group guessing mechanism no longer exists in Wazuh 5.0 — see [Agent groups migration](agent-groups-migration.md) for the replacement workflow.
+> `remoted.guess_agent_group` has been explicitly removed. The checksum-based group guessing mechanism no longer exists in GuardSarm 5.0 — see [Agent groups migration](agent-groups-migration.md) for the replacement workflow.
 
 **Other removed options:**
 
@@ -355,15 +355,15 @@ maild.grouping
 maild.full_subject
 maild.geoip
 monitord.sign
-wazuh_download.enabled
+guardsarm_download.enabled
 dbd.reconnect_attempts
 integrator.debug
-wazuh_clusterd.debug
+guardsarm_clusterd.debug
 ```
 
 ### Retained options
 
-The following options are valid in `wazuh-manager-internal-options.conf` and carry over from 4.x without change:
+The following options are valid in `guardsarm-manager-internal-options.conf` and carry over from 4.x without change:
 
 ```
 monitord.day_wait
@@ -379,20 +379,20 @@ auth.timeout_seconds
 auth.timeout_microseconds
 authd.max_agents
 authd.debug
-wazuh_modules.task_nice
-wazuh_modules.max_eps
-wazuh_modules.kill_timeout
-wazuh_modules.rlimit_nofile
-wazuh_modules.debug
-wazuh_modules.max_sessions
-wazuh_modules.inventory_sync_queue_size
-wazuh_modules.inventory_sync_data_value_quota
-wazuh_command.remote_commands
-wazuh.thread_stack_size
-wazuh_database.sync_agents
-wazuh_database.real_time
-wazuh_database.interval
-wazuh_database.max_queued_events
+guardsarm_modules.task_nice
+guardsarm_modules.max_eps
+guardsarm_modules.kill_timeout
+guardsarm_modules.rlimit_nofile
+guardsarm_modules.debug
+guardsarm_modules.max_sessions
+guardsarm_modules.inventory_sync_queue_size
+guardsarm_modules.inventory_sync_data_value_quota
+guardsarm_command.remote_commands
+guardsarm.thread_stack_size
+guardsarm_database.sync_agents
+guardsarm_database.real_time
+guardsarm_database.interval
+guardsarm_database.max_queued_events
 remoted.recv_counter_flush
 remoted.comp_average_printout
 remoted.verify_msg_id
@@ -426,17 +426,17 @@ remoted.batch_events_capacity
 remoted.batch_events_per_agent_capacity
 remoted.enrich_cache_expire_time
 remoted.debug
-wazuh_db.worker_pool_size
-wazuh_db.commit_time_min
-wazuh_db.commit_time_max
-wazuh_db.open_db_limit
-wazuh_db.rlimit_nofile
-wazuh_db.max_fragmentation
-wazuh_db.fragmentation_threshold
-wazuh_db.fragmentation_delta
-wazuh_db.free_pages_percentage
-wazuh_db.check_fragmentation_interval
-wazuh_db.debug
+guardsarm_db.worker_pool_size
+guardsarm_db.commit_time_min
+guardsarm_db.commit_time_max
+guardsarm_db.open_db_limit
+guardsarm_db.rlimit_nofile
+guardsarm_db.max_fragmentation
+guardsarm_db.fragmentation_threshold
+guardsarm_db.fragmentation_delta
+guardsarm_db.free_pages_percentage
+guardsarm_db.check_fragmentation_interval
+guardsarm_db.debug
 vulnerability-detection.translation_lru_size
 vulnerability-detection.osdata_lru_size
 vulnerability-detection.remediation_lru_size
@@ -535,7 +535,7 @@ upload_configuration:
 `cluster.json` is an internal file that controls cluster behavior. It is not intended for direct user editing, but if you applied customizations to the 4.x version you should be aware of the changes.
 
 > [!WARNING]
-> The `cluster.json` file located at `framework/wazuh/core/cluster/cluster.json` is replaced during installation. Do not copy the 4.x file into the 5.0 installation — use the 5.0 default as the base and reapply only the interval values you changed.
+> The `cluster.json` file located at `framework/guardsarm/core/cluster/cluster.json` is replaced during installation. Do not copy the 4.x file into the 5.0 installation — use the 5.0 default as the base and reapply only the interval values you changed.
 
 ### Files synchronized in the cluster
 
@@ -551,7 +551,7 @@ The list of paths synchronized from master to worker nodes has changed.
 
 | 4.x | 5.0 |
 |-----|-----|
-| `ar.conf`, `ossec.conf` | `wazuh-manager.conf` |
+| `ar.conf`, `ossec.conf` | `guardsarm-manager.conf` |
 
 ### New master intervals
 

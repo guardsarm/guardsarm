@@ -1,5 +1,5 @@
 /*
- * Wazuh - Indexer connector unit tests
+ * GuardSarm - Indexer connector unit tests
  * Copyright (C) 2015, Wazuh Inc.
  * September 08, 2023.
  *

@@ -20,7 +20,7 @@
 #include <windows.h>
 #endif
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 // Remove STATIC qualifier from tests
 #define STATIC
 #else
@@ -159,14 +159,14 @@ int buffer_append(const char *msg, ssize_t msg_len) {
 STATIC void send_buffer_status_event(const char *action, int severity) {
     char msg[OS_MAXSTR];
     cJSON *event = cJSON_CreateObject();
-    cJSON_AddStringToObject(event, "event.module", "wazuh-agent");
+    cJSON_AddStringToObject(event, "event.module", "guardsarm-agent");
     cJSON_AddStringToObject(event, "event.category", "change");
-    cJSON_AddStringToObject(event, "event.dataset", "wazuh-agent.buffer");
+    cJSON_AddStringToObject(event, "event.dataset", "guardsarm-agent.buffer");
     cJSON_AddNumberToObject(event, "event.severity", severity);
     cJSON_AddStringToObject(event, "event.action", action);
     char *json_str = cJSON_PrintUnformatted(event);
     cJSON_Delete(event);
-    snprintf(msg, OS_MAXSTR, "%c:%s:%s", LOCALFILE_MQ, "wazuh-agent", json_str);
+    snprintf(msg, OS_MAXSTR, "%c:%s:%s", LOCALFILE_MQ, "guardsarm-agent", json_str);
     os_free(json_str);
     send_msg(msg, -1);
 }

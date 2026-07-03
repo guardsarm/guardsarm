@@ -1,0 +1,12 @@
+# GUARDSARM SYSTEM FILE, PLEASE DO NOT MODIFY
+
+default_users:
+  guardsarm:
+    description: Superuser of GuardSarm.
+    password: guardsarm
+    allow_run_as: True
+
+  guardsarm-wui:
+    description: Superuser of GuardSarm UI
+    password: guardsarm-wui
+    allow_run_as: True

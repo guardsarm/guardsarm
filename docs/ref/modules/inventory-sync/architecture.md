@@ -4,7 +4,7 @@ Inventory Sync is a **manager-only**, **session-oriented** synchronization servi
 
 ## Main components
 
-### `src/wazuh_modules/inventory_sync/src/inventorySyncFacade.hpp`
+### `src/guardsarm_modules/inventory_sync/src/inventorySyncFacade.hpp`
 
 This is the orchestration layer.
 
@@ -17,7 +17,7 @@ Responsibilities:
 - Executes bulk indexing, delete-by-query, update-by-query, checksum verification, stale-session cleanup, and agent deletion.
 - Triggers the Vulnerability Scanner for sessions marked with `VDFirst` or `VDSync`.
 
-### `src/wazuh_modules/inventory_sync/src/agentSession.hpp`
+### `src/guardsarm_modules/inventory_sync/src/agentSession.hpp`
 
 This component owns the lifecycle of a single session.
 
@@ -30,7 +30,7 @@ Responsibilities:
 - Stores `DataClean` indices and `ChecksumModule` values in session state.
 - Enqueues the session for final processing once `End` arrives and all required chunks are present.
 
-### `src/wazuh_modules/inventory_sync/src/context.hpp`
+### `src/guardsarm_modules/inventory_sync/src/context.hpp`
 
 `Context` stores the per-session metadata used by both indexing and downstream consumers:
 
@@ -43,11 +43,11 @@ Responsibilities:
 - Checksum data for `ModuleCheck`.
 - Deferred `DataClean` index set.
 
-### `src/wazuh_modules/inventory_sync/src/responseDispatcher.hpp`
+### `src/guardsarm_modules/inventory_sync/src/responseDispatcher.hpp`
 
 This component sends `StartAck`, `EndAck`, and retransmission requests back to the agent through the Router/response path.
 
-### `src/wazuh_modules/inventory_sync/src/inventorySyncQueryBuilder.hpp`
+### `src/guardsarm_modules/inventory_sync/src/inventorySyncQueryBuilder.hpp`
 
 This component builds the OpenSearch update and search queries used for:
 
@@ -62,8 +62,8 @@ This component builds the OpenSearch update and search queries used for:
 Inventory Sync currently processes these module families:
 
 - **`syscollector`**: inventory system, hardware, hotfixes, packages, processes, ports, interfaces, protocols, networks, users, groups, services, and browser extensions.
-- **`fim`**: `wazuh-states-fim-files`, `wazuh-states-fim-registry-keys`, and `wazuh-states-fim-registry-values`.
-- **`sca`**: `wazuh-states-sca`.
+- **`fim`**: `guardsarm-states-fim-files`, `guardsarm-states-fim-registry-keys`, and `guardsarm-states-fim-registry-values`.
+- **`sca`**: `guardsarm-states-sca`.
 
 It also handles manager-side **agent metadata** and **group membership** reconciliation across already indexed state documents.
 
@@ -79,7 +79,7 @@ flowchart LR
   EndQueue --> Indexer[Indexer Connector]
   EndQueue --> VD[Vulnerability Scanner]
   EndQueue --> Ack[ResponseDispatcher]
-  Indexer --> OpenSearch[Wazuh Indexer]
+  Indexer --> OpenSearch[GuardSarm Indexer]
   Ack --> Agent
 ```
 
@@ -115,7 +115,7 @@ Inventory Sync supports these synchronization modes:
 - `ModuleCheck`: compare the agent checksum with the manager checksum for the target index.
 - `MetadataDelta`: update agent metadata fields on existing state documents.
 - `MetadataCheck`: repair stale or inconsistent metadata through update-by-query.
-- `GroupDelta`: update `wazuh.agent.groups` on existing state documents.
+- `GroupDelta`: update `guardsarm.agent.groups` on existing state documents.
 - `GroupCheck`: repair stale or inconsistent groups through update-by-query.
 
 ## Message handling details
@@ -124,7 +124,7 @@ Inventory Sync supports these synchronization modes:
 
 - Stored in RocksDB as `{session}_{seq}`.
 - Replayed at End time into `bulkIndex` or `bulkDelete` calls.
-- Enriched by the manager with `wazuh.agent.*` and `wazuh.cluster.name` metadata before indexing.
+- Enriched by the manager with `guardsarm.agent.*` and `guardsarm.cluster.name` metadata before indexing.
 
 ### `DataBatch`
 

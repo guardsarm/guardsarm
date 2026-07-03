@@ -10,7 +10,7 @@
 #include "shared.h"
 
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 #ifdef WIN32
 #define getenv wrap_getenv
 #endif

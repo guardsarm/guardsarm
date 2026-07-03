@@ -1,5 +1,5 @@
 /*
- * Wazuh keystore
+ * GuardSarm keystore
  * Copyright (C) 2015, Wazuh Inc.
  * January 25, 2024.
  *
@@ -94,7 +94,7 @@ public:
      */
     static void showHelp()
     {
-        std::cout << "\nUsage: wazuh-manager-keystore <option(s)>\n"
+        std::cout << "\nUsage: guardsarm-manager-keystore <option(s)>\n"
                   << "Options:\n"
                   << "\t-h \t\t\tShow this help message\n"
                   << "\t-f COLUMN_FAMILY\tSpecifies the target column family for the insertion.\n"
@@ -103,11 +103,11 @@ public:
                   << "\t-vp VALUE_PATH\t\tPath to a file containing the value to read (single line). Only use one value option at the time.\n"
                   << "\tNOTE: if both value parameters are empty, stdin will be read.\n"
                   << "\nExample:"
-                  << "\n\t./wazuh-manager-keystore -f indexer -k username -v wazuh-server\n"
-                  << "\n\t./wazuh-manager-keystore -f indexer -k password -vp /path/to/file.txt\n"
-                  << "\n\t./wazuh-manager-keystore -f indexer -k password < /path/to/file.txt\n"
-                  << "\n\techo 'pass' | ./wazuh-manager-keystore -f indexer -k password\n"
-                  << "\n\tcat /path/to/file.txt | ./wazuh-manager-keystore -f indexer -k password\n"
+                  << "\n\t./guardsarm-manager-keystore -f indexer -k username -v guardsarm-server\n"
+                  << "\n\t./guardsarm-manager-keystore -f indexer -k password -vp /path/to/file.txt\n"
+                  << "\n\t./guardsarm-manager-keystore -f indexer -k password < /path/to/file.txt\n"
+                  << "\n\techo 'pass' | ./guardsarm-manager-keystore -f indexer -k password\n"
+                  << "\n\tcat /path/to/file.txt | ./guardsarm-manager-keystore -f indexer -k password\n"
                   << std::endl;
     }
 

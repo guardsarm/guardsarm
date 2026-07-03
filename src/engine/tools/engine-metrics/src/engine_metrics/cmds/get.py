@@ -48,6 +48,6 @@ def configure(subparsers):
         '--space',
         type=str,
         default=None,
-        help='Space name for per-space metrics (e.g. wazuh)'
+        help='Space name for per-space metrics (e.g. guardsarm)'
     )
     parser.set_defaults(func=run)

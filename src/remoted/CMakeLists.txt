@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.12.4)
 
-project(wazuh-remoted C)
+project(guardsarm-remoted C)
 
-if(NOT DEFINED WAZUH_MAIN_PROJECT)
+if(NOT DEFINED GUARDSARM_MAIN_PROJECT)
   get_filename_component(SRC_FOLDER ${CMAKE_SOURCE_DIR}/../ ABSOLUTE)
   list(APPEND CMAKE_MODULE_PATH "${SRC_FOLDER}/cmake")
-  include(WazuhRpath)
+  include(GuardSarmRpath)
 endif()
 
 # Include directories
@@ -29,11 +29,11 @@ include_directories(
   ${SRC_FOLDER}/config/include/
   ${SRC_FOLDER}/data_provider/include/
   ${SRC_FOLDER}/syscheckd/include/
-  ${SRC_FOLDER}/wazuh_modules/include/
-  ${SRC_FOLDER}/wazuh_modules/src/
-  ${SRC_FOLDER}/wazuh_modules/src/agent_upgrade/
-  ${SRC_FOLDER}/wazuh_modules/src/task_manager/
-  ${SRC_FOLDER}/wazuh_db/include/
+  ${SRC_FOLDER}/guardsarm_modules/include/
+  ${SRC_FOLDER}/guardsarm_modules/src/
+  ${SRC_FOLDER}/guardsarm_modules/src/agent_upgrade/
+  ${SRC_FOLDER}/guardsarm_modules/src/task_manager/
+  ${SRC_FOLDER}/guardsarm_db/include/
   ${SRC_FOLDER}/shared_modules/agent_metadata/include/
   ${SRC_FOLDER}/shared_modules/common/
   ${SRC_FOLDER}/shared_modules/router/include/
@@ -43,16 +43,16 @@ include_directories(
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-set(WAZUH_RUNTIME_GROUP "wazuh")
-set(WAZUH_RUNTIME_USER "wazuh")
+set(GUARDSARM_RUNTIME_GROUP "guardsarm")
+set(GUARDSARM_RUNTIME_USER "guardsarm")
 if(NOT "${TARGET}" STREQUAL "winagent" AND NOT "${TARGET}" STREQUAL "agent")
-  set(WAZUH_RUNTIME_GROUP "wazuh-manager")
-  set(WAZUH_RUNTIME_USER "wazuh-manager")
+  set(GUARDSARM_RUNTIME_GROUP "guardsarm-manager")
+  set(GUARDSARM_RUNTIME_USER "guardsarm-manager")
 endif()
 
-add_definitions(-DARGV0="wazuh-manager-remoted")
-add_definitions(-DGROUPGLOBAL="${WAZUH_RUNTIME_GROUP}")
-add_definitions(-DUSER="${WAZUH_RUNTIME_USER}")
+add_definitions(-DARGV0="guardsarm-manager-remoted")
+add_definitions(-DGROUPGLOBAL="${GUARDSARM_RUNTIME_GROUP}")
+add_definitions(-DUSER="${GUARDSARM_RUNTIME_USER}")
 add_definitions(-DPORTABLE_UNALIGNED_ACCESS=0)
 
 set(LIB_DIR ${CMAKE_BINARY_DIR}/lib)
@@ -67,14 +67,14 @@ list(REMOVE_ITEM REMOTED_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c")
 add_library(remoted_lib STATIC ${REMOTED_SRC})
 set_target_properties(remoted_lib PROPERTIES LINKER_LANGUAGE C)
 
-# Enable WAZUH_UNIT_TESTING to export static functions for unit tests
+# Enable GUARDSARM_UNIT_TESTING to export static functions for unit tests
 if(UNIT_TEST)
-  target_compile_definitions(remoted_lib PRIVATE WAZUH_UNIT_TESTING)
+  target_compile_definitions(remoted_lib PRIVATE GUARDSARM_UNIT_TESTING)
   target_compile_options(remoted_lib PRIVATE -O0 -g)
 endif()
 
-target_link_libraries(remoted_lib PUBLIC wazuhext pthread router config
-                                         wazuh_modulesd_lib wazuh)
+target_link_libraries(remoted_lib PUBLIC guardsarmext pthread router config
+                                         guardsarm_modulesd_lib guardsarm)
 
 if(UNIX)
   target_link_libraries(remoted_lib PUBLIC dl)
@@ -86,11 +86,11 @@ endif(UNIX)
 # Only build Unix executable when not running unit tests (server-only, no
 # Windows)
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows" AND NOT UNIT_TEST)
-  add_executable(wazuh-manager-remoted "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c")
+  add_executable(guardsarm-manager-remoted "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c")
   set_target_properties(
-    wazuh-manager-remoted PROPERTIES LINKER_LANGUAGE C RUNTIME_OUTPUT_DIRECTORY
+    guardsarm-manager-remoted PROPERTIES LINKER_LANGUAGE C RUNTIME_OUTPUT_DIRECTORY
                                                        ${SRC_FOLDER}/build/bin)
-  target_link_libraries(wazuh-manager-remoted PRIVATE remoted_lib)
+  target_link_libraries(guardsarm-manager-remoted PRIVATE remoted_lib)
 
-  wazuh_set_runtime_rpath(wazuh-manager-remoted)
+  guardsarm_set_runtime_rpath(guardsarm-manager-remoted)
 endif()

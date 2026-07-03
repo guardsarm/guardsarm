@@ -34,7 +34,7 @@ TEST_DATA_PATH = join(dirname(dirname(realpath(__file__))), 'data')
 
 
 @pytest.mark.parametrize('auth_path, offset, query, workspace, reparse, tag', [
-    (os.environ.get('INSTALLDIR', '/var/wazuh-manager'), '1d', 'query', 'workspace', False, 'la_tag')
+    (os.environ.get('INSTALLDIR', '/var/guardsarm-manager'), '1d', 'query', 'workspace', False, 'la_tag')
 ])
 @patch('azure_services.analytics.get_log_analytics_events')
 @patch('azure_services.analytics.build_log_analytics_query')

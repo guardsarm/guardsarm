@@ -54,10 +54,10 @@ namespace logging
  *
  * Example:
  *
- *     wazuh-engine.log                   (active file — never compressed)
- *     wazuh-engine-2026-03-09-1.log.gz  (first rotation that day, compressed)
- *     wazuh-engine-2026-03-09-2.log.gz  (second rotation same day)
- *     wazuh-engine-2026-03-10-1.log.gz  (next day rotation)
+ *     guardsarm-engine.log                   (active file — never compressed)
+ *     guardsarm-engine-2026-03-09-1.log.gz  (first rotation that day, compressed)
+ *     guardsarm-engine-2026-03-09-2.log.gz  (second rotation same day)
+ *     guardsarm-engine-2026-03-10-1.log.gz  (next day rotation)
  *
  * Design notes for reviewers:
  *
@@ -111,7 +111,7 @@ public:
     struct Config
     {
         /// Base filename for the active log file
-        /// Example: "/var/log/wazuh-engine.log"
+        /// Example: "/var/log/guardsarm-engine.log"
         /// Log4j2: <RollingFile fileName="...">
         spdlog::filename_t filePath;
 
@@ -362,7 +362,7 @@ private:
      *
      * Example:
      *
-     *     wazuh-engine-2026-03-09-1.log
+     *     guardsarm-engine-2026-03-09-1.log
      *
      * Note: The .gz suffix is added later by the compression thread.
      */

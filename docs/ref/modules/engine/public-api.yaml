@@ -1,11 +1,11 @@
 openapi: 3.0.3
 info:
-  title: Wazuh-Engine Public API
-  description: Public-facing API endpoints of the Wazuh Engine. These endpoints are intended for external consumers such as wazuh-indexer in standalone mode.
+  title: GuardSarm-Engine Public API
+  description: Public-facing API endpoints of the GuardSarm Engine. These endpoints are intended for external consumers such as guardsarm-indexer in standalone mode.
   version: 1.0.0
 servers:
-- url: http+unix:/run/wazuh-server/analysis
-  description: Wazuh server using Unix socket over HTTP
+- url: http+unix:/run/guardsarm-server/analysis
+  description: GuardSarm server using Unix socket over HTTP
 tags:
 - name: Content
   description: Operations for managing content.
@@ -270,7 +270,7 @@ paths:
                           description: Default filter to allow all events (for default ruleset)
                           author:
                             name: Wazuh, Inc.
-                            url: https://wazuh.com
+                            url: https://guardsarm.com
                             date: 2022/11/08
                         check: $host.os.platform == 'ubuntu'
                         type: pre-filter
@@ -340,10 +340,10 @@ paths:
       tags:
       - Logtest
       summary: Inject an event into an existing testing session
-      description: "Injects a single event into the engine using a previously created and loaded testing session.\n\nThis endpoint **does not** validate policies and **does not** create sessions.\nIt only validates request parameters, parses/builds the event payload, and runs the test ingestion\nagainst the session identified by the `space` field.\n\nIf tracing is enabled (trace_level != NONE), the endpoint retrieves the list of policy assets\nfrom the specified testing session and uses them as the trace filter.\n\nAfter the pipeline finishes, the final output event is validated against the Wazuh Common\nSchema (WCS). Validation is **non-blocking**: the pipeline result is always returned\nregardless of validation errors. The result is reported in `result.validation` when the\nschema validator is available (see below).\n\nEach entry in `result.validation.errors` has:\n- `path` \u2014 field path using dot notation for nesting and `[N]` for array indices\n  (e.g. `\"event.severity\"`, `\"tags[1]\"\
+      description: "Injects a single event into the engine using a previously created and loaded testing session.\n\nThis endpoint **does not** validate policies and **does not** create sessions.\nIt only validates request parameters, parses/builds the event payload, and runs the test ingestion\nagainst the session identified by the `space` field.\n\nIf tracing is enabled (trace_level != NONE), the endpoint retrieves the list of policy assets\nfrom the specified testing session and uses them as the trace filter.\n\nAfter the pipeline finishes, the final output event is validated against the GuardSarm Common\nSchema (WCS). Validation is **non-blocking**: the pipeline result is always returned\nregardless of validation errors. The result is reported in `result.validation` when the\nschema validator is available (see below).\n\nEach entry in `result.validation.errors` has:\n- `path` \u2014 field path using dot notation for nesting and `[N]` for array indices\n  (e.g. `\"event.severity\"`, `\"tags[1]\"\
         `, `\"hits[0].id\"`).\n- `kind` \u2014 one of:\n  - `unknown_field` \u2014 field is not defined in WCS and is not a temporary field.\n  - `invalid_type` \u2014 value does not match the WCS type for that field.\n- `expected` / `actual` \u2014 present only for `invalid_type` errors; both are type strings\n  (e.g. `\"keyword\"`, `\"object\"`, `\"number\"`).\n\nPipeline-internal temporary fields (root key starts with `_`) are cleaned before validation.\n\nAny WCS field can hold either a single value or an array of values of the same type.\nArrays are always unrolled: each element is validated individually using the field's\nschema type. This applies to scalar types (e.g. `keyword`), numeric types, and object\ntypes such as `nested` (array of objects). Only one error is reported per invalid element.\n\n`FLAT_OBJECT` and `GEO_POINT` fields are treated as opaque: their children are never visited.\n\n`result.validation` is only present when the schema validator is available and the\npipeline\
-        \ produced an output event. If absent, no validation was performed.\n\nErrors are sorted by path, with kind as tiebreaker.\n\nNotes about event parsing:\n- `queue` indicates the queue to which the event will be sent.\n- `location` cannot be empty.\n- If `location` matches the legacy agent format (`\"[ID] (Name) IP->Module\"`), it is parsed and may\n  rewrite the final stored location to just the module.\n- If not legacy, host metadata is merged into the event before setting location/message.\n- `metadata` is **not required** and can be an empty **JSON object**, it can't be a JSON-encoded string, number, or array.\n  If `metadata` is present and it contains invalid nested fields, or includes top-level keys other than `wazuh`,\n  the request is rejected with a clear error message.\n- `metadata` is restricted to the top-level `wazuh` key. Arbitrary sibling fields such as `metadata.name` are not allowed.\n- `metadata.wazuh` must be a JSON object when present.\n  Use it to provide only\
-        \ fields accepted by the Wazuh event schema.\n"
+        \ produced an output event. If absent, no validation was performed.\n\nErrors are sorted by path, with kind as tiebreaker.\n\nNotes about event parsing:\n- `queue` indicates the queue to which the event will be sent.\n- `location` cannot be empty.\n- If `location` matches the legacy agent format (`\"[ID] (Name) IP->Module\"`), it is parsed and may\n  rewrite the final stored location to just the module.\n- If not legacy, host metadata is merged into the event before setting location/message.\n- `metadata` is **not required** and can be an empty **JSON object**, it can't be a JSON-encoded string, number, or array.\n  If `metadata` is present and it contains invalid nested fields, or includes top-level keys other than `guardsarm`,\n  the request is rejected with a clear error message.\n- `metadata` is restricted to the top-level `guardsarm` key. Arbitrary sibling fields such as `metadata.name` are not allowed.\n- `metadata.guardsarm` must be a JSON object when present.\n  Use it to provide only\
+        \ fields accepted by the GuardSarm event schema.\n"
       requestBody:
         required: true
         content:
@@ -358,7 +358,7 @@ paths:
                   queue: 1
                   location: /var/log/auth.log
                   metadata:
-                    wazuh:
+                    guardsarm:
                       agent:
                         name: AgentName
                   event: 'Dec 19 12:00:00 host sshd[123]: Failed password for root from 10.0.0.1 port 12345 ssh2'
@@ -370,56 +370,56 @@ paths:
                   queue: 1
                   location: '[001] (my-agent) 192.168.1.10->syslog'
                   metadata:
-                    wazuh:
+                    guardsarm:
                       agent:
                         id: '001'
                   event: '<34>Dec 19 12:00:00 my-agent myapp: something happened'
                   trace_level: ALL
-              metadata_wazuh_ok:
-                summary: metadata with top-level `wazuh` object
+              metadata_guardsarm_ok:
+                summary: metadata with top-level `guardsarm` object
                 value:
                   space: test
                   queue: 1
                   location: syscheck
                   metadata:
-                    wazuh:
+                    guardsarm:
                       host:
                         ip: 192.168.1.10
                   event: File /etc/passwd modified
                   trace_level: ALL
-              metadata_wazuh_wrong_type:
+              metadata_guardsarm_wrong_type:
                 summary: INVALID - metadata with type missmatch
                 value:
                   queue: 1
                   location: syscheck
                   metadata:
-                    wazuh:
+                    guardsarm:
                       host:
                         ip: notAnIpAddress
                   event: File /etc/passwd modified
                   trace_level: ALL
-              metadata_wazuh_nested_ok:
-                summary: metadata can provide nested `wazuh` fields accepted by the event schema
+              metadata_guardsarm_nested_ok:
+                summary: metadata can provide nested `guardsarm` fields accepted by the event schema
                 value:
                   space: test
                   queue: 1
                   location: syscheck
                   metadata:
-                    wazuh:
+                    guardsarm:
                       agent:
                         id: '001'
                       labels:
                         kind: test
                   event: File /etc/passwd modified
                   trace_level: ALL
-              metadata_wazuh_empty_valid:
-                summary: VALID - empty wazuh metadata object
+              metadata_guardsarm_empty_valid:
+                summary: VALID - empty guardsarm metadata object
                 value:
                   space: test
                   queue: 1
                   location: syscheck
                   metadata:
-                    wazuh: {}
+                    guardsarm: {}
                   event: File /etc/passwd modified
                   trace_level: ALL
               metadata_empty_object_valid:
@@ -430,8 +430,8 @@ paths:
                   metadata: {}
                   event: File /etc/passwd modified
                   trace_level: ALL
-              metadata_non_wazuh_key_invalid:
-                summary: INVALID - non-`wazuh` top-level metadata fields are rejected
+              metadata_non_guardsarm_key_invalid:
+                summary: INVALID - non-`guardsarm` top-level metadata fields are rejected
                 value:
                   queue: 1
                   location: syscheck
@@ -444,7 +444,7 @@ paths:
                 value:
                   queue: 1
                   location: syscheck
-                  metadata: '{"wazuh": {}}'
+                  metadata: '{"guardsarm": {}}'
                   event: File /etc/passwd modified
                   trace_level: ALL
               missing_metadata_invalid:
@@ -463,21 +463,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/TesterRunPost_Response'
               examples:
-                ok_with_wazuh_metadata:
-                  summary: OK - `metadata.wazuh` contributes Wazuh-scoped fields
+                ok_with_guardsarm_metadata:
+                  summary: OK - `metadata.guardsarm` contributes GuardSarm-scoped fields
                   value:
                     status: OK
                     result:
                       output:
-                        wazuh:
+                        guardsarm:
                           protocol:
                             queue: 1
                             location: syscheck
                           integration:
                             category: Security
-                            name: integration/wazuh-core/0
+                            name: integration/guardsarm-core/0
                             decoders:
-                            - core-wazuh-message
+                            - core-guardsarm-message
                             - integrations
                           host:
                             name: test-host
@@ -485,28 +485,28 @@ paths:
                           original: File /etc/passwd modified
                         '@timestamp': '2025-12-26T17:33:22Z'
                       asset_traces:
-                      - asset: decoder/core-wazuh-message/0
+                      - asset: decoder/core-guardsarm-message/0
                         success: true
                         traces:
                         - '@timestamp: get_date -> Success'
                       validation:
                         valid: true
                         errors: []
-                ok_with_nested_wazuh_metadata:
-                  summary: OK - populated `metadata.wazuh` is accepted
+                ok_with_nested_guardsarm_metadata:
+                  summary: OK - populated `metadata.guardsarm` is accepted
                   value:
                     status: OK
                     result:
                       output:
-                        wazuh:
+                        guardsarm:
                           protocol:
                             queue: 1
                             location: syscheck
                           integration:
                             category: Security
-                            name: integration/wazuh-core/0
+                            name: integration/guardsarm-core/0
                             decoders:
-                            - core-wazuh-message
+                            - core-guardsarm-message
                             - integrations
                           agent:
                             id: '001'
@@ -514,7 +514,7 @@ paths:
                           original: File /etc/passwd modified
                         '@timestamp': '2025-12-26T17:34:18Z'
                       asset_traces:
-                      - asset: decoder/core-wazuh-message/0
+                      - asset: decoder/core-guardsarm-message/0
                         success: true
                         traces:
                         - '@timestamp: get_date -> Success'
@@ -527,7 +527,7 @@ paths:
                     status: OK
                     result:
                       output:
-                        wazuh:
+                        guardsarm:
                           protocol:
                             queue: 1
                             location: syscheck
@@ -583,7 +583,7 @@ paths:
                   summary: metadata contains unsupported top-level fields
                   value:
                     status: ERROR
-                    error: Metadata must be a non-empty object with 'wazuh' as root
+                    error: Metadata must be a non-empty object with 'guardsarm' as root
         '500':
           $ref: '#/components/responses/InternalServerError_500'
     delete:
@@ -642,7 +642,7 @@ paths:
               update_iocs:
                 summary: Update IOCs from file with hash
                 value:
-                  path: /var/lib/wazuh-server/iocs/threat-intel.ndjson
+                  path: /var/lib/guardsarm-server/iocs/threat-intel.ndjson
                   hash: 5d41402abc4b2a76b9719d911017c592
       responses:
         '200':
@@ -909,7 +909,7 @@ paths:
                 summary: Disable a per-space metric
                 value:
                   instrumentName: events.discarded
-                  space: wazuh
+                  space: guardsarm
                   status: false
       responses:
         '200':
@@ -966,7 +966,7 @@ paths:
                 summary: Get a per-space metric
                 value:
                   instrumentName: events.discarded
-                  space: wazuh
+                  space: guardsarm
       responses:
         '200':
           description: Metric value retrieved
@@ -987,7 +987,7 @@ paths:
                   summary: Per-space counter
                   value:
                     status: OK
-                    name: space.wazuh.events.discarded
+                    name: space.guardsarm.events.discarded
                     type: counter
                     enabled: true
                     value: 42
@@ -1031,7 +1031,7 @@ paths:
               list_space:
                 summary: List metrics for a specific space
                 value:
-                  space: wazuh
+                  space: guardsarm
       responses:
         '200':
           description: Metric names retrieved
@@ -1052,21 +1052,21 @@ paths:
                     - router.queue.size
                     - router.queue.usage.percent
                     - server.events.dropped.input
-                    - space.wazuh.events.discarded
-                    - space.wazuh.events.unclassified
-                    - space.wazuh.events.discarded.prefilter
-                    - space.wazuh.events.discarded.postfilter
-                    - space.wazuh.events.dropped.output
+                    - space.guardsarm.events.discarded
+                    - space.guardsarm.events.unclassified
+                    - space.guardsarm.events.discarded.prefilter
+                    - space.guardsarm.events.discarded.postfilter
+                    - space.guardsarm.events.dropped.output
                 space_filtered:
-                  summary: Only metrics for space 'wazuh'
+                  summary: Only metrics for space 'guardsarm'
                   value:
                     status: OK
                     names:
-                    - space.wazuh.events.discarded
-                    - space.wazuh.events.unclassified
-                    - space.wazuh.events.discarded.prefilter
-                    - space.wazuh.events.discarded.postfilter
-                    - space.wazuh.events.dropped.output
+                    - space.guardsarm.events.discarded
+                    - space.guardsarm.events.unclassified
+                    - space.guardsarm.events.discarded.prefilter
+                    - space.guardsarm.events.discarded.postfilter
+                    - space.guardsarm.events.dropped.output
         '400':
           description: Bad Request
           content:
@@ -1086,7 +1086,7 @@ paths:
       tags:
       - Metrics
       summary: Dump all metrics with their current values
-      description: "Returns a full snapshot of all registered metrics, organized into two groups:\n\n- **`global`**: engine-wide metrics not scoped to any specific space\n  (e.g., `router.events.processed`, `router.eps.1m`).\n- **`spaces`**: per-space metrics grouped by space name. The internal prefix\n  `space.<name>.` is stripped from metric names for readability.\n\nThe response also includes:\n- **`name`**: daemon identifier (e.g., `wazuh-manager-analysisd`)\n- **`uptime`**: ISO 8601 timestamp of when the daemon started\n- **`timestamp`**: ISO 8601 timestamp of when the dump was collected\n\nThis endpoint is designed for monitoring dashboards and observability tools.\n"
+      description: "Returns a full snapshot of all registered metrics, organized into two groups:\n\n- **`global`**: engine-wide metrics not scoped to any specific space\n  (e.g., `router.events.processed`, `router.eps.1m`).\n- **`spaces`**: per-space metrics grouped by space name. The internal prefix\n  `space.<name>.` is stripped from metric names for readability.\n\nThe response also includes:\n- **`name`**: daemon identifier (e.g., `guardsarm-manager-analysisd`)\n- **`uptime`**: ISO 8601 timestamp of when the daemon started\n- **`timestamp`**: ISO 8601 timestamp of when the dump was collected\n\nThis endpoint is designed for monitoring dashboards and observability tools.\n"
       requestBody:
         required: true
         content:
@@ -1110,7 +1110,7 @@ paths:
                   summary: Complete metrics dump with global and per-space metrics
                   value:
                     status: OK
-                    name: wazuh-manager-analysisd
+                    name: guardsarm-manager-analysisd
                     uptime: '2024-01-15T10:30:00Z'
                     timestamp: '2024-01-15T12:45:30Z'
                     global:
@@ -1127,7 +1127,7 @@ paths:
                       enabled: true
                       value: 3
                     spaces:
-                    - name: wazuh
+                    - name: guardsarm
                       metrics:
                       - name: events.discarded
                         type: counter
@@ -1279,7 +1279,7 @@ components:
         path:
           type: string
           description: Absolute path to the ndjson file containing IOCs to synchronize
-          example: /var/lib/wazuh-server/iocs/threat-intel.ndjson
+          example: /var/lib/guardsarm-server/iocs/threat-intel.ndjson
         hash:
           type: string
           description: MD5 hash of the IOC file. Required for change detection and skipping unnecessary syncs.
@@ -1392,7 +1392,7 @@ components:
           description: Event source/location label (e.g., file path, agent name, or custom identifier)
         metadata:
           type: object
-          description: 'Required metadata object. Only the top-level `wazuh` key is allowed, and `metadata.wazuh` must be an object. The minimal accepted value is `{ "wazuh": {} }`.'
+          description: 'Required metadata object. Only the top-level `guardsarm` key is allowed, and `metadata.guardsarm` must be an object. The minimal accepted value is `{ "guardsarm": {} }`.'
         event:
           type: string
           description: Raw event payload to test
@@ -1456,7 +1456,7 @@ components:
         properties:
           name:
             type: string
-            description: Resolved metric name (full internal name, e.g., 'space.wazuh.events.discarded')
+            description: Resolved metric name (full internal name, e.g., 'space.guardsarm.events.discarded')
           type:
             type: string
             description: Metric type as string
@@ -1512,7 +1512,7 @@ components:
       properties:
         name:
           type: string
-          description: Space name (e.g., 'wazuh', 'testing')
+          description: Space name (e.g., 'guardsarm', 'testing')
         metrics:
           type: array
           items:
@@ -1525,7 +1525,7 @@ components:
         properties:
           name:
             type: string
-            description: Daemon name (e.g., 'wazuh-manager-analysisd')
+            description: Daemon name (e.g., 'guardsarm-manager-analysisd')
           uptime:
             type: string
             format: date-time

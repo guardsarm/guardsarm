@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12.4)
 
 project(sysinfo)
 
-if(NOT DEFINED WAZUH_MAIN_PROJECT)
+if(NOT DEFINED GUARDSARM_MAIN_PROJECT)
   get_filename_component(SRC_FOLDER ${CMAKE_SOURCE_DIR}/../ ABSOLUTE)
 endif()
 
@@ -215,10 +215,10 @@ elseif(APPLE)
             browser_extensions)
 endif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
-target_link_libraries(sysinfo PRIVATE wazuhext FilesystemWrapper FileIO)
+target_link_libraries(sysinfo PRIVATE guardsarmext FilesystemWrapper FileIO)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  set(CURL_DEP "wazuhext")
+  set(CURL_DEP "guardsarmext")
   target_link_libraries(
     sysinfo
     PRIVATE urlrequest

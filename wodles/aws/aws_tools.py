@@ -16,10 +16,10 @@ import sys
 import re
 
 DEFAULT_AWS_CONFIG_PATH = path.join(path.expanduser('~'), '.aws', 'config')
-CREDENTIALS_URL = 'https://documentation.wazuh.com/current/amazon/services/prerequisites/credentials.html'
+CREDENTIALS_URL = 'https://documentation.guardsarm.com/current/amazon/services/prerequisites/credentials.html'
 DEPRECATED_MESSAGE = 'The {name} authentication parameter was deprecated in {release}. ' \
                      'Please use another authentication method instead. Check {url} for more information.'
-SECURITY_LAKE_IAM_ROLE_AUTHENTICATION_URL = 'https://documentation.wazuh.com/current/cloud-security/amazon/services/' \
+SECURITY_LAKE_IAM_ROLE_AUTHENTICATION_URL = 'https://documentation.guardsarm.com/current/cloud-security/amazon/services/' \
                                         'supported-services/security-lake.html#configuring-an-iam-role'
 
 ALL_REGIONS = (
@@ -341,7 +341,7 @@ def get_aws_config_params() -> configparser.RawConfigParser:
 
 def get_script_arguments():
     parser = argparse.ArgumentParser(usage="usage: %(prog)s [options]",
-                                     description="Wazuh wodle for monitoring AWS",
+                                     description="GuardSarm wodle for monitoring AWS",
                                      formatter_class=argparse.RawTextHelpFormatter)
     # only one must be present (bucket or service)
     group = parser.add_mutually_exclusive_group(required=True)

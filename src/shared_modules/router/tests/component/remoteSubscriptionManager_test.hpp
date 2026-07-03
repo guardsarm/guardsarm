@@ -1,5 +1,5 @@
 /*
- * Wazuh router - RemoteSubscriptionManager tests
+ * GuardSarm router - RemoteSubscriptionManager tests
  * Copyright (C) 2015, Wazuh Inc.
  * December 19, 2023.
  *

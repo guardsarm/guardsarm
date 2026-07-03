@@ -612,12 +612,12 @@ TEST_F(WIndexerConnectorMockTest, GetPolicyHappyPath)
     nlohmann::json hits = {
         {"total", {{"value", 5}}},
         {"hits",
-         {makePolicyHit("wazuh-threatintel-kvdbs", "kv1", nlohmann::json::array({1, "a"})),
-          makePolicyHit("wazuh-threatintel-decoders", "d1", nlohmann::json::array({2, "b"})),
-          makePolicyHit("wazuh-threatintel-filters", "f1", nlohmann::json::array({3, "c"})),
-          makePolicyHit("wazuh-threatintel-integrations", "i1", nlohmann::json::array({4, "d"})),
+         {makePolicyHit("guardsarm-threatintel-kvdbs", "kv1", nlohmann::json::array({1, "a"})),
+          makePolicyHit("guardsarm-threatintel-decoders", "d1", nlohmann::json::array({2, "b"})),
+          makePolicyHit("guardsarm-threatintel-filters", "f1", nlohmann::json::array({3, "c"})),
+          makePolicyHit("guardsarm-threatintel-integrations", "i1", nlohmann::json::array({4, "d"})),
           makePolicyHit(
-              "wazuh-threatintel-policies", "policy1", nlohmann::json::array({5, "e"}), std::string("HASHX"))}}};
+              "guardsarm-threatintel-policies", "policy1", nlohmann::json::array({5, "e"}), std::string("HASHX"))}}};
 
     EXPECT_CALL(*mock, search(_, _, _, _, _, _)).WillOnce(Return(hits));
 
@@ -705,7 +705,7 @@ TEST_F(WIndexerConnectorMockTest, GetPolicyMissingPolicyHashThrows)
 
     // Provide a hit whose _source.space.hash.sha256 is the wrong type (number instead of string)
     // so the get<string>() conversion throws, exercising the catch in getPolicy.
-    nlohmann::json badHit = {{"_index", "wazuh-threatintel-policies"},
+    nlohmann::json badHit = {{"_index", "guardsarm-threatintel-policies"},
                              {"_source", {{"document", {{"name", "p"}}}, {"space", {{"hash", {{"sha256", 12345}}}}}}},
                              {"sort", nlohmann::json::array({1, "a"})}};
     nlohmann::json hits = {{"total", {{"value", 1}}}, {"hits", {badHit}}};
@@ -1141,12 +1141,12 @@ TEST_F(WIndexerConnectorMockTest, GetPolicyWithConsumerReady)
         {"total", {{"value", 3}}},
         {"hits",
          {// Consumer hit from PIT — should be skipped
-          {{"_index", ".wazuh-cti-consumers"},
+          {{"_index", ".guardsarm-cti-consumers"},
            {"_source", {{"status", "ready"}}},
            {"sort", nlohmann::json::array({0, "z"})}},
-          makePolicyHit("wazuh-threatintel-decoders", "d1", nlohmann::json::array({1, "a"})),
+          makePolicyHit("guardsarm-threatintel-decoders", "d1", nlohmann::json::array({1, "a"})),
           makePolicyHit(
-              "wazuh-threatintel-policies", "policy1", nlohmann::json::array({2, "b"}), std::string("HASH1"))}}};
+              "guardsarm-threatintel-policies", "policy1", nlohmann::json::array({2, "b"}), std::string("HASH1"))}}};
 
     EXPECT_CALL(*mock, search(An<const PointInTime&>(), _, _, _, _, _))
         .WillOnce(Return(consumerResp))

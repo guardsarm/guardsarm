@@ -1,5 +1,5 @@
 /*
- * Wazuh content manager - Unit Tests
+ * GuardSarm content manager - Unit Tests
  * Copyright (C) 2015, Wazuh Inc.
  * Jun 07, 2023.
  *
@@ -295,7 +295,7 @@ TEST_F(ExecutionContextTest, ReadLastDownloadedFileHash)
 TEST_F(ExecutionContextTest, HttpUserAgentSet)
 {
     m_spExecutionContext->handleRequest(m_spUpdaterBaseContext);
-    EXPECT_EQ(m_spUpdaterBaseContext->httpUserAgent, m_consumerName + "/" + __wazuh_version);
+    EXPECT_EQ(m_spUpdaterBaseContext->httpUserAgent, m_consumerName + "/" + __guardsarm_version);
 }
 
 /**

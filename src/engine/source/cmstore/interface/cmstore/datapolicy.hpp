@@ -70,7 +70,7 @@ constexpr std::string_view DEFAULT_ORIGIN_SPACE = "UNDEFINED"; ///< Default orig
 } // namespace jsonpolicy
 
 /**
- * @brief Policy class representing a policy in wazuh-engine
+ * @brief Policy class representing a policy in guardsarm-engine
  *
  * This defines the pipeline of processing for events, including integrations,
  */

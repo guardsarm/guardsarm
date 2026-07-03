@@ -132,7 +132,7 @@ protected:
 
         defaultConfig = {
             tmpDir,                              // basePath
-            "wazuh-${name}-${YYYY}-${MM}-${DD}", // pattern (extension from ext parameter)
+            "guardsarm-${name}-${YYYY}-${MM}-${DD}", // pattern (extension from ext parameter)
             0,                                   // maxSize (no limit)
             fastqueue::MIN_QUEUE_CAPACITY,       // bufferSize
         };

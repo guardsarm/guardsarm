@@ -1,8 +1,8 @@
 # Indexer Configuration
 
-The `<indexer>` section configures the connection from the manager to the Wazuh Indexer (OpenSearch). It is consumed by the Indexer Connector module and by the Vulnerability Scanner for feed downloads.
+The `<indexer>` section configures the connection from the manager to the GuardSarm Indexer (OpenSearch). It is consumed by the Indexer Connector module and by the Vulnerability Scanner for feed downloads.
 
-Configuration file: `/var/wazuh-manager/etc/wazuh-manager.conf`
+Configuration file: `/var/guardsarm-manager/etc/guardsarm-manager.conf`
 
 Parser: `src/shared/src/engine_external.c` (`get_indexer_cnf`) — converts the XML section to JSON before passing it to the engine. Only paths listed in `VALID_CONFIG_PATHS` are accepted; any unknown path causes a configuration error and the manager will not start.
 
@@ -39,7 +39,7 @@ Path to one or more CA certificates used to verify the Indexer's TLS certificate
 ```xml
 <ssl>
   <certificate_authorities>
-    <ca>/var/wazuh-manager/etc/certs/root-ca.pem</ca>
+    <ca>/var/guardsarm-manager/etc/certs/root-ca.pem</ca>
   </certificate_authorities>
 </ssl>
 ```
@@ -67,10 +67,10 @@ Path to the private key corresponding to `ssl/certificate`. The path must exist 
   </hosts>
   <ssl>
     <certificate_authorities>
-      <ca>/var/wazuh-manager/etc/certs/root-ca.pem</ca>
+      <ca>/var/guardsarm-manager/etc/certs/root-ca.pem</ca>
     </certificate_authorities>
-    <certificate>/var/wazuh-manager/etc/certs/manager.pem</certificate>
-    <key>/var/wazuh-manager/etc/certs/manager-key.pem</key>
+    <certificate>/var/guardsarm-manager/etc/certs/manager.pem</certificate>
+    <key>/var/guardsarm-manager/etc/certs/manager-key.pem</key>
   </ssl>
 </indexer>
 ```
@@ -86,21 +86,21 @@ Path to the private key corresponding to `ssl/certificate`. The path must exist 
   </hosts>
   <ssl>
     <certificate_authorities>
-      <ca>/var/wazuh-manager/etc/certs/root-ca.pem</ca>
+      <ca>/var/guardsarm-manager/etc/certs/root-ca.pem</ca>
     </certificate_authorities>
-    <certificate>/var/wazuh-manager/etc/certs/manager.pem</certificate>
-    <key>/var/wazuh-manager/etc/certs/manager-key.pem</key>
+    <certificate>/var/guardsarm-manager/etc/certs/manager.pem</certificate>
+    <key>/var/guardsarm-manager/etc/certs/manager-key.pem</key>
   </ssl>
 </indexer>
 ```
 
 ## Indexer credentials
 
-If the Wazuh Indexer requires username/password authentication (e.g. the built-in `admin` user), store the credentials in the Wazuh Keystore rather than embedding them in the configuration file:
+If the GuardSarm Indexer requires username/password authentication (e.g. the built-in `admin` user), store the credentials in the GuardSarm Keystore rather than embedding them in the configuration file:
 
 ```bash
-wazuh-manager-keystore -f indexer -k username -v admin
-wazuh-manager-keystore -f indexer -k password -v <password>
+guardsarm-manager-keystore -f indexer -k username -v admin
+guardsarm-manager-keystore -f indexer -k password -v <password>
 ```
 
 The Indexer Connector reads these values automatically at startup from the `indexer` column family in the keystore. For full keystore usage see [Keystore](../modules/keystore/README.md).
@@ -108,9 +108,9 @@ The Indexer Connector reads these values automatically at startup from the `inde
 ## Verifying connectivity
 
 ```bash
-curl --cacert /var/wazuh-manager/etc/certs/root-ca.pem \
-     --cert   /var/wazuh-manager/etc/certs/manager.pem \
-     --key    /var/wazuh-manager/etc/certs/manager-key.pem \
+curl --cacert /var/guardsarm-manager/etc/certs/root-ca.pem \
+     --cert   /var/guardsarm-manager/etc/certs/manager.pem \
+     --key    /var/guardsarm-manager/etc/certs/manager-key.pem \
      https://127.0.0.1:9200/_cluster/health
 ```
 

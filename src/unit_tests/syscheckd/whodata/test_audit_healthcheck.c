@@ -20,15 +20,15 @@
 #include "wrappers/libc/stdio_wrappers.h"
 #include "wrappers/libc/stdlib_wrappers.h"
 #include "wrappers/posix/unistd_wrappers.h"
-#include "wrappers/wazuh/shared/audit_op_wrappers.h"
-#include "wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "wrappers/wazuh/shared/file_op_wrappers.h"
-#include "wrappers/wazuh/shared/atomic_wrappers.h"
-#include "wrappers/wazuh/shared/time_op_wrappers.h"
-#include "wrappers/wazuh/shared/pthreads_op_wrappers.h"
+#include "wrappers/guardsarm/shared/audit_op_wrappers.h"
+#include "wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "wrappers/guardsarm/shared/file_op_wrappers.h"
+#include "wrappers/guardsarm/shared/atomic_wrappers.h"
+#include "wrappers/guardsarm/shared/time_op_wrappers.h"
+#include "wrappers/guardsarm/shared/pthreads_op_wrappers.h"
 
 
-#include "wrappers/wazuh/syscheckd/audit_parse_wrappers.h"
+#include "wrappers/guardsarm/syscheckd/audit_parse_wrappers.h"
 
 
 #define PERMS (AUDIT_PERM_WRITE | AUDIT_PERM_ATTR)
@@ -95,7 +95,7 @@ void prepare_post_audit_healthcheck_thread() {
 
     expect_string(__wrap_audit_delete_rule, path, AUDIT_HEALTHCHECK_DIR);
     expect_value(__wrap_audit_delete_rule, perms, PERMS);
-    expect_string(__wrap_audit_delete_rule, key, "wazuh_hc");
+    expect_string(__wrap_audit_delete_rule, key, "guardsarm_hc");
     will_return(__wrap_audit_delete_rule, 1);
 
     // Signal the secondary thread to stop and wait for it to finish
@@ -301,7 +301,7 @@ void test_audit_health_check_thread_wait_loop(void **state) {
 
     expect_string(__wrap_audit_delete_rule, path, AUDIT_HEALTHCHECK_DIR);
     expect_value(__wrap_audit_delete_rule, perms, PERMS);
-    expect_string(__wrap_audit_delete_rule, key, "wazuh_hc");
+    expect_string(__wrap_audit_delete_rule, key, "guardsarm_hc");
     will_return(__wrap_audit_delete_rule, 1);
 
     // Signal the secondary thread to stop and wait for it to finish

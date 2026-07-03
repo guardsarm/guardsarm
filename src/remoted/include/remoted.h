@@ -12,7 +12,7 @@
 #define LOGREMOTE_H
 
 #ifndef ARGV0
-#define ARGV0 "wazuh-remoted"
+#define ARGV0 "guardsarm-remoted"
 #endif
 
 #include "config.h"
@@ -190,7 +190,7 @@ size_t rem_getCounter(int fd);
 /**
  * @brief Infers OS family type given a certain OS platform
  *
- * @param os_platform Platform of the machine where wazuh is being executed.
+ * @param os_platform Platform of the machine where guardsarm is being executed.
  * @return const char* OS family type associated with the given platform
  */
 const char* infer_os_type(const char *os_platform);

@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-|Wazuh version| Component | Action type |
+|GuardSarm version| Component | Action type |
 |---| --- | --- |
 | X.Y.Z-rev | Rules/Decoders | New/Error/Improve |
 

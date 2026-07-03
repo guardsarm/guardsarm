@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Wazuh Configuration File Generator
+# GuardSarm Configuration File Generator
 # Copyright (C) 2015, Wazuh Inc.
 # November 24, 2016.
 #

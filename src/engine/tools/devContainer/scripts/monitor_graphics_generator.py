@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 """
-Graphics generator for Wazuh Manager benchmark results.
+Graphics generator for GuardSarm Manager benchmark results.
 
 Reads bench CSV and monitor CSV files from a results directory and generates
 comparison charts.  Supports comparing multiple runs (e.g. before/after fix)
@@ -392,7 +392,7 @@ def generate_charts(
     analysisd_dfs: dict[str, pd.DataFrame] = {}
     logs: dict[str, pd.DataFrame] = {}
     modulesd_dfs: dict[str, pd.DataFrame] = {}
-    # wazuh-indexer process CSV (present only in all-in-one deployments).
+    # guardsarm-indexer process CSV (present only in all-in-one deployments).
     # Kept separate so manager-only charts stay clean; combined charts add it back.
     indexer_proc_dfs: dict[str, pd.DataFrame] = {}
 
@@ -455,7 +455,7 @@ def generate_charts(
                 proc_name = fname.removesuffix(".csv")
                 key = f"{label}/{proc_name}" if len(result_dirs) > 1 else proc_name
                 df = load_monitor(fpath)
-                if proc_name == "wazuh-indexer":
+                if proc_name == "guardsarm-indexer":
                     if len(df) > 0:
                         indexer_proc_dfs[label] = df
                 else:
@@ -479,7 +479,7 @@ def generate_charts(
                 proc_name = fname.removesuffix(".csv")
                 key = f"{label}/{proc_name}" if len(result_dirs) > 1 else proc_name
                 df = load_monitor(fpath)
-                if proc_name == "wazuh-indexer":
+                if proc_name == "guardsarm-indexer":
                     if len(df) > 0:
                         indexer_proc_dfs[label] = df
                 else:
@@ -508,19 +508,19 @@ def generate_charts(
 
     # -- Monitor time-series: one chart per metric, overlaying all runs ------
     if monitors:
-        # For the simple per-metric charts, include wazuh-indexer as an extra
+        # For the simple per-metric charts, include guardsarm-indexer as an extra
         # line when available.  For multi-result-dir runs the key follows the
         # same "{label}/{proc}" convention used by other processes.
         monitors_with_indexer: dict[str, pd.DataFrame] = dict(monitors)
         for lbl, idf in indexer_proc_dfs.items():
-            ikey = f"{lbl}/wazuh-indexer" if len(result_dirs) > 1 else "wazuh-indexer"
+            ikey = f"{lbl}/guardsarm-indexer" if len(result_dirs) > 1 else "guardsarm-indexer"
             monitors_with_indexer[ikey] = idf
 
         for col, title_suffix, ylabel in MONITOR_METRICS:
             out = os.path.join(out_dir, f"monitor_{col}.{fmt}")
             plot_timeseries(
                 monitors_with_indexer, col,
-                f"Wazuh Manager — {title_suffix}",
+                f"GuardSarm Manager — {title_suffix}",
                 ylabel, out,
             )
 
@@ -530,7 +530,7 @@ def generate_charts(
         _plot_with_total(monitors, "rss_mb", "RSS Memory (per process + total)",
                          "MB", os.path.join(out_dir, f"monitor_rss_total.{fmt}"))
 
-        # combined: manager processes + wazuh-indexer line + single grand total.
+        # combined: manager processes + guardsarm-indexer line + single grand total.
         if indexer_proc_dfs:
             _plot_with_total_and_indexer(
                 monitors, indexer_proc_dfs, "cpu_pct",
@@ -584,7 +584,7 @@ def generate_charts(
             out = os.path.join(out_dir, f"bench_{col}.{fmt}")
             plot_timeseries(
                 benches, col,
-                f"Wazuh Manager — {title_suffix}",
+                f"GuardSarm Manager — {title_suffix}",
                 ylabel, out,
             )
 
@@ -608,7 +608,7 @@ def generate_charts(
             plot_timeseries(
                 remoted_dfs,
                 col,
-                f"Wazuh Remoted API — {title_suffix}",
+                f"GuardSarm Remoted API — {title_suffix}",
                 ylabel,
                 out,
             )
@@ -1170,7 +1170,7 @@ def _plot_with_total_and_indexer(
     out_path: str,
     figsize=(14, 7),
 ):
-    """Per-process manager lines + wazuh-indexer line + single grand total.
+    """Per-process manager lines + guardsarm-indexer line + single grand total.
 
     For a single-result-dir run (keys have no "/") all manager processes are
     summed into one total, the indexer is added on top, and a single "Total"
@@ -1218,7 +1218,7 @@ def _plot_with_total_and_indexer(
         if idf is not None and y_col in idf.columns:
             ax.plot(
                 idf["elapsed_s"], idf[y_col],
-                label=f"wazuh-indexer{suffix}",
+                label=f"guardsarm-indexer{suffix}",
                 color=COLORS[3], linewidth=2.0, alpha=0.9, linestyle="-",
             )
             for t, v in zip(idf["elapsed_s"], idf[y_col]):
@@ -1512,7 +1512,7 @@ def _plot_combined(
 # ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="Generate comparison charts from Wazuh Manager benchmark results.",
+        description="Generate comparison charts from GuardSarm Manager benchmark results.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )

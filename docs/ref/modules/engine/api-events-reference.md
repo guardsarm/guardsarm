@@ -1,6 +1,6 @@
 # API Events Reference
 
-This page documents the Wazuh Engine events ingestion API.
+This page documents the GuardSarm Engine events ingestion API.
 
 - Interactive ReDoc: [Events API ReDoc](api-events-reference.html)
 - OpenAPI source: `spec-events.yaml`

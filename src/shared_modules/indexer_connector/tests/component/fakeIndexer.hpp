@@ -1,5 +1,5 @@
 /*
- * Wazuh Indexer Connector - Component tests
+ * GuardSarm Indexer Connector - Component tests
  * Copyright (C) 2015, Wazuh Inc.
  * January 09, 2024.
  *
@@ -168,7 +168,7 @@ public:
                      {
                          const auto response = nlohmann::json::array({{{"epoch", "1726271464"},
                                                                        {"timestamp", "23:51:04"},
-                                                                       {"cluster", "wazuh-cluster"},
+                                                                       {"cluster", "guardsarm-cluster"},
                                                                        {"status", m_health},
                                                                        {"node.total", "1"},
                                                                        {"node.data", "1"},

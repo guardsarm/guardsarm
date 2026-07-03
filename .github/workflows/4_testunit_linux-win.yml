@@ -1,4 +1,4 @@
-name: 4.X - Wazuh - Legacy Unit tests
+name: 4.X - GuardSarm - Legacy Unit tests
 
 on:
   workflow_dispatch:

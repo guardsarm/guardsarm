@@ -13,7 +13,7 @@
 #include <cmocka.h>
 
 #include "agentd.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
 
 #define DUMMY_VALID_SOCKET_FD 1
 

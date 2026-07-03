@@ -19,7 +19,7 @@ targets:
     - manager
 
 daemons:
-    - wazuh-manager-authd
+    - guardsarm-manager-authd
 
 os_platform:
     - linux
@@ -45,13 +45,13 @@ import pytest
 from pathlib import Path
 import re
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.utils.configuration import load_configuration_template, get_test_cases_data
-from wazuh_testing.utils.services import control_service
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils import callbacks
-from wazuh_testing.modules.authd import PREFIX
-from wazuh_testing.modules.authd.configuration import AUTHD_DEBUG_CONFIG
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.utils.configuration import load_configuration_template, get_test_cases_data
+from guardsarm_testing.utils.services import control_service
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.utils import callbacks
+from guardsarm_testing.modules.authd import PREFIX
+from guardsarm_testing.modules.authd.configuration import AUTHD_DEBUG_CONFIG
 
 from . import CONFIGURATIONS_FOLDER_PATH, TEST_CASES_FOLDER_PATH
 
@@ -69,7 +69,7 @@ local_internal_options = {AUTHD_DEBUG_CONFIG: '2'}
 
 # Tests
 @pytest.mark.parametrize('test_configuration,test_metadata', zip(test_configuration, test_metadata), ids=test_cases_ids)
-def test_authd_use_password_invalid(test_configuration, test_metadata, set_wazuh_configuration, truncate_monitored_files_module,
+def test_authd_use_password_invalid(test_configuration, test_metadata, set_guardsarm_configuration, truncate_monitored_files_module,
                                     configure_local_internal_options, set_authd_pass):
     '''
     description:
@@ -78,7 +78,7 @@ def test_authd_use_password_invalid(test_configuration, test_metadata, set_wazuh
         to come from the cases yaml, this is done this way to handle easily
         the different error logs that could be raised from different inputs.
 
-    wazuh_min_version:
+    guardsarm_min_version:
         5.0.0
 
     tier: 1
@@ -90,9 +90,9 @@ def test_authd_use_password_invalid(test_configuration, test_metadata, set_wazuh
         - test_metadata:
             type: dict
             brief: Test case metadata.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
-            brief: Load basic wazuh configuration.
+            brief: Load basic guardsarm configuration.
         - configure_local_internal_options:
             type: fixture
             brief: Configure the local internal options file.
@@ -105,10 +105,10 @@ def test_authd_use_password_invalid(test_configuration, test_metadata, set_wazuh
 
     assertions:
         - Error log 'Empty password provided.' is raised in ossec.log.
-        - wazuh-manager.service must not be able to restart.
+        - guardsarm-manager.service must not be able to restart.
 
     input_description:
-        ./data/configuration_template/config_authd_use_password_invalid.yaml: Wazuh config needed for the tests.
+        ./data/configuration_template/config_authd_use_password_invalid.yaml: GuardSarm config needed for the tests.
         ./data/test_cases/cases_authd_use_password_invalid.yaml: Values to be used and expected error.
 
     expected_output:
@@ -117,7 +117,7 @@ def test_authd_use_password_invalid(test_configuration, test_metadata, set_wazuh
     '''
     log = test_metadata['error']
     if log == 'Invalid password provided.':
-        pytest.xfail(reason="No password validation in authd.pass - Issue wazuh/wazuh#16282.")
+        pytest.xfail(reason="No password validation in authd.pass - Issue guardsarm/guardsarm#16282.")
 
     # Attempt restart; it may fail (older behavior) or succeed (5.x behavior where
     # the service continues even if authd exits on invalid password).
@@ -128,7 +128,7 @@ def test_authd_use_password_invalid(test_configuration, test_metadata, set_wazuh
 
     # Verify the error log is raised.
 
-    wazuh_log_monitor = FileMonitor(WAZUH_LOG_PATH)
+    guardsarm_log_monitor = FileMonitor(GUARDSARM_LOG_PATH)
     log = re.escape(log)
-    wazuh_log_monitor.start(callback=callbacks.generate_callback(fr'{PREFIX}{log}'), timeout=10)
-    assert wazuh_log_monitor.callback_result, f'Error event not detected'
+    guardsarm_log_monitor.start(callback=callbacks.generate_callback(fr'{PREFIX}{log}'), timeout=10)
+    assert guardsarm_log_monitor.callback_result, f'Error event not detected'

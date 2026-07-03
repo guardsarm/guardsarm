@@ -19,8 +19,8 @@
 namespace api::ioccrud::handlers
 {
 
-namespace eIoc = com::wazuh::api::engine::ioc;
-namespace eEngine = com::wazuh::api::engine;
+namespace eIoc = com::guardsarm::api::engine::ioc;
+namespace eEngine = com::guardsarm::api::engine;
 
 constexpr std::string_view LOG_MODULE_NAME = "API::IOC"; ///< Log module name for IOC CRUD handlers
 

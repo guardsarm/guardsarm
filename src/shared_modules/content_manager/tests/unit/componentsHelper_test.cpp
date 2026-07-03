@@ -1,5 +1,5 @@
 /*
- * Wazuh Content Manager - Unit Tests
+ * GuardSarm Content Manager - Unit Tests
  * Copyright (C) 2015, Wazuh Inc.
  * Nov 29, 2023.
  *

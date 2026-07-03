@@ -11,7 +11,7 @@ set -euo pipefail
 # ------------------------------------------------------------------------------
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-WAZUH_REPO="${WAZUH_REPO:-$(cd "$SCRIPT_DIR/../../../../.." && pwd)}"
+GUARDSARM_REPO="${GUARDSARM_REPO:-$(cd "$SCRIPT_DIR/../../../../.." && pwd)}"
 CLANG_FORMAT="${CLANG_FORMAT:-clang-format}"
 CHECK_ONLY=0
 
@@ -43,17 +43,17 @@ if [[ -n "$PR_NUMBER" ]]; then
   COMMITTED_FILES="$(gh pr diff "$PR_NUMBER" --name-only)"
 else
   echo "    No PR associated, diffing against main..."
-  COMMITTED_FILES="$(git -C "$WAZUH_REPO" diff --name-only --diff-filter=AM main...HEAD)"
+  COMMITTED_FILES="$(git -C "$GUARDSARM_REPO" diff --name-only --diff-filter=AM main...HEAD)"
 fi
 
 # Staged (index) files — added or modified
-STAGED_FILES="$(git -C "$WAZUH_REPO" diff --cached --name-only --diff-filter=AM)"
+STAGED_FILES="$(git -C "$GUARDSARM_REPO" diff --cached --name-only --diff-filter=AM)"
 
 # Unstaged (working tree) modifications
-UNSTAGED_FILES="$(git -C "$WAZUH_REPO" diff --name-only --diff-filter=AM)"
+UNSTAGED_FILES="$(git -C "$GUARDSARM_REPO" diff --name-only --diff-filter=AM)"
 
 # Untracked files
-UNTRACKED_FILES="$(git -C "$WAZUH_REPO" ls-files --others --exclude-standard)"
+UNTRACKED_FILES="$(git -C "$GUARDSARM_REPO" ls-files --others --exclude-standard)"
 
 # Merge all sources, deduplicate
 CHANGED_FILES="$(printf '%s\n%s\n%s\n%s' "$COMMITTED_FILES" "$STAGED_FILES" "$UNSTAGED_FILES" "$UNTRACKED_FILES" | sort -u)"
@@ -65,8 +65,8 @@ FILTERED_FILES=()
 while IFS= read -r file; do
   [[ -z "$file" ]] && continue
   [[ "$file" =~ ^src/.*\.(cpp|hpp)$ ]] || continue
-  [[ -f "${WAZUH_REPO}/${file}" ]] || continue
-  FILTERED_FILES+=("${WAZUH_REPO}/${file}")
+  [[ -f "${GUARDSARM_REPO}/${file}" ]] || continue
+  FILTERED_FILES+=("${GUARDSARM_REPO}/${file}")
 done <<< "$CHANGED_FILES"
 
 if [[ ${#FILTERED_FILES[@]} -eq 0 ]]; then
@@ -76,7 +76,7 @@ fi
 
 echo "==> Found ${#FILTERED_FILES[@]} file(s) to format:"
 for f in "${FILTERED_FILES[@]}"; do
-  echo "    - ${f#"${WAZUH_REPO}/"}"
+  echo "    - ${f#"${GUARDSARM_REPO}/"}"
 done
 
 # ------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ if [[ "$CHECK_ONLY" -eq 1 ]]; then
   NEEDS_FMT=0
   for f in "${FILTERED_FILES[@]}"; do
     if ! "$CLANG_FORMAT" --style=file --dry-run --Werror "$f" 2>/dev/null; then
-      echo "    NEEDS FORMAT: ${f#"${WAZUH_REPO}/"}"
+      echo "    NEEDS FORMAT: ${f#"${GUARDSARM_REPO}/"}"
       NEEDS_FMT=1
     fi
   done

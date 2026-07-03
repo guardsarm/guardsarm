@@ -22,7 +22,7 @@
 #include "external/cJSON/cJSON.h"
 
 #ifndef ARGV0
-#define ARGV0 "wazuh-agent"
+#define ARGV0 "guardsarm-agent"
 #endif
 
 /**************************************************************************************
@@ -34,7 +34,7 @@
 /* Help message */
 void agent_help()
 {
-    printf("\n%s %s %s .\n", __wazuh_name, ARGV0, __wazuh_version);
+    printf("\n%s %s %s .\n", PRODUCT_NAME, ARGV0, PRODUCT_VERSION);
     printf("Available options:\n");
     printf("\t/?                This help message.\n");
     printf("\t-h                This help message.\n");

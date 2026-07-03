@@ -8,11 +8,11 @@
  * Foundation
  */
 
-#if defined(Darwin) || (defined(__linux__) && defined(WAZUH_UNIT_TESTING))
+#if defined(Darwin) || (defined(__linux__) && defined(GUARDSARM_UNIT_TESTING))
 #include "macos_log.h"
 
 /* Removes STATIC/INLINE qualifiers from the tests */
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 #define STATIC
 #define INLINE
 #else

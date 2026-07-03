@@ -65,7 +65,7 @@ public:
     void makeControllerPolicyAssetsSuccess()
     {
         makeControllerBuildPolicySuccess();
-        auto assets = std::unordered_set<base::Name> {"asset/wazuh/0"};
+        auto assets = std::unordered_set<base::Name> {"asset/guardsarm/0"};
         EXPECT_CALL(*m_mockPolicy, assets()).WillRepeatedly(::testing::ReturnRefOfCopy(assets));
     }
 

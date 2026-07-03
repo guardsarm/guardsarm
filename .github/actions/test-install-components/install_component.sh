@@ -9,7 +9,7 @@ if [ -z "$package_name" ] || [ -z "$target" ]; then
     exit 1
 fi
 
-echo "Installing Wazuh $target."
+echo "Installing GuardSarm $target."
 
 if [ -n "$(command -v yum)" ]; then
     install="yum --setopt=retries=5 --setopt=timeout=30 install -y --nogpgcheck"
@@ -22,17 +22,17 @@ else
     exit 1
 fi
 
-WAZUH_MANAGER="10.0.0.2" $install "/packages/$package_name"| tee /packages/status.log
-grep -i " installed.*wazuh-$target" $installed_log| tee -a /packages/status.log
+GUARDSARM_MANAGER="10.0.0.2" $install "/packages/$package_name"| tee /packages/status.log
+grep -i " installed.*guardsarm-$target" $installed_log| tee -a /packages/status.log
 
-# Retrieve wazuh gid and uid
+# Retrieve guardsarm gid and uid
 if [ "$target" = "manager" ]; then
-    wazuh_gid=$(getent group wazuh-manager | cut -d: -f3)
-    wazuh_uid=$(getent passwd wazuh-manager | cut -d: -f3)
+    guardsarm_gid=$(getent group guardsarm-manager | cut -d: -f3)
+    guardsarm_uid=$(getent passwd guardsarm-manager | cut -d: -f3)
 else
-    wazuh_gid=$(getent group wazuh | cut -d: -f3)
-    wazuh_uid=$(getent passwd wazuh | cut -d: -f3)
+    guardsarm_gid=$(getent group guardsarm | cut -d: -f3)
+    guardsarm_uid=$(getent passwd guardsarm | cut -d: -f3)
 fi
 
-echo $wazuh_gid > /tests/wazuh_gid
-echo $wazuh_uid > /tests/wazuh_uid
+echo $guardsarm_gid > /tests/guardsarm_gid
+echo $guardsarm_uid > /tests/guardsarm_uid

@@ -409,7 +409,7 @@ firewall_result_t try_pf(const char *srcip, int action, int ip_version, const ch
 
     // Add or delete IP from table
     const char *table_operation = (action == ENABLE_COMMAND) ? "add" : "delete";
-    char *exec_cmd2[] = {pfctl_path, "-t", "wazuh_fwtable", "-T", (char *)table_operation, (char *)srcip, NULL};
+    char *exec_cmd2[] = {pfctl_path, "-t", "guardsarm_fwtable", "-T", (char *)table_operation, (char *)srcip, NULL};
 
     wfd = wpopenv(pfctl_path, exec_cmd2, W_BIND_STDERR);
     if (!wfd) {
@@ -471,7 +471,7 @@ firewall_result_t try_npf(const char *srcip, int action, int ip_version, const c
 
     // Check for table existence
     while (fgets(output_buf, OS_MAXSTR, wfd->file_out)) {
-        if (strstr(output_buf, "table <wazuh_blacklist>") != NULL) {
+        if (strstr(output_buf, "table <guardsarm_blacklist>") != NULL) {
             table_exists = true;
             break;
         }
@@ -485,14 +485,14 @@ firewall_result_t try_npf(const char *srcip, int action, int ip_version, const c
     }
 
     if (!table_exists) {
-        log_firewall_action(argv0, LOG_LEVEL_WARNING, "npf", "check", "wazuh_blacklist table not found");
+        log_firewall_action(argv0, LOG_LEVEL_WARNING, "npf", "check", "guardsarm_blacklist table not found");
         os_free(npfctl_path);
         return FIREWALL_INVALID_STATE;
     }
 
     // Add or delete IP from table
     const char *table_operation = (action == ENABLE_COMMAND) ? "add" : "del";
-    char *exec_cmd2[] = {npfctl_path, "table", "wazuh_blacklist", (char *)table_operation, (char *)srcip, NULL};
+    char *exec_cmd2[] = {npfctl_path, "table", "guardsarm_blacklist", (char *)table_operation, (char *)srcip, NULL};
 
     wfd = wpopenv(npfctl_path, exec_cmd2, W_BIND_STDERR);
     os_free(npfctl_path);

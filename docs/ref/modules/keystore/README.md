@@ -1,30 +1,30 @@
 # Keystore
 
-`wazuh-manager-keystore` is a CLI utility that stores encrypted credentials for the Wazuh Manager. Other components (Indexer Connector, Server API) read secrets from the keystore at runtime via the `Keystore` C++ library.
+`guardsarm-manager-keystore` is a CLI utility that stores encrypted credentials for the GuardSarm Manager. Other components (Indexer Connector, Server API) read secrets from the keystore at runtime via the `Keystore` C++ library.
 
 Source: `src/shared_modules/keystore/`
 
 ## Storage
 
-Secrets are stored in a RocksDB database at `queue/keystore/` (relative to the Wazuh install directory, i.e. `/var/wazuh-manager/queue/keystore/`). All values are encrypted with AES-256-CBC before being written to disk.
+Secrets are stored in a RocksDB database at `queue/keystore/` (relative to the GuardSarm install directory, i.e. `/var/guardsarm-manager/queue/keystore/`). All values are encrypted with AES-256-CBC before being written to disk.
 
 Secrets are organized into **column families** (namespaces). The main column families used by the manager are:
 
 | Column family | Contents |
 |---------------|----------|
-| `indexer` | Wazuh Indexer credentials (`username`, `password`) |
+| `indexer` | GuardSarm Indexer credentials (`username`, `password`) |
 
 ## CLI usage
 
 ```bash
 # Store a value inline
-wazuh-manager-keystore -f indexer -k username -v admin
+guardsarm-manager-keystore -f indexer -k username -v admin
 
 # Store a value from stdin (avoids the value appearing in shell history)
-echo 'MySecretPassword' | wazuh-manager-keystore -f indexer -k password
+echo 'MySecretPassword' | guardsarm-manager-keystore -f indexer -k password
 
 # Store a value from a file
-wazuh-manager-keystore -f indexer -k password -vp /path/to/secret.txt
+guardsarm-manager-keystore -f indexer -k password -vp /path/to/secret.txt
 ```
 
 | Flag | Description |

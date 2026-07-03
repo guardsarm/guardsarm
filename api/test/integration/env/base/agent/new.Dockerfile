@@ -16,12 +16,12 @@ RUN wget http://archive.ubuntu.com/ubuntu/pool/main/r/rtmpdump/librtmp1_2.4+2015
     rm librtmp1_2.4+20151223.gitfa8646d.1-2build4_amd64.deb && \
     rm -rf /var/lib/apt/lists/* && ldconfig
 
-ARG WAZUH_BRANCH
+ARG GUARDSARM_BRANCH
 
-## install Wazuh
-RUN mkdir wazuh && curl -sL https://github.com/wazuh/wazuh/tarball/${WAZUH_BRANCH} | tar zx --strip-components=1 -C wazuh
-ADD base/agent/preloaded-vars.conf /wazuh/etc/preloaded-vars.conf
-RUN /wazuh/install.sh
+## install GuardSarm
+RUN mkdir guardsarm && curl -sL https://github.com/guardsarm/guardsarm/tarball/${GUARDSARM_BRANCH} | tar zx --strip-components=1 -C guardsarm
+ADD base/agent/preloaded-vars.conf /guardsarm/etc/preloaded-vars.conf
+RUN /guardsarm/install.sh
 
 COPY base/agent/entrypoint.sh /scripts/entrypoint.sh
 

@@ -2,8 +2,8 @@
 
 Inventory Sync exposes two API surfaces:
 
-- The **module start/stop interface** used by the Wazuh module loader.
-- The **indexed state data surface** exposed through the Wazuh Indexer.
+- The **module start/stop interface** used by the GuardSarm module loader.
+- The **indexed state data surface** exposed through the GuardSarm Indexer.
 
 ## Module interface
 
@@ -55,58 +55,58 @@ See the FlatBuffers page for the full schema details.
 
 ## Indexed state indices
 
-Inventory Sync works against the `wazuh-states-*` family. The currently supported inventory families are:
+Inventory Sync works against the `guardsarm-states-*` family. The currently supported inventory families are:
 
 ### Syscollector indices
 
-- `wazuh-states-inventory-system`
-- `wazuh-states-inventory-hardware`
-- `wazuh-states-inventory-hotfixes`
-- `wazuh-states-inventory-packages`
-- `wazuh-states-inventory-processes`
-- `wazuh-states-inventory-ports`
-- `wazuh-states-inventory-interfaces`
-- `wazuh-states-inventory-protocols`
-- `wazuh-states-inventory-networks`
-- `wazuh-states-inventory-users`
-- `wazuh-states-inventory-groups`
-- `wazuh-states-inventory-services`
-- `wazuh-states-inventory-browser-extensions`
+- `guardsarm-states-inventory-system`
+- `guardsarm-states-inventory-hardware`
+- `guardsarm-states-inventory-hotfixes`
+- `guardsarm-states-inventory-packages`
+- `guardsarm-states-inventory-processes`
+- `guardsarm-states-inventory-ports`
+- `guardsarm-states-inventory-interfaces`
+- `guardsarm-states-inventory-protocols`
+- `guardsarm-states-inventory-networks`
+- `guardsarm-states-inventory-users`
+- `guardsarm-states-inventory-groups`
+- `guardsarm-states-inventory-services`
+- `guardsarm-states-inventory-browser-extensions`
 
 ### FIM indices
 
-- `wazuh-states-fim-files`
-- `wazuh-states-fim-registry-keys`
-- `wazuh-states-fim-registry-values`
+- `guardsarm-states-fim-files`
+- `guardsarm-states-fim-registry-keys`
+- `guardsarm-states-fim-registry-values`
 
 ### SCA index
 
-- `wazuh-states-sca`
+- `guardsarm-states-sca`
 
 ### Related downstream index
 
-- `wazuh-states-vulnerabilities`
+- `guardsarm-states-vulnerabilities`
 
-`wazuh-states-vulnerabilities` is not written directly by Inventory Sync, but it is part of the current manager-side flow because Inventory Sync can trigger vulnerability scans from the same synchronization session.
+`guardsarm-states-vulnerabilities` is not written directly by Inventory Sync, but it is part of the current manager-side flow because Inventory Sync can trigger vulnerability scans from the same synchronization session.
 
 ## Querying synchronized data
 
-State data can be queried through the Wazuh Indexer search API.
+State data can be queried through the GuardSarm Indexer search API.
 
 ### Search all state indices
 
 ```http
-GET /wazuh-states-*/_search
+GET /guardsarm-states-*/_search
 ```
 
 ### Search one agent across all state indices
 
 ```json
-GET /wazuh-states-*/_search
+GET /guardsarm-states-*/_search
 {
   "query": {
     "term": {
-      "wazuh.agent.id": "001"
+      "guardsarm.agent.id": "001"
     }
   }
 }
@@ -115,11 +115,11 @@ GET /wazuh-states-*/_search
 ### Search SCA documents for one agent
 
 ```json
-GET /wazuh-states-sca/_search
+GET /guardsarm-states-sca/_search
 {
   "query": {
     "term": {
-      "wazuh.agent.id": "001"
+      "guardsarm.agent.id": "001"
     }
   }
 }
@@ -128,12 +128,12 @@ GET /wazuh-states-sca/_search
 ### Search inventory packages for one agent
 
 ```json
-GET /wazuh-states-inventory-packages/_search
+GET /guardsarm-states-inventory-packages/_search
 {
   "query": {
     "bool": {
       "filter": [
-        { "term": { "wazuh.agent.id": "001" } },
+        { "term": { "guardsarm.agent.id": "001" } },
         { "exists": { "field": "package.name" } }
       ]
     }
@@ -145,20 +145,20 @@ GET /wazuh-states-inventory-packages/_search
 
 Inventory Sync enriches indexed state documents with manager-side metadata before sending them to the indexer. In practice, upserted documents include at least:
 
-- `wazuh.agent.id`
-- `wazuh.agent.name`
-- `wazuh.agent.version`
-- `wazuh.agent.groups`
-- `wazuh.agent.host.architecture`
-- `wazuh.agent.host.hostname`
-- `wazuh.agent.host.os.*`
-- `wazuh.cluster.name`
+- `guardsarm.agent.id`
+- `guardsarm.agent.name`
+- `guardsarm.agent.version`
+- `guardsarm.agent.groups`
+- `guardsarm.agent.host.architecture`
+- `guardsarm.agent.host.hostname`
+- `guardsarm.agent.host.os.*`
+- `guardsarm.cluster.name`
 
 The domain-specific payload from the agent is then appended to that metadata. A package document, for example, can look like this:
 
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "agent": {
       "id": "001",
       "name": "ubuntu22",

@@ -18,15 +18,15 @@ from api.models.configuration_model import SecurityConfigurationModel
 from api.models.security_model import (CreateUserModel, PolicyModel, RoleModel,
                                        RuleModel, UpdateUserModel)
 from api.util import parse_api_param, raise_if_exc, remove_nones_to_dict
-from wazuh import security
-from wazuh.core.cluster.control import get_system_nodes_or_none
-from wazuh.core.cluster.dapi.dapi import DistributedAPI
-from wazuh.core.exception import WazuhException, WazuhPermissionError
-from wazuh.core.results import AffectedItemsWazuhResult, WazuhResult
-from wazuh.core.security import revoke_tokens
-from wazuh.rbac import preprocessor
+from guardsarm import security
+from guardsarm.core.cluster.control import get_system_nodes_or_none
+from guardsarm.core.cluster.dapi.dapi import DistributedAPI
+from guardsarm.core.exception import GuardSarmException, GuardSarmPermissionError
+from guardsarm.core.results import AffectedItemsGuardSarmResult, GuardSarmResult
+from guardsarm.core.security import revoke_tokens
+from guardsarm.rbac import preprocessor
 
-logger = logging.getLogger('wazuh-api')
+logger = logging.getLogger('guardsarm-api')
 auth_re = re.compile(r'basic (.*)', re.IGNORECASE)
 
 async def login_user(user: str, raw: bool = False) -> ConnexionResponse:
@@ -58,13 +58,13 @@ async def login_user(user: str, raw: bool = False) -> ConnexionResponse:
     token = None
     try:
         token = generate_token(user_id=user, data=data.dikt)
-    except WazuhException as e:
+    except GuardSarmException as e:
         raise_if_exc(e)
 
     return ConnexionResponse(body=token,
                              content_type='text/plain',
                              status_code=200) if raw else \
-           ConnexionResponse(body=dumps(WazuhResult({'data': TokenResponseModel(token=token)})),
+           ConnexionResponse(body=dumps(GuardSarmResult({'data': TokenResponseModel(token=token)})),
                              content_type=JSON_CONTENT_TYPE,
                              status_code=200)
 
@@ -100,13 +100,13 @@ async def run_as_login(user: str, raw: bool = False) -> ConnexionResponse:
     token = None
     try:
         token = generate_token(user_id=user, data=data.dikt, auth_context=auth_context)
-    except WazuhException as e:
+    except GuardSarmException as e:
         raise_if_exc(e)
 
     return ConnexionResponse(body=token,
                              content_type='text/plain',
                              status_code=200) if raw else \
-           ConnexionResponse(body=dumps(WazuhResult({'data': TokenResponseModel(token=token)})),
+           ConnexionResponse(body=dumps(GuardSarmResult({'data': TokenResponseModel(token=token)})),
                              content_type=JSON_CONTENT_TYPE,
                              status_code=200)
 
@@ -156,7 +156,7 @@ async def get_user_me_policies(pretty: bool = False, wait_for_complete: bool = F
     ConnexionResponse
         API response with the user RBAC policies and mode.
     """
-    data = WazuhResult({'data': request.context['token_info']['rbac_policies'],
+    data = GuardSarmResult({'data': request.context['token_info']['rbac_policies'],
                         'message': "Current user processed policies information was returned"})
 
     return json_response(data, pretty=pretty)
@@ -1166,8 +1166,8 @@ async def revoke_all_tokens(pretty: bool = False) -> ConnexionResponse:
                           nodes=nodes
                           )
     data = raise_if_exc(await dapi.distribute_function())
-    if type(data) == AffectedItemsWazuhResult and len(data.affected_items) == 0:
-        raise_if_exc(WazuhPermissionError(4000, data.message))
+    if type(data) == AffectedItemsGuardSarmResult and len(data.affected_items) == 0:
+        raise_if_exc(GuardSarmPermissionError(4000, data.message))
 
     return json_response(data, pretty=pretty)
 

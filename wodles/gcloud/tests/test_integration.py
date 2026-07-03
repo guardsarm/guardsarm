@@ -17,7 +17,7 @@ from unittest.mock import patch
 import pytest
 
 sys.path.append(join(dirname(realpath(__file__)), '..'))  # noqa: E501
-from integration import WazuhGCloudIntegration, ANALYSISD
+from integration import GuardSarmGCloudIntegration, ANALYSISD
 import exceptions
 
 
@@ -25,16 +25,16 @@ test_data_path = join(dirname(realpath(__file__)), 'data')
 test_message = 'test-message'
 
 
-def test_WazuhGCloudIntegration__init__():
-    """Test if an instance of WazuhGCloudIntegration is created properly."""
-    integration = WazuhGCloudIntegration(logger=MagicMock())
+def test_GuardSarmGCloudIntegration__init__():
+    """Test if an instance of GuardSarmGCloudIntegration is created properly."""
+    integration = GuardSarmGCloudIntegration(logger=MagicMock())
     for attribute in ['logger', 'socket']:
         assert hasattr(integration, attribute)
 
 
-def test_WazuhGCloudIntegration_format_msg():
+def test_GuardSarmGCloudIntegration_format_msg():
     """Test format_msg returns a well-formatted message."""
-    integration = WazuhGCloudIntegration(logger=MagicMock())
+    integration = GuardSarmGCloudIntegration(logger=MagicMock())
     msg = integration.format_msg(json.dumps(test_message))
     assert isinstance(msg, str)
     msg_json = json.loads(msg)
@@ -43,9 +43,9 @@ def test_WazuhGCloudIntegration_format_msg():
 
 
 @patch('integration.socket.socket')
-def test_WazuhGCloudIntegration_initialize_socket(mock_socket):
+def test_GuardSarmGCloudIntegration_initialize_socket(mock_socket):
     """Test initialize_socket establish a connection with the ANALYSISD socket."""
-    integration = WazuhGCloudIntegration(logger=MagicMock())
+    integration = GuardSarmGCloudIntegration(logger=MagicMock())
     integration.initialize_socket()
     integration.socket.connect.assert_called_with(ANALYSISD)
 
@@ -54,54 +54,54 @@ def test_WazuhGCloudIntegration_initialize_socket(mock_socket):
     (ConnectionRefusedError, 1),
     (OSError, 2)
 ])
-def test_WazuhGCloudIntegration_initialize_socket_ko(raised_exception, errcode):
+def test_GuardSarmGCloudIntegration_initialize_socket_ko(raised_exception, errcode):
     """Test initialize_socket properly handles exceptions."""
-    integration = WazuhGCloudIntegration(logger=MagicMock())
-    with patch('socket.socket', side_effect=raised_exception), pytest.raises(exceptions.WazuhIntegrationInternalError) as e:
+    integration = GuardSarmGCloudIntegration(logger=MagicMock())
+    with patch('socket.socket', side_effect=raised_exception), pytest.raises(exceptions.GuardSarmIntegrationInternalError) as e:
         integration.initialize_socket()
     assert errcode == e.value.errcode
 
 
-def test_WazuhGCloudIntegration_process_data():
+def test_GuardSarmGCloudIntegration_process_data():
     """Test process_data is not implemented for this base class."""
-    integration = WazuhGCloudIntegration(logger=MagicMock())
+    integration = GuardSarmGCloudIntegration(logger=MagicMock())
     with pytest.raises(NotImplementedError):
         integration.process_data()
 
 
 @patch('integration.socket.socket')
-def test_WazuhGCloudIntegration_send_message(mock_socket):
-    """Test if messages are sent to Wazuh queue socket."""
-    integration = WazuhGCloudIntegration(logger=MagicMock())
+def test_GuardSarmGCloudIntegration_send_message(mock_socket):
+    """Test if messages are sent to GuardSarm queue socket."""
+    integration = GuardSarmGCloudIntegration(logger=MagicMock())
     with integration.initialize_socket():
         integration.send_msg(test_message)
     mock_socket.return_value.send.assert_called_with(
-        f'{WazuhGCloudIntegration.header}{test_message}'.encode(errors='replace'))
+        f'{GuardSarmGCloudIntegration.header}{test_message}'.encode(errors='replace'))
 
 
-def test_WazuhGCloudIntegration_send_message_ko():
+def test_GuardSarmGCloudIntegration_send_message_ko():
     """Test send_message when the socket hasn't been initialized."""
-    integration = WazuhGCloudIntegration(logger=MagicMock())
+    integration = GuardSarmGCloudIntegration(logger=MagicMock())
     integration.socket = MagicMock()
     integration.socket.send.side_effect = OSError
-    with pytest.raises(exceptions.WazuhIntegrationInternalError) as e:
+    with pytest.raises(exceptions.GuardSarmIntegrationInternalError) as e:
         integration.send_msg(test_message)
     assert e.value.errcode == 3
 
 
-def test_WazuhGCloudIntegration_check_permissions_raises_not_implemented():
+def test_GuardSarmGCloudIntegration_check_permissions_raises_not_implemented():
     """Test check_permissions raises NotImplementedError for the base class."""
-    integration = WazuhGCloudIntegration(logger=MagicMock())
+    integration = GuardSarmGCloudIntegration(logger=MagicMock())
     with pytest.raises(NotImplementedError):
         integration.check_permissions()
 
 
 @patch('integration.logging.warning')
 @patch('integration.socket.socket')
-def test_WazuhGCloudIntegration_send_message_logs_warning_when_oversized(mock_socket, mock_warning):
+def test_GuardSarmGCloudIntegration_send_message_logs_warning_when_oversized(mock_socket, mock_warning):
     """Test send_msg logs a warning when the encoded event exceeds MAX_EVENT_SIZE."""
     from integration import MAX_EVENT_SIZE
-    integration = WazuhGCloudIntegration(logger=MagicMock())
+    integration = GuardSarmGCloudIntegration(logger=MagicMock())
     with integration.initialize_socket():
         integration.send_msg('x' * (MAX_EVENT_SIZE + 1))
     mock_warning.assert_called_once()

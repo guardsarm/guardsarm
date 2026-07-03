@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-engine-metrics: Real-time metrics dashboard and CLI for Wazuh Engine.
+engine-metrics: Real-time metrics dashboard and CLI for GuardSarm Engine.
 
 Subcommands:
     dashboard   Start the real-time web dashboard
@@ -28,7 +28,7 @@ def parse_args():
     meta = metadata('engine-metrics')
     parser = argparse.ArgumentParser(
         prog='engine-metrics',
-        description='Metrics dashboard and CLI tools for Wazuh Engine'
+        description='Metrics dashboard and CLI tools for GuardSarm Engine'
     )
     parser.add_argument(
         '-v', '--version',

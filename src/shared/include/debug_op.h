@@ -32,8 +32,8 @@
 #define LOGFILE   "logs/ossec.log"
 #define LOGJSONFILE "logs/ossec.json"
 #else
-#define LOGFILE   "logs/wazuh-manager.log"
-#define LOGJSONFILE "logs/wazuh-manager.json"
+#define LOGFILE   "logs/guardsarm-manager.log"
+#define LOGJSONFILE "logs/guardsarm-manager.json"
 #endif
 #else
 #define LOGFILE "ossec.log"

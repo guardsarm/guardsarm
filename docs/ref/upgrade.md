@@ -1,8 +1,8 @@
 # Upgrade
 
-This guide provides instructions for upgrading Wazuh server and agent components from a previous version. The upgrade process preserves the documented configuration and runtime paths while replacing package-managed files with the new version. The service is automatically restarted during the upgrade.
+This guide provides instructions for upgrading GuardSarm server and agent components from a previous version. The upgrade process preserves the documented configuration and runtime paths while replacing package-managed files with the new version. The service is automatically restarted during the upgrade.
 
-**Important**: Upgrading the Wazuh **manager** from version 4.x to 5.x is **not supported**. For manager major version upgrades, a fresh installation is required. However, Wazuh **agents** support upgrades from 4.x to 5.x and can connect to a 5.x manager.
+**Important**: Upgrading the GuardSarm **manager** from version 4.x to 5.x is **not supported**. For manager major version upgrades, a fresh installation is required. However, GuardSarm **agents** support upgrades from 4.x to 5.x and can connect to a 5.x manager.
 
 ---
 
@@ -26,36 +26,36 @@ Create a backup before upgrading:
 
 ```bash
 # Create backup directory
-BACKUP_DIR="/backup/wazuh-manager-$(date +%Y%m%d-%H%M%S)"
+BACKUP_DIR="/backup/guardsarm-manager-$(date +%Y%m%d-%H%M%S)"
 sudo mkdir -p $BACKUP_DIR/db
 
 # Backup configuration and database
-sudo tar -czf $BACKUP_DIR/wazuh-etc.tar.gz -C /var/wazuh-manager etc/
-sudo sqlite3 /var/wazuh-manager/var/db/global.db ".backup '$BACKUP_DIR/db/global.db'"
+sudo tar -czf $BACKUP_DIR/guardsarm-etc.tar.gz -C /var/guardsarm-manager etc/
+sudo sqlite3 /var/guardsarm-manager/var/db/global.db ".backup '$BACKUP_DIR/db/global.db'"
 
 # Verify backup integrity
-tar -tzf $BACKUP_DIR/wazuh-etc.tar.gz > /dev/null && echo "Backup successful"
+tar -tzf $BACKUP_DIR/guardsarm-etc.tar.gz > /dev/null && echo "Backup successful"
 sudo sqlite3 $BACKUP_DIR/db/global.db "PRAGMA integrity_check"
 ```
 
 ### Download package
 
-Download the Wazuh manager package for your platform and version. See the [Package Download](getting-started/packages.md#package-download) section for available repositories and download instructions.
+Download the GuardSarm manager package for your platform and version. See the [Package Download](getting-started/packages.md#package-download) section for available repositories and download instructions.
 
 ### Upgrade
 
-Install the downloaded Wazuh manager package for your platform:
+Install the downloaded GuardSarm manager package for your platform:
 
 **Debian-based platforms:**
 
 ```bash
-sudo dpkg -i wazuh-manager_*.deb
+sudo dpkg -i guardsarm-manager_*.deb
 ```
 
 **Red Hat-based platforms:**
 
 ```bash
-sudo rpm -Uvh wazuh-manager-*.rpm
+sudo rpm -Uvh guardsarm-manager-*.rpm
 ```
 
 The package manager will automatically:
@@ -79,15 +79,15 @@ This applies to `.deb`, `.rpm`, and source-based upgrades.
 
 File contents, permissions, and ownership are preserved for the paths listed above. The upgrade does not normalize or reset any permissions or ownership set by the administrator.
 
-**Seeing new defaults.** Because `etc/` is fully preserved, new default values shipped by the package are not automatically applied to existing files. On DEB manager upgrades a `wazuh-manager.conf.new` side-file is written alongside the live config so you can compare changes manually. On RPM no equivalent side-file is generated for the preserved paths; compare against the package defaults manually if needed.
+**Seeing new defaults.** Because `etc/` is fully preserved, new default values shipped by the package are not automatically applied to existing files. On DEB manager upgrades a `guardsarm-manager.conf.new` side-file is written alongside the live config so you can compare changes manually. On RPM no equivalent side-file is generated for the preserved paths; compare against the package defaults manually if needed.
 
 **If the upgrade fails.** Source-based upgrades attempt to restore preserved files automatically when the upgrade fails or is interrupted after the preserve step. If automatic restore fails, or if a package-based upgrade fails before restoration completes, the preserve directory is left in place for manual recovery:
 
 | Stack | Preserve directory |
 |---|---|
-| DEB | `/var/wazuh-manager/packages_files/manager_upgrade_preserve` |
-| RPM | `/var/wazuh-manager/tmp/manager_upgrade_preserve` |
-| Source | `${TMPDIR:-/tmp}/wazuh-manager-upgrade-preserve.*` |
+| DEB | `/var/guardsarm-manager/packages_files/manager_upgrade_preserve` |
+| RPM | `/var/guardsarm-manager/tmp/manager_upgrade_preserve` |
+| Source | `${TMPDIR:-/tmp}/guardsarm-manager-upgrade-preserve.*` |
 
 Once you have recovered the data, remove the preserve directory before retrying. DEB and RPM upgrades abort if they find an existing preserve backup. Source upgrades create a new temporary preserve directory for each attempt, so an older source preserve directory does not block a retry, but it should still be removed after manual recovery.
 
@@ -97,13 +97,13 @@ Verify the server is running:
 
 ```bash
 # Check service status
-sudo systemctl status wazuh-manager
+sudo systemctl status guardsarm-manager
 
 # Check logs for errors
-sudo tail -50 /var/wazuh-manager/logs/wazuh-manager.log
+sudo tail -50 /var/guardsarm-manager/logs/guardsarm-manager.log
 
 # Check database integrity
-sudo sqlite3 /var/wazuh-manager/var/db/global.db "PRAGMA integrity_check"
+sudo sqlite3 /var/guardsarm-manager/var/db/global.db "PRAGMA integrity_check"
 ```
 
 ### Cluster upgrade
@@ -120,28 +120,28 @@ This approach minimizes service disruption as agents can connect to other worker
 **On the master node:**
 
 ```bash
-BACKUP_DIR="/backup/wazuh-master-$(date +%Y%m%d-%H%M%S)"
+BACKUP_DIR="/backup/guardsarm-master-$(date +%Y%m%d-%H%M%S)"
 sudo mkdir -p $BACKUP_DIR/db
 
 # Full backup of master
-sudo tar -czf $BACKUP_DIR/wazuh-master-etc.tar.gz -C /var/wazuh-manager etc/
-sudo sqlite3 /var/wazuh-manager/var/db/global.db ".backup '$BACKUP_DIR/db/global.db'"
+sudo tar -czf $BACKUP_DIR/guardsarm-master-etc.tar.gz -C /var/guardsarm-manager etc/
+sudo sqlite3 /var/guardsarm-manager/var/db/global.db ".backup '$BACKUP_DIR/db/global.db'"
 
 # Verify backup
-tar -tzf $BACKUP_DIR/wazuh-master-etc.tar.gz > /dev/null && echo "Master backup successful"
+tar -tzf $BACKUP_DIR/guardsarm-master-etc.tar.gz > /dev/null && echo "Master backup successful"
 ```
 
 **On each worker node:**
 
 ```bash
-BACKUP_DIR="/backup/wazuh-worker-$(hostname)-$(date +%Y%m%d-%H%M%S)"
+BACKUP_DIR="/backup/guardsarm-worker-$(hostname)-$(date +%Y%m%d-%H%M%S)"
 sudo mkdir -p $BACKUP_DIR
 
 # Configuration backup only
-sudo tar -czf $BACKUP_DIR/wazuh-worker-config.tar.gz -C /var/wazuh-manager/etc wazuh-manager.conf local_internal_options.conf
+sudo tar -czf $BACKUP_DIR/guardsarm-worker-config.tar.gz -C /var/guardsarm-manager/etc guardsarm-manager.conf local_internal_options.conf
 
 # Verify backup
-tar -tzf $BACKUP_DIR/wazuh-worker-config.tar.gz > /dev/null && echo "Worker backup successful"
+tar -tzf $BACKUP_DIR/guardsarm-worker-config.tar.gz > /dev/null && echo "Worker backup successful"
 ```
 
 #### Upgrade worker nodes
@@ -153,7 +153,7 @@ Upgrade worker nodes one at a time to maintain service availability.
 1. Check cluster status before upgrading:
 
 ```bash
-sudo /var/wazuh-manager/bin/cluster_control -l
+sudo /var/guardsarm-manager/bin/cluster_control -l
 ```
 
 2. Download the package (see [Package Download](getting-started/packages.md#package-download) section).
@@ -163,36 +163,36 @@ sudo /var/wazuh-manager/bin/cluster_control -l
 **Debian-based platforms:**
 
 ```bash
-sudo dpkg -i wazuh-manager_*.deb
+sudo dpkg -i guardsarm-manager_*.deb
 ```
 
 **Red Hat-based platforms:**
 
 ```bash
-sudo rpm -Uvh wazuh-manager-*.rpm
+sudo rpm -Uvh guardsarm-manager-*.rpm
 ```
 
 4. Verify the upgrade:
 
 ```bash
 # Check service status
-sudo systemctl status wazuh-manager
+sudo systemctl status guardsarm-manager
 
 # Check cluster connectivity
-sudo /var/wazuh-manager/bin/cluster_control -l
+sudo /var/guardsarm-manager/bin/cluster_control -l
 
 # Monitor cluster synchronization
-sudo tail -f /var/wazuh-manager/logs/cluster.log
+sudo tail -f /var/guardsarm-manager/logs/cluster.log
 ```
 
 5. Wait for synchronization before upgrading the next worker:
 
 ```bash
 # Monitor synchronization status
-sudo /var/wazuh-manager/bin/cluster_control -i
+sudo /var/guardsarm-manager/bin/cluster_control -i
 
 # Check cluster logs
-sudo tail -50 /var/wazuh-manager/logs/cluster.log | grep -i sync
+sudo tail -50 /var/guardsarm-manager/logs/cluster.log | grep -i sync
 ```
 
 **Repeat for each remaining worker node**, ensuring each worker is fully synchronized before upgrading the next one.
@@ -207,10 +207,10 @@ Upgrade the master node last to ensure worker nodes can continue operating durin
 
 ```bash
 # Check cluster status
-sudo /var/wazuh-manager/bin/cluster_control -l
+sudo /var/guardsarm-manager/bin/cluster_control -l
 
 # Verify all workers are connected
-sudo /var/wazuh-manager/bin/cluster_control -i
+sudo /var/guardsarm-manager/bin/cluster_control -i
 ```
 
 2. Download the package (see [Package Download](getting-started/packages.md#package-download) section).
@@ -220,40 +220,40 @@ sudo /var/wazuh-manager/bin/cluster_control -i
 **Debian-based platforms:**
 
 ```bash
-sudo dpkg -i wazuh-manager_*.deb
+sudo dpkg -i guardsarm-manager_*.deb
 ```
 
 **Red Hat-based platforms:**
 
 ```bash
-sudo rpm -Uvh wazuh-manager-*.rpm
+sudo rpm -Uvh guardsarm-manager-*.rpm
 ```
 
 4. Verify the upgrade:
 
 ```bash
 # Check service status
-sudo systemctl status wazuh-manager
+sudo systemctl status guardsarm-manager
 
 # Check cluster status
-sudo /var/wazuh-manager/bin/cluster_control -l
+sudo /var/guardsarm-manager/bin/cluster_control -l
 
 # Verify cluster health
-sudo /var/wazuh-manager/bin/cluster_control -i
+sudo /var/guardsarm-manager/bin/cluster_control -i
 
 # Check logs
-sudo tail -50 /var/wazuh-manager/logs/wazuh-manager.log
-sudo tail -50 /var/wazuh-manager/logs/cluster.log
+sudo tail -50 /var/guardsarm-manager/logs/guardsarm-manager.log
+sudo tail -50 /var/guardsarm-manager/logs/cluster.log
 ```
 
 5. Verify cluster synchronization:
 
 ```bash
 # Check that all workers are synchronized with the master
-sudo /var/wazuh-manager/bin/cluster_control -l
+sudo /var/guardsarm-manager/bin/cluster_control -l
 
 # Monitor cluster logs on master
-sudo tail -f /var/wazuh-manager/logs/cluster.log
+sudo tail -f /var/guardsarm-manager/logs/cluster.log
 ```
 
 #### Verify cluster upgrade
@@ -264,27 +264,27 @@ After upgrading all nodes, perform comprehensive verification:
 
 ```bash
 # Check cluster status
-sudo /var/wazuh-manager/bin/cluster_control -l
+sudo /var/guardsarm-manager/bin/cluster_control -l
 
 # Check cluster health
-sudo /var/wazuh-manager/bin/cluster_control -i
+sudo /var/guardsarm-manager/bin/cluster_control -i
 
 # Check database integrity
-sudo sqlite3 /var/wazuh-manager/var/db/global.db "PRAGMA integrity_check"
+sudo sqlite3 /var/guardsarm-manager/var/db/global.db "PRAGMA integrity_check"
 
 # Monitor logs for errors
-sudo tail -100 /var/wazuh-manager/logs/wazuh-manager.log | grep -i error
-sudo tail -100 /var/wazuh-manager/logs/cluster.log | grep -i error
+sudo tail -100 /var/guardsarm-manager/logs/guardsarm-manager.log | grep -i error
+sudo tail -100 /var/guardsarm-manager/logs/cluster.log | grep -i error
 ```
 
 **On each worker node:**
 
 ```bash
 # Check cluster connectivity
-sudo /var/wazuh-manager/bin/cluster_control -l
+sudo /var/guardsarm-manager/bin/cluster_control -l
 
 # Monitor logs
-sudo tail -50 /var/wazuh-manager/logs/cluster.log
+sudo tail -50 /var/guardsarm-manager/logs/cluster.log
 ```
 
 ---
@@ -302,7 +302,7 @@ Before upgrading agents:
 3. Test on non-production agents first
 4. Verify manager compatibility with the new agent version
 
-**Note:** Wazuh agents version 4.x and later support upgrades to version 5.x.
+**Note:** GuardSarm agents version 4.x and later support upgrades to version 5.x.
 
 ### File preservation
 
@@ -324,11 +324,11 @@ Preserve directory locations for recovery:
 |---|---|
 | DEB | `/var/ossec/packages_files/agent_upgrade_preserve` |
 | RPM | `/var/ossec/tmp/agent_upgrade_preserve` |
-| Source | `${TMPDIR:-/tmp}/wazuh-agent-upgrade-preserve.*` |
+| Source | `${TMPDIR:-/tmp}/guardsarm-agent-upgrade-preserve.*` |
 
 ### Download package
 
-Download the Wazuh agent package for your platform and version. See the [Package Download](getting-started/packages.md#package-download) section for available repositories and download instructions.
+Download the GuardSarm agent package for your platform and version. See the [Package Download](getting-started/packages.md#package-download) section for available repositories and download instructions.
 
 ### Linux
 
@@ -337,13 +337,13 @@ Download the Wazuh agent package for your platform and version. See the [Package
 Upgrade the package:
 
 ```bash
-sudo dpkg -i wazuh-agent_*.deb
+sudo dpkg -i guardsarm-agent_*.deb
 ```
 
 Verify the agent is running:
 
 ```bash
-sudo systemctl status wazuh-agent
+sudo systemctl status guardsarm-agent
 ```
 
 #### Red Hat-based platforms
@@ -351,13 +351,13 @@ sudo systemctl status wazuh-agent
 Upgrade the package:
 
 ```bash
-sudo rpm -Uvh wazuh-agent-*.rpm
+sudo rpm -Uvh guardsarm-agent-*.rpm
 ```
 
 Verify the agent is running:
 
 ```bash
-sudo systemctl status wazuh-agent
+sudo systemctl status guardsarm-agent
 ```
 
 #### SUSE-based platforms
@@ -365,13 +365,13 @@ sudo systemctl status wazuh-agent
 Upgrade the package:
 
 ```bash
-sudo rpm -Uvh wazuh-agent-*.rpm
+sudo rpm -Uvh guardsarm-agent-*.rpm
 ```
 
 Verify the agent is running:
 
 ```bash
-sudo systemctl status wazuh-agent
+sudo systemctl status guardsarm-agent
 ```
 
 ### macOS
@@ -379,13 +379,13 @@ sudo systemctl status wazuh-agent
 Upgrade the package:
 
 ```bash
-sudo installer -pkg wazuh-agent-*.pkg -target /
+sudo installer -pkg guardsarm-agent-*.pkg -target /
 ```
 
 Verify the agent is running:
 
 ```bash
-sudo /Library/Ossec/bin/wazuh-control status
+sudo /Library/Ossec/bin/guardsarm-control status
 ```
 
 ### Windows
@@ -393,13 +393,13 @@ sudo /Library/Ossec/bin/wazuh-control status
 Upgrade the package:
 
 ```powershell
-wazuh-agent-*.msi /q
+guardsarm-agent-*.msi /q
 ```
 
 Verify the agent is running:
 
 ```powershell
-Get-Service -Name wazuh
+Get-Service -Name guardsarm
 ```
 
 ---
@@ -413,7 +413,7 @@ If the upgrade fails or causes issues, you can roll back to the previous version
 **Step 1: Stop the service**
 
 ```bash
-sudo systemctl stop wazuh-manager
+sudo systemctl stop guardsarm-manager
 ```
 
 **Step 2: Remove the new package**
@@ -421,27 +421,27 @@ sudo systemctl stop wazuh-manager
 **Debian-based platforms:**
 
 ```bash
-sudo dpkg -r wazuh-manager
+sudo dpkg -r guardsarm-manager
 ```
 
 **Red Hat-based platforms:**
 
 ```bash
-sudo rpm -e wazuh-manager
+sudo rpm -e guardsarm-manager
 ```
 
 **Step 3: Restore from backup**
 
 ```bash
 # Restore configuration
-sudo tar -xzf $BACKUP_DIR/wazuh-etc.tar.gz -C /var/wazuh-manager
+sudo tar -xzf $BACKUP_DIR/guardsarm-etc.tar.gz -C /var/guardsarm-manager
 
 # Restore database
-sudo cp $BACKUP_DIR/db/global.db /var/wazuh-manager/var/db/global.db
+sudo cp $BACKUP_DIR/db/global.db /var/guardsarm-manager/var/db/global.db
 
 # Set permissions
-sudo chown -R wazuh-manager:wazuh-manager /var/wazuh-manager/etc
-sudo chown -R wazuh-manager:wazuh-manager /var/wazuh-manager/var/db
+sudo chown -R guardsarm-manager:guardsarm-manager /var/guardsarm-manager/etc
+sudo chown -R guardsarm-manager:guardsarm-manager /var/guardsarm-manager/var/db
 ```
 
 **Step 4: Reinstall the previous version**
@@ -451,8 +451,8 @@ Install the previous version package.
 **Step 5: Verify the rollback**
 
 ```bash
-sudo systemctl start wazuh-manager
-sudo systemctl status wazuh-manager
+sudo systemctl start guardsarm-manager
+sudo systemctl status guardsarm-manager
 ```
 
 ### Cluster rollback
@@ -466,51 +466,51 @@ If the cluster upgrade fails, roll back nodes in reverse order:
 
 ```bash
 # Stop the service
-sudo systemctl stop wazuh-manager
+sudo systemctl stop guardsarm-manager
 
 # Remove the new package (Debian)
-sudo dpkg -r wazuh-manager
+sudo dpkg -r guardsarm-manager
 # Or remove the new package (Red Hat)
-sudo rpm -e wazuh-manager
+sudo rpm -e guardsarm-manager
 
 # Restore configuration
-sudo tar -xzf $BACKUP_DIR/wazuh-worker-config.tar.gz -C /var/wazuh-manager/etc
+sudo tar -xzf $BACKUP_DIR/guardsarm-worker-config.tar.gz -C /var/guardsarm-manager/etc
 
 # Reinstall previous version package
 
 # Start the service
-sudo systemctl start wazuh-manager
+sudo systemctl start guardsarm-manager
 
 # Verify cluster connectivity
-sudo /var/wazuh-manager/bin/cluster_control -l
+sudo /var/guardsarm-manager/bin/cluster_control -l
 ```
 
 **Rollback the master node:**
 
 ```bash
 # Stop the service
-sudo systemctl stop wazuh-manager
+sudo systemctl stop guardsarm-manager
 
 # Remove the new package (Debian)
-sudo dpkg -r wazuh-manager
+sudo dpkg -r guardsarm-manager
 # Or remove the new package (Red Hat)
-sudo rpm -e wazuh-manager
+sudo rpm -e guardsarm-manager
 
 # Restore configuration and database
-sudo tar -xzf $BACKUP_DIR/wazuh-master-etc.tar.gz -C /var/wazuh-manager
-sudo cp $BACKUP_DIR/db/global.db /var/wazuh-manager/var/db/global.db
+sudo tar -xzf $BACKUP_DIR/guardsarm-master-etc.tar.gz -C /var/guardsarm-manager
+sudo cp $BACKUP_DIR/db/global.db /var/guardsarm-manager/var/db/global.db
 
 # Set permissions
-sudo chown -R wazuh-manager:wazuh-manager /var/wazuh-manager/etc
-sudo chown -R wazuh-manager:wazuh-manager /var/wazuh-manager/var/db
+sudo chown -R guardsarm-manager:guardsarm-manager /var/guardsarm-manager/etc
+sudo chown -R guardsarm-manager:guardsarm-manager /var/guardsarm-manager/var/db
 
 # Reinstall previous version package
 
 # Start the service
-sudo systemctl start wazuh-manager
+sudo systemctl start guardsarm-manager
 
 # Verify cluster status
-sudo /var/wazuh-manager/bin/cluster_control -l
+sudo /var/guardsarm-manager/bin/cluster_control -l
 ```
 
 ---
@@ -523,65 +523,65 @@ sudo /var/wazuh-manager/bin/cluster_control -l
 
 ```bash
 # Check logs for specific errors
-sudo tail -100 /var/wazuh-manager/logs/wazuh-manager.log
+sudo tail -100 /var/guardsarm-manager/logs/guardsarm-manager.log
 
 # Verify permissions
-sudo chown -R wazuh-manager:wazuh-manager /var/wazuh-manager
+sudo chown -R guardsarm-manager:guardsarm-manager /var/guardsarm-manager
 
 # Check database integrity
-sudo sqlite3 /var/wazuh-manager/var/db/global.db "PRAGMA integrity_check"
+sudo sqlite3 /var/guardsarm-manager/var/db/global.db "PRAGMA integrity_check"
 ```
 
 **Issue: Agents not reconnecting after manager upgrade**
 
 ```bash
 # Verify manager is listening on agent ports
-sudo netstat -tulpn | grep wazuh-manager
+sudo netstat -tulpn | grep guardsarm-manager
 
 # Check remoted process
-ps aux | grep wazuh-manager-remoted
+ps aux | grep guardsarm-manager-remoted
 
 # Review remoted logs
-sudo tail -f /var/wazuh-manager/logs/wazuh-manager.log | grep remoted
+sudo tail -f /var/guardsarm-manager/logs/guardsarm-manager.log | grep remoted
 
 # Verify client.keys integrity
-sudo ls -l /var/wazuh-manager/etc/client.keys
+sudo ls -l /var/guardsarm-manager/etc/client.keys
 ```
 
 **Issue: Cluster node not synchronizing after upgrade**
 
 ```bash
 # Check cluster configuration
-sudo grep -A10 "<cluster>" /var/wazuh-manager/etc/wazuh-manager.conf
+sudo grep -A10 "<cluster>" /var/guardsarm-manager/etc/guardsarm-manager.conf
 
 # Verify network connectivity
 ping <master_node_ip>
 telnet <master_node_ip> 1516
 
 # Check cluster daemon
-ps aux | grep wazuh-manager-clusterd
+ps aux | grep guardsarm-manager-clusterd
 
 # Review cluster logs
-sudo tail -100 /var/wazuh-manager/logs/cluster.log
+sudo tail -100 /var/guardsarm-manager/logs/cluster.log
 
 # Restart cluster service
-sudo systemctl restart wazuh-manager
+sudo systemctl restart guardsarm-manager
 ```
 
 **Issue: Database migration errors**
 
 ```bash
 # Check database file permissions
-sudo ls -l /var/wazuh-manager/var/db/
+sudo ls -l /var/guardsarm-manager/var/db/
 
-# Review wazuh-manager.log for migration messages
-sudo grep -i "database\|migration" /var/wazuh-manager/logs/wazuh-manager.log
+# Review guardsarm-manager.log for migration messages
+sudo grep -i "database\|migration" /var/guardsarm-manager/logs/guardsarm-manager.log
 
 # If migration fails, restore from backup
-sudo systemctl stop wazuh-manager
-sudo cp $BACKUP_DIR/db/global.db /var/wazuh-manager/var/db/global.db
-sudo chown wazuh-manager:wazuh-manager /var/wazuh-manager/var/db/global.db
-sudo systemctl start wazuh-manager
+sudo systemctl stop guardsarm-manager
+sudo cp $BACKUP_DIR/db/global.db /var/guardsarm-manager/var/db/global.db
+sudo chown guardsarm-manager:guardsarm-manager /var/guardsarm-manager/var/db/global.db
+sudo systemctl start guardsarm-manager
 ```
 
 ### Upgrade aborted: existing preserve directory
@@ -594,9 +594,9 @@ If a previous package-based upgrade was interrupted, a preserve directory may st
 
 ```bash
 # Example for manager DEB
-ls /var/wazuh-manager/packages_files/manager_upgrade_preserve/
+ls /var/guardsarm-manager/packages_files/manager_upgrade_preserve/
 # Recover if needed, then:
-sudo rm -rf /var/wazuh-manager/packages_files/manager_upgrade_preserve
+sudo rm -rf /var/guardsarm-manager/packages_files/manager_upgrade_preserve
 ```
 
 ### Agent issues
@@ -611,7 +611,7 @@ sudo tail -50 /var/ossec/logs/ossec.log
 sudo ls -l /var/ossec/etc/client.keys
 
 # Check permissions
-sudo chown -R root:wazuh /var/ossec/etc
+sudo chown -R root:guardsarm /var/ossec/etc
 ```
 
 **Issue: Agent not connecting after upgrade**
@@ -628,23 +628,23 @@ telnet <manager_ip> 1514
 # Compare key on agent with manager's client.keys entry
 
 # Restart agent
-sudo systemctl restart wazuh-agent
+sudo systemctl restart guardsarm-agent
 ```
 
 **Issue: Windows agent upgrade fails**
 
 ```powershell
 # Check Windows event logs
-Get-EventLog -LogName Application -Source "Wazuh" -Newest 50
+Get-EventLog -LogName Application -Source "GuardSarm" -Newest 50
 
 # Verify service status
-Get-Service -Name wazuh
+Get-Service -Name guardsarm
 
 # Check installation logs
-Get-Content "C:\Windows\Temp\wazuh-agent-install.log"
+Get-Content "C:\Windows\Temp\guardsarm-agent-install.log"
 
 # Restart service
-Restart-Service -Name wazuh
+Restart-Service -Name guardsarm
 ```
 
 ---

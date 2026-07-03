@@ -1,5 +1,5 @@
 /*
- * Wazuh - Indexer connector implementation.
+ * GuardSarm - Indexer connector implementation.
  * Copyright (C) 2015, Wazuh Inc.
  * July 2, 2025.
  *
@@ -206,13 +206,13 @@ public:
         static auto password = Keystore::get(INDEXER_COLUMN, PASSWORD_KEY);
         if (username.empty() && password.empty())
         {
-            username = "wazuh-server";
-            password = "wazuh-server";
+            username = "guardsarm-server";
+            password = "guardsarm-server";
             logWarn(m_logTag.c_str(), "No username and password found in the keystore, using default values.");
         }
         if (username.empty())
         {
-            username = "wazuh-server";
+            username = "guardsarm-server";
             logWarn(m_logTag.c_str(), "No username found in the keystore, using default value.");
         }
         m_secureCommunication = SecureCommunication::builder();
@@ -448,21 +448,21 @@ public:
                             {
                                 // If the bulk size is too small, log an error and throw an exception.
                                 // This error will be fixed by the user by increasing the http.max_content_length
-                                // value in the wazuh-indexer settings.
+                                // value in the guardsarm-indexer settings.
                                 if (m_error413Logged == false)
                                 {
                                     m_error413Logged = true;
                                     logError(m_logTag.c_str(),
                                              "The amount of elements to process is too small, review the "
                                              "'http.max_content_length' value in "
-                                             "the wazuh-indexer settings. Current data size: %llu.",
+                                             "the guardsarm-indexer settings. Current data size: %llu.",
                                              bulkData.size());
                                 }
 
                                 throw IndexerConnectorException(
                                     "The amount of elements to process is too small, review the "
                                     "'http.max_content_length' value in "
-                                    "the wazuh-indexer settings.");
+                                    "the guardsarm-indexer settings.");
                             }
                             else
                             {

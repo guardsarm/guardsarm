@@ -2,7 +2,7 @@
 
 ## Overview
 
-`fastqueue` provides thread-safe, bounded queue implementations for high-throughput inter-thread communication in the Wazuh Engine. It offers two implementations behind a common `IQueue<T>` interface:
+`fastqueue` provides thread-safe, bounded queue implementations for high-throughput inter-thread communication in the GuardSarm Engine. It offers two implementations behind a common `IQueue<T>` interface:
 
 - **`CQueue`** — Lock-free queue backed by `moodycamel::BlockingConcurrentQueue` with optimized block/index traits. Best for high-contention scenarios.
 - **`StdQueue`** — Mutex-based queue backed by `std::queue` with condition variable. Simpler, with exact (not approximate) size reporting.

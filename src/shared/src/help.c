@@ -15,15 +15,17 @@
 
 void print_header()
 {
+    /* User-visible banner: uses the GuardSarm display branding (PRODUCT_*),
+     * NOT the frozen __guardsarm_* wire/DB literals. */
     print_out(" ");
-    print_out("%s %s - %s (%s)", __wazuh_name, __wazuh_version, __author, __contact);
-    print_out("%s", __site);
+    print_out("%s %s - %s (%s)", PRODUCT_NAME, PRODUCT_VERSION, PRODUCT_AUTHOR, PRODUCT_CONTACT);
+    print_out("%s", PRODUCT_SITE);
 }
 
 void print_version()
 {
     print_out(" ");
-    print_out("%s %s - %s", __wazuh_name, __wazuh_version, __author);
+    print_out("%s %s - %s", PRODUCT_NAME, PRODUCT_VERSION, PRODUCT_AUTHOR);
     print_out(" ");
     print_out("%s", __license);
     exit(0);

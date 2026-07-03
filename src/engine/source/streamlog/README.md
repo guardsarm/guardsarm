@@ -53,7 +53,7 @@ The **streamlog** module provides high-performance, named, rotating log channels
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                           Application Threads                          │
 │                                                                        │
-│   auto w = logManager->ensureAndGetWriter("standard-wazuh-events-v5", cfg, "json"); │
+│   auto w = logManager->ensureAndGetWriter("standard-guardsarm-events-v5", cfg, "json"); │
 │   (*w)( R"({"ts":"...","msg":"hello"})" );   // enqueue (move)        │
 │                                                                        │
 └──────────────────────────┬──────────────────────────────────────────────┘
@@ -238,7 +238,7 @@ This "lazy start / eager stop" model ensures no background threads exist when a 
 Triggered when `currentSize + messageSize >= maxSize`.
 
 1. Increment `counter`.
-2. Generate new path from pattern (e.g. `standard-wazuh-events-v5-3.log`).
+2. Generate new path from pattern (e.g. `standard-guardsarm-events-v5-3.log`).
 3. Create directories if needed.
 4. Close current file, open new file (`updateOutputFileAndLink()`).
 5. Update hard-link to point to the new file.
@@ -249,7 +249,7 @@ Triggered when `currentSize + messageSize >= maxSize`.
 Triggered when the **hour boundary** changes and the resolved pattern produces a **different path**.
 
 1. Reset `counter` to 0.
-2. Generate new path from pattern (e.g. `2026/Mar/standard-wazuh-events-v5-26.json` → `2026/Mar/standard-wazuh-events-v5-27.json`).
+2. Generate new path from pattern (e.g. `2026/Mar/standard-guardsarm-events-v5-26.json` → `2026/Mar/standard-guardsarm-events-v5-27.json`).
 3. Same steps 3–6 as size-based rotation.
 
 ### Rotation check frequency
@@ -319,8 +319,8 @@ Set via `internal_options.conf` or environment variables:
 
 | Key | Env var | Default |
 |-----|---------|---------|
-| `analysisd.streamlog_max_files` | `WAZUH_STREAMLOG_MAX_FILES` | `90` |
-| `analysisd.streamlog_max_accumulated_size` | `WAZUH_STREAMLOG_MAX_ACCUMULATED_SIZE` | `21474836480` (20 GiB) |
+| `analysisd.streamlog_max_files` | `GUARDSARM_STREAMLOG_MAX_FILES` | `90` |
+| `analysisd.streamlog_max_accumulated_size` | `GUARDSARM_STREAMLOG_MAX_ACCUMULATED_SIZE` | `21474836480` (20 GiB) |
 
 Set either to `0` to disable that specific policy.
 
@@ -395,24 +395,24 @@ If compression is disabled, the stored state is cleared on startup.
 | `${MM}` | 2-digit month | `07` |
 | `${DD}` | 2-digit day | `01` |
 | `${HH}` | 2-digit hour (24h) | `14` |
-| `${name}` | Channel name | `standard-wazuh-events-v5` |
+| `${name}` | Channel name | `standard-guardsarm-events-v5` |
 | `${counter}` | Rotation counter | `3` |
 
-**Example:** pattern `${YYYY}/${MMM}/${name}-${DD}` with `ext = "json"` for channel `standard-wazuh-events-v5` on March 26, 2026 → `2026/Mar/standard-wazuh-events-v5-26.json`. The file extension is **not** part of the pattern — it is appended automatically from the `ext` parameter passed to `ChannelHandler::create()`.
+**Example:** pattern `${YYYY}/${MMM}/${name}-${DD}` with `ext = "json"` for channel `standard-guardsarm-events-v5` on March 26, 2026 → `2026/Mar/standard-guardsarm-events-v5-26.json`. The file extension is **not** part of the pattern — it is appended automatically from the `ext` parameter passed to `ChannelHandler::create()`.
 
 ### Example Filesystem Layout
 
-With `basePath = "/var/wazuh-manager/logs"`, `name = "standard-wazuh-events-v5"`, `ext = "json"`, `pattern = "${YYYY}/${MMM}/${name}-${DD}"`, and `LogManager::isolatedBasePath(name, cfg)`, the resulting layout is:
+With `basePath = "/var/guardsarm-manager/logs"`, `name = "standard-guardsarm-events-v5"`, `ext = "json"`, `pattern = "${YYYY}/${MMM}/${name}-${DD}"`, and `LogManager::isolatedBasePath(name, cfg)`, the resulting layout is:
 
 ```text
-/var/wazuh-manager/logs/standard-wazuh-events-v5/
-├── standard-wazuh-events-v5.json
+/var/guardsarm-manager/logs/standard-guardsarm-events-v5/
+├── standard-guardsarm-events-v5.json
 └── 2026/
   └── Mar/
-    └── standard-wazuh-events-v5-26.json
+    └── standard-guardsarm-events-v5-26.json
 ```
 
-The `standard-wazuh-events-v5.json` hard link and all rotated files share the same extension (`ext`); it is never encoded in the pattern itself.
+The `standard-guardsarm-events-v5.json` hard link and all rotated files share the same extension (`ext`); it is never encoded in the pattern itself.
 
 ---
 
@@ -430,7 +430,7 @@ streamlog::LogManager logManager(store, scheduler);
 
 // Register a channel
 streamlog::RotationConfig cfg {
-  "/var/wazuh-manager/logs",
+  "/var/guardsarm-manager/logs",
   "${YYYY}/${MMM}/${name}-${DD}",  // extension ("json") is passed separately, not part of the pattern
     10 * 1024 * 1024,   // 10 MiB max size
     1 << 20,            // buffer
@@ -439,10 +439,10 @@ streamlog::RotationConfig cfg {
     30,                 // keep at most 30 files in the channel directory
     20ULL * 1024 * 1024 * 1024  // max 20 GiB accumulated size in the channel directory
 };
-streamlog::LogManager::isolatedBasePath("standard-wazuh-events-v5", cfg);
+streamlog::LogManager::isolatedBasePath("standard-guardsarm-events-v5", cfg);
 
 // Obtain a writer (auto-registers and starts the worker thread)
-auto writer = logManager.ensureAndGetWriter("standard-wazuh-events-v5", cfg, "json");
+auto writer = logManager.ensureAndGetWriter("standard-guardsarm-events-v5", cfg, "json");
 
 // Write from any thread
 (*writer)(R"({"timestamp":"2025-07-01T12:00:00Z","level":"warning","msg":"disk 90%"})");
@@ -458,7 +458,7 @@ writer.reset();
 
 void processEvent(streamlog::ILogManager& logManager) {
     streamlog::RotationConfig cfg {
-      "/var/wazuh-manager/logs",
+      "/var/guardsarm-manager/logs",
       "${YYYY}/${MMM}/${name}-${DD}",  // extension ("json") is passed separately, not part of the pattern
       0,
       1 << 20,
@@ -467,8 +467,8 @@ void processEvent(streamlog::ILogManager& logManager) {
       30,
       2ULL * 1024 * 1024 * 1024
     };
-    streamlog::LogManager::isolatedBasePath("standard-wazuh-events-v5", cfg);
-    auto writer = logManager.ensureAndGetWriter("standard-wazuh-events-v5", cfg, "json");
+    streamlog::LogManager::isolatedBasePath("standard-guardsarm-events-v5", cfg);
+    auto writer = logManager.ensureAndGetWriter("standard-guardsarm-events-v5", cfg, "json");
     (*writer)(buildJsonString());
 }
 ```
@@ -477,9 +477,9 @@ void processEvent(streamlog::ILogManager& logManager) {
 
 ```cpp
 streamlog::RotationConfig cfg { /* ... */ };
-streamlog::LogManager::isolatedBasePath("standard-wazuh-events-v5", cfg);
-// cfg.basePath is now "<original>/standard-wazuh-events-v5/"
-auto writer = logManager.ensureAndGetWriter("standard-wazuh-events-v5", cfg, "json");
+streamlog::LogManager::isolatedBasePath("standard-guardsarm-events-v5", cfg);
+// cfg.basePath is now "<original>/standard-guardsarm-events-v5/"
+auto writer = logManager.ensureAndGetWriter("standard-guardsarm-events-v5", cfg, "json");
 ```
 
 ---

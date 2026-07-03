@@ -1,16 +1,16 @@
 # Agent Upgrade
 
-The agent upgrade module orchestrates remote agent upgrades from the manager. It distributes WPK (Wazuh Package Kit) files to agents over the existing agent connection, validates checksums, executes the installer, and tracks the result through the task manager.
+The agent upgrade module orchestrates remote agent upgrades from the manager. It distributes WPK (GuardSarm Package Kit) files to agents over the existing agent connection, validates checksums, executes the installer, and tracks the result through the task manager.
 
-Source: `src/wazuh_modules/src/agent_upgrade/`
+Source: `src/guardsarm_modules/src/agent_upgrade/`
 
 For configuration options see [Agent Upgrade Configuration](../../configuration/agent-upgrade.md).
 
 ## What is a WPK file
 
-A WPK is a gzip-compressed tar archive containing the Wazuh agent binaries and an installer script (`pkg_install.sh`) for a specific platform and version. WPK files are identified by a SHA-1 checksum distributed alongside them from the WPK repository.
+A WPK is a gzip-compressed tar archive containing the GuardSarm agent binaries and an installer script (`pkg_install.sh`) for a specific platform and version. WPK files are identified by a SHA-1 checksum distributed alongside them from the WPK repository.
 
-Default repository: `packages.wazuh.com/<major>.x/wpk/` (auto-derived from the manager version). A custom URL can be set with `wpk_repository` in the configuration.
+Default repository: `packages.guardsarm.com/<major>.x/wpk/` (auto-derived from the manager version). A custom URL can be set with `wpk_repository` in the configuration.
 
 ## Upgrade flow
 

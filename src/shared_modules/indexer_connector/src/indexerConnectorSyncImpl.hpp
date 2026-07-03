@@ -1,5 +1,5 @@
 /*
- * Wazuh - Indexer connector implementation.
+ * GuardSarm - Indexer connector implementation.
  * Copyright (C) 2015, Wazuh Inc.
  * July 2, 2025.
  *
@@ -61,14 +61,14 @@ constexpr auto DELETE_FORMATTED_LENGTH {DELETE_OPERATION_PREFIX + DELETE_ID_FIEL
 
 /**
  * @brief Validates that an index name is safe to embed in a URL path component or
- *        in a JSON string sent to wazuh-indexer.
+ *        in a JSON string sent to guardsarm-indexer.
  *
  * Rejects empty strings and any character outside the conservative allowlist
  * `[a-zA-Z0-9._*-]`. Blocks `/`, `?`, `#`, `,`, whitespace and quote characters,
  * which would otherwise enable path traversal, query-string injection in URLs,
- * or JSON-body escape attacks. `*` is allowed because wazuh-indexer interprets it
+ * or JSON-body escape attacks. `*` is allowed because guardsarm-indexer interprets it
  * as a wildcard and the connector has legitimate callers that use patterns such
- * as `wazuh-states-*`.
+ * as `guardsarm-states-*`.
  *
  * @param idx Candidate index name.
  * @return true if the name is non-empty and contains only safe characters.
@@ -460,7 +460,7 @@ class IndexerConnectorSyncImpl final
         {
             throw IndexerConnectorException(
                 "Cannot split bulk data with less than two operations. Consider increasing http.max_content_length in "
-                "Wazuh-Indexer settings.");
+                "GuardSarm-Indexer settings.");
         }
         logDebug2(m_logTag.c_str(), "Splitting %zu operations into two halves", totalOperations);
 
@@ -665,13 +665,13 @@ public:
         static auto password = Keystore::get(INDEXER_COLUMN, PASSWORD_KEY);
         if (username.empty() && password.empty())
         {
-            username = "wazuh-server";
-            password = "wazuh-server";
+            username = "guardsarm-server";
+            password = "guardsarm-server";
             logWarn(m_logTag.c_str(), "No username and password found in the keystore, using default values.");
         }
         if (username.empty())
         {
-            username = "wazuh-server";
+            username = "guardsarm-server";
             logWarn(m_logTag.c_str(), "No username found in the keystore, using default value.");
         }
         m_secureCommunication = SecureCommunication::builder();
@@ -745,7 +745,7 @@ public:
             throw IndexerConnectorException("Unsafe index name");
         }
         auto [it, success] = m_deleteByQuery.try_emplace(index, nlohmann::json::object());
-        it->second["query"]["bool"]["filter"]["terms"]["wazuh.agent.id"].push_back(agentId);
+        it->second["query"]["bool"]["filter"]["terms"]["guardsarm.agent.id"].push_back(agentId);
     }
 
     void executeUpdateByQuery(const std::vector<std::string>& indices, const nlohmann::json& updateQuery)

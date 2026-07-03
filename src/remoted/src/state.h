@@ -13,7 +13,7 @@
 
 #define REM_MAX_NUM_AGENTS_STATS 150
 
-#include "wazuhdb_queries_op.h"
+#include "guardsarmdb_queries_op.h"
 #include <stdint.h>
 
 /* Status structures */

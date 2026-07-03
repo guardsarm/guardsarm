@@ -18,7 +18,7 @@
 #include "syscheck_op.h"
 #include "file.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 #ifdef WIN32
 #include "../../unit_tests/wrappers/windows/fileapi_wrappers.h"
 #include "../../unit_tests/wrappers/windows/handleapi_wrappers.h"
@@ -221,7 +221,7 @@ void realtime_process() {
         if (event->wd == -1 && event->mask == IN_Q_OVERFLOW) {
             mwarn("Real-time inotify kernel queue is full. Some events may be lost. Next scheduled scan will recover lost data.");
             fim_realtime_set_queue_overflow(true);
-            send_log_msg("wazuh: Real-time inotify kernel queue is full. Some events may be lost. Next scheduled scan will recover lost data.");
+            send_log_msg("guardsarm: Real-time inotify kernel queue is full. Some events may be lost. Next scheduled scan will recover lost data.");
             continue;
         }
 

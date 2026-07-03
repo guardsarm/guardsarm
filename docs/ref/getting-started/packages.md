@@ -1,6 +1,6 @@
 # Packages
 
-This page lists the supported operating systems and architectures for Wazuh Server and Agent packages. Before installing Wazuh, verify that your platform and architecture are compatible with the available packages.
+This page lists the supported operating systems and architectures for GuardSarm Server and Agent packages. Before installing GuardSarm, verify that your platform and architecture are compatible with the available packages.
 
 ## Server
 
@@ -140,7 +140,7 @@ This page lists the supported operating systems and architectures for Wazuh Serv
 
 ## Package Download
 
-Wazuh packages are available in different repositories depending on the release stage. Package paths follow this structure:
+GuardSarm packages are available in different repositories depending on the release stage. Package paths follow this structure:
 
 ```
 <BASE_URL>/<PACKAGE_TYPE>/<COMPONENT>_<VERSION>[-<REVISION>]_<ARCH>.<EXT>
@@ -150,10 +150,10 @@ Wazuh packages are available in different repositories depending on the release 
 
 | Environment        | Base URL                                                                  | Access         | Version format      |
 | ------------------ | ------------------------------------------------------------------------- | -------------- | ------------------- |
-| **Nightly**        | `https://packages-staging.xdrsiem.wazuh.info/nightly/<VERSION>/`          | Public (HTTPS) | `<version>-latest`  |
-| **Nightly Backup** | `https://packages-staging.xdrsiem.wazuh.info/nightly-backup/<TIMESTAMP>/` | Public (HTTPS) | `<version>-latest`  |
-| **Pre-release**    | `https://packages-staging.xdrsiem.wazuh.info/pre-release/5.x/`            | Public (HTTPS) | `<version>-<stage>` |
-| **Production**     | `https://packages.wazuh.com/production/5.x/`                              | Public (HTTPS) | `<version>`         |
+| **Nightly**        | `https://packages-staging.xdrsiem.guardsarm.info/nightly/<VERSION>/`          | Public (HTTPS) | `<version>-latest`  |
+| **Nightly Backup** | `https://packages-staging.xdrsiem.guardsarm.info/nightly-backup/<TIMESTAMP>/` | Public (HTTPS) | `<version>-latest`  |
+| **Pre-release**    | `https://packages-staging.xdrsiem.guardsarm.info/pre-release/5.x/`            | Public (HTTPS) | `<version>-<stage>` |
+| **Production**     | `https://packages.guardsarm.com/production/5.x/`                              | Public (HTTPS) | `<version>`         |
 
 ### Package paths by format
 
@@ -169,34 +169,34 @@ yum/<component>-<version>[-<revision>].<arch>.rpm
 
 **macOS packages:**
 ```
-macos/wazuh-agent-<version>[-<revision>].<arch>.pkg
+macos/guardsarm-agent-<version>[-<revision>].<arch>.pkg
 ```
 
 **Windows packages:**
 ```
-windows/wazuh-agent-<version>[-<revision>].msi
+windows/guardsarm-agent-<version>[-<revision>].msi
 ```
 
 ### Download examples
 
 **Nightly:**
 ```bash
-curl -O https://packages-staging.xdrsiem.wazuh.info/nightly/5.0.0/apt/pool/main/w/wazuh-manager/wazuh-manager_5.0.0-latest_amd64.deb
-curl -O https://packages-staging.xdrsiem.wazuh.info/nightly/5.0.0/yum/wazuh-agent-5.0.0-latest.x86_64.rpm
-curl -O https://packages-staging.xdrsiem.wazuh.info/nightly/5.0.0/macos/wazuh-agent-5.0.0-latest.arm64.pkg
-curl -O https://packages-staging.xdrsiem.wazuh.info/nightly/5.0.0/windows/wazuh-agent-5.0.0-latest.msi
+curl -O https://packages-staging.xdrsiem.guardsarm.info/nightly/5.0.0/apt/pool/main/w/guardsarm-manager/guardsarm-manager_5.0.0-latest_amd64.deb
+curl -O https://packages-staging.xdrsiem.guardsarm.info/nightly/5.0.0/yum/guardsarm-agent-5.0.0-latest.x86_64.rpm
+curl -O https://packages-staging.xdrsiem.guardsarm.info/nightly/5.0.0/macos/guardsarm-agent-5.0.0-latest.arm64.pkg
+curl -O https://packages-staging.xdrsiem.guardsarm.info/nightly/5.0.0/windows/guardsarm-agent-5.0.0-latest.msi
 ```
 
 **Pre-release:**
 ```bash
-curl -O https://packages-staging.xdrsiem.wazuh.info/pre-release/5.x/apt/pool/main/w/wazuh-manager/wazuh-manager_5.0.0-beta1_amd64.deb
-curl -O https://packages-staging.xdrsiem.wazuh.info/pre-release/5.x/yum/wazuh-agent-5.0.0-beta1.x86_64.rpm
+curl -O https://packages-staging.xdrsiem.guardsarm.info/pre-release/5.x/apt/pool/main/w/guardsarm-manager/guardsarm-manager_5.0.0-beta1_amd64.deb
+curl -O https://packages-staging.xdrsiem.guardsarm.info/pre-release/5.x/yum/guardsarm-agent-5.0.0-beta1.x86_64.rpm
 ```
 
 **Production:**
 ```bash
-curl -O https://packages.wazuh.com/production/5.x/apt/pool/main/w/wazuh-manager/wazuh-manager_5.0.0_amd64.deb
-curl -O https://packages.wazuh.com/production/5.x/yum/wazuh-agent-5.0.0.x86_64.rpm
+curl -O https://packages.guardsarm.com/production/5.x/apt/pool/main/w/guardsarm-manager/guardsarm-manager_5.0.0_amd64.deb
+curl -O https://packages.guardsarm.com/production/5.x/yum/guardsarm-agent-5.0.0.x86_64.rpm
 ```
 
 ---
@@ -210,6 +210,6 @@ curl -O https://packages.wazuh.com/production/5.x/yum/wazuh-agent-5.0.0.x86_64.r
   - **RPM packages**: `x86_64`, `aarch64`
   - **macOS packages**: `intel64`, `arm64`
 - Adjust the package name for your component:
-  - **Manager**: `wazuh-manager`
-  - **Agent**: `wazuh-agent`
+  - **Manager**: `guardsarm-manager`
+  - **Agent**: `guardsarm-agent`
 - These repositories are not accessible via web browser, even though some are public via HTTPS.

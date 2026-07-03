@@ -1,8 +1,8 @@
-# Wazuh Engine API — Developer Guide
+# GuardSarm Engine API — Developer Guide
 
 ## Overview
 
-The Wazuh Engine exposes an internal HTTP API over a **Unix Domain Socket (UDS)**. This API is the control plane for the engine: it handles routing, testing, content management, event dumping, geolocation, IOC synchronization, and more.
+The GuardSarm Engine exposes an internal HTTP API over a **Unix Domain Socket (UDS)**. This API is the control plane for the engine: it handles routing, testing, content management, event dumping, geolocation, IOC synchronization, and more.
 
 The API system spans five tightly-coupled locations in the repository:
 
@@ -18,11 +18,11 @@ The API system spans five tightly-coupled locations in the repository:
 
 ```
 ┌──────────────────────┐     HTTP/JSON over UDS      ┌──────────────────────┐
-│  Python CLI tools    │  ─────────────────────────►  │   wazuh-engine       │
+│  Python CLI tools    │  ─────────────────────────►  │   guardsarm-engine       │
 │  (engine-suite)      │  ◄─────────────────────────  │   (C++ HTTP server)  │
 │                      │                               │                      │
 │  Uses APIClient      │   Unix socket path            │  httplib server on  │
-│  from                │   /run/wazuh-server/analysis  │  UDS, routes to     │
+│  from                │   /run/guardsarm-server/analysis  │  UDS, routes to     │
 │  api-communication   │                               │  handler functions   │
 └──────────────────────┘                               └──────────────────────┘
 ```
@@ -193,16 +193,16 @@ add_library(api::dumper ALIAS api_dumper)
 
 | File | Package | Domain |
 |------|---------|--------|
-| `engine.proto` | `com.wazuh.api.engine` | Base types: `ReturnStatus` enum, `GenericStatus_Response` |
-| `router.proto` | `com.wazuh.api.engine.router` | Route CRUD, table queries, event queue |
-| `tester.proto` | `com.wazuh.api.engine.tester` | Session management, test runs, logtest |
-| `geo.proto` | `com.wazuh.api.engine.geo` | GeoIP database queries |
-| `event_dumper.proto` | `com.wazuh.api.engine.event_dumper` | Event Dumper activate/deactivate/status |
-| `rawevtindexer.proto` | `com.wazuh.api.engine.rawevtindexer` | Raw event indexer status |
-| `crud.proto` | `com.wazuh.api.engine.content` | Namespace, policy, and resource CRUD |
-| `ioc.proto` | `com.wazuh.api.engine.ioc` | IOC sync: update and state |
-| `metrics.proto` | `com.wazuh.api.engine.metrics` | Metrics dump/get/enable/list |
-| `request_response.proto` | `com.wazuh.api.engine.test` | Generic test request/response |
+| `engine.proto` | `com.guardsarm.api.engine` | Base types: `ReturnStatus` enum, `GenericStatus_Response` |
+| `router.proto` | `com.guardsarm.api.engine.router` | Route CRUD, table queries, event queue |
+| `tester.proto` | `com.guardsarm.api.engine.tester` | Session management, test runs, logtest |
+| `geo.proto` | `com.guardsarm.api.engine.geo` | GeoIP database queries |
+| `event_dumper.proto` | `com.guardsarm.api.engine.event_dumper` | Event Dumper activate/deactivate/status |
+| `rawevtindexer.proto` | `com.guardsarm.api.engine.rawevtindexer` | Raw event indexer status |
+| `crud.proto` | `com.guardsarm.api.engine.content` | Namespace, policy, and resource CRUD |
+| `ioc.proto` | `com.guardsarm.api.engine.ioc` | IOC sync: update and state |
+| `metrics.proto` | `com.guardsarm.api.engine.metrics` | Metrics dump/get/enable/list |
+| `request_response.proto` | `com.guardsarm.api.engine.test` | Generic test request/response |
 
 ### Naming Convention
 
@@ -268,7 +268,7 @@ pip install -e src/engine/tools/api-communication
 ```python
 from api_communication.client import APIClient
 
-client = APIClient("/run/wazuh-server/analysis")  # UDS path
+client = APIClient("/run/guardsarm-server/analysis")  # UDS path
 
 # Option 1: send_recv (returns raw dict)
 error, response_dict = client.send_recv(proto_request_message)
@@ -469,7 +469,7 @@ Create or modify a `.proto` file in `src/engine/source/proto/src/`:
 // src/engine/source/proto/src/example.proto
 syntax = "proto3";
 import "engine.proto";
-package com.wazuh.api.engine.example;
+package com.guardsarm.api.engine.example;
 
 message ExampleAction_Request {
     string name = 1;

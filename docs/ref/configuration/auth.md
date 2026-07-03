@@ -1,8 +1,8 @@
 # Auth (Enrollment) Configuration
 
-The `<auth>` section configures the enrollment service (`wazuh-manager-authd`), which issues keys and registers new agents.
+The `<auth>` section configures the enrollment service (`guardsarm-manager-authd`), which issues keys and registers new agents.
 
-Configuration file: `/var/wazuh-manager/etc/wazuh-manager.conf`
+Configuration file: `/var/guardsarm-manager/etc/guardsarm-manager.conf`
 
 Parser: `src/config/src/authd-config.c`
 
@@ -50,7 +50,7 @@ Require agents to provide a shared enrollment password.
 - **Default value**: `no`
 - **Allowed values**: `yes`, `no`
 
-When enabled, place the password in `/var/wazuh-manager/etc/authd.pass` (one line, no trailing newline).
+When enabled, place the password in `/var/guardsarm-manager/etc/authd.pass` (one line, no trailing newline).
 
 ### remote_enrollment
 
@@ -84,15 +84,15 @@ Verify that the CN of the agent certificate matches the agent's IP address. Requ
 
 Path to the manager's TLS certificate presented to agents during enrollment.
 
-- **Default value**: `etc/sslmanager.cert` (resolved relative to the Wazuh install directory, e.g. `/var/wazuh-manager/etc/sslmanager.cert`)
-- **Allowed values**: Path to a PEM-encoded certificate (relative paths resolved from the Wazuh install directory)
+- **Default value**: `etc/sslmanager.cert` (resolved relative to the GuardSarm install directory, e.g. `/var/guardsarm-manager/etc/sslmanager.cert`)
+- **Allowed values**: Path to a PEM-encoded certificate (relative paths resolved from the GuardSarm install directory)
 
 ### ssl_manager_key
 
 Path to the private key corresponding to `ssl_manager_cert`.
 
-- **Default value**: `etc/sslmanager.key` (resolved relative to the Wazuh install directory)
-- **Allowed values**: Path to a PEM-encoded private key (relative paths resolved from the Wazuh install directory)
+- **Default value**: `etc/sslmanager.key` (resolved relative to the GuardSarm install directory)
+- **Allowed values**: Path to a PEM-encoded private key (relative paths resolved from the GuardSarm install directory)
 
 ### ssl_auto_negotiate
 
@@ -152,7 +152,7 @@ Minimum time since an agent was last registered before a forced re-enrollment is
 
 ### agents / allow_higher_versions
 
-Accept enrollment from agents running a newer Wazuh version than the manager.
+Accept enrollment from agents running a newer GuardSarm version than the manager.
 
 - **Default value**: `no`
 - **Allowed values**: `yes`, `no`
@@ -175,8 +175,8 @@ Accept enrollment from agents running a newer Wazuh version than the manager.
   <purge>yes</purge>
   <use_password>no</use_password>
   <ssl_verify_host>no</ssl_verify_host>
-  <ssl_manager_cert>/var/wazuh-manager/etc/sslmanager.cert</ssl_manager_cert>
-  <ssl_manager_key>/var/wazuh-manager/etc/sslmanager.key</ssl_manager_key>
+  <ssl_manager_cert>/var/guardsarm-manager/etc/sslmanager.cert</ssl_manager_cert>
+  <ssl_manager_key>/var/guardsarm-manager/etc/sslmanager.key</ssl_manager_key>
   <ssl_auto_negotiate>no</ssl_auto_negotiate>
   <force>
     <enabled>yes</enabled>

@@ -30,7 +30,7 @@ static int read_main_elements(const OS_XML *xml, int modules,
     const char *osclient = "client";                            /* Agent Config  */
     const char *osbuffer = "client_buffer";                     /* Agent Buffer Config  */
     const char *osactiveresponse = "active-response";           /* Agent Active Response Config  */
-    const char *oswmodule = "wodle";                            /* Wodle - Wazuh Module  */
+    const char *oswmodule = "wodle";                            /* Wodle - GuardSarm Module  */
     const char *oslogging = "logging";                          /* Logging Config */
     const char *oscluster = "cluster";                          /* Cluster Config */
     const char *ossocket = "socket";                            /* Socket Config */
@@ -39,11 +39,11 @@ static int read_main_elements(const OS_XML *xml, int modules,
     const char *osvulndetection = "vulnerability-detection";    /* Vulnerability Detection Config */
     const char *osvulndetector = "vulnerability-detector";      /* Old Vulnerability Detector Config */
     const char *osindexer = "indexer";                          /* Indexer Config */
-    const char *osgcp_pub = "gcp-pubsub";                       /* Google Cloud PubSub - Wazuh Module */
-    const char *osgcp_bucket = "gcp-bucket";                    /* Google Cloud Bucket - Wazuh Module */
+    const char *osgcp_pub = "gcp-pubsub";                       /* Google Cloud PubSub - GuardSarm Module */
+    const char *osgcp_bucket = "gcp-bucket";                    /* Google Cloud Bucket - GuardSarm Module */
     const char *agent_upgrade = "agent-upgrade";                /* Agent Upgrade Module */
     const char *task_manager = "task-manager";                  /* Task Manager Module */
-    const char *wazuh_db = "wdb";                               /* Wazuh-DB Daemon */
+    const char *guardsarm_db = "wdb";                               /* GuardSarm-DB Daemon */
 #ifndef WIN32
     const char *anti_tampering = "anti_tampering";              /* Agent anti tampering Config */
     const char *osauthd = "auth";                               /* Authd Config */
@@ -143,7 +143,7 @@ static int read_main_elements(const OS_XML *xml, int modules,
                 mwarn(
                     "The '%s' configuration is deprecated, please update your settings to use the new '%s' instead "
                     "(default values will be used based on your previous configurations). "
-                    "See https://documentation.wazuh.com",
+                    "See https://documentation.guardsarm.com",
                     osvulndetector,
                     osvulndetection);
                 if (Read_Vulnerability_Detection(xml, chld_node, d1, true) < 0) {
@@ -155,7 +155,7 @@ static int read_main_elements(const OS_XML *xml, int modules,
 #endif
         } else if (strcmp(node[i]->element, osindexer) == 0) {
 #if !defined(WIN32) && !defined(CLIENT)
-            if ((modules & CWMODULE) && (Read_Indexer(WAZUHCONF) < 0)) {
+            if ((modules & CWMODULE) && (Read_Indexer(GUARDSARMCONF) < 0)) {
                 goto fail;
             }
 #else
@@ -194,9 +194,9 @@ static int read_main_elements(const OS_XML *xml, int modules,
             #else
                 mwarn("%s configuration is only set in the manager.", node[i]->element);
             #endif
-        }  else if (chld_node && (strcmp(node[i]->element, wazuh_db) == 0)) {
+        }  else if (chld_node && (strcmp(node[i]->element, guardsarm_db) == 0)) {
 #if !defined(CLIENT)
-                if ((modules & WAZUHDB) && (Read_WazuhDB(xml, chld_node) < 0)) {
+                if ((modules & GUARDSARMDB) && (Read_GuardSarmDB(xml, chld_node) < 0)) {
                     goto fail;
                 }
             #else
@@ -247,7 +247,7 @@ int ReadConfig(int modules, const char *cfgfile, void *d1, void *d2)
 
     /** XML definitions **/
     /* Global */
-    const char *xml_start_ossec = WAZUHCONFIG;
+    const char *xml_start_ossec = GUARDSARMCONFIG;
     const char *xml_start_agent = "agent_config";
 
     /* Attributes of the <agent_config> tag */

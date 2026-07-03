@@ -1,5 +1,5 @@
 /*
- * Shared functions for querying wazuh-agentd
+ * Shared functions for querying guardsarm-agentd
  * Copyright (C) 2015, Wazuh Inc.
  *
  * This program is free software; you can redistribute it

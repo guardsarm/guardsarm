@@ -6,12 +6,12 @@ For the full per-option reference (all options, defaults and allowed values veri
 
 ## XML Configuration
 
-File: `/var/wazuh-manager/etc/wazuh-manager.conf`
+File: `/var/guardsarm-manager/etc/guardsarm-manager.conf`
 
 ### Key Options
 
 ```xml
-<wazuh_config>
+<guardsarm_config>
   <remote>
     <port>1514</port>
     <protocol>tcp</protocol>
@@ -20,7 +20,7 @@ File: `/var/wazuh-manager/etc/wazuh-manager.conf`
       <allow_higher_versions>no</allow_higher_versions>
     </agents>
   </remote>
-</wazuh_config>
+</guardsarm_config>
 ```
 
 | Option | Default | Description |
@@ -28,11 +28,11 @@ File: `/var/wazuh-manager/etc/wazuh-manager.conf`
 | `port` | `1514` | Listening port |
 | `protocol` | `tcp` | Protocol: `tcp`, `udp`, or `tcp,udp` |
 | `queue_size` | `131072` | Message queue size (warn if > 262144) |
-| `agents/allow_higher_versions` | `no` | Accept agents with a higher Wazuh version than the manager |
+| `agents/allow_higher_versions` | `no` | Accept agents with a higher GuardSarm version than the manager |
 
 ## Internal Options
 
-File: `/var/wazuh-manager/etc/wazuh-manager-internal-options.conf`
+File: `/var/guardsarm-manager/etc/guardsarm-manager-internal-options.conf`
 
 ### Key Settings
 
@@ -122,13 +122,13 @@ remoted.sender_pool=4
 
 ## Monitoring
 
-Enable statistics in `/var/wazuh-manager/etc/wazuh-manager-internal-options.conf`:
+Enable statistics in `/var/guardsarm-manager/etc/guardsarm-manager-internal-options.conf`:
 
 ```conf
 remoted.state_interval=5
 ```
 
-View statistics: `cat /var/wazuh-manager/var/run/wazuh-manager-remoted.state`
+View statistics: `cat /var/guardsarm-manager/var/run/guardsarm-manager-remoted.state`
 
 Enable `debug2` logging:
 

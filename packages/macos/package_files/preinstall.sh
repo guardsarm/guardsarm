@@ -39,17 +39,17 @@ function check_arch
 check_arch
 
 if [ -d "${DIR}" ]; then
-    echo "A Wazuh agent installation was found in ${DIR}. Will perform an upgrade."
+    echo "A GuardSarm agent installation was found in ${DIR}. Will perform an upgrade."
     upgrade="true"
-    touch "${DIR}/WAZUH_PKG_UPGRADE"
+    touch "${DIR}/GUARDSARM_PKG_UPGRADE"
 
-    if [ -f "${DIR}/WAZUH_RESTART" ]; then
-        rm -f "${DIR}/WAZUH_RESTART"
+    if [ -f "${DIR}/GUARDSARM_RESTART" ]; then
+        rm -f "${DIR}/GUARDSARM_RESTART"
     fi
 
     # Get version information
-    if [ -f "${DIR}/bin/wazuh-control" ]; then
-        OLD_VERSION=`${DIR}/bin/wazuh-control info -v 2>/dev/null`
+    if [ -f "${DIR}/bin/guardsarm-control" ]; then
+        OLD_VERSION=`${DIR}/bin/guardsarm-control info -v 2>/dev/null`
         MAJOR=$(echo $OLD_VERSION | cut -dv -f2 | cut -d. -f1)
         MINOR=$(echo $OLD_VERSION | cut -dv -f2 | cut -d. -f2)
     elif [ -f ${DIR}/VERSION.json ]; then
@@ -65,14 +65,14 @@ if [ -d "${DIR}" ]; then
     if [ -z "$MAJOR" ] || [ -z "$MINOR" ]; then
         ERROR_TYPE="no_version"
         ERROR_TITLE="Cannot detect current version"
-        ERROR_MESSAGE="Unable to detect the currently installed Wazuh version."
+        ERROR_MESSAGE="Unable to detect the currently installed GuardSarm version."
     elif [ "$MAJOR" -lt 4 ] || ([ "$MAJOR" -eq 4 ] && [ "$MINOR" -lt 14 ]); then
         ERROR_TYPE="unsupported"
         ERROR_TITLE="Incompatible version detected"
         ERROR_MESSAGE="Current version: $OLD_VERSION
 Target version:  5.0.0
 
-Upgrade to Wazuh 5.0.0 is only supported from version 4.14.0 or later."
+Upgrade to GuardSarm 5.0.0 is only supported from version 4.14.0 or later."
     fi
 
     # If any error was detected, show message and block
@@ -88,16 +88,16 @@ Upgrade to Wazuh 5.0.0 is only supported from version 4.14.0 or later."
         echo "  2. Then upgrade to 5.0.0"
         echo ""
         echo "For more information, visit:"
-        echo "  https://documentation.wazuh.com/current/upgrade-guide/"
+        echo "  https://documentation.guardsarm.com/current/upgrade-guide/"
         echo "═════════════════════════════════════════════════════════════════"
         echo -n "1" > ${DIR}/var/upgrade/upgrade_result
         exit 1
     fi
 
     # Stops the agent before upgrading it
-    if ${DIR}/bin/wazuh-control status | grep "is running" > /dev/null 2>&1; then
-        touch "${DIR}/WAZUH_RESTART"
-        ${DIR}/bin/wazuh-control stop
+    if ${DIR}/bin/guardsarm-control status | grep "is running" > /dev/null 2>&1; then
+        touch "${DIR}/GUARDSARM_RESTART"
+        ${DIR}/bin/guardsarm-control stop
         restart="true"
     fi
 
@@ -116,8 +116,8 @@ Upgrade to Wazuh 5.0.0 is only supported from version 4.14.0 or later."
     cp -r ${DIR}/etc/{ossec.conf,client.keys,local_internal_options.conf,shared} ${DIR}/config_files/
 
     if [ -d ${DIR}/logs/ossec ]; then
-        echo "Renaming ${DIR}/logs/ossec to ${DIR}/logs/wazuh"
-        mv ${DIR}/logs/ossec ${DIR}/logs/wazuh
+        echo "Renaming ${DIR}/logs/ossec to ${DIR}/logs/guardsarm"
+        mv ${DIR}/logs/ossec ${DIR}/logs/guardsarm
     fi
 
     if [ -d ${DIR}/queue/ossec ]; then
@@ -125,9 +125,9 @@ Upgrade to Wazuh 5.0.0 is only supported from version 4.14.0 or later."
         mv ${DIR}/queue/ossec ${DIR}/queue/sockets
     fi
 
-    if pkgutil --pkgs | grep -i wazuh-agent-etc > /dev/null 2>&1 ; then
-        echo "Removing previous package receipt for wazuh-agent-etc"
-        pkgutil --forget com.wazuh.pkg.wazuh-agent-etc
+    if pkgutil --pkgs | grep -i guardsarm-agent-etc > /dev/null 2>&1 ; then
+        echo "Removing previous package receipt for guardsarm-agent-etc"
+        pkgutil --forget com.guardsarm.pkg.guardsarm-agent-etc
     fi
 fi
 
@@ -154,7 +154,7 @@ while [[ $idvar -eq 0 ]]; do
    fi
 done
 
-echo "UID available for wazuh user is:";
+echo "UID available for guardsarm user is:";
 echo ${new_uid}
 
 # Verify that the uid and gid exist and match
@@ -171,37 +171,37 @@ fi
 
 # Creating the group
 echo "Checking group..."
-if [[ $(dscl . -read /Groups/wazuh) ]]
+if [[ $(dscl . -read /Groups/guardsarm) ]]
     then
-    echo "wazuh group already exists.";
+    echo "guardsarm group already exists.";
 else
-    sudo ${DSCL} localhost -create /Local/Default/Groups/wazuh
-    check_errm "Error creating group wazuh" "67"
-    sudo ${DSCL} localhost -createprop /Local/Default/Groups/wazuh PrimaryGroupID ${new_gid}
-    sudo ${DSCL} localhost -createprop /Local/Default/Groups/wazuh RealName wazuh
-    sudo ${DSCL} localhost -createprop /Local/Default/Groups/wazuh RecordName wazuh
-    sudo ${DSCL} localhost -createprop /Local/Default/Groups/wazuh RecordType: dsRecTypeStandard:Groups
-    sudo ${DSCL} localhost -createprop /Local/Default/Groups/wazuh Password "*"
+    sudo ${DSCL} localhost -create /Local/Default/Groups/guardsarm
+    check_errm "Error creating group guardsarm" "67"
+    sudo ${DSCL} localhost -createprop /Local/Default/Groups/guardsarm PrimaryGroupID ${new_gid}
+    sudo ${DSCL} localhost -createprop /Local/Default/Groups/guardsarm RealName guardsarm
+    sudo ${DSCL} localhost -createprop /Local/Default/Groups/guardsarm RecordName guardsarm
+    sudo ${DSCL} localhost -createprop /Local/Default/Groups/guardsarm RecordType: dsRecTypeStandard:Groups
+    sudo ${DSCL} localhost -createprop /Local/Default/Groups/guardsarm Password "*"
 fi
 
 # Creating the user
 echo "Checking user..."
-if [[ $(dscl . -read /Users/wazuh) ]]
+if [[ $(dscl . -read /Users/guardsarm) ]]
     then
-    echo "wazuh user already exists.";
+    echo "guardsarm user already exists.";
 else
-    sudo ${DSCL} localhost -create /Local/Default/Users/wazuh
-    check_errm "Error creating user wazuh" "77"
-    sudo ${DSCL} localhost -createprop /Local/Default/Users/wazuh RecordName wazuh
-    sudo ${DSCL} localhost -createprop /Local/Default/Users/wazuh RealName wazuh
-    sudo ${DSCL} localhost -createprop /Local/Default/Users/wazuh UserShell /usr/bin/false
-    sudo ${DSCL} localhost -createprop /Local/Default/Users/wazuh NFSHomeDirectory /var/wazuh
-    sudo ${DSCL} localhost -createprop /Local/Default/Users/wazuh UniqueID ${new_uid}
-    sudo ${DSCL} localhost -createprop /Local/Default/Users/wazuh PrimaryGroupID ${new_gid}
-    sudo ${DSCL} localhost -append /Local/Default/Groups/wazuh GroupMembership wazuh
-    sudo ${DSCL} localhost -createprop /Local/Default/Users/wazuh Password "*"
+    sudo ${DSCL} localhost -create /Local/Default/Users/guardsarm
+    check_errm "Error creating user guardsarm" "77"
+    sudo ${DSCL} localhost -createprop /Local/Default/Users/guardsarm RecordName guardsarm
+    sudo ${DSCL} localhost -createprop /Local/Default/Users/guardsarm RealName guardsarm
+    sudo ${DSCL} localhost -createprop /Local/Default/Users/guardsarm UserShell /usr/bin/false
+    sudo ${DSCL} localhost -createprop /Local/Default/Users/guardsarm NFSHomeDirectory /var/guardsarm
+    sudo ${DSCL} localhost -createprop /Local/Default/Users/guardsarm UniqueID ${new_uid}
+    sudo ${DSCL} localhost -createprop /Local/Default/Users/guardsarm PrimaryGroupID ${new_gid}
+    sudo ${DSCL} localhost -append /Local/Default/Groups/guardsarm GroupMembership guardsarm
+    sudo ${DSCL} localhost -createprop /Local/Default/Users/guardsarm Password "*"
 fi
 
 #Hide the fixed users
-echo "Hiding the fixed wazuh user"
-dscl . create /Users/wazuh IsHidden 1
+echo "Hiding the fixed guardsarm user"
+dscl . create /Users/guardsarm IsHidden 1

@@ -2,23 +2,23 @@
 
 ## Introduction
 
-The Wazuh manager can push configuration settings to registered agents using the `agent.conf` file. This centralized approach simplifies managing large deployments by allowing administrators to define monitoring policies once on the manager and distribute them automatically to agents based on group membership.
+The GuardSarm manager can push configuration settings to registered agents using the `agent.conf` file. This centralized approach simplifies managing large deployments by allowing administrators to define monitoring policies once on the manager and distribute them automatically to agents based on group membership.
 
 Configuration values defined in `agent.conf` take precedence over the local `ossec.conf` on each agent. This ensures consistent policy enforcement across all managed endpoints.
 
 ## How it works
 
-1. The administrator creates or edits the `agent.conf` file on the Wazuh manager.
+1. The administrator creates or edits the `agent.conf` file on the GuardSarm manager.
 2. The file is placed in the appropriate group's shared directory on the manager.
 3. When agents connect (or reconnect), the manager distributes the updated configuration.
 4. The agent merges the received `agent.conf` settings with its local `ossec.conf`, with `agent.conf` values taking precedence.
 
 ## File location
 
-On the Wazuh manager, the centralized configuration files are located in the shared directory for each group:
+On the GuardSarm manager, the centralized configuration files are located in the shared directory for each group:
 
 ```
-/var/wazuh-manager/etc/shared/<GROUP_NAME>/agent.conf
+/var/guardsarm-manager/etc/shared/<GROUP_NAME>/agent.conf
 ```
 
 The default group is named `default`. All agents belong to the `default` group unless explicitly assigned to another group.
@@ -98,7 +98,7 @@ The following configuration sections can be distributed via `agent.conf`:
 | `<syscheck>` | File integrity monitoring settings |
 | `<rootcheck>` | Rootkit detection settings |
 | `<sca>` | Security configuration assessment policies |
-| `<wodle>` | Wazuh module (wodle) settings |
+| `<wodle>` | GuardSarm module (wodle) settings |
 | `<active-response>` | Active response configuration |
 
 ## Verifying the configuration
@@ -106,17 +106,17 @@ The following configuration sections can be distributed via `agent.conf`:
 After editing `agent.conf`, verify the configuration syntax on the manager:
 
 ```bash
-/var/wazuh-manager/bin/verify-agent-conf
+/var/guardsarm-manager/bin/verify-agent-conf
 ```
 
 If the configuration is valid, the output confirms success. If there are syntax errors, they are reported with line numbers.
 
 ## Applying changes
 
-After editing `agent.conf`, restart the Wazuh manager so the new configuration is distributed to agents:
+After editing `agent.conf`, restart the GuardSarm manager so the new configuration is distributed to agents:
 
 ```bash
-systemctl restart wazuh-manager
+systemctl restart guardsarm-manager
 ```
 
 Agents receive the updated configuration automatically on their next connection to the manager.

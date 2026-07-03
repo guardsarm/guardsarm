@@ -1,6 +1,6 @@
 {
   "index_patterns": [
-    "wazuh-states-vulnerabilities*"
+    "guardsarm-states-vulnerabilities*"
   ],
   "priority": 1,
   "template": {
@@ -23,8 +23,8 @@
           "package.version",
           "vulnerability.id",
           "vulnerability.severity",
-          "wazuh.agent.id",
-          "wazuh.cluster.name"
+          "guardsarm.agent.id",
+          "guardsarm.cluster.name"
         ],
         "refresh_interval": "2s"
       }
@@ -178,7 +178,7 @@
             }
           }
         },
-        "wazuh": {
+        "guardsarm": {
           "properties": {
             "agent": {
               "properties": {

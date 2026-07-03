@@ -348,7 +348,7 @@ For environments with frequent inventory changes:
 
 Validate configuration syntax:
 ```bash
-/var/ossec/bin/wazuh-agentd -t
+/var/ossec/bin/guardsarm-agentd -t
 ```
 
 Monitor for errors:

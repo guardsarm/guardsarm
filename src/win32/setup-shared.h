@@ -20,7 +20,7 @@
 #include <windows.h>
 #include <winsock2.h>
 
-#define WAZUHCONF  "ossec.conf"
+#define GUARDSARMCONF  "ossec.conf"
 #define OSSECDEF   "default-ossec.conf"
 #define OSSECLAST  "ossec.conf.bak"
 #define CLIENTKEYS "client.keys"

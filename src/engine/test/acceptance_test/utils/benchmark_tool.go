@@ -26,10 +26,10 @@ import (
 // ---------------------------------------------------------------------------
 
 const (
-	// Unix HTTP socket where wazuh-engine listens
-	SocketPath = "/var/wazuh-manager/queue/sockets/queue-http.sock"
+	// Unix HTTP socket where guardsarm-engine listens
+	SocketPath = "/var/guardsarm-manager/queue/sockets/queue-http.sock"
 	// Inline JSON header sent with every batch
-	HeaderJSON = `{"wazuh":{"cluster": {"name": "wazuh", "node": "123"},"agent":{"id":"001","name":"test-agent"}}}`
+	HeaderJSON = `{"guardsarm":{"cluster": {"name": "guardsarm", "node": "123"},"agent":{"id":"001","name":"test-agent"}}}`
 	// HTTP endpoint for event ingestion
 	Endpoint = "/events/enriched"
 	// Fixed queue identifier in event format
@@ -123,7 +123,7 @@ func parseFlags() Config {
 	flag.IntVar(&cfg.BatchSize, "b", 50, "Events per HTTP request (batch size)")
 	flag.StringVar(&cfg.InputDir, "i", "./test_logs", "Directory with .txt / .log input files")
 	flag.StringVar(&cfg.OutputFile, "o",
-		"/var/wazuh-manager/logs/standard-wazuh-events-v5/standard-wazuh-events-v5.json",
+		"/var/guardsarm-manager/logs/standard-guardsarm-events-v5/standard-guardsarm-events-v5.json",
 		"Output file to watch for processed events")
 	flag.BoolVar(&cfg.Truncate, "T", false, "Truncate output file before the test")
 	flag.StringVar(&cfg.CSVFile, "csv", "", "Path to CSV report output file (optional)")

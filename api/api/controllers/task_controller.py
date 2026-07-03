@@ -9,11 +9,11 @@ from connexion.lifecycle import ConnexionResponse
 
 from api.controllers.util import json_response
 from api.util import remove_nones_to_dict, parse_api_param, raise_if_exc
-from wazuh.core.cluster.dapi.dapi import DistributedAPI
-from wazuh.core.common import DATABASE_LIMIT
-from wazuh.task import get_task_status
+from guardsarm.core.cluster.dapi.dapi import DistributedAPI
+from guardsarm.core.common import DATABASE_LIMIT
+from guardsarm.task import get_task_status
 
-logger = logging.getLogger('wazuh')
+logger = logging.getLogger('guardsarm')
 
 
 async def get_tasks_status(pretty: bool = False, wait_for_complete: bool = False, offset: int = 0,

@@ -263,7 +263,7 @@ def download_blob(container_client, blob, number_of_retries=3):
     Returns
     -------
     StorageStreamDownloader[str]
-        Message that will be sent to the WazuhQueue socket.
+        Message that will be sent to the GuardSarmQueue socket.
 
     Raises
     ------

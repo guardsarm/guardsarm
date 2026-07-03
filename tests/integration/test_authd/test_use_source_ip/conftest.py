@@ -5,7 +5,7 @@ This program is free software; you can redistribute it and/or modify it under th
 """
 import pytest
 
-from wazuh_testing.constants.ports import DEFAULT_SSL_REMOTE_ENROLLMENT_PORT
+from guardsarm_testing.constants.ports import DEFAULT_SSL_REMOTE_ENROLLMENT_PORT
 
 
 @pytest.fixture()

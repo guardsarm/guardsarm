@@ -6,7 +6,7 @@ on:
     inputs:
       revision:
         description: |
-          Revision used to naming Filebeat package wazuh-filebeat-X.X.tar.gz.
+          Revision used to naming Filebeat package guardsarm-filebeat-X.X.tar.gz.
           Default 0.0.
         required: false
         default: "0.0"

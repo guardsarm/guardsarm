@@ -13,8 +13,8 @@ if [ -n "${4:-}" ]; then
 else
     exit 1
 fi
-GITHUB_REPOSITORY="wazuh/wazuh"
-GITHUB_OWNER="wazuh"
+GITHUB_REPOSITORY="guardsarm/guardsarm"
+GITHUB_OWNER="guardsarm"
 IMAGE_ID=ghcr.io/${GITHUB_OWNER}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 IMAGE_ID=$(echo ${IMAGE_ID} | tr '[A-Z]' '[a-z]')
 

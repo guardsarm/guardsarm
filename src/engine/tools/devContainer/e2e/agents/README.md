@@ -1,10 +1,10 @@
 # Agents E2E
 
-This directory contains a minimal environment to run Wazuh agents inside containers and connect them to a manager reachable from the devContainer host. The goal is to validate agent-side end-to-end scenarios without depending on manual installations on separate machines.
+This directory contains a minimal environment to run GuardSarm agents inside containers and connect them to a manager reachable from the devContainer host. The goal is to validate agent-side end-to-end scenarios without depending on manual installations on separate machines.
 
 There are currently two agent variants based on Rocky Linux 8:
 
-- `4.14.3`: installs the package from the official Wazuh repository.
+- `4.14.3`: installs the package from the official GuardSarm repository.
 - `5.x`: installs the agent from a local RPM that must be present in the build context.
 
 ## Structure
@@ -19,7 +19,7 @@ agents/
     └── 5.x/
         ├── Dockerfile
         ├── entrypoint.sh
-        └── wazuh-agent_5.0.0-0_x86_64_*.rpm
+        └── guardsarm-agent_5.0.0-0_x86_64_*.rpm
 ```
 
 ## Files and responsibilities
@@ -52,18 +52,18 @@ Builds an image based on `rockylinux:8` and:
 
 - updates base packages
 - installs required utilities such as `curl`, `hostname`, `procps-ng`, and `tini`
-- imports the Wazuh GPG key
-- creates the Wazuh 4.x Yum repository
-- installs `wazuh-agent-4.14.3*` from the official repository
+- imports the GuardSarm GPG key
+- creates the GuardSarm 4.x Yum repository
+- installs `guardsarm-agent-4.14.3*` from the official repository
 - copies `entrypoint.sh`
 
 This variant does not require any additional local artifacts to build the image.
 
 ### `rpm/5.x/Dockerfile`
 
-This image also starts from `rockylinux:8`, installs basic dependencies, and imports the Wazuh GPG key, but the important difference is that it does not download the agent from a repository. Instead, it:
+This image also starts from `rockylinux:8`, installs basic dependencies, and imports the GuardSarm GPG key, but the important difference is that it does not download the agent from a repository. Instead, it:
 
-- runs `COPY wazuh-agent_5.0.0-0_x86_64_*.rpm /tmp/`
+- runs `COPY guardsarm-agent_5.0.0-0_x86_64_*.rpm /tmp/`
 - installs the local RPM with `dnf`
 - removes the temporary file and cleans the cache
 - copies `entrypoint.sh`
@@ -79,7 +79,7 @@ rpm/5.x/
 with a filename matching this pattern:
 
 ```text
-wazuh-agent_5.0.0-0_x86_64_*.rpm
+guardsarm-agent_5.0.0-0_x86_64_*.rpm
 ```
 
 If the file is not present, the Docker build fails at the `COPY` step.
@@ -87,7 +87,7 @@ If the file is not present, the Docker build fails at the `COPY` step.
 Example of a valid filename:
 
 ```text
-wazuh-agent_5.0.0-0_x86_64_test.rpm
+guardsarm-agent_5.0.0-0_x86_64_test.rpm
 ```
 
 If the expected agent version changes, the pattern in `rpm/5.x/Dockerfile` must be updated.
@@ -99,7 +99,7 @@ Both entrypoints implement the same flow:
 1. read environment variables for connection and registration
 2. update the manager address inside `/var/ossec/etc/ossec.conf`
 3. run `agent-auth` to register the agent against `authd`
-4. start the agent with `wazuh-control start`
+4. start the agent with `guardsarm-control start`
 5. keep the container alive by following `/var/ossec/logs/ossec.log`
 
 Supported variables:
@@ -117,7 +117,7 @@ The scripts tolerate `agent-auth` failures with `|| true`. That prevents the con
 ### Prerequisites
 
 - Docker must be available inside the devContainer
-- a Wazuh manager must be reachable from the container host
+- a GuardSarm manager must be reachable from the container host
 - port `1514` must be reachable for agent connection
 - port `1515` must be reachable if `authd` registration is used
 - for `5.x`, the agent RPM must be copied into `rpm/5.x/` beforehand
@@ -217,7 +217,7 @@ environment:
 The expected location for the local `5.x` agent package is:
 
 ```text
-wazuh/src/engine/tools/devContainer/e2e/agents/rpm/5.x/
+guardsarm/src/engine/tools/devContainer/e2e/agents/rpm/5.x/
 ```
 
 That file is part of the Docker build context. If it is placed outside that folder, the `Dockerfile` will not be able to copy it.

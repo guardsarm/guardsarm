@@ -1,12 +1,12 @@
 run-name: External deps - ${{ inputs.dependencies && format('{0}', inputs.dependencies) || '(no version overrides)' }}
 name: 5.X - Package - Build external dependencies
 
-# Rebuilds Wazuh's external dependencies across every (system, architecture)
+# Rebuilds GuardSarm's external dependencies across every (system, architecture)
 # leg we ship. Each runner uploads a per-leg .tar.gz laid out in the S3
 # layout expected by `make deps` (libraries/<os>/<arch>/<dep>.tar.gz plus
 # libraries/sources/<dep>.tar.gz). The `consolidate` job then merges every
 # per-leg tarball into a single externals-all.tar.gz ready for upload to
-# packages.wazuh.com/deps/<version>/ — use that artifact, not a hand-merge
+# packages.guardsarm.com/deps/<version>/ — use that artifact, not a hand-merge
 # of the per-leg ones, since on Linux the agent and manager legs overlap.
 #
 # A deps release is whole-or-nothing: every consumer platform needs its
@@ -130,7 +130,7 @@ jobs:
         timeout-minutes: 20
         run: |
           bash "${GITHUB_WORKSPACE}/.github/actions/ghcr-pull-and-push/pull_image_from_ghcr.sh" \
-            "${{ secrets.CI_WAZUH_AGENT_PACKAGES_CLASSIC }}" "${{ github.actor }}" "${CONTAINER_NAME}" "${TAG}"
+            "${{ secrets.CI_GUARDSARM_AGENT_PACKAGES_CLASSIC }}" "${{ github.actor }}" "${CONTAINER_NAME}" "${TAG}"
 
       - name: Install build tools (macOS leg)
         if: matrix.system == 'macos'
@@ -173,7 +173,7 @@ jobs:
 
   consolidate:
     # Merge every per-leg tarball into a single libraries/ tree shaped
-    # like the packages.wazuh.com/deps/<version>/ layout: sources/ holds
+    # like the packages.guardsarm.com/deps/<version>/ layout: sources/ holds
     # the union of upstream blobs (byte-identical across legs, so any
     # leg's copy works), linux/<arch>/ holds the Linux binaries, darwin/<arch>/
     # holds the macOS leg binaries, and windows/ holds the MinGW leg
@@ -228,7 +228,7 @@ jobs:
           #      (rocksdb, lzma: gated by `if(NOT IS_AGENT ...)` in
           #      src/external/CMakeLists.txt) coming from the manager leg.
           #   2. between two compiled copies the agent leg wins — its
-          #      centos:6 / glibc-2.12 binaries link in every Wazuh builder
+          #      centos:6 / glibc-2.12 binaries link in every GuardSarm builder
           #      image; the manager's centos:7 / glibc-2.17 ones do not.
           # Output-driven only: no dependency names appear here.
           should_replace() {
@@ -297,7 +297,7 @@ jobs:
     # Sanity check: build the agent and the manager from source against the
     # dependency tree we just consolidated, to confirm the binaries actually
     # link. No package is produced — this runs `make deps` (pointed at the
-    # local tree, not packages.wazuh.com) then the plain `make` build inside
+    # local tree, not packages.guardsarm.com) then the plain `make` build inside
     # the same builder images build-externals uses. The full build log is
     # uploaded for human review; the analysis step only flags the obvious
     # signal (a dep that got recompiled from source instead of being consumed
@@ -361,7 +361,7 @@ jobs:
         timeout-minutes: 20
         run: |
           bash "${GITHUB_WORKSPACE}/.github/actions/ghcr-pull-and-push/pull_image_from_ghcr.sh" \
-            "${{ secrets.CI_WAZUH_AGENT_PACKAGES_CLASSIC }}" "${{ github.actor }}" "${CONTAINER_NAME}" "${TAG}"
+            "${{ secrets.CI_GUARDSARM_AGENT_PACKAGES_CLASSIC }}" "${{ github.actor }}" "${CONTAINER_NAME}" "${TAG}"
 
       - name: Download consolidated dependency tree
         uses: actions/download-artifact@v4
@@ -383,19 +383,19 @@ jobs:
 
           jobs="$(nproc 2>/dev/null || echo 2)"
           # Same mount layout as generate_external.sh: working tree at
-          # /wazuh-local-src (rw — the build writes into src/external/ and
+          # /guardsarm-local-src (rw — the build writes into src/external/ and
           # src/build/). The consolidated tree lives inside the workspace so
           # it is visible in the container without a second mount.
           docker run --rm -t \
-            -v "${GITHUB_WORKSPACE}:/wazuh-local-src:Z" \
+            -v "${GITHUB_WORKSPACE}:/guardsarm-local-src:Z" \
             -e BUILD_TARGET="${{ matrix.target }}" \
             -e ARCHITECTURE_TARGET="${{ matrix.architecture }}" \
-            -e DEPS_DIR="/wazuh-local-src/consolidated-deps" \
+            -e DEPS_DIR="/guardsarm-local-src/consolidated-deps" \
             -e JOBS="${jobs}" \
-            -e WAZUH_VERBOSE="yes" \
+            -e GUARDSARM_VERBOSE="yes" \
             --entrypoint /bin/bash \
             "${CONTAINER_NAME}:${TAG}" \
-            /wazuh-local-src/packages/externals/smoke_build.sh 2>&1 | tee "${log}"
+            /guardsarm-local-src/packages/externals/smoke_build.sh 2>&1 | tee "${log}"
 
       - name: Analyze dependency usage
         if: always()
@@ -420,8 +420,8 @@ jobs:
           #    such lines.
           #  - "pattern B" deps (cJSON, sqlite, procps): the fallback is
           #    add_library(ext_<dep> STATIC <dep>.c), which compiles into
-          #    ext_<dep>.dir/. (wazuhext is Wazuh's own aggregation lib, not a
-          #    dep — its target is `wazuhext`, never `ext_<name>`, so the
+          #    ext_<dep>.dir/. (guardsarmext is GuardSarm's own aggregation lib, not a
+          #    dep — its target is `guardsarmext`, never `ext_<name>`, so the
           #    \bext_ word boundary below does not match it.)
           # For a build against a complete consolidated tree both should be
           # empty.

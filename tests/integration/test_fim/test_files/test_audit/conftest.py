@@ -6,7 +6,7 @@ import re
 import pytest
 import subprocess
 
-from wazuh_testing.constants.platforms import CENTOS, UBUNTU, DEBIAN
+from guardsarm_testing.constants.platforms import CENTOS, UBUNTU, DEBIAN
 
 
 @pytest.fixture(scope="module")

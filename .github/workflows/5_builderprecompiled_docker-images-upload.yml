@@ -113,32 +113,32 @@ jobs:
             arch: arm64
             system: rpm
           - key: pkg_deb_agent_builder_amd64
-            repo: wazuh/wazuh-agent-packages
+            repo: guardsarm/guardsarm-agent-packages
             workflow: 5_builderpackage_upload-images-amd.yml
             arch: amd64
             system: deb
           - key: pkg_rpm_agent_builder_amd64
-            repo: wazuh/wazuh-agent-packages
+            repo: guardsarm/guardsarm-agent-packages
             workflow: 5_builderpackage_upload-images-amd.yml
             arch: amd64
             system: rpm
           - key: pkg_deb_agent_builder_arm64
-            repo: wazuh/wazuh-agent-packages
+            repo: guardsarm/guardsarm-agent-packages
             workflow: 5_builderpackage_upload-images-arm.yml
             arch: arm64
             system: deb
           - key: pkg_rpm_agent_builder_arm64
-            repo: wazuh/wazuh-agent-packages
+            repo: guardsarm/guardsarm-agent-packages
             workflow: 5_builderpackage_upload-images-arm.yml
             arch: arm64
             system: rpm
           - key: compile_windows_agent
-            repo: wazuh/wazuh-agent-packages
+            repo: guardsarm/guardsarm-agent-packages
             workflow: 5_builderpackage_upload-images-amd.yml
             arch: i386
             system: windows
           - key: commom_wpk_builder
-            repo: wazuh/wazuh-agent-packages
+            repo: guardsarm/guardsarm-agent-packages
             workflow: 5_builderpackage_upload-images-wpk.yml
 
     steps:
@@ -151,4 +151,4 @@ jobs:
           if [ -n "${{ matrix.system }}" ]; then CMD="$CMD -f system=${{ matrix.system }}"; fi
           eval $CMD
         env:
-          GH_TOKEN: ${{ matrix.repo == 'current' && secrets.GITHUB_TOKEN || secrets.CI_WAZUH_AGENT_PACKAGES }}
+          GH_TOKEN: ${{ matrix.repo == 'current' && secrets.GITHUB_TOKEN || secrets.CI_GUARDSARM_AGENT_PACKAGES }}

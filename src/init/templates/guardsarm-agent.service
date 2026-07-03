@@ -1,0 +1,17 @@
+[Unit]
+Description=GuardSarm agent
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=forking
+TimeoutSec=45
+
+ExecStart=/usr/bin/env GUARDSARM_HOME_TMP/bin/guardsarm-control start
+ExecStop=/usr/bin/env GUARDSARM_HOME_TMP/bin/guardsarm-control stop
+ExecReload=/usr/bin/env GUARDSARM_HOME_TMP/bin/guardsarm-control reload
+
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

@@ -38,8 +38,8 @@ def test_bin_details(current_bin):
     product_version, file_version_major, file_version_minor, file_version_build, file_version_revision = read_version()
 
     fields_dict = {
-        'FileDescription': 'Wazuh Agent',
-        'ProductName': 'Wazuh Windows Agent',
+        'FileDescription': 'GuardSarm Agent',
+        'ProductName': 'GuardSarm Windows Agent',
         'ProductVersion': f"v{product_version}",
         'FileVersionRaw.Major': file_version_major,
         'FileVersionRaw.Minor': file_version_minor,

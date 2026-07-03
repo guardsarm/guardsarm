@@ -11,15 +11,15 @@ import subprocess
 import time
 from pathlib import Path
 
-from wazuh_testing.constants.paths.ruleset import CIS_RULESET_PATH
-from wazuh_testing.utils.file import copy, remove_file, copy_files_in_folder, delete_path_recursively
-from wazuh_testing.constants.paths import TEMP_FILE_PATH, WAZUH_PATH
-from wazuh_testing.constants.platforms import WINDOWS
-from wazuh_testing.utils.services import control_service
+from guardsarm_testing.constants.paths.ruleset import CIS_RULESET_PATH
+from guardsarm_testing.utils.file import copy, remove_file, copy_files_in_folder, delete_path_recursively
+from guardsarm_testing.constants.paths import TEMP_FILE_PATH, GUARDSARM_PATH
+from guardsarm_testing.constants.platforms import WINDOWS
+from guardsarm_testing.utils.services import control_service
 
 from . import TEST_DATA_PATH
 
-SCA_DB_DIR = Path(WAZUH_PATH, 'queue', 'sca', 'db')
+SCA_DB_DIR = Path(GUARDSARM_PATH, 'queue', 'sca', 'db')
 
 
 @pytest.fixture()

@@ -9,7 +9,7 @@
  */
 
 #include "shared.h"
-#include "wazuhdb_queries_op.h"
+#include "guardsarmdb_queries_op.h"
 
 /**
  * @brief Looks for the OS architecture in a string. Possibles architectures

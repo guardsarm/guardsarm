@@ -9,16 +9,16 @@ from connexion.lifecycle import ConnexionResponse
 
 from api.controllers.util import json_response
 from api.models.basic_info_model import BasicInfo
-from wazuh.core.common import DATE_FORMAT
-from wazuh.core.results import WazuhResult
-from wazuh.core.security import load_spec
-from wazuh.core.utils import get_utc_now
+from guardsarm.core.common import DATE_FORMAT
+from guardsarm.core.results import GuardSarmResult
+from guardsarm.core.security import load_spec
+from guardsarm.core.utils import get_utc_now
 
-logger = logging.getLogger('wazuh-api')
+logger = logging.getLogger('guardsarm-api')
 
 
 async def default_info(pretty: bool = False) -> ConnexionResponse:
-    """Return basic information about the Wazuh API.
+    """Return basic information about the GuardSarm API.
 
     Parameters
     ----------
@@ -40,6 +40,6 @@ async def default_info(pretty: bool = False) -> ConnexionResponse:
         'hostname': socket.gethostname(),
         'timestamp': get_utc_now().strftime(DATE_FORMAT)
     }
-    data = WazuhResult({'data': BasicInfo.from_dict(data)})
+    data = GuardSarmResult({'data': BasicInfo.from_dict(data)})
 
     return json_response(data, pretty=pretty)

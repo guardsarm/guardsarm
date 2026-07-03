@@ -2,7 +2,7 @@
 
 The `<socket>` section defines named output sockets that the Log Collector can forward events to. Multiple `<socket>` blocks are allowed, one per socket.
 
-Configuration file: `/var/wazuh-manager/etc/wazuh-manager.conf`
+Configuration file: `/var/guardsarm-manager/etc/guardsarm-manager.conf`
 
 Parser: `src/config/src/socket-config.c`
 
@@ -43,7 +43,7 @@ String prepended to every message before it is sent to this socket.
   <name>custom_siem</name>
   <location>/var/run/custom-siem.sock</location>
   <mode>tcp</mode>
-  <prefix>wazuh: </prefix>
+  <prefix>guardsarm: </prefix>
 </socket>
 ```
 

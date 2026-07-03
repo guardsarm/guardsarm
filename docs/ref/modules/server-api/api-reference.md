@@ -1,9 +1,9 @@
 # API Reference
 
-This document covers the key API endpoints with practical examples, the Wazuh Query Language (WQL), error handling, and input validation.
+This document covers the key API endpoints with practical examples, the GuardSarm Query Language (WQL), error handling, and input validation.
 
 > All paths are validated against `api/api/spec/spec.yaml` (OpenAPI 3.0).
-> For the complete endpoint specification, refer to the [official Wazuh API Reference](https://documentation.wazuh.com/current/user-manual/api/reference.html).
+> For the complete endpoint specification, refer to the [official GuardSarm API Reference](https://documentation.guardsarm.com/current/user-manual/api/reference.html).
 
 ---
 
@@ -76,11 +76,11 @@ curl -k -X GET "https://localhost:55000/?pretty=true" \
 ```json
 {
   "data": {
-    "title": "Wazuh API REST",
+    "title": "GuardSarm API REST",
     "api_version": "5.0.1",
     "revision": "alpha0",
     "license_name": "GPL 2.0",
-    "hostname": "wazuh-manager",
+    "hostname": "guardsarm-manager",
     "timestamp": "2026-02-20T12:00:00Z"
   },
   "error": 0
@@ -464,7 +464,7 @@ curl -k -X GET "https://localhost:55000/tasks/status?pretty=true" \
 
 ---
 
-## Wazuh Query Language (WQL)
+## GuardSarm Query Language (WQL)
 
 WQL allows server-side filtering of large datasets, reducing payload size and avoiding client-side filtering.
 
@@ -505,7 +505,7 @@ curl -k -X GET "https://localhost:55000/agents?q=status%3Dactive%3Bos.name~%3Dub
   -H "Authorization: Bearer $TOKEN"
 
 # Agents with version not equal to 5.0.0
-curl -k -X GET "https://localhost:55000/agents?q=version!%3Dwazuh%205.0.0" \
+curl -k -X GET "https://localhost:55000/agents?q=version!%3Dguardsarm%205.0.0" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -530,12 +530,12 @@ Errors follow a structured JSON response format.
 
 ### Exception Hierarchy
 
-All exceptions inherit from `WazuhException` (defined in `core/exception.py`), with a numeric error code catalog:
+All exceptions inherit from `GuardSarmException` (defined in `core/exception.py`), with a numeric error code catalog:
 
 | Range | Category | Examples |
 |-------|----------|----------|
 | 900–999 | API-level errors | Child process terminated, executor failure, endpoint restricted to master |
-| 999–1099 | Core Wazuh errors | Incompatible Python, internal error, command errors, socket issues |
+| 999–1099 | Core GuardSarm errors | Incompatible Python, internal error, command errors, socket issues |
 | 1100–1199 | Configuration errors | Invalid section/field/type, XML syntax, missing config |
 | 1200–1299 | Agent errors | Agent not found, duplicate, version mismatch |
 | 1700–1799 | RBAC errors | Permission denied, invalid role/policy |

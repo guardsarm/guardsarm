@@ -1,5 +1,5 @@
 /*
- * Wazuh router
+ * GuardSarm router
  * Copyright (C) 2015, Wazuh Inc.
  * March 25, 2023.
  *
@@ -304,15 +304,15 @@ extern "C"
 
             // Verify flatbuffer structure
             flatbuffers::Verifier verifier(reinterpret_cast<const uint8_t*>(message), message_size);
-            if (!Wazuh::SyncSchema::VerifyMessageBuffer(verifier))
+            if (!GuardSarm::SyncSchema::VerifyMessageBuffer(verifier))
             {
                 throw std::runtime_error("Invalid flatbuffer message structure");
             }
 
-            auto syncMessage = Wazuh::SyncSchema::GetMessage(message);
+            auto syncMessage = GuardSarm::SyncSchema::GetMessage(message);
 
             // Anti-spoofing validation: only validate Start messages (which contain agent ID)
-            if (syncMessage->content_type() == Wazuh::SyncSchema::MessageType_Start)
+            if (syncMessage->content_type() == GuardSarm::SyncSchema::MessageType_Start)
             {
                 const auto startMsg = syncMessage->content_as_Start();
                 if (!startMsg)

@@ -1,6 +1,6 @@
 # Engine Benchmark Suite
 
-Automated benchmark harness for the Wazuh Engine (`wazuh-manager-analysisd`).  
+Automated benchmark harness for the GuardSarm Engine (`guardsarm-manager-analysisd`).  
 Measures how resource usage and event throughput scale across different orchestrator thread counts.
 
 ## Directory Structure
@@ -28,7 +28,7 @@ acceptance_test/
 For each requested thread count, `acceptance_test.sh` executes the following steps:
 
 1. **Stop** the manager (if running) and clean stale KVDB locks.
-2. **Launch** `wazuh-manager-analysisd` with `WAZUH_ORCHESTRATOR_THREADS=N`.
+2. **Launch** `guardsarm-manager-analysisd` with `GUARDSARM_ORCHESTRATOR_THREADS=N`.
 3. **Wait** until the engine is ready (log line detection + route verification via `curl`).
 4. **Start** `monitor.py` to sample CPU, memory, FDs and disk I/O every second.
 5. **Grace period** before the benchmark.
@@ -83,7 +83,7 @@ Python packages are auto-installed by the script if missing.
 | `--rate EPS` | `0` | Target EPS (`0` = unlimited) |
 | `--batch SIZE` | `50` | Events per HTTP request |
 | `--input DIR` | `utils/test_logs` | Directory with `.txt` / `.log` input files |
-| `--output FILE` | `$WAZUH_HOME/logs/standard-wazuh-events-v5/standard-wazuh-events-v5.json` | Output file to watch for processed events |
+| `--output FILE` | `$GUARDSARM_HOME/logs/standard-guardsarm-events-v5/standard-guardsarm-events-v5.json` | Output file to watch for processed events |
 | `--grace SECS` | `5` | Grace period before & after benchmark |
 | `--monitor-interval SECS` | `1` | Monitor sampling interval |
 | `--results DIR` | `./results` | Directory for output CSVs |
@@ -153,7 +153,7 @@ go run utils/benchmark_tool.go -h
 | `-r` | `1000` | Target EPS (`0` = unlimited) |
 | `-b` | `50` | Batch size (events per request) |
 | `-i` | `./test_logs` | Input directory with log files |
-| `-o` | `/var/wazuh-manager/logs/standard-wazuh-events-v5/standard-wazuh-events-v5.json` | Output file to watch |
+| `-o` | `/var/guardsarm-manager/logs/standard-guardsarm-events-v5/standard-guardsarm-events-v5.json` | Output file to watch |
 | `-T` | `false` | Truncate output file before test |
 | `-csv` | *(none)* | Path to CSV report output |
 

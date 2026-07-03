@@ -33,7 +33,7 @@ configurator.configure_test(configuration_file='custom_bucket_configuration.yaml
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_custom_bucket_defaults(
-        test_configuration, metadata, create_test_bucket, set_test_sqs_queue, set_wazuh_configuration,
+        test_configuration, metadata, create_test_bucket, set_test_sqs_queue, set_guardsarm_configuration,
         configure_local_internal_options_function, truncate_monitored_files,
         daemons_handler, file_monitoring
 ):
@@ -41,19 +41,19 @@ def test_custom_bucket_defaults(
     description: Test the AWS S3 custom bucket module is invoked with the expected parameters and no error occurs.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has appeared calling the module with correct parameters.
             - Check in the ossec.log that no errors occurs.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
 
-    wazuh_min_version: 4.7.0
+    guardsarm_min_version: 4.7.0
     parameters:
         - test_configuration:
             type: dict
@@ -67,7 +67,7 @@ def test_custom_bucket_defaults(
         - set_test_sqs_queue:
             type: fixture
             brief: Create temporal SQS queue.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - configure_local_internal_options_function:
@@ -75,10 +75,10 @@ def test_custom_bucket_defaults(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
+            brief: Truncate guardsarm logs.
         - daemons_handler:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -135,7 +135,7 @@ configurator.configure_test(configuration_file='custom_bucket_configuration.yaml
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_custom_bucket_logs(
-        test_configuration, metadata, create_test_bucket, set_test_sqs_queue, manage_bucket_files, set_wazuh_configuration,
+        test_configuration, metadata, create_test_bucket, set_test_sqs_queue, manage_bucket_files, set_guardsarm_configuration,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler,
         file_monitoring
 ):
@@ -144,22 +144,22 @@ def test_custom_bucket_logs(
     the messages from the SQS Queue.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
             - Uploads a file to the S3 Bucket.
         - test:
             - Check in the log that the module was called with correct parameters.
             - Check that the module retrieved a message from the SQS Queue.
             - Check that the module processed a message from the SQS Queue.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
             - Deletes the file created in the S3 Bucket.
 
-    wazuh_min_version: 4.7.0
+    guardsarm_min_version: 4.7.0
     parameters:
         - test_configuration:
             type: dict
@@ -176,7 +176,7 @@ def test_custom_bucket_logs(
         - manage_bucket_files:
             type: fixture
             brief: S3 buckets manager.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - configure_local_internal_options_function:
@@ -184,10 +184,10 @@ def test_custom_bucket_logs(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
+            brief: Truncate guardsarm logs.
         - daemons_handler:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.

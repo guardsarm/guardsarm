@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from wazuh_testing.utils import file
+from guardsarm_testing.utils import file
 
 
 @pytest.fixture()

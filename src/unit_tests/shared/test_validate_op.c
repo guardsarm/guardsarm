@@ -17,8 +17,8 @@
 
 #include "shared.h"
 #include "validate_op.h"
-#include "../wrappers/wazuh/shared/expression_wrappers.h"
-#include "../wrappers/wazuh/os_net/os_net_wrappers.h"
+#include "../wrappers/guardsarm/shared/expression_wrappers.h"
+#include "../wrappers/guardsarm/os_net/os_net_wrappers.h"
 #include "../../shared/src/validate_op.c"
 
 /* tests */

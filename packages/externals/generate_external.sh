@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Wazuh external dependency builder (host-side).
+# GuardSarm external dependency builder (host-side).
 #
 # Drives the per-leg external dependency rebuild. Picks the right Docker image
 # for the (system, architecture) combo, mounts the working tree, runs
@@ -16,7 +16,7 @@ set -e
 
 CURRENT_PATH="$(cd "$(dirname "$0")"; pwd -P)"
 # This script lives in packages/externals/, so the repo root is two levels up.
-WAZUH_PATH="$(cd "${CURRENT_PATH}/../.."; pwd -P)"
+GUARDSARM_PATH="$(cd "${CURRENT_PATH}/../.."; pwd -P)"
 
 ARCHITECTURE=""
 SYSTEM=""
@@ -25,7 +25,7 @@ DOCKER_TAG="latest"
 DEPS_TO_UPDATE=""
 JOBS="$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2)"
 VERBOSE=""
-OUTDIR="${WAZUH_PATH}/packages/output_externals"
+OUTDIR="${GUARDSARM_PATH}/packages/output_externals"
 
 usage() {
     cat <<EOF
@@ -82,7 +82,7 @@ esac
 case "${SYSTEM}-${ARCHITECTURE}" in
     deb-amd64|deb-arm64|rpm-amd64|rpm-arm64) ;;
     macos-intel64|macos-arm64) ;;
-    windows-i686) ;;  # Wazuh's Windows agent is always 32-bit MinGW cross-compile
+    windows-i686) ;;  # GuardSarm's Windows agent is always 32-bit MinGW cross-compile
     *)
         echo "ERROR: invalid combination ${SYSTEM}-${ARCHITECTURE}." >&2
         echo "       Valid: deb-{amd64,arm64}, rpm-{amd64,arm64}, macos-{intel64,arm64}, windows-i686" >&2
@@ -112,7 +112,7 @@ echo "[generate_external] deps='${DEPS_TO_UPDATE}'"
 echo "[generate_external] output=${OUTDIR}"
 
 # macOS runs natively on the macOS runner (no Docker available, host toolchain
-# is what we ship against). Every other leg runs inside a pinned Wazuh builder
+# is what we ship against). Every other leg runs inside a pinned GuardSarm builder
 # image so the host glibc the build was produced against is the image's, not
 # the runner's:
 #   - deb/rpm   -> pkg_<sys>_<target>_builder_<arch>      (centos:6/7 era)
@@ -127,15 +127,15 @@ echo "[generate_external] output=${OUTDIR}"
 if [ "${SYSTEM}" = "macos" ]; then
     echo "[generate_external] mode=native (no docker)"
     env \
-        WAZUH_SRC="${WAZUH_PATH}" \
+        GUARDSARM_SRC="${GUARDSARM_PATH}" \
         ARTIFACTS_DIR="${OUTDIR}/external_artifacts" \
         SYSTEM="${SYSTEM}" \
         BUILD_TARGET="${TARGET}" \
         ARCHITECTURE_TARGET="${ARCHITECTURE}" \
         DEPS_TO_UPDATE="${DEPS_TO_UPDATE}" \
         JOBS="${JOBS}" \
-        WAZUH_VERBOSE="${VERBOSE}" \
-        bash "${WAZUH_PATH}/packages/externals/build_external.sh"
+        GUARDSARM_VERBOSE="${VERBOSE}" \
+        bash "${GUARDSARM_PATH}/packages/externals/build_external.sh"
 else
     if [ "${SYSTEM}" = "windows" ]; then
         CONTAINER_NAME="compile_windows_agent"
@@ -145,31 +145,31 @@ else
     echo "[generate_external] image=${CONTAINER_NAME}:${DOCKER_TAG}"
 
     # Run build_external.sh inside the builder image.
-    # - /wazuh-local-src    working tree (read-write so we can replace src/external/)
-    # - /var/local/wazuh    artifact output (build_external.sh writes
+    # - /guardsarm-local-src    working tree (read-write so we can replace src/external/)
+    # - /var/local/guardsarm    artifact output (build_external.sh writes
     #                       external_artifacts/ subdir here, we pull from there)
     # We override the image entrypoint because each image's default entrypoint
     # drives a full package build (docker_builder.sh on the rpm/deb images,
     # entrypoint.sh on compile_windows_agent).
     docker run --rm -t \
-        -v "${WAZUH_PATH}:/wazuh-local-src:Z" \
-        -v "${OUTDIR}:/var/local/wazuh:Z" \
+        -v "${GUARDSARM_PATH}:/guardsarm-local-src:Z" \
+        -v "${OUTDIR}:/var/local/guardsarm:Z" \
         -e SYSTEM="${SYSTEM}" \
         -e BUILD_TARGET="${TARGET}" \
         -e ARCHITECTURE_TARGET="${ARCHITECTURE}" \
         -e DEPS_TO_UPDATE="${DEPS_TO_UPDATE}" \
         -e JOBS="${JOBS}" \
-        -e WAZUH_VERBOSE="${VERBOSE}" \
+        -e GUARDSARM_VERBOSE="${VERBOSE}" \
         --entrypoint /bin/bash \
         "${CONTAINER_NAME}:${DOCKER_TAG}" \
-        /wazuh-local-src/packages/externals/build_external.sh
+        /guardsarm-local-src/packages/externals/build_external.sh
 fi
 
 echo "[generate_external] per-dep zips:"
 ls -la "${OUTDIR}/external_artifacts/" 2>/dev/null || echo "  (none — build may have failed)"
 
 # Re-pack the per-dep zips into the S3 layout `make deps` consumes from
-# packages.wazuh.com/deps/<version>/libraries/. Each runner emits a single
+# packages.guardsarm.com/deps/<version>/libraries/. Each runner emits a single
 # tarball that already contains its slice of the libraries/ tree, so
 # downloading every artifact from a run and extracting each into the same
 # destination yields the complete tree — no aggregation job needed.
@@ -243,7 +243,7 @@ repack() {
 # agent leg gets a source-only snapshot for server-only deps like rocksdb /
 # jemalloc that src/external/CMakeLists.txt gates behind `if(NOT IS_AGENT ...)`),
 # and where both legs compiled a dep the agent copy wins because its
-# centos:6 / glibc-2.12 binaries link in every Wazuh builder image while the
+# centos:6 / glibc-2.12 binaries link in every GuardSarm builder image while the
 # manager's centos:7 / glibc-2.17 binaries do not. That comparison is the
 # consolidate job's responsibility (see 5_builderpackage_externals.yml); it
 # is output-driven, so changing a dependency never needs a code change here.

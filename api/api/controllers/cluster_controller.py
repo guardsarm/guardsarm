@@ -7,18 +7,18 @@ import logging
 from connexion import request
 from connexion.lifecycle import ConnexionResponse
 
-import wazuh.cluster as cluster
-import wazuh.manager as manager
-import wazuh.stats as stats
+import guardsarm.cluster as cluster
+import guardsarm.manager as manager
+import guardsarm.stats as stats
 from api.controllers.util import json_response, XML_CONTENT_TYPE
 from api.models.base_model_ import Body
 from api.util import remove_nones_to_dict, parse_api_param, raise_if_exc
 from api.validator import check_component_configuration_pair
-from wazuh.core.cluster.control import get_system_nodes
-from wazuh.core.cluster.dapi.dapi import DistributedAPI
-from wazuh.core.results import AffectedItemsWazuhResult
+from guardsarm.core.cluster.control import get_system_nodes
+from guardsarm.core.cluster.dapi.dapi import DistributedAPI
+from guardsarm.core.results import AffectedItemsGuardSarmResult
 
-logger = logging.getLogger('wazuh-api')
+logger = logging.getLogger('guardsarm-api')
 
 
 async def get_cluster_node(pretty: bool = False, wait_for_complete: bool = False) -> ConnexionResponse:
@@ -217,7 +217,7 @@ async def get_config(pretty: bool = False, wait_for_complete: bool = False) -> C
 
 
 async def get_status_node(node_id: str, pretty: bool = False, wait_for_complete: bool = False) -> ConnexionResponse:
-    """Get a specified node's Wazuh daemons status.
+    """Get a specified node's GuardSarm daemons status.
 
     Parameters
     ----------
@@ -289,7 +289,7 @@ async def get_info_node(node_id: str, pretty: bool = False, wait_for_complete: b
 async def get_configuration_node(node_id: str, pretty: bool = False, wait_for_complete: bool = False,
                                  section: str = None, field: str = None,
                                  raw: bool = False) -> ConnexionResponse:
-    """Get a specified node's configuration (wazuh-manager.conf).
+    """Get a specified node's configuration (guardsarm-manager.conf).
 
     Parameters
     ----------
@@ -300,7 +300,7 @@ async def get_configuration_node(node_id: str, pretty: bool = False, wait_for_co
     wait_for_complete : bool
         Disable response timeout or not. Default `False`
     section : str
-        Indicates the wazuh configuration section.
+        Indicates the guardsarm configuration section.
     field : str
         Indicates a section child.
     raw : bool, optional
@@ -331,7 +331,7 @@ async def get_configuration_node(node_id: str, pretty: bool = False, wait_for_co
                           )
     data = raise_if_exc(await dapi.distribute_function())
 
-    if isinstance(data, AffectedItemsWazuhResult):
+    if isinstance(data, AffectedItemsGuardSarmResult):
         response = json_response(data, pretty=pretty)
     else:
         response = ConnexionResponse(body=data["message"],
@@ -341,7 +341,7 @@ async def get_configuration_node(node_id: str, pretty: bool = False, wait_for_co
 
 async def get_daemon_stats_node(node_id: str, pretty: bool = False, wait_for_complete: bool = False,
                                 daemons_list: list = None):
-    """Get Wazuh statistical information from the specified daemons of a specified cluster node.
+    """Get GuardSarm statistical information from the specified daemons of a specified cluster node.
 
     Parameters
     ----------
@@ -375,9 +375,9 @@ async def get_daemon_stats_node(node_id: str, pretty: bool = False, wait_for_com
 async def get_log_node(node_id: str, pretty: bool = False, wait_for_complete: bool = False, offset: int = 0,
                        limit: int = None, sort: str = None, search: str = None, tag: str = None, level: str = None,
                        q: str = None, select: str = None, distinct: bool = False) -> ConnexionResponse:
-    """Get a specified node's wazuh logs.
+    """Get a specified node's guardsarm logs.
 
-    Returns the last 2000 wazuh log entries in node {node_id}.
+    Returns the last 2000 guardsarm log entries in node {node_id}.
 
     Parameters
     ----------
@@ -442,7 +442,7 @@ async def get_log_node(node_id: str, pretty: bool = False, wait_for_complete: bo
 
 async def get_log_summary_node(node_id: str, pretty: bool = False,
                                wait_for_complete: bool = False) -> ConnexionResponse:
-    """Get a summary of a specified node's wazuh logs.
+    """Get a summary of a specified node's guardsarm logs.
 
     Parameters
     ----------
@@ -635,7 +635,7 @@ async def put_reload(pretty: bool = False, nodes_list: str = '*') -> ConnexionRe
 
 async def get_conf_validation(pretty: bool = False, wait_for_complete: bool = False,
                               nodes_list: str = '*') -> ConnexionResponse:
-    """Check whether the Wazuh configuration in a list of cluster nodes is correct or not.
+    """Check whether the GuardSarm configuration in a list of cluster nodes is correct or not.
 
 
     Parameters
@@ -715,14 +715,14 @@ async def get_node_config(node_id: str, component: str, wait_for_complete: bool 
 
 async def update_configuration(node_id: str, body: bytes, pretty: bool = False,
                                wait_for_complete: bool = False) -> ConnexionResponse:
-    """Update Wazuh configuration (wazuh-manager.conf) in node node_id.
+    """Update GuardSarm configuration (guardsarm-manager.conf) in node node_id.
 
     Parameters
     ----------
     node_id : str
         Node ID.
     body : bytes
-        New content for the Wazuh configuration (wazuh-manager.conf).
+        New content for the GuardSarm configuration (guardsarm-manager.conf).
     pretty : bool
         Show results in human-readable format.
     wait_for_complete : bool

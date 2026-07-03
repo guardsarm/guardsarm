@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "engine.proto";
 
-package com.wazuh.api.engine.event_dumper;
+package com.guardsarm.api.engine.event_dumper;
 
 /*
  * This API is used to manage the event dumper in the engine

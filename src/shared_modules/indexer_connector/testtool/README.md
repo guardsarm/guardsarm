@@ -2,14 +2,14 @@
 
 A command-line tool for manually testing all features of the `IndexerConnector` module:
 pushing events (sync and async), exporting policy documents, and generating full policy assets
-from a running wazuh-indexer instance.
+from a running guardsarm-indexer instance.
 
 ---
 
 ## Building
 
 ```bash
-cd /workspaces/devContainer/wazuh/src/build
+cd /workspaces/devContainer/guardsarm/src/build
 make indexer_connector_tool -j$(nproc)
 # Binary is placed at: src/build/bin/indexer_connector_tool
 ```
@@ -21,7 +21,7 @@ make indexer_connector_tool -j$(nproc)
 | Subcommand | Description |
 |---|---|
 | `push-events` | Push documents to an index/data-stream (default if no subcommand given) |
-| `export-policy` | Dump all raw policy documents for a space from `wazuh-threatintel-policies` |
+| `export-policy` | Dump all raw policy documents for a space from `guardsarm-threatintel-policies` |
 | `generate-full-policy` | Build a structured full-policy asset (kvdbs, decoders, filters, integrations, policy) across all 5 policy aliases using a consistent PIT snapshot |
 
 ---
@@ -48,14 +48,14 @@ Every subcommand requires a **config JSON** passed with `-c`. Fields:
 `input/config.json`:
 ```json
 {
-  "name": "wazuh-states-vulnerabilities-cluster",
+  "name": "guardsarm-states-vulnerabilities-cluster",
   "enabled": "yes",
   "hosts": ["https://127.0.0.1:9200"],
   "username": "admin",
   "password": "admin",
   "ssl": {
     "certificate_authorities": [
-      "/workspaces/devContainer/wazuh/src/engine/tools/devContainer/e2e/certs/root-ca.pem"
+      "/workspaces/devContainer/guardsarm/src/engine/tools/devContainer/e2e/certs/root-ca.pem"
     ]
   }
 }
@@ -142,7 +142,7 @@ Push documents to an index. Supports sync (bulk HTTP) and async (RocksDB-queued)
     "id": "000_pkghash_CVE-2022-1234",
     "operation": "INSERT",
     "data": {
-      "wazuh": {
+      "guardsarm": {
         "agent": { "id": "000", "name": "agent-01", "version": "5.0.0" }
       },
       "package": {
@@ -159,7 +159,7 @@ Push documents to an index. Supports sync (bulk HTTP) and async (RocksDB-queued)
 
 ## Subcommand: `export-policy`
 
-Fetches all raw documents for a given space from the `wazuh-threatintel-policies` index
+Fetches all raw documents for a given space from the `guardsarm-threatintel-policies` index
 and writes them to a JSON file. Useful for inspecting what is currently stored.
 
 ### Options
@@ -199,11 +199,11 @@ Retrieves all resources for a space across **all 5 policy aliases** using a
 Point-In-Time (PIT) snapshot for consistency, then writes a structured JSON asset.
 
 Aliases queried:
-- `wazuh-threatintel-kvdbs`
-- `wazuh-threatintel-decoders`
-- `wazuh-threatintel-filters`
-- `wazuh-threatintel-integrations`
-- `wazuh-threatintel-policies`
+- `guardsarm-threatintel-kvdbs`
+- `guardsarm-threatintel-decoders`
+- `guardsarm-threatintel-filters`
+- `guardsarm-threatintel-integrations`
+- `guardsarm-threatintel-policies`
 
 ### Options
 
@@ -252,7 +252,7 @@ docker compose \
 ### Get the container IP
 
 ```bash
-docker inspect wazuh-indexer \
+docker inspect guardsarm-indexer \
   --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
 ```
 
@@ -261,7 +261,7 @@ Update `hosts` in `input/config.json` with this IP.
 ### Credentials
 
 The `admin` password after a fresh `indexer-security-init.sh` run is `admin`.
-Check `src/engine/tools/devContainer/e2e/certs/wazuh-passwords.txt` if it differs.
+Check `src/engine/tools/devContainer/e2e/certs/guardsarm-passwords.txt` if it differs.
 
 ### TLS certificate note
 
@@ -275,7 +275,7 @@ CERTS=src/engine/tools/devContainer/e2e/certs
 # Generate new CSR (reuse existing key)
 openssl req -new -key $CERTS/node-1-key.pem \
   -out /tmp/node-1.csr \
-  -subj "/C=US/L=California/O=Wazuh/OU=Wazuh/CN=node-1"
+  -subj "/C=US/L=California/O=GuardSarm/OU=GuardSarm/CN=node-1"
 
 # Sign with SAN including the new IP (replace 127.0.0.X)
 printf "[v3_req]\nsubjectAltName=IP:127.0.0.1,IP:127.0.0.X\n" > /tmp/san.cnf
@@ -285,11 +285,11 @@ openssl x509 -req -in /tmp/node-1.csr \
   -extensions v3_req -extfile /tmp/san.cnf
 
 # Deploy to running container
-docker exec wazuh-indexer cp /certs/node-1.pem /etc/wazuh-indexer/certs/indexer.pem
-docker exec wazuh-indexer chown wazuh-indexer:wazuh-indexer /etc/wazuh-indexer/certs/indexer.pem
-docker exec wazuh-indexer chmod 640 /etc/wazuh-indexer/certs/indexer.pem
-docker exec wazuh-indexer service wazuh-indexer restart
-docker exec wazuh-indexer /usr/share/wazuh-indexer/bin/indexer-security-init.sh
+docker exec guardsarm-indexer cp /certs/node-1.pem /etc/guardsarm-indexer/certs/indexer.pem
+docker exec guardsarm-indexer chown guardsarm-indexer:guardsarm-indexer /etc/guardsarm-indexer/certs/indexer.pem
+docker exec guardsarm-indexer chmod 640 /etc/guardsarm-indexer/certs/indexer.pem
+docker exec guardsarm-indexer service guardsarm-indexer restart
+docker exec guardsarm-indexer /usr/share/guardsarm-indexer/bin/indexer-security-init.sh
 ```
 
 ---
@@ -328,6 +328,6 @@ EOF
 | `No username and password found in the keystore` | `username`/`password` missing from config JSON | Add them to the config file |
 | `SSL peer certificate or SSH remote key was not OK` | Cert SAN doesn't include the target IP/hostname | Regenerate cert with correct SAN (see above) |
 | `No available server` | Wrong IP, wrong port, or indexer not running | Check `docker ps` and container IP |
-| `Health check failed … status: 401` | Wrong password | Check `wazuh-passwords.txt` or use `admin:admin` after fresh init |
+| `Health check failed … status: 401` | Wrong password | Check `guardsarm-passwords.txt` or use `admin:admin` after fresh init |
 | `Space name is required` | Missing `-s` flag on policy subcommands | Add `-s <space_name>` |
 | Output file is empty / 0 documents | Space name doesn't exist in the indexer | Verify with `curl` directly against the index |

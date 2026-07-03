@@ -2,14 +2,14 @@
 
 ## Introduction
 
-Agent groups allow administrators to organize Wazuh agents into logical collections for targeted configuration and policy management. Each group has its own shared directory on the Wazuh manager where centralized configuration files and shared resources are stored.
+Agent groups allow administrators to organize GuardSarm agents into logical collections for targeted configuration and policy management. Each group has its own shared directory on the GuardSarm manager where centralized configuration files and shared resources are stored.
 
 All agents belong to the `default` group by default. Agents can be assigned to one or more groups, enabling flexible policy management across the deployment.
 
 ## How it works
 
-1. The administrator creates a group on the Wazuh manager.
-2. Agents are assigned to the group via the Wazuh API or command-line tools.
+1. The administrator creates a group on the GuardSarm manager.
+2. Agents are assigned to the group via the GuardSarm API or command-line tools.
 3. The manager maintains a shared directory for each group containing the group's `agent.conf` and any shared files.
 4. When agents connect, they receive the merged configuration from all their assigned groups.
 
@@ -18,7 +18,7 @@ All agents belong to the `default` group by default. Agents can be assigned to o
 Each group has a dedicated directory under the manager's shared configuration path:
 
 ```
-/var/wazuh-manager/etc/shared/
+/var/guardsarm-manager/etc/shared/
 ├── default/
 │   └── agent.conf
 ├── web-servers/
@@ -29,7 +29,7 @@ Each group has a dedicated directory under the manager's shared configuration pa
     └── agent.conf
 ```
 
-## Managing groups with the Wazuh API
+## Managing groups with the GuardSarm API
 
 ### Create a group
 
@@ -75,25 +75,25 @@ DELETE /groups?groups_list=<GROUP_NAME>
 ### List agent groups
 
 ```bash
-/var/wazuh-manager/bin/agent_groups -l
+/var/guardsarm-manager/bin/agent_groups -l
 ```
 
 ### Create a group
 
 ```bash
-/var/wazuh-manager/bin/agent_groups -a -g <GROUP_NAME>
+/var/guardsarm-manager/bin/agent_groups -a -g <GROUP_NAME>
 ```
 
 ### Assign an agent to a group
 
 ```bash
-/var/wazuh-manager/bin/agent_groups -a -i <AGENT_ID> -g <GROUP_NAME>
+/var/guardsarm-manager/bin/agent_groups -a -i <AGENT_ID> -g <GROUP_NAME>
 ```
 
 ### Remove an agent from a group
 
 ```bash
-/var/wazuh-manager/bin/agent_groups -r -i <AGENT_ID> -g <GROUP_NAME>
+/var/guardsarm-manager/bin/agent_groups -r -i <AGENT_ID> -g <GROUP_NAME>
 ```
 
 ## Multi-group agents

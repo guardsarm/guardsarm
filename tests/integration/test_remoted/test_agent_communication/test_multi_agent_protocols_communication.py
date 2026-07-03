@@ -8,13 +8,13 @@ import pytest
 import time
 
 from pathlib import Path
-from wazuh_testing.tools.simulators.agent_simulator import connect
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
-from wazuh_testing.modules.remoted.configuration import REMOTED_DEBUG
-from wazuh_testing.modules.remoted import patterns
-from wazuh_testing.tools.monitors import queue_monitor
-from wazuh_testing.tools.thread_executor import ThreadExecutor
-from wazuh_testing.utils.callbacks import generate_callback
+from guardsarm_testing.tools.simulators.agent_simulator import connect
+from guardsarm_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from guardsarm_testing.modules.remoted.configuration import REMOTED_DEBUG
+from guardsarm_testing.modules.remoted import patterns
+from guardsarm_testing.tools.monitors import queue_monitor
+from guardsarm_testing.tools.thread_executor import ThreadExecutor
+from guardsarm_testing.utils.callbacks import generate_callback
 from . import CONFIGS_PATH, TEST_CASES_PATH
 
 
@@ -43,7 +43,7 @@ def send_event(event, protocol, manager_port, agent, injectors):
 # Test function.
 @pytest.mark.parametrize('test_configuration, test_metadata',  zip(test_configuration, test_metadata), ids=cases_ids)
 def test_multi_agent_protocols_communication(test_configuration, test_metadata, configure_local_internal_options, truncate_monitored_files,
-                            set_wazuh_configuration, daemons_handler, simulate_agents):
+                            set_guardsarm_configuration, daemons_handler, simulate_agents):
 
     '''
     description: Check agent-manager communication with several agents simultaneously via TCP, UDP or both.
@@ -63,14 +63,14 @@ def test_multi_agent_protocols_communication(test_configuration, test_metadata, 
             brief: Truncate all the log files and json alerts files before and after the test execution.
         - configure_local_internal_options:
             type: fixture
-            brief: Configure the Wazuh local internal options using the values from `local_internal_options`.
+            brief: Configure the GuardSarm local internal options using the values from `local_internal_options`.
         - daemons_handler:
             type: fixture
             brief: Restart service once the test finishes stops the daemons.
         - simulate_agents:
             type: fixture
             brief: create agents
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
     '''

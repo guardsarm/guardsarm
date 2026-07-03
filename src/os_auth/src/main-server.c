@@ -28,8 +28,8 @@
 #include <pthread.h>
 #include <sys/wait.h>
 #include "check_cert_op.h"
-#include "wazuhdb_queries_op.h"
-#include "wazuhdb_op.h"
+#include "guardsarmdb_queries_op.h"
+#include "guardsarmdb_op.h"
 #include "os_err.h"
 #include "generate_cert.h"
 #include <sys/epoll.h>
@@ -372,8 +372,8 @@ int main(int argc, char **argv)
         }
 
         // Return -1 if not configured
-        if (authd_read_config(WAZUHCONF) < 0) {
-            merror_exit(CONFIG_ERROR, WAZUHCONF);
+        if (authd_read_config(GUARDSARMCONF) < 0) {
+            merror_exit(CONFIG_ERROR, GUARDSARMCONF);
         }
 
         // Overwrite arguments
@@ -430,7 +430,7 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    mdebug1(WAZUH_HOMEDIR, home_path);
+    mdebug1(GUARDSARM_HOMEDIR, home_path);
 
     switch(w_is_worker()) {
     case -1:
@@ -1200,7 +1200,7 @@ void* run_writer(__attribute__((unused)) void *arg) {
 
             gettime(&t0);
             if (wdb_remove_agent(atoi(cur->id), &wdb_sock) != OS_SUCCESS) {
-                mdebug1("Could not remove the information stored in Wazuh DB of the agent %s.", cur->id);
+                mdebug1("Could not remove the information stored in GuardSarm DB of the agent %s.", cur->id);
             }
             gettime(&t1);
             mdebug2("[Writer] wdb_remove_agent(): %d µs.", (int)(1000000. * (double)time_diff(&t0, &t1)));

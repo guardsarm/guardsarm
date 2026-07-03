@@ -29,7 +29,7 @@ RUN /usr/local/bin/retry.sh --attempts 5 --delay 10 --backoff 2 --max-delay 40 -
 
 # Install Perl 5.10
 RUN /usr/local/bin/retry.sh --attempts 5 --delay 5 --backoff 2 --max-delay 30 --timeout 360 -- \
-    curl -fsSL --connect-timeout 20 --max-time 300 -o perl-5.10.1.tar.gz http://packages.wazuh.com/utils/perl/perl-5.10.1.tar.gz && \
+    curl -fsSL --connect-timeout 20 --max-time 300 -o perl-5.10.1.tar.gz http://packages.guardsarm.com/utils/perl/perl-5.10.1.tar.gz && \
     gunzip perl-5.10.1.tar.gz && tar -xf perl*.tar && \
     cd /perl-5.10.1 && ./Configure -des -Dcc='gcc' -Dusethreads && \
     make -j2 && make install && ln -fs /usr/local/bin/perl /bin/perl && \
@@ -37,13 +37,13 @@ RUN /usr/local/bin/retry.sh --attempts 5 --delay 5 --backoff 2 --max-delay 30 --
 
 # Update rpmbuild, rpm and autoconf
 RUN /usr/local/bin/retry.sh --attempts 5 --delay 5 --backoff 2 --max-delay 30 --timeout 360 -- \
-    curl -fsSL --connect-timeout 20 --max-time 300 -o autoconf-2.69.tar.gz http://packages.wazuh.com/utils/autoconf/autoconf-2.69.tar.gz && \
+    curl -fsSL --connect-timeout 20 --max-time 300 -o autoconf-2.69.tar.gz http://packages.guardsarm.com/utils/autoconf/autoconf-2.69.tar.gz && \
     gunzip autoconf-2.69.tar.gz && tar xvf autoconf-2.69.tar && \
     cd autoconf-2.69 && ./configure && make -j$(nproc) && \
     make install && cd / && rm -rf autoconf-*
 
 RUN /usr/local/bin/retry.sh --attempts 5 --delay 5 --backoff 2 --max-delay 30 --timeout 360 -- \
-    curl -fsSL --connect-timeout 20 --max-time 300 -o rpm-4.15.1.tar.bz2 http://packages.wazuh.com/utils/rpm/rpm-4.15.1.tar.bz2 && \
+    curl -fsSL --connect-timeout 20 --max-time 300 -o rpm-4.15.1.tar.bz2 http://packages.guardsarm.com/utils/rpm/rpm-4.15.1.tar.bz2 && \
     tar -xjf rpm-4.15.1.tar.bz2 && cd rpm-4.15.1 && \
     ./configure --without-lua && make -j$(nproc) && make install && cd / && rm -rf rpm-*
 
@@ -53,7 +53,7 @@ RUN mkdir -p /usr/local/var/lib/rpm && \
 
 RUN /usr/local/bin/retry.sh --attempts 5 --delay 5 --backoff 2 --max-delay 30 --timeout 360 -- \
     curl -fsSL --connect-timeout 20 --max-time 300 -o /tmp/gcc-14.3-1.x86_64.rpm \
-    https://packages.wazuh.com/utils/gcc/gcc-14.3-1.x86_64.rpm
+    https://packages.guardsarm.com/utils/gcc/gcc-14.3-1.x86_64.rpm
 RUN rpm -i /tmp/gcc-14.3-1.x86_64.rpm && \
     ln -fs /opt/gcc-14/bin/g++ /usr/bin/c++ && \
     ln -fs /opt/gcc-14/bin/g++ /usr/bin/g++ && \
@@ -65,7 +65,7 @@ ENV PATH "/opt/gcc-14/bin:${PATH}"
 
 RUN /usr/local/bin/retry.sh --attempts 5 --delay 5 --backoff 2 --max-delay 30 --timeout 360 -- \
     curl -fsSL --connect-timeout 20 --max-time 300 -o /tmp/binutils-2.38-1.x86_64.rpm \
-    https://packages.wazuh.com/utils/binutils/binutils-2.38-1.x86_64.rpm
+    https://packages.guardsarm.com/utils/binutils/binutils-2.38-1.x86_64.rpm
 RUN rpm -i /tmp/binutils-2.38-1.x86_64.rpm
 
 ENV PATH "/opt/binutils-2/bin:${PATH}"

@@ -15,7 +15,7 @@
 #include <winsvc.h>
 #include "syscheckd/src/db/include/db.h"
 #ifndef ARGV0
-#define ARGV0 "wazuh-agent"
+#define ARGV0 "guardsarm-agent"
 #endif
 
 /**************************************************************************************
@@ -24,9 +24,9 @@
     verification can be executed in local_start.
 **************************************************************************************/
 
-static LPTSTR g_lpszServiceName        = "WazuhSvc";
-static LPTSTR g_lpszServiceDisplayName = "Wazuh";
-static LPTSTR g_lpszServiceDescription = "Wazuh Windows Agent";
+static LPTSTR g_lpszServiceName        = "GuardSarmSvc";
+static LPTSTR g_lpszServiceDisplayName = "GuardSarm";
+static LPTSTR g_lpszServiceDescription = "GuardSarm Windows Agent";
 
 static SERVICE_STATUS          ossecServiceStatus;
 static SERVICE_STATUS_HANDLE   ossecServiceStatusHandle;
@@ -99,7 +99,7 @@ int os_stop_service()
 
     /*
     * Sleep for a short period of time to avoid possible race-conditions with
-    * newer instances of wazuh-agent.
+    * newer instances of guardsarm-agent.
     */
     if (rc == 1 || rc == -1) {
         Sleep(300);
@@ -287,7 +287,7 @@ VOID WINAPI OssecServiceCtrlHandler(DWORD dwOpcode)
                 SetServiceStatus (ossecServiceStatusHandle, &ossecServiceStatus);
                 plain_minfo("Set pending exit signal.");
 
-                // Kill children processes spawned by modules, only in wazuh-agent
+                // Kill children processes spawned by modules, only in guardsarm-agent
                 wm_kill_children();
                 stop_wmodules();
                 is_fim_shutdown = true;

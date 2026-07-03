@@ -14,11 +14,11 @@
 #include "os_net.h"
 #include "authd-config.h"
 #include "auth.h"
-#include "wazuhdb_queries_op.h"
+#include "guardsarmdb_queries_op.h"
 #include "sysInfo.h"
 #include "sym_load.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 #define static
 #ifdef WIN32
 #include "../../unit_tests/wrappers/windows/libc/stdio_wrappers.h"
@@ -523,7 +523,7 @@ int w_send_clustered_message(const char* command, const char* payload, char* res
     for (send_attempts = 0; send_attempts < CLUSTER_SEND_MESSAGE_ATTEMPTS; ++send_attempts) {
         result = 0;
         send_error = FALSE;
-        if (sock = external_socket_connect(sockname, WAZUH_IPC_TIMEOUT), sock >= 0) {
+        if (sock = external_socket_connect(sockname, GUARDSARM_IPC_TIMEOUT), sock >= 0) {
             if (OS_SendSecureTCPCluster(sock, command, payload, strlen(payload)) >= 0) {
                 if (response_length = OS_RecvSecureClusterTCP(sock, response, OS_MAXSTR), response_length <= 0) {
                     switch (response_length) {

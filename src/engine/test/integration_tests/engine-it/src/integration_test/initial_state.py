@@ -30,8 +30,8 @@ DECODER_OTHER_NAME = "decoder/other-test-message/0"
 DECODER_TEST_UUID = "2faeea8b-672b-4b42-8f91-657d7810d636"
 DECODER_OTHER_UUID = "594ea807-a037-408d-95b8-9a124ea333df"
 
-INTEG_WAZUH_CORE_UUID = "9b1a1ef2-1a70-4a8b-a89b-38b34174c2d1"
-INTEG_OTHER_WAZUH_CORE_UUID = "a15bbd77-8cb0-488f-94cd-4783d689a72f"
+INTEG_GUARDSARM_CORE_UUID = "9b1a1ef2-1a70-4a8b-a89b-38b34174c2d1"
+INTEG_OTHER_GUARDSARM_CORE_UUID = "a15bbd77-8cb0-488f-94cd-4783d689a72f"
 
 
 # ===================================================================
@@ -290,12 +290,12 @@ def init_cm_resources(api_client: APIClient):
     dec_test_json = build_tester_decoder_json(
         DECODER_TEST_NAME,
         DECODER_TEST_UUID,
-        check_expr="$wazuh.agent.id == AA11",
+        check_expr="$guardsarm.agent.id == AA11",
     )
     dec_other_json = build_tester_decoder_json(
         DECODER_OTHER_NAME,
         DECODER_OTHER_UUID,
-        check_expr="$wazuh.agent.id == BB22",
+        check_expr="$guardsarm.agent.id == BB22",
     )
 
     for payload in (dec_test_json, dec_other_json):
@@ -306,23 +306,23 @@ def init_cm_resources(api_client: APIClient):
         send_recv(api_client, req, api_engine.GenericStatus_Response())
 
     # 3) Integrations
-    wazuh_core_json = build_integration_json(
-        integ_uuid=INTEG_WAZUH_CORE_UUID,
-        integ_title="wazuh-core-test",
+    guardsarm_core_json = build_integration_json(
+        integ_uuid=INTEG_GUARDSARM_CORE_UUID,
+        integ_title="guardsarm-core-test",
         default_parent=DECODER_TEST_UUID,
         category="unclassified",
         decoder_uuid=DECODER_TEST_UUID,
     )
 
     other_core_json = build_integration_json(
-        integ_uuid=INTEG_OTHER_WAZUH_CORE_UUID,
-        integ_title="other-wazuh-core-test",
+        integ_uuid=INTEG_OTHER_GUARDSARM_CORE_UUID,
+        integ_title="other-guardsarm-core-test",
         default_parent=DECODER_TEST_UUID,
         category="other",
         decoder_uuid=DECODER_OTHER_UUID,
     )
 
-    for payload in (wazuh_core_json, other_core_json):
+    for payload in (guardsarm_core_json, other_core_json):
         req = api_crud.resourcePost_Request()
         req.space = POLICY_NS
         req.type = "integration"
@@ -355,7 +355,7 @@ def init(env_path: Path, test_path: Path):
         init_geo_store(env_path, test_path)
 
         # Binary path
-        bin_path = env_path / "wazuh-engine"
+        bin_path = env_path / "guardsarm-engine"
 
         print("Starting the Engine...")
         engine_handler = EngineHandler(bin_path.as_posix(), config_path.as_posix())

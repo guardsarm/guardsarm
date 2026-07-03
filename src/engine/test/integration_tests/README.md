@@ -1,8 +1,8 @@
-# Integration Tests for Wazuh Engine
+# Integration Tests for GuardSarm Engine
 
 ## Overview
 
-This directory contains the integration tests for the Wazuh Engine. These tests are essential for validating the interactions between different components of the Wazuh Engine and ensuring that they function together as expected.
+This directory contains the integration tests for the GuardSarm Engine. These tests are essential for validating the interactions between different components of the GuardSarm Engine and ensuring that they function together as expected.
 
 ## Prerequisites
 

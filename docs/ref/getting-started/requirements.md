@@ -4,7 +4,7 @@
 
 ### Operating System Requirements
 
-The following operating systems are recommended for Wazuh 5.x:
+The following operating systems are recommended for GuardSarm 5.x:
 
 - Amazon Linux 2023
 - Ubuntu 22.04, 24.04

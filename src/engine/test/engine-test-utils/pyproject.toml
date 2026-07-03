@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "engine-test-utils"
 version = "0.0.1"
 authors = [{ name = "Wazuh, Inc." }]
-description = "Test utilities for Wazuh Engine"
+description = "Test utilities for GuardSarm Engine"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = ["Programming Language :: Python :: 3"]
@@ -14,4 +14,4 @@ classifiers = ["Programming Language :: Python :: 3"]
 dependencies = ["api-communication"]
 
 [project.urls]
-Homepage = "https://github.com/wazuh/wazuh/src/engine/tools/engine-updown"
+Homepage = "https://github.com/guardsarm/guardsarm/src/engine/tools/engine-updown"

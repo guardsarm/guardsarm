@@ -9,7 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '.'))
 import aws_utils as utils
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
-import wazuh_integration
+import guardsarm_integration
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'services'))
 import aws_service
@@ -47,7 +47,7 @@ def mock_get_client(*args, **kwargs):
         return mock_client
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('aws_service.AWSService.__init__', side_effect=aws_service.AWSService.__init__)
 def test_aws_inspector_initializes_properly(mock_aws_service, mock_sts_client):
     """Test if the instances of AWSInspector are created properly."""
@@ -76,7 +76,7 @@ def test_aws_inspector_send_describe_findings(mock_sts_client):
             }
         ]
     }
-    with patch('wazuh_integration.WazuhIntegration.send_msg') as mock_send_msg, \
+    with patch('guardsarm_integration.GuardSarmIntegration.send_msg') as mock_send_msg, \
             patch('aws_service.AWSService.format_message') as mock_format:
         instance.send_describe_findings(arn_list)
         assert instance.sent_events == 1
@@ -86,12 +86,12 @@ def test_aws_inspector_send_describe_findings(mock_sts_client):
 
 @pytest.mark.parametrize('reparse', [True, False])
 @pytest.mark.parametrize('only_logs_after', [utils.TEST_ONLY_LOGS_AFTER, None])
-@patch('wazuh_integration.WazuhAWSDatabase.init_db')
-@patch('wazuh_integration.WazuhAWSDatabase.close_db')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.init_db')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.close_db')
 @patch('inspector.AWSInspector.send_describe_findings')
 @patch('inspector.aws_tools.debug')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
-@patch('wazuh_integration.WazuhIntegration.send_msg')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.send_msg')
 @patch.object(inspector.AWSInspector, 'get_client', mock_get_client)
 def test_aws_inspector_get_alerts(mock_send_msg, mock_sts_client, mock_debug, mock_send_describe_findings, mock_init_db, mock_close_db,
                                   only_logs_after, reparse, custom_database):
@@ -126,11 +126,11 @@ def test_aws_inspector_get_alerts(mock_send_msg, mock_sts_client, mock_debug, mo
 
 
 @pytest.mark.parametrize('region', inspector.INSPECTOR_V2_REGIONS)
-@patch('wazuh_integration.WazuhAWSDatabase.init_db')
-@patch('wazuh_integration.WazuhAWSDatabase.close_db')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.init_db')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.close_db')
 @patch('inspector.aws_tools.debug')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
-@patch('wazuh_integration.WazuhIntegration.send_msg')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.send_msg')
 @patch.object(inspector.AWSInspector, 'get_client', mock_get_client)
 def test_aws_inspector_v2_get_alerts(mock_send_msg, mock_sts_client, mock_debug, mock_init_db, mock_close_db,
                                      region, custom_database):
@@ -161,8 +161,8 @@ def test_aws_inspector_v2_get_alerts(mock_send_msg, mock_sts_client, mock_debug,
     assert datetime.strptime(last_scan_date.split(' ')[0], "%Y-%m-%d").strftime("%Y%m%d") == datetime.utcnow().strftime("%Y%m%d")
 
 
-@patch('wazuh_integration.WazuhIntegration.send_msg')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.send_msg')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('inspector.aws_tools.debug')
 def test_aws_inspector_send_describe_findings_skips_event_matching_discard_field(
         mock_debug, mock_sts_client, mock_send_msg):
@@ -185,10 +185,10 @@ def test_aws_inspector_send_describe_findings_skips_event_matching_discard_field
         f'"severity" field. The event will be skipped.', 2)
 
 
-@patch('wazuh_integration.WazuhAWSDatabase.init_db')
-@patch('wazuh_integration.WazuhAWSDatabase.close_db')
-@patch('wazuh_integration.WazuhIntegration.send_msg')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.init_db')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.close_db')
+@patch('guardsarm_integration.GuardSarmIntegration.send_msg')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('inspector.aws_tools.debug')
 def test_aws_inspector_v2_get_alerts_logs_no_findings_when_sent_events_v2_is_zero(
         mock_debug, mock_sts_client, mock_send_msg, mock_close_db, mock_init_db, custom_database):
@@ -215,10 +215,10 @@ def test_aws_inspector_v2_get_alerts_logs_no_findings_when_sent_events_v2_is_zer
         f"+++ [InspectorV2] No findings with recent updates in the specified time range", 1)
 
 
-@patch('wazuh_integration.WazuhAWSDatabase.init_db')
-@patch('wazuh_integration.WazuhAWSDatabase.close_db')
-@patch('wazuh_integration.WazuhIntegration.send_msg')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.init_db')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.close_db')
+@patch('guardsarm_integration.GuardSarmIntegration.send_msg')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('inspector.aws_tools.debug')
 def test_aws_inspector_get_alerts_logs_no_new_events_when_nothing_sent(
         mock_debug, mock_sts_client, mock_send_msg, mock_close_db, mock_init_db, custom_database):
@@ -247,8 +247,8 @@ def test_aws_inspector_get_alerts_logs_no_new_events_when_nothing_sent(
         f'+++ There are no new events in the "{region}" region', 1)
 
 
-@patch('wazuh_integration.WazuhIntegration.send_msg')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.send_msg')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('inspector.aws_tools.debug')
 def test_aws_inspector_v2_get_alerts_inspector_v2_skips_event_matching_discard_field(
         mock_debug, mock_sts_client, mock_send_msg):

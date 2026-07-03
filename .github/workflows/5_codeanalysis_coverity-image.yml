@@ -19,8 +19,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: wazuh/coverity-scan
-  PROJECT: wazuh/wazuh
+  IMAGE_NAME: guardsarm/coverity-scan
+  PROJECT: guardsarm/guardsarm
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
@@ -49,7 +49,7 @@ jobs:
 
       - name: Download Coverity tarball
         env:
-          COVERITY_TOKEN: ${{ secrets.COVERITY_SCAN_WAZUH_TOKEN }}
+          COVERITY_TOKEN: ${{ secrets.COVERITY_SCAN_GUARDSARM_TOKEN }}
         run: |
           wget -q https://scan.coverity.com/download/linux64 \
             --post-data "token=${COVERITY_TOKEN}&project=${PROJECT//\//%2F}" \

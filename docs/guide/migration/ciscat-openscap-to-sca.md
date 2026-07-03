@@ -1,8 +1,8 @@
 # Migrating from CIS-CAT and OpenSCAP to SCA
 
-In previous Wazuh versions (4.x), configuration and policy assessment could be performed with two integration wodles configured in the agent's `ossec.conf`: CIS-CAT (`<wodle name="cis-cat">`), which ran the external CIS-CAT Assessor against CIS benchmark content, and OpenSCAP (`<wodle name="open-scap">`), which ran the external OpenSCAP scanner against SCAP content (XCCDF profiles and OVAL definitions).
+In previous GuardSarm versions (4.x), configuration and policy assessment could be performed with two integration wodles configured in the agent's `ossec.conf`: CIS-CAT (`<wodle name="cis-cat">`), which ran the external CIS-CAT Assessor against CIS benchmark content, and OpenSCAP (`<wodle name="open-scap">`), which ran the external OpenSCAP scanner against SCAP content (XCCDF profiles and OVAL definitions).
 
-Starting with Wazuh 5.0, both wodles have been **removed**. The agent no longer ships the CIS-CAT or OpenSCAP integrations, and no module is registered under those names. Configuration assessment is now performed natively by the **Security Configuration Assessment (SCA)** module, which evaluates the system against YAML policies bundled with the agent — no Java runtime, no external CIS-CAT Assessor, and no `openscap-scanner` package are required.
+Starting with GuardSarm 5.0, both wodles have been **removed**. The agent no longer ships the CIS-CAT or OpenSCAP integrations, and no module is registered under those names. Configuration assessment is now performed natively by the **Security Configuration Assessment (SCA)** module, which evaluates the system against YAML policies bundled with the agent — no Java runtime, no external CIS-CAT Assessor, and no `openscap-scanner` package are required.
 
 > **Note:** If a `<wodle name="cis-cat">` or `<wodle name="open-scap">` block is left in `ossec.conf` (or in a shared `agent.conf`) after upgrading to 5.0, the block is ignored and the agent logs an informational message: `INFO: The 'cis-cat' module is deprecated. Use the SCA module instead.` or `INFO: The 'open-scap' module is deprecated. Use the SCA module instead.` The configuration still loads and the agent starts, but the wodles no longer run, so remove these blocks as part of the migration.
 
@@ -10,26 +10,26 @@ Starting with Wazuh 5.0, both wodles have been **removed**. The agent no longer 
 
 ## Capability mapping (4.x -> 5.x)
 
-The following table maps each CIS-CAT and OpenSCAP capability from Wazuh 4.x to its Wazuh 5.x equivalent.
+The following table maps each CIS-CAT and OpenSCAP capability from GuardSarm 4.x to its GuardSarm 5.x equivalent.
 
-| Capability                  | CIS-CAT / OpenSCAP (4.x)                                       | Wazuh 5.x equivalent                                                                 |
+| Capability                  | CIS-CAT / OpenSCAP (4.x)                                       | GuardSarm 5.x equivalent                                                                 |
 | --------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | Configuration block         | `<wodle name="cis-cat">` / `<wodle name="open-scap">`         | [`<sca>`](../../ref/modules/sca/configuration.md)                                    |
 | Policy/benchmark format     | XCCDF / SCAP datastream                                       | YAML policy file                                                                     |
 | External dependency         | Java runtime + CIS-CAT Assessor / `openscap-scanner`          | None — assessment is built into the agent                                            |
 | CIS benchmark content       | Benchmark files downloaded and referenced by path             | Bundled policies under `ruleset/sca` (per distribution and version)                  |
 | Custom benchmark content    | Custom XCCDF profile                                          | [Custom SCA YAML policy](../../ref/modules/sca/custom-policies.md)                   |
-| Compliance scan results     | Alerts + agent database                                       | SCA events sent to the indexer; SCA inventory in the Wazuh dashboard                 |
+| Compliance scan results     | Alerts + agent database                                       | SCA events sent to the indexer; SCA inventory in the GuardSarm dashboard                 |
 | Vulnerability (OVAL) scan   | OpenSCAP OVAL content (e.g. `cve-redhat-7-ds.xml`)            | [Vulnerability Detection module](../../ref/modules/vulnerability-scanner/README.md) — **not** SCA |
 
-> **Important:** SCA replaces the **configuration-assessment** (XCCDF) side of CIS-CAT and OpenSCAP only. The **vulnerability-assessment** (OVAL/CVE) side of OpenSCAP has no SCA equivalent. In Wazuh, CVE detection is a separate capability (Vulnerability Detector in 4.x, the [Vulnerability Detection module](../../ref/modules/vulnerability-scanner/README.md) in 5.x). If your OpenSCAP configuration included `<content type="oval">` blocks, do not expect SCA to reproduce them — enable Vulnerability Detection instead.
+> **Important:** SCA replaces the **configuration-assessment** (XCCDF) side of CIS-CAT and OpenSCAP only. The **vulnerability-assessment** (OVAL/CVE) side of OpenSCAP has no SCA equivalent. In GuardSarm, CVE detection is a separate capability (Vulnerability Detector in 4.x, the [Vulnerability Detection module](../../ref/modules/vulnerability-scanner/README.md) in 5.x). If your OpenSCAP configuration included `<content type="oval">` blocks, do not expect SCA to reproduce them — enable Vulnerability Detection instead.
 
-## Wazuh 4.x ossec.conf reference
+## GuardSarm 4.x ossec.conf reference
 
-Below are the typical Wazuh 4.x wodle blocks you may have in your `ossec.conf`. Use them as a reference when following the migration steps.
+Below are the typical GuardSarm 4.x wodle blocks you may have in your `ossec.conf`. Use them as a reference when following the migration steps.
 
 ```xml
-<!-- Wazuh 4.x ossec.conf -->
+<!-- GuardSarm 4.x ossec.conf -->
 
 <!-- CIS-CAT: runs the external CIS-CAT Assessor against a CIS benchmark profile -->
 <wodle name="cis-cat">
@@ -63,8 +63,8 @@ Below are the typical Wazuh 4.x wodle blocks you may have in your `ossec.conf`. 
 
 Before proceeding, make sure you have:
 
-- Wazuh 5.0 or later deployed (indexer, manager, dashboard) and the agents upgraded.
-- Access to each agent's local `ossec.conf`, and to the Wazuh manager, where shared `agent.conf` files are edited (one per agent group, under `etc/shared/<group>/`) before being pushed to agents.
+- GuardSarm 5.0 or later deployed (indexer, manager, dashboard) and the agents upgraded.
+- Access to each agent's local `ossec.conf`, and to the GuardSarm manager, where shared `agent.conf` files are edited (one per agent group, under `etc/shared/<group>/`) before being pushed to agents.
 - A list of the benchmarks and profiles you previously assessed with CIS-CAT and OpenSCAP, so you can match them to the equivalent SCA policies.
 
 > These steps remove the deprecated wodles and replace them with SCA. Apply them wherever the wodles were configured: in each agent's local `ossec.conf`, and in any shared `agent.conf` on the manager.
@@ -79,11 +79,11 @@ For each block, note the benchmark content and profile it referenced (the `<cont
 
 Delete the `<wodle name="cis-cat">` and `<wodle name="open-scap">` blocks. Edit the local `ossec.conf` directly on each agent, and edit any shared `agent.conf` on the manager (in the group's `etc/shared/<group>/` directory) — not on the agents, which receive that file from the manager.
 
-Wazuh 5.0 no longer registers a runnable module under either name: leftover blocks are ignored with an INFO deprecation message and provide no assessment, so remove them to keep the configuration clean.
+GuardSarm 5.0 no longer registers a runnable module under either name: leftover blocks are ignored with an INFO deprecation message and provide no assessment, so remove them to keep the configuration clean.
 
 ## 3. Map your benchmarks to SCA policies
 
-Wazuh ships SCA policies for common CIS benchmarks under `ruleset/sca`, organized by distribution and version — for example `ruleset/sca/centos/7/cis_centos7_linux.yml`, `ruleset/sca/rhel/7/cis_rhel7_linux.yml`, or `ruleset/sca/ubuntu/cis_ubuntu24-04.yml`. In most cases the CIS benchmark you assessed with CIS-CAT or the SSG XCCDF profile you assessed with OpenSCAP already has a bundled SCA policy equivalent.
+GuardSarm ships SCA policies for common CIS benchmarks under `ruleset/sca`, organized by distribution and version — for example `ruleset/sca/centos/7/cis_centos7_linux.yml`, `ruleset/sca/rhel/7/cis_rhel7_linux.yml`, or `ruleset/sca/ubuntu/cis_ubuntu24-04.yml`. In most cases the CIS benchmark you assessed with CIS-CAT or the SSG XCCDF profile you assessed with OpenSCAP already has a bundled SCA policy equivalent.
 
 Identify the SCA policy that corresponds to each benchmark you recorded in [Step 1](#1-inventory-your-cis-cat-and-openscap-configuration). SCA auto-loads the policies bundled for the detected platform; you can also enable specific policies explicitly in the next step. See the [SCA module overview](../../ref/modules/sca/README.md) and the [SCA configuration reference](../../ref/modules/sca/configuration.md) for the available options.
 
@@ -110,11 +110,11 @@ If you maintained **custom** XCCDF content — a tailored CIS profile or a hand-
 
 Follow [Creating custom SCA policies](../../ref/modules/sca/custom-policies.md) for the policy file format (sections, checks, rule types, compliance, and MITRE mapping). Store custom policies in an administrator-managed path — not under `ruleset/sca`, whose contents are replaced on package upgrades — and reference them with explicit `<policy>` entries.
 
-If you are also bringing forward custom SCA policies that were written for Wazuh 4.x, review the [SCA policies from 4.x to 5.x](sca-policies-4x-to-5x.md) migration guide for the policy-format changes between versions.
+If you are also bringing forward custom SCA policies that were written for GuardSarm 4.x, review the [SCA policies from 4.x to 5.x](sca-policies-4x-to-5x.md) migration guide for the policy-format changes between versions.
 
 ## 6. Move OVAL/CVE scanning to Vulnerability Detection (OpenSCAP only)
 
-If your OpenSCAP configuration included `<content type="oval">` blocks for CVE scanning (for example `cve-redhat-7-ds.xml`), that workload is **not** covered by SCA. Enable the [Vulnerability Detection module](../../ref/modules/vulnerability-scanner/README.md) instead, which detects CVEs by correlating the inventory collected by Syscollector against Wazuh's CVE databases. No OVAL content files are needed.
+If your OpenSCAP configuration included `<content type="oval">` blocks for CVE scanning (for example `cve-redhat-7-ds.xml`), that workload is **not** covered by SCA. Enable the [Vulnerability Detection module](../../ref/modules/vulnerability-scanner/README.md) instead, which detects CVEs by correlating the inventory collected by Syscollector against GuardSarm's CVE databases. No OVAL content files are needed.
 
 ## 7. Apply the configuration
 
@@ -122,7 +122,7 @@ Restart the agent to apply the changes:
 
 ```bash
 # Linux
-systemctl restart wazuh-agent
+systemctl restart guardsarm-agent
 ```
 
 If the deprecated wodles were distributed through a shared `agent.conf`, push the updated shared configuration from the manager and let it propagate to the assigned agents.
@@ -140,7 +140,7 @@ Confirm that the migration succeeded on a representative agent:
    INFO: Scan ended.
    ```
 
-3. Review the results in the Wazuh dashboard SCA inventory, or query them through the API. See the [SCA output samples](../../ref/modules/sca/output-samples.md) and the [SCA database schema](../../ref/modules/sca/database-schema.md) for the data SCA produces.
+3. Review the results in the GuardSarm dashboard SCA inventory, or query them through the API. See the [SCA output samples](../../ref/modules/sca/output-samples.md) and the [SCA database schema](../../ref/modules/sca/database-schema.md) for the data SCA produces.
 
 <details>
 <summary>Example A: rewriting a single OpenSCAP XCCDF rule as an SCA check</summary>
@@ -193,13 +193,13 @@ CIS-CAT differs from OpenSCAP here: the CIS-CAT Pro Assessor and its machine-rea
 So instead of rewriting a rule, you match the recommendation. Take the recommendation a CIS-CAT scan reported as a finding:
 
 ```
-# CIS-CAT finding (as reported in a Wazuh 4.x alert)
+# CIS-CAT finding (as reported in a GuardSarm 4.x alert)
 Benchmark: CIS Ubuntu Linux 22.04 LTS Benchmark
 Recommendation: 2.4.1.2 Ensure permissions on /etc/crontab are configured
 Result: fail
 ```
 
-Wazuh's bundled SCA CIS policies already implement these recommendations and preserve the CIS numbering in a comment, so the equivalent check is a direct lookup (`ruleset/sca/ubuntu/cis_ubuntu22-04.yml`):
+GuardSarm's bundled SCA CIS policies already implement these recommendations and preserve the CIS numbering in a comment, so the equivalent check is a direct lookup (`ruleset/sca/ubuntu/cis_ubuntu22-04.yml`):
 
 ```yaml
   # 2.4.1.2 Ensure permissions on /etc/crontab are configured. (Automated)

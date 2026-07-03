@@ -2,11 +2,11 @@ syntax = "proto3";
 
 import "engine.proto";
 
-package com.wazuh.api.engine.rawevtindexer;
+package com.guardsarm.api.engine.rawevtindexer;
 
 /*
  * This API is used to query the raw event indexer status in the engine.
- * Enable/disable control is managed via remote configuration (wazuh-indexer).
+ * Enable/disable control is managed via remote configuration (guardsarm-indexer).
  */
 
 /***************************************************

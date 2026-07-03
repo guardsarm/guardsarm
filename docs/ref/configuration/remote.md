@@ -2,7 +2,7 @@
 
 The `<remote>` section configures the manager listener that receives events from agents. Each `<remote>` block defines one listener; multiple blocks are allowed.
 
-Configuration file: `/var/wazuh-manager/etc/wazuh-manager.conf`
+Configuration file: `/var/guardsarm-manager/etc/guardsarm-manager.conf`
 
 Parser: `src/config/src/remote-config.c`
 
@@ -61,7 +61,7 @@ Seconds the manager waits before allowing a new connection to take over an exist
 
 ### agents / allow_higher_versions
 
-Controls whether agents running a newer Wazuh version than the manager are accepted.
+Controls whether agents running a newer GuardSarm version than the manager are accepted.
 
 - **Default value**: `no`
 - **Allowed values**: `yes`, `no`

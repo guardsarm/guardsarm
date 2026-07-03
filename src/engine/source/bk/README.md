@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `bk` (**b**ac**k**end) module is the execution engine of the Wazuh engine. Its responsibility is to take a **logical expression tree** (`base::Expression`) —which describes an event-processing pipeline— and turn it into a **concrete execution graph** that processes events (`base::Event`) efficiently.
+The `bk` (**b**ac**k**end) module is the execution engine of the GuardSarm engine. Its responsibility is to take a **logical expression tree** (`base::Expression`) —which describes an event-processing pipeline— and turn it into a **concrete execution graph** that processes events (`base::Event`) efficiently.
 
 In simple terms: other modules (such as the `builder`) construct a tree that *describes* what operations to perform and in what order. The `bk` module takes that description and materializes it into an executable pipeline, receives JSON events, runs them through the pipeline, and returns the result.
 

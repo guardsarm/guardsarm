@@ -1,5 +1,5 @@
 /*
- * Wazuh SysInfo
+ * GuardSarm SysInfo
  * Copyright (C) 2015, Wazuh Inc.
  * July 20, 2023.
  *
@@ -364,7 +364,7 @@ TEST_F(PKGWrapperTest, pkgVersionXML)
     std::string inputPath;
     inputPath += currentWorkingDirectory();
     inputPath += "/input_files";
-    std::string package { "com.wazuh.pkg.wazuh-agent.plist" };
+    std::string package { "com.guardsarm.pkg.guardsarm-agent.plist" };
 
     struct PackageContext ctx
     {
@@ -372,16 +372,16 @@ TEST_F(PKGWrapperTest, pkgVersionXML)
     };
     std::shared_ptr<PKGWrapper> wrapper;
     EXPECT_NO_THROW(wrapper = std::make_shared<PKGWrapper>(ctx));
-    EXPECT_EQ(wrapper->name(), "wazuh-agent");
+    EXPECT_EQ(wrapper->name(), "guardsarm-agent");
     EXPECT_EQ(wrapper->version(), "4.10.1");
     EXPECT_EQ(wrapper->groups(), " ");
-    EXPECT_EQ(wrapper->description(), "com.wazuh.pkg.wazuh-agent");
+    EXPECT_EQ(wrapper->description(), "com.guardsarm.pkg.guardsarm-agent");
     EXPECT_EQ(wrapper->architecture(), " ");
     EXPECT_EQ(wrapper->format(), "pkg");
     EXPECT_EQ(wrapper->osPatch(), "");
     EXPECT_EQ(wrapper->source(), "receipts");
     EXPECT_EQ(wrapper->location(), inputPath + "/" + package);
-    EXPECT_EQ(wrapper->vendor(), "Wazuh");
+    EXPECT_EQ(wrapper->vendor(), "GuardSarm");
     EXPECT_EQ(wrapper->priority(), " ");
     EXPECT_EQ(wrapper->size(), 0);
     EXPECT_EQ(wrapper->install_time(), "2024-11-07T08:58:38Z");
@@ -490,12 +490,12 @@ TEST_F(PKGWrapperTest, ReceiptKeptWhenLivenessCheckerReturnsTrue)
     });
 
     const std::string dir { currentWorkingDirectory() + "/input_files" };
-    const std::string package { "com.wazuh.pkg.wazuh-agent.plist" };
+    const std::string package { "com.guardsarm.pkg.guardsarm-agent.plist" };
     PackageContext ctx { dir, package, "" };
 
     std::shared_ptr<PKGWrapper> wrapper;
     EXPECT_NO_THROW(wrapper = std::make_shared<PKGWrapper>(ctx));
-    EXPECT_EQ(wrapper->name(), "wazuh-agent");
+    EXPECT_EQ(wrapper->name(), "guardsarm-agent");
     EXPECT_EQ(wrapper->location(), dir + "/" + package);
 
     // The wrapper must have asked the checker about this exact receipt.
@@ -513,7 +513,7 @@ TEST_F(PKGWrapperTest, ReceiptDroppedWhenLivenessCheckerReturnsFalse)
     });
 
     const std::string dir { currentWorkingDirectory() + "/input_files" };
-    const std::string package { "com.wazuh.pkg.wazuh-agent.plist" };
+    const std::string package { "com.guardsarm.pkg.guardsarm-agent.plist" };
     PackageContext ctx { dir, package, "" };
 
     std::shared_ptr<PKGWrapper> wrapper;

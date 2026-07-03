@@ -21,7 +21,7 @@ static const char *XML_POLICY = "policy";
 static const char *XML_SKIP_NFS = "skip_nfs";
 static const char *XML_SYNC = "synchronization";
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 /* Remove static qualifier when testing */
 #define static
 #endif

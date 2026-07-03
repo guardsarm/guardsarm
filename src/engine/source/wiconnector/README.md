@@ -2,13 +2,13 @@
 
 ## Overview
 
-The **wiconnector** module provides the **Wazuh Indexer Connector** — a thread-safe client that the engine uses to communicate with the wazuh-indexer (OpenSearch). It exposes a unified interface for:
+The **wiconnector** module provides the **GuardSarm Indexer Connector** — a thread-safe client that the engine uses to communicate with the guardsarm-indexer (OpenSearch). It exposes a unified interface for:
 
 - **Indexing events** — pushing alert / raw-event JSON documents into data-stream indices.
 - **Retrieving policy resources** — fetching the full content of a policy space (KVDBs, decoders, integrations, policy definition) for content synchronization.
 - **Policy metadata queries** — checking policy existence, retrieving the SHA-256 hash and enabled status.
 - **IOC operations** — checking whether the IOC index exists, reading hash manifests, and streaming IOC records by type with batched pagination.
-- **Remote engine configuration** — pulling runtime engine settings from `.wazuh-settings`.
+- **Remote engine configuration** — pulling runtime engine settings from `.guardsarm-settings`.
 - **Queue introspection** — reporting the current size of the pending-event queue.
 
 Internally the module wraps an asynchronous `IndexerConnectorAsync` instance (from the shared `indexer_connector` library) and protects every operation with a `std::shared_mutex` for concurrent access.
@@ -39,7 +39,7 @@ Internally the module wraps an asynchronous `IndexerConnectorAsync` instance (fr
                         │
                         ▼
               ┌─────────────────────┐
-              │   wazuh-indexer     │
+              │   guardsarm-indexer     │
               │   (OpenSearch)      │
               └─────────────────────┘
 ```
@@ -50,7 +50,7 @@ Internally the module wraps an asynchronous `IndexerConnectorAsync` instance (fr
 
 To prevent **TOCTOU (time-of-check time-of-use) races** between policy/IOC hash validation and subsequent data download, the connector implements **consumer validation within a PIT snapshot**. When downstream modules (`cmsync`, `iocsync`) pass a `consumerIdToValidate` parameter:
 
-1. A **multi-index PIT** is created that includes both the data index AND `.wazuh-cti-consumers`.
+1. A **multi-index PIT** is created that includes both the data index AND `.guardsarm-cti-consumers`.
 2. Within the same PIT snapshot, the consumer document is queried and validated to be in the `idle` status.
 3. If the consumer is not idle, the method returns `std::nullopt` (graceful skip — data download is deferred).
 4. If the consumer is idle, data retrieval proceeds within the same PIT, guaranteeing consistency.
@@ -84,7 +84,7 @@ In `main.cpp`, the exit handler registers both: `requestShutdown()` executes fir
 
 ### Point-In-Time (PIT) Pagination
 
-For large result sets (`getPolicy`, `queryByBatches`), the connector opens a **Point-In-Time** snapshot on the wazuh-indexer with a keep-alive of 5 minutes. Results are retrieved in pages using `search_after` cursors, guaranteeing a consistent view even if the index is being concurrently updated. The PIT is automatically deleted via an RAII guard.
+For large result sets (`getPolicy`, `queryByBatches`), the connector opens a **Point-In-Time** snapshot on the guardsarm-indexer with a keep-alive of 5 minutes. Results are retrieved in pages using `search_after` cursors, guaranteeing a consistent view even if the index is being concurrently updated. The PIT is automatically deleted via an RAII guard.
 
 ### Batched Query Abstraction with Consumer Validation
 
@@ -94,7 +94,7 @@ The private `queryByBatches()` method provides a reusable pagination loop used b
 - An `onDocument` callback invoked for each hit.
 - An optional source filter for field-level projection.
 - An **optional `consumerIdToValidate`** parameter:
-  - When provided: PIT is created over both the data index AND `.wazuh-cti-consumers`; consumer is validated to be `idle` before pagination begins.
+  - When provided: PIT is created over both the data index AND `.guardsarm-cti-consumers`; consumer is validated to be `idle` before pagination begins.
   - When not provided: PIT is created over the data index only; no consumer validation.
   - **Returns `std::optional<std::size_t>`**: `std::nullopt` if consumer not idle, otherwise the number of documents processed.
 
@@ -102,10 +102,10 @@ The private `queryByBatches()` method provides a reusable pagination loop used b
 
 | Constant | Index Name | Purpose |
 |---|---|---|
-| `POLICY_INDEX` | `wazuh-threatintel-policies` | Policy metadata (hash, enabled, integrations) |
-| `POLICY_ALIASES` | `wazuh-threatintel-kvdbs`, `wazuh-threatintel-decoders`, `wazuh-threatintel-integrations`, `wazuh-threatintel-policies` | Full policy resource retrieval |
-| `IOC_INDEX` | `wazuh-threatintel-enrichments` | Indicators of Compromise |
-| `REMOTE_CONF_INDEX` | `.wazuh-settings` | Remote engine runtime configuration |
+| `POLICY_INDEX` | `guardsarm-threatintel-policies` | Policy metadata (hash, enabled, integrations) |
+| `POLICY_ALIASES` | `guardsarm-threatintel-kvdbs`, `guardsarm-threatintel-decoders`, `guardsarm-threatintel-integrations`, `guardsarm-threatintel-policies` | Full policy resource retrieval |
+| `IOC_INDEX` | `guardsarm-threatintel-enrichments` | Indicators of Compromise |
+| `REMOTE_CONF_INDEX` | `.guardsarm-settings` | Remote engine runtime configuration |
 
 ### Configuration
 
@@ -249,7 +249,7 @@ Acquires shared lock, delegates to `IndexerConnectorAsync::indexDataStream()`. E
 #### `getPolicy(space, consumerIdToValidate?)`
 
 1. **When `consumerIdToValidate` is provided** (typically `STANDARD_RULESET_CONSUMER_ID`):
-   - Opens a **multi-index PIT** including all 4 policy aliases AND `.wazuh-cti-consumers`.
+   - Opens a **multi-index PIT** including all 4 policy aliases AND `.guardsarm-cti-consumers`.
    - Validates consumer is `idle` within the PIT snapshot.
    - Returns `std::nullopt` if consumer not idle (cmsync skips sync cycle).
 2. **Otherwise** (no consumer validation):
@@ -263,7 +263,7 @@ Acquires shared lock, delegates to `IndexerConnectorAsync::indexDataStream()`. E
 #### `getPolicyHashAndEnabled(space, consumerIdToValidate?)`
 
 **When `consumerIdToValidate` is provided** (typically `STANDARD_RULESET_CONSUMER_ID`):
-- Creates a multi-index PIT including both `wazuh-threatintel-policies` AND `.wazuh-cti-consumers`.
+- Creates a multi-index PIT including both `guardsarm-threatintel-policies` AND `.guardsarm-cti-consumers`.
 - Validates consumer is `idle` within the PIT snapshot.
 - Queries policy within the same PIT to guarantee consistency.
 - Returns `std::nullopt` if consumer not idle.
@@ -288,7 +288,7 @@ Uses `queryByBatches()` with a `term` query on `document.type`, projecting only 
 #### `getIocTypeHashes(consumerIdToValidate?)`
 
 **When `consumerIdToValidate` is provided** (typically `IOC_ENRICHMENT_CONSUMER_ID`):
-- Creates a multi-index PIT including both `wazuh-threatintel-enrichments` AND `.wazuh-cti-consumers`.
+- Creates a multi-index PIT including both `guardsarm-threatintel-enrichments` AND `.guardsarm-cti-consumers`.
 - Validates consumer is `idle` within the PIT snapshot.
 - Queries IOC hashes within the same PIT to guarantee consistency.
 - Returns `std::nullopt` if consumer not idle (iocsync skips sync cycle).
@@ -300,7 +300,7 @@ Parses the `__ioc_type_hashes__` manifest into a `map<type, sha256>`.
 
 #### `getEngineRemoteConfig()`
 
-Searches `.wazuh-settings` for a single document, extracts `_source.engine`, validates it is an object, and returns it as `json::Json`.
+Searches `.guardsarm-settings` for a single document, extracts `_source.engine`, validates it is an object, and returns it as `json::Json`.
 
 ## CMake Targets
 
@@ -323,6 +323,6 @@ Searches `.wazuh-settings` for a single document, extracts `_source.engine`, val
 | `builder` | `wIndexerConnector::iwIndexerConnector` | Uses the connector to push indexed events via the `indexerOutput` stage builder |
 | `cmsync` | `wIndexerConnector::iwIndexerConnector` | Fetches policy resources and hashes from the indexer for content synchronization |
 | `iocsync` | `wIndexerConnector::iwIndexerConnector` | Reads IOC type hashes and streams IOC records for local KVDB synchronization |
-| `rawevtindexer` | `wIndexerConnector::iwIndexerConnector` | Indexes raw events into the wazuh-indexer |
-| `confremote` | `wIndexerConnector::iwIndexerConnector` | Retrieves remote engine configuration from `.wazuh-settings` |
+| `rawevtindexer` | `wIndexerConnector::iwIndexerConnector` | Indexes raw events into the guardsarm-indexer |
+| `confremote` | `wIndexerConnector::iwIndexerConnector` | Retrieves remote engine configuration from `.guardsarm-settings` |
 | `main.cpp` | `wIndexerConnector::wIndexerConnector` | Creates the `WIndexerConnector` instance with configuration and injects it into consuming modules |

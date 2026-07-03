@@ -22,9 +22,9 @@
 #define FORMAT_ERROR  "(1106): String not correctly formatted."
 #define MKDIR_ERROR   "(1107): Could not create directory '%s' due to [(%d)-(%s)]."
 #ifdef CLIENT
-#define HOME_ERROR    "(1108): Unable to find Wazuh install directory. Export it to WAZUH_AGENT_HOME environment variable."
+#define HOME_ERROR    "(1108): Unable to find GuardSarm install directory. Export it to GUARDSARM_AGENT_HOME environment variable."
 #else
-#define HOME_ERROR    "(1108): Unable to find Wazuh install directory. Export it to WAZUH_MANAGER_HOME environment variable."
+#define HOME_ERROR    "(1108): Unable to find GuardSarm install directory. Export it to GUARDSARM_MANAGER_HOME environment variable."
 #endif
 #define THREAD_ERROR  "(1109): Unable to create new pthread."
 #define FWRITE_ERROR  "(1110): Could not write file '%s' due to [(%d)-(%s)]."
@@ -292,8 +292,8 @@
 #define AG_ENROLL_FAIL  "(4113): Auto Enrollment configuration failed."
 #define AG_INV_INT      "(4114): All server addresses are IPv6 link-local and no interface to any <manager> block has been configured."
 #define AG_TOKEN_FAIL   "(4115): Error trying to get API token with login: %s"
-#define AG_API_ERROR_CODE  "(4116): Unexpected status code in Wazuh agent package uninstallation request: %ld\n"
-#define AG_REQUEST_FAIL    "(4117): Failed validation request to uninstall Wazuh agent package."
+#define AG_API_ERROR_CODE  "(4116): Unexpected status code in GuardSarm agent package uninstallation request: %ld\n"
+#define AG_REQUEST_FAIL    "(4117): Failed validation request to uninstall GuardSarm agent package."
 
 /* Rules reading errors */
 #define RL_INV_ROOT     "(5101): Invalid root element: '%s'."
@@ -313,7 +313,7 @@
 #define DB_MISS_CONFIG        "(5205): Missing database configuration. "\
                               "It requires host, user, pass and database."
 #define DB_CONFIGERR          "(5206): Database configuration error."
-#define DB_COMPILED           "(5207): Wazuh not compiled with support for '%s'."
+#define DB_COMPILED           "(5207): GuardSarm not compiled with support for '%s'."
 #define DB_MAINERROR          "(5208): Multiple database errors. Exiting."
 #define DB_CLOSING            "(5209): Closing connection to database."
 #define DB_ATTEMPT            "(5210): Attempting to reconnect to database."
@@ -530,7 +530,7 @@
 #define MSG_SOCKET_SIZE "(unix_domain) Maximum send buffer set to: '%d'."
 
 #define CONN_TO     "Connected to '%s' (%s queue)"
-#define WAZUH_HOMEDIR "Wazuh home directory: %s"
+#define GUARDSARM_HOMEDIR "GuardSarm home directory: %s"
 
 /* Debug Messages */
 #define FOUND_USER  "Found user/group ..."
@@ -552,11 +552,11 @@
 #define NORMAL_BUFFER   "Agent buffer is under %d %%. Working properly again."
 #define TOLERANCE_TIME  "Tolerance time set to Zero, defined flooding condition when buffer is full."
 
-/* Wazuh alert messages */
-#define OS_MG_STARTED   "wazuh: Manager started."
-#define OS_AG_STOPPED   "wazuh: Agent stopped: [%03d] (%s)."
-#define OS_AG_DISCON    "wazuh: Agent disconnected: [%03d] (%s)."
-#define OS_AG_REMOVED   "wazuh: Agent removed: [%03d] (%s)."
+/* GuardSarm alert messages */
+#define OS_MG_STARTED   "GuardSarm: Manager started."
+#define OS_AG_STOPPED   "GuardSarm: Agent stopped: [%03d] (%s)."
+#define OS_AG_DISCON    "GuardSarm: Agent disconnected: [%03d] (%s)."
+#define OS_AG_REMOVED   "GuardSarm: Agent removed: [%03d] (%s)."
 
 
 /* WIN32 errors */

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Shell script functions for Wazuh
+# Shell script functions for GuardSarm
 # Copyright (C) 2015, Wazuh Inc.
 # Author: Daniel B. Cid <daniel.cid@gmail.com>
 

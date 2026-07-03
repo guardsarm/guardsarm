@@ -11,9 +11,9 @@ build/
 
 # Objects
 libsqlite3.so*
-wazuh-clusterd-internal
+guardsarm-clusterd-internal
 
 # Projects
 .idea
 
-wazuh/wazuh.json
+guardsarm/guardsarm.json

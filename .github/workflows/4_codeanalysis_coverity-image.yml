@@ -18,7 +18,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: wazuh/coverity-scan
+  IMAGE_NAME: guardsarm/coverity-scan
 
 jobs:
   deprecated:

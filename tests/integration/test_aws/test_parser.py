@@ -33,7 +33,7 @@ configurator.configure_test(configuration_file='configuration_bucket_and_service
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_bucket_and_service_missing(
-        test_configuration, metadata, set_wazuh_configuration,
+        test_configuration, metadata, set_guardsarm_configuration,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler,
         file_monitoring
 ):
@@ -41,17 +41,17 @@ def test_bucket_and_service_missing(
     description: Command for bucket and service weren't invoked.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has not appeared calling the module with correct parameters.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -59,7 +59,7 @@ def test_bucket_and_service_missing(
         - metadata:
             type: dict
             brief: Get metadata from the module.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - configure_local_internal_options_function:
@@ -67,10 +67,10 @@ def test_bucket_and_service_missing(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
+            brief: Truncate guardsarm logs.
         - daemons_handler:
             type: fixture
-            brief: Restart the wazuh service catching the exception.
+            brief: Restart the guardsarm service catching the exception.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -99,7 +99,7 @@ configurator.configure_test(configuration_file='configuration_type_missing_in_bu
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_type_missing_in_bucket(
-        test_configuration, metadata, set_wazuh_configuration,
+        test_configuration, metadata, set_guardsarm_configuration,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler,
         file_monitoring
 ):
@@ -107,17 +107,17 @@ def test_type_missing_in_bucket(
     description: A warning occurs and was displayed in `ossec.log`.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has not appeared calling the module with correct parameters.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -125,7 +125,7 @@ def test_type_missing_in_bucket(
         - metadata:
             type: dict
             brief: Get metadata from the module.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - configure_local_internal_options_function:
@@ -133,10 +133,10 @@ def test_type_missing_in_bucket(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
+            brief: Truncate guardsarm logs.
         - daemons_handler:
             type: fixture
-            brief: Restart the wazuh service catching the exception.
+            brief: Restart the guardsarm service catching the exception.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -164,7 +164,7 @@ configurator.configure_test(configuration_file='configuration_type_missing_in_se
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_type_missing_in_service(
-        test_configuration, metadata, set_wazuh_configuration,
+        test_configuration, metadata, set_guardsarm_configuration,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler,
         file_monitoring
 ):
@@ -172,17 +172,17 @@ def test_type_missing_in_service(
     description: An error occurs and was displayed in `ossec.log`.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has not appeared calling the module with correct parameters.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -190,7 +190,7 @@ def test_type_missing_in_service(
         - metadata:
             type: dict
             brief: Get metadata from the module.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - configure_local_internal_options_function:
@@ -198,10 +198,10 @@ def test_type_missing_in_service(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
+            brief: Truncate guardsarm logs.
         - daemons_handler:
             type: fixture
-            brief: Restart the wazuh service catching the exception.
+            brief: Restart the guardsarm service catching the exception.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -230,7 +230,7 @@ configurator.configure_test(configuration_file='configuration_values_in_bucket.y
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_empty_values_in_bucket(
-        test_configuration, metadata, set_wazuh_configuration,
+        test_configuration, metadata, set_guardsarm_configuration,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler,
         file_monitoring
 ):
@@ -238,17 +238,17 @@ def test_empty_values_in_bucket(
     description: An error occurs and was displayed in `ossec.log`.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has not appeared calling the module with correct parameters.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -256,7 +256,7 @@ def test_empty_values_in_bucket(
         - metadata:
             type: dict
             brief: Get metadata from the module.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - configure_local_internal_options_function:
@@ -264,10 +264,10 @@ def test_empty_values_in_bucket(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
+            brief: Truncate guardsarm logs.
         - daemons_handler:
             type: fixture
-            brief: Restart the wazuh service catching the exception.
+            brief: Restart the guardsarm service catching the exception.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -295,7 +295,7 @@ configurator.configure_test(configuration_file='configuration_values_in_service.
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_empty_values_in_service(
-        test_configuration, metadata, set_wazuh_configuration,
+        test_configuration, metadata, set_guardsarm_configuration,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler,
         file_monitoring
 ):
@@ -303,17 +303,17 @@ def test_empty_values_in_service(
     description: An error occurs and was displayed in `ossec.log`.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has not appeared calling the module with correct parameters.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -321,7 +321,7 @@ def test_empty_values_in_service(
         - metadata:
             type: dict
             brief: Get metadata from the module.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - configure_local_internal_options_function:
@@ -329,10 +329,10 @@ def test_empty_values_in_service(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
+            brief: Truncate guardsarm logs.
         - daemons_handler:
             type: fixture
-            brief: Restart the wazuh service catching the exception.
+            brief: Restart the guardsarm service catching the exception.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -361,7 +361,7 @@ configurator.configure_test(configuration_file='configuration_values_in_bucket.y
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_invalid_values_in_bucket(
-        test_configuration, metadata, set_wazuh_configuration,
+        test_configuration, metadata, set_guardsarm_configuration,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler,
         file_monitoring
 ):
@@ -369,17 +369,17 @@ def test_invalid_values_in_bucket(
     description: An error occurs and was displayed in `ossec.log`.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has not appeared calling the module with correct parameters.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -387,7 +387,7 @@ def test_invalid_values_in_bucket(
         - metadata:
             type: dict
             brief: Get metadata from the module.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - configure_local_internal_options_function:
@@ -395,10 +395,10 @@ def test_invalid_values_in_bucket(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
+            brief: Truncate guardsarm logs.
         - daemons_handler:
             type: fixture
-            brief: Restart the wazuh service catching the exception.
+            brief: Restart the guardsarm service catching the exception.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -426,7 +426,7 @@ configurator.configure_test(configuration_file='configuration_values_in_service.
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_invalid_values_in_service(
-        test_configuration, metadata, set_wazuh_configuration,
+        test_configuration, metadata, set_guardsarm_configuration,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler,
         file_monitoring
 ):
@@ -434,17 +434,17 @@ def test_invalid_values_in_service(
     description: An error occurs and was displayed in `ossec.log`.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has not appeared calling the module with correct parameters.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -452,7 +452,7 @@ def test_invalid_values_in_service(
         - metadata:
             type: dict
             brief: Get metadata from the module.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - configure_local_internal_options_function:
@@ -460,10 +460,10 @@ def test_invalid_values_in_service(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
+            brief: Truncate guardsarm logs.
         - daemons_handler:
             type: fixture
-            brief: Restart the wazuh service catching the exception.
+            brief: Restart the guardsarm service catching the exception.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -491,7 +491,7 @@ configurator.configure_test(configuration_file='configuration_multiple_bucket_an
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_multiple_bucket_and_service_tags(
-        test_configuration, metadata, set_wazuh_configuration,
+        test_configuration, metadata, set_guardsarm_configuration,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler,
         file_monitoring
 ):
@@ -499,17 +499,17 @@ def test_multiple_bucket_and_service_tags(
     description: The command is invoked two times for buckets and two times for services.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has not appeared calling the module with correct parameters.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -517,7 +517,7 @@ def test_multiple_bucket_and_service_tags(
         - metadata:
             type: dict
             brief: Get metadata from the module.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - configure_local_internal_options_function:
@@ -525,10 +525,10 @@ def test_multiple_bucket_and_service_tags(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
+            brief: Truncate guardsarm logs.
         - daemons_handler:
             type: fixture
-            brief: Restart the wazuh service catching the exception.
+            brief: Restart the guardsarm service catching the exception.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.

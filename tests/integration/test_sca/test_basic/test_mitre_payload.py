@@ -17,7 +17,7 @@ targets:
     - agent
 
 daemons:
-    - wazuh-modulesd
+    - guardsarm-modulesd
 
 os_platform:
     - linux
@@ -31,8 +31,8 @@ os_version:
     - Windows Server 2016
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/capabilities/sec-config-assessment/index.html
-    - https://documentation.wazuh.com/current/user-manual/ruleset/mitre.html
+    - https://documentation.guardsarm.com/current/user-manual/capabilities/sec-config-assessment/index.html
+    - https://documentation.guardsarm.com/current/user-manual/ruleset/mitre.html
 
 tags:
     - sca
@@ -44,13 +44,13 @@ from pathlib import Path
 
 import pytest
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.constants.platforms import WINDOWS
-from wazuh_testing.modules.agentd.configuration import AGENTD_WINDOWS_DEBUG
-from wazuh_testing.modules.modulesd.configuration import MODULESD_DEBUG
-from wazuh_testing.modules.modulesd.sca import patterns
-from wazuh_testing.tools.monitors import file_monitor
-from wazuh_testing.utils import callbacks, configuration
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.constants.platforms import WINDOWS
+from guardsarm_testing.modules.agentd.configuration import AGENTD_WINDOWS_DEBUG
+from guardsarm_testing.modules.modulesd.configuration import MODULESD_DEBUG
+from guardsarm_testing.modules.modulesd.sca import patterns
+from guardsarm_testing.tools.monitors import file_monitor
+from guardsarm_testing.utils import callbacks, configuration
 
 from . import CONFIGURATIONS_FOLDER_PATH, TEST_CASES_FOLDER_PATH
 
@@ -140,7 +140,7 @@ def _callback_scan_result_for_policy(policy: str, allow_any_policy: bool = False
 # Tests
 @pytest.mark.parametrize('test_configuration, test_metadata', zip(configurations, configuration_metadata), ids=case_ids)
 def test_sca_mitre_payload(test_configuration, test_metadata, prepare_cis_policies_file, clean_sca_db,
-                           truncate_monitored_files, set_wazuh_configuration, configure_local_internal_options,
+                           truncate_monitored_files, set_guardsarm_configuration, configure_local_internal_options,
                            daemons_handler, wait_for_sca_enabled):
     '''
     description: Runs a scan with a policy that contains a MITRE object and verifies that the
@@ -148,27 +148,27 @@ def test_sca_mitre_payload(test_configuration, test_metadata, prepare_cis_polici
 
     test_phases:
         - Copy the MITRE policy file into the agent's ruleset path.
-        - Restart wazuh.
+        - Restart guardsarm.
         - Verify the SCA module starts.
         - Capture the "Stateful event queued" log and verify the MITRE object in the event payload.
 
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
 
     tier: 0
 
     parameters:
         - test_configuration:
             type: dict
-            brief: Wazuh configuration data. Needed for set_wazuh_configuration fixture.
+            brief: GuardSarm configuration data. Needed for set_guardsarm_configuration fixture.
         - test_metadata:
             type: dict
-            brief: Wazuh configuration metadata.
+            brief: GuardSarm configuration metadata.
         - prepare_cis_policies_file:
             type: fixture
             brief: Copy test SCA policy file. Deleted after test.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
-            brief: Set the wazuh configuration according to the configuration data.
+            brief: Set the guardsarm configuration according to the configuration data.
         - configure_local_internal_options:
             type: fixture
             brief: Configure the local_internal_options file.
@@ -177,7 +177,7 @@ def test_sca_mitre_payload(test_configuration, test_metadata, prepare_cis_polici
             brief: Truncate all log files before and after the test execution.
         - daemons_handler:
             type: fixture
-            brief: Restart all wazuh daemons.
+            brief: Restart all guardsarm daemons.
         - wait_for_sca_enabled:
             type: fixture
             brief: Wait for the SCA module to start before the test.
@@ -194,7 +194,7 @@ def test_sca_mitre_payload(test_configuration, test_metadata, prepare_cis_polici
         - r".*sca.*INFO: SCA module running"
         - r".*sca.*Stateful event queued: (.*)"
     '''
-    log_monitor = file_monitor.FileMonitor(WAZUH_LOG_PATH)
+    log_monitor = file_monitor.FileMonitor(GUARDSARM_LOG_PATH)
 
     scan_timeout = 180 if sys.platform == WINDOWS else 60
 

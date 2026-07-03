@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **logpar** module implements the **log parsing expression language** used by the Wazuh Engine to extract structured fields from raw log lines. It takes a logpar expression string (e.g., `<timestamp> <host> <message>`) and compiles it into a composed parser that, when applied to a log line, returns a JSON object with the extracted fields.
+The **logpar** module implements the **log parsing expression language** used by the GuardSarm Engine to extract structured fields from raw log lines. It takes a logpar expression string (e.g., `<timestamp> <host> <message>`) and compiles it into a composed parser that, when applied to a log line, returns a JSON object with the extracted fields.
 
 Logpar bridges the **parsec** combinator library (grammar-level parsing) with the **hlp** library (type-specific parsers like IP, date, JSON, etc.) and the **schemf** schema validator (field type resolution). It is the mechanism that turns declarative extraction patterns in decoder definitions into executable parsers.
 

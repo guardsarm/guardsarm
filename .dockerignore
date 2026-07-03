@@ -1,0 +1,7 @@
+.git
+docs
+brand
+tests
+**/*.o
+**/*.a
+build

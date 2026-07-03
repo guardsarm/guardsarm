@@ -17,7 +17,7 @@
 #include "agentd.h"
 #include "agent_op.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 // Remove static qualifier when unit testing
 #define STATIC
 #ifdef WIN32

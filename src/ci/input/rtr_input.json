@@ -17,7 +17,7 @@
             "flags": "-r"
         },
         {
-            "name": "wazuh_modules/syscollector",
+            "name": "guardsarm_modules/syscollector",
             "flags": "-r"
         },
         {
@@ -40,11 +40,11 @@
             "flags": "-r"
         },
         {
-            "name": "wazuh_modules/sca",
+            "name": "guardsarm_modules/sca",
             "flags": "-r"
         },
         {
-            "name": "wazuh_modules/agent_info",
+            "name": "guardsarm_modules/agent_info",
             "flags": "-r"
         }
     ]

@@ -84,7 +84,7 @@ jobs:
       BRANCH_BASE: ${{ github.base_ref || inputs.base_branch }}
       BUILD_WORKFLOW: 5_builderpackage_agent-macos.yml
       PACKAGES_PATH: /tmp/packages
-      AGENT_PKG_REGEXP: wazuh-agent_.*arm64.*\.pkg
+      AGENT_PKG_REGEXP: guardsarm-agent_.*arm64.*\.pkg
     runs-on: macos-15
     steps:
       - name: Checkout Repo
@@ -109,14 +109,14 @@ jobs:
           check_artifacts: true
           search_artifacts: true
 
-      - name: Install and configure wazuh agent
+      - name: Install and configure guardsarm agent
         run: |
-          PACKAGE_PATH=$(find "${PACKAGES_PATH}" -maxdepth 2 -type f -name "wazuh-agent*.pkg" | head -n 1)
+          PACKAGE_PATH=$(find "${PACKAGES_PATH}" -maxdepth 2 -type f -name "guardsarm-agent*.pkg" | head -n 1)
           if [ -z "$PACKAGE_PATH" ]; then
             echo "No agent package found in ${PACKAGES_PATH}"
             exit 1
           fi
-          echo "WAZUH_MANAGER='127.0.0.1'" > /tmp/wazuh_envs && sudo installer -pkg "${PACKAGE_PATH}" -target /
+          echo "GUARDSARM_MANAGER='127.0.0.1'" > /tmp/guardsarm_envs && sudo installer -pkg "${PACKAGE_PATH}" -target /
 
           sudo awk '
             /<rootcheck>/ { in_block=1; print; next }
@@ -171,10 +171,10 @@ jobs:
           fi
           exit $EXIT_CODE
 
-      - name: Dump wazuh-agent logs on failure
+      - name: Dump guardsarm-agent logs on failure
         if: failure()
         run: |
-          sudo /Library/Ossec/bin/wazuh-control status || true
+          sudo /Library/Ossec/bin/guardsarm-control status || true
           sudo tail -n 200 /Library/Ossec/logs/ossec.log || true
 
       - name: Upload failed test results

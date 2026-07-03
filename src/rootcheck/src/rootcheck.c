@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 
 int rootcheck_init(int test_config)
 {
-    const char *cfg = WAZUHCONF;
+    const char *cfg = GUARDSARMCONF;
 
 #endif /* OSSECHIDS */
 
@@ -179,7 +179,7 @@ int rootcheck_init(int test_config)
 
     /* Set default values */
 #ifndef OSSECHIDS
-    mdebug1(WAZUH_HOMEDIR, home_path);
+    mdebug1(GUARDSARM_HOMEDIR, home_path);
     if (rootcheck.workdir == NULL) {
         rootcheck.workdir = home_path;
     }

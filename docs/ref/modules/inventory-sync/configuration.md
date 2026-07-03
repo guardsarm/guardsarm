@@ -1,6 +1,6 @@
 # Configuration
 
-Inventory Sync does not use its own `<inventory_sync>` block in `wazuh-manager.conf`, but it is not configuration-free. At startup, the manager wrapper builds a JSON configuration object and passes it into the shared library.
+Inventory Sync does not use its own `<inventory_sync>` block in `guardsarm-manager.conf`, but it is not configuration-free. At startup, the manager wrapper builds a JSON configuration object and passes it into the shared library.
 
 ## Configuration sources
 
@@ -27,13 +27,13 @@ Example configuration payload passed to the module:
     "hosts": ["https://127.0.0.1:9200"],
     "ssl": {
       "certificate_authorities": [
-        "/var/wazuh-manager/etc/certs/root-ca.pem"
+        "/var/guardsarm-manager/etc/certs/root-ca.pem"
       ],
-      "certificate": "/var/wazuh-manager/etc/certs/manager.pem",
-      "key": "/var/wazuh-manager/etc/certs/manager-key.pem"
+      "certificate": "/var/guardsarm-manager/etc/certs/manager.pem",
+      "key": "/var/guardsarm-manager/etc/certs/manager-key.pem"
     }
   },
-  "clusterName": "wazuh",
+  "clusterName": "guardsarm",
   "clusterNodeName": "node01",
   "maxSessions": 1000,
   "queueSize": 10000,
@@ -45,7 +45,7 @@ Example configuration payload passed to the module:
 
 ### Maximum sessions
 
-Inventory Sync reads the session cap from the internal option `wazuh_modules.max_sessions`.
+Inventory Sync reads the session cap from the internal option `guardsarm_modules.max_sessions`.
 
 Current manager-side behavior:
 
@@ -55,7 +55,7 @@ Current manager-side behavior:
 
 ### Input worker queue size
 
-Inventory Sync reads the input worker queue cap from the internal option `wazuh_modules.inventory_sync_queue_size`.
+Inventory Sync reads the input worker queue cap from the internal option `guardsarm_modules.inventory_sync_queue_size`.
 
 The cap is applied to the queue that buffers incoming router messages before they reach the worker threads.
 
@@ -68,7 +68,7 @@ Current manager-side behavior:
 
 ### Global DataValue quota
 
-Inventory Sync reads the global `DataValue` quota from the internal option `wazuh_modules.inventory_sync_data_value_quota`.
+Inventory Sync reads the global `DataValue` quota from the internal option `guardsarm_modules.inventory_sync_data_value_quota`.
 
 The quota bounds the total number of `DataValue` items that all active sessions can collectively handle. When a Start message arrives, the value declared in its `size` field is reserved from the quota; when the session ends (success, error, stale cleanup, or timeout), the reservation is returned.
 
@@ -125,7 +125,7 @@ No dedicated Inventory Sync configuration flag enables or disables vulnerability
 
 ## Verifying the indexer connection
 
-Before troubleshooting Inventory Sync, verify that the Wazuh Indexer is healthy:
+Before troubleshooting Inventory Sync, verify that the GuardSarm Indexer is healthy:
 
 ```console
 curl --cacert <root_ca> --cert <manager_cert> --key <manager_key> \

@@ -1,5 +1,5 @@
 /*
- * Wazuh content manager
+ * GuardSarm content manager
  * Copyright (C) 2015, Wazuh Inc.
  * April 26, 2023.
  *
@@ -23,7 +23,7 @@
 /**
  * @brief In charge of initializing the content updater orchestration.
  *
- * The orchestration fetches CVE data from the Wazuh Indexer (via IndexerDownloader)
+ * The orchestration fetches CVE data from the GuardSarm Indexer (via IndexerDownloader)
  * and persists it to the local RocksDB feed database.
  */
 class ActionOrchestrator final

@@ -93,7 +93,7 @@ jobs:
       BRANCH_BASE: ${{ github.base_ref || inputs.base_branch }}
       BUILD_WORKFLOW: 5_builderpackage_agent-linux.yml
       PACKAGES_PATH: /tmp/packages
-      AGENT_PACKAGE_REGEXP: wazuh-agent.*amd64.*\.deb
+      AGENT_PACKAGE_REGEXP: guardsarm-agent.*amd64.*\.deb
     runs-on: codebuild-github-actions-codebuild-runner-server-amd-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - name: Checkout Repo
@@ -118,15 +118,15 @@ jobs:
           check_artifacts: true
           search_artifacts: true
 
-      - name: Install and configure wazuh agent
+      - name: Install and configure guardsarm agent
         run: |
-          PACKAGE_PATH=$(find "${PACKAGES_PATH}" -maxdepth 2 -type f -name "wazuh-agent*amd64*.deb" | grep -v -E "wazuh-agent-dbg" | head -n 1)
+          PACKAGE_PATH=$(find "${PACKAGES_PATH}" -maxdepth 2 -type f -name "guardsarm-agent*amd64*.deb" | grep -v -E "guardsarm-agent-dbg" | head -n 1)
           if [ -z "$PACKAGE_PATH" ]; then
             echo "No agent package found in ${PACKAGES_PATH}"
             exit 1
           fi
 
-          sudo WAZUH_MANAGER="127.0.0.1" dpkg -i "${PACKAGE_PATH}" || sudo apt-get install -f -y
+          sudo GUARDSARM_MANAGER="127.0.0.1" dpkg -i "${PACKAGE_PATH}" || sudo apt-get install -f -y
 
           sudo awk '
             /<rootcheck>/ { in_block=1; print; next }
@@ -187,10 +187,10 @@ jobs:
           fi
           exit $EXIT_CODE
 
-      - name: Dump wazuh-agent logs on failure
+      - name: Dump guardsarm-agent logs on failure
         if: failure()
         run: |
-          sudo journalctl -xeu wazuh-agent.service || true
+          sudo journalctl -xeu guardsarm-agent.service || true
           sudo tail -n 200 /var/ossec/logs/ossec.log || true
 
       - name: Upload failed test results

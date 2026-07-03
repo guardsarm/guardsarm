@@ -7,45 +7,45 @@ import pytest
 
 from os.path import join as path_join
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.constants.paths import WAZUH_PATH
-from wazuh_testing.constants.paths.configurations import WAZUH_CONF_PATH
-from wazuh_testing.constants.daemons import LOGCOLLECTOR_DAEMON
-from wazuh_testing.modules.logcollector.patterns import LOGCOLLECTOR_MODULE_START
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils import callbacks, configuration
-from wazuh_testing.utils.services import control_service
-from wazuh_testing.utils.file import truncate_file, replace_regex_in_file, write_json_file
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.constants.paths import GUARDSARM_PATH
+from guardsarm_testing.constants.paths.configurations import GUARDSARM_CONF_PATH
+from guardsarm_testing.constants.daemons import LOGCOLLECTOR_DAEMON
+from guardsarm_testing.modules.logcollector.patterns import LOGCOLLECTOR_MODULE_START
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.utils import callbacks, configuration
+from guardsarm_testing.utils.services import control_service
+from guardsarm_testing.utils.file import truncate_file, replace_regex_in_file, write_json_file
 
 # Logcollector internal paths
-LOGCOLLECTOR_OFE_PATH = path_join(WAZUH_PATH, 'queue', 'logcollector', 'file_status.json')
+LOGCOLLECTOR_OFE_PATH = path_join(GUARDSARM_PATH, 'queue', 'logcollector', 'file_status.json')
 
 @pytest.fixture()
 def stop_logcollector(request):
-    """Stop wazuh-logcollector and truncate logs file."""
+    """Stop guardsarm-logcollector and truncate logs file."""
     control_service('stop', daemon=LOGCOLLECTOR_DAEMON)
-    truncate_file(WAZUH_LOG_PATH)
+    truncate_file(GUARDSARM_LOG_PATH)
 
 
 @pytest.fixture()
 def wait_for_logcollector_start(request):
     # Wait for logcollector thread to start
-    log_monitor = FileMonitor(WAZUH_LOG_PATH)
+    log_monitor = FileMonitor(GUARDSARM_LOG_PATH)
     log_monitor.start(callback=callbacks.generate_callback(LOGCOLLECTOR_MODULE_START))
     assert (log_monitor.callback_result != None), f'Error logcollector start event not detected'
 
 @pytest.fixture()
-def remove_all_localfiles_wazuh_config(request):
-    """Configure a custom settting for testing. Restart Wazuh is needed for applying the configuration. """
+def remove_all_localfiles_guardsarm_config(request):
+    """Configure a custom settting for testing. Restart GuardSarm is needed for applying the configuration. """
     # Backup the original configuration
-    backup_config = configuration.get_wazuh_conf()
+    backup_config = configuration.get_guardsarm_conf()
 
     # Remove localfiles from the configuration
     list_tags = [r"<localfile>[\s\S]*?<\/localfile>"]
-    replace_regex_in_file(list_tags, [''] * len(list_tags), WAZUH_CONF_PATH, True)
+    replace_regex_in_file(list_tags, [''] * len(list_tags), GUARDSARM_CONF_PATH, True)
 
     yield
-    configuration.write_wazuh_conf(backup_config)
+    configuration.write_guardsarm_conf(backup_config)
 
 
 @pytest.fixture()

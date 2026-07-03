@@ -7,8 +7,8 @@
 # Foundation.
 
 output_dir="./output"
-wazuh_version=$(jq -r '.version' "$(dirname "${BASH_SOURCE[0]}")/../../VERSION.json")
-wazuh_root_dir=$(dirname "${BASH_SOURCE[0]}")/../../
+guardsarm_version=$(jq -r '.version' "$(dirname "${BASH_SOURCE[0]}")/../../VERSION.json")
+guardsarm_root_dir=$(dirname "${BASH_SOURCE[0]}")/../../
 
 main() {
 
@@ -22,8 +22,8 @@ run_compilation() {
   mkdir -p $output_dir
   docker run \
     --env ARCH="$architecture" \
-    -it -v $wazuh_root_dir:/wazuh_host -v $output_dir:/output \
-    --entrypoint=bash $image /wazuh_host/framework/cpython/compile.sh $compile_parameters
+    -it -v $guardsarm_root_dir:/guardsarm_host -v $output_dir:/output \
+    --entrypoint=bash $image /guardsarm_host/framework/cpython/compile.sh $compile_parameters
 }
 
 pull_builder_image() {
@@ -33,10 +33,10 @@ pull_builder_image() {
   # Set architecture and image variables
   if [ "$current_arch" = "arm64" ] || [ "$current_arch" = "aarch64" ]; then
       architecture="arm64"
-      image="ghcr.io/wazuh/pkg_rpm_manager_builder_arm64:$wazuh_version"
+      image="ghcr.io/guardsarm/pkg_rpm_manager_builder_arm64:$guardsarm_version"
   elif [ "$current_arch" = "amd64" ] || [ "$current_arch" = "x86_64" ]; then
       architecture="x86_64"
-      image="ghcr.io/wazuh/pkg_rpm_manager_builder_amd64:$wazuh_version"
+      image="ghcr.io/guardsarm/pkg_rpm_manager_builder_amd64:$guardsarm_version"
   else
       echo "Unsupported architecture ($current_arch)" >&2
       exit 1
@@ -75,11 +75,11 @@ parse_args() {
     exit 1
   fi
 
-  if [ -z "${WAZUH_BRANCH:-}" ]; then
-    echo "No Wazuh branch specified. Using local source code (no modifications will be applied to it)."
+  if [ -z "${GUARDSARM_BRANCH:-}" ]; then
+    echo "No GuardSarm branch specified. Using local source code (no modifications will be applied to it)."
   else
-    echo "Wazuh branch specified: $WAZUH_BRANCH"
-    compile_parameters+=" --wazuh-branch $WAZUH_BRANCH"
+    echo "GuardSarm branch specified: $GUARDSARM_BRANCH"
+    compile_parameters+=" --guardsarm-branch $GUARDSARM_BRANCH"
   fi
 
   if [ "${BUILD_CPYTHON:-false}" = "true" ]; then

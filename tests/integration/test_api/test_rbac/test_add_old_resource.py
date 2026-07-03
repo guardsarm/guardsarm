@@ -21,11 +21,11 @@ targets:
     - manager
 
 daemons:
-    - wazuh-manager-apid
-    - wazuh-manager-modulesd
-    - wazuh-manager-analysisd
-    - wazuh-manager-db
-    - wazuh-manager-remoted
+    - guardsarm-manager-apid
+    - guardsarm-manager-modulesd
+    - guardsarm-manager-analysisd
+    - guardsarm-manager-db
+    - guardsarm-manager-remoted
 
 os_platform:
     - linux
@@ -42,8 +42,8 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/api/getting-started.html
-    - https://documentation.wazuh.com/current/user-manual/api/reference.html#tag/Security
+    - https://documentation.guardsarm.com/current/user-manual/api/getting-started.html
+    - https://documentation.guardsarm.com/current/user-manual/api/reference.html#tag/Security
     - https://en.wikipedia.org/wiki/Role-based_access_control
 
 tags:
@@ -53,9 +53,9 @@ import pytest
 from pathlib import Path
 
 from . import TEST_CASES_FOLDER_PATH
-from wazuh_testing.constants.daemons import API_DAEMONS_REQUIREMENTS
-from wazuh_testing.modules.api.utils import manage_security_resources
-from wazuh_testing.utils.configuration import get_test_cases_data
+from guardsarm_testing.constants.daemons import API_DAEMONS_REQUIREMENTS
+from guardsarm_testing.modules.api.utils import manage_security_resources
+from guardsarm_testing.utils.configuration import get_test_cases_data
 
 
 # Marks
@@ -78,7 +78,7 @@ def test_add_old_resource(test_configuration, test_metadata, truncate_monitored_
     description: Check if the security relationships of a previous user are removed from the system after adding a
                  new user with the same ID.
 
-    wazuh_min_version: 4.2.0
+    guardsarm_min_version: 4.2.0
 
     test_phases:
         - setup:
@@ -110,7 +110,7 @@ def test_add_old_resource(test_configuration, test_metadata, truncate_monitored_
             brief: Truncate all the log files and json alerts files before and after the test execution.
         - daemons_handler:
             type: fixture
-            brief: Wrapper of a helper function to handle Wazuh daemons.
+            brief: Wrapper of a helper function to handle GuardSarm daemons.
         - wait_for_api_start:
             type: fixture
             brief: Monitor the API log file to detect whether it has been started or not.

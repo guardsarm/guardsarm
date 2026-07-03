@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.12.4)
 
-project(wazuh-win32 C)
+project(guardsarm-win32 C)
 
-if(NOT DEFINED WAZUH_MAIN_PROJECT)
+if(NOT DEFINED GUARDSARM_MAIN_PROJECT)
   get_filename_component(SRC_FOLDER ${CMAKE_SOURCE_DIR}/../ ABSOLUTE)
 endif()
 
@@ -43,12 +43,12 @@ include_directories(
   ${SRC_FOLDER}/shared_modules/sync_protocol/include/
   ${SRC_FOLDER}/shared_modules/router/include/
   ${SRC_FOLDER}/shared_modules/content_manager/include/
-  ${SRC_FOLDER}/wazuh_modules/include/
-  ${SRC_FOLDER}/wazuh_modules/src/
-  ${SRC_FOLDER}/wazuh_modules/src/agent_upgrade/
-  ${SRC_FOLDER}/wazuh_modules/src/agent_upgrade/agent/
-  ${SRC_FOLDER}/wazuh_modules/src/agent_upgrade/manager/
-  ${SRC_FOLDER}/wazuh_modules/src/task_manager/
+  ${SRC_FOLDER}/guardsarm_modules/include/
+  ${SRC_FOLDER}/guardsarm_modules/src/
+  ${SRC_FOLDER}/guardsarm_modules/src/agent_upgrade/
+  ${SRC_FOLDER}/guardsarm_modules/src/agent_upgrade/agent/
+  ${SRC_FOLDER}/guardsarm_modules/src/agent_upgrade/manager/
+  ${SRC_FOLDER}/guardsarm_modules/src/task_manager/
   ${SRC_FOLDER}/external/cJSON/
   ${SRC_FOLDER}/external/curl/include/curl/
   ${SRC_FOLDER}/external/libpcre2/include/
@@ -60,7 +60,7 @@ include_directories(
 
 # Common Windows system libraries
 set(WIN_SYSTEM_LIBS
-    ${WAZUH_WINDOWS_LIBS}
+    ${GUARDSARM_WINDOWS_LIBS}
     wsock32
     wevtapi
     comctl32
@@ -75,41 +75,41 @@ set(WIN_SYSTEM_LIBS
 # ──────────────────────────────────────────────────────────────────────────────
 
 # win32_common: core Windows sources compiled with OSSECHIDS +
-# ARGV0="wazuh-agent"
+# ARGV0="guardsarm-agent"
 add_library(
   win32_common OBJECT
   ${CMAKE_CURRENT_SOURCE_DIR}/win_agent.c
   ${CMAKE_CURRENT_SOURCE_DIR}/win_service.c
   ${CMAKE_CURRENT_SOURCE_DIR}/win_utils.c)
-target_compile_definitions(win32_common PRIVATE OSSECHIDS ARGV0="wazuh-agent"
+target_compile_definitions(win32_common PRIVATE OSSECHIDS ARGV0="guardsarm-agent"
                                                 _WIN32_WINNT=0x600)
 
-# Enable WAZUH_UNIT_TESTING to activate wrapper macros for unit tests
+# Enable GUARDSARM_UNIT_TESTING to activate wrapper macros for unit tests
 if(UNIT_TEST)
-  target_compile_definitions(win32_common PRIVATE WAZUH_UNIT_TESTING)
+  target_compile_definitions(win32_common PRIVATE GUARDSARM_UNIT_TESTING)
 endif()
 
 # win32_service_rk: win_service.c compiled WITHOUT OSSECHIDS (for setup/UI
 # tools) Equivalent to the Makefile's "win32/%_rk.o: win32/%.c" pattern rule
 add_library(win32_service_rk OBJECT ${CMAKE_CURRENT_SOURCE_DIR}/win_service.c)
-target_compile_definitions(win32_service_rk PRIVATE ARGV0="wazuh-agent"
+target_compile_definitions(win32_service_rk PRIVATE ARGV0="guardsarm-agent"
                                                     _WIN32_WINNT=0x600)
 
 # win32_setup: shared setup code
 add_library(win32_setup OBJECT ${CMAKE_CURRENT_SOURCE_DIR}/setup-shared.c)
-target_compile_definitions(win32_setup PRIVATE ARGV0="wazuh-agent"
+target_compile_definitions(win32_setup PRIVATE ARGV0="guardsarm-agent"
                                                _WIN32_WINNT=0x600)
 
 # win32_stubs: stub functions for active-response executables (exported so
 # active-response/CMakeLists.txt can reference WIN_STUBS directly)
 add_library(win32_stubs OBJECT ${CMAKE_CURRENT_SOURCE_DIR}/win_stubs.c)
-target_compile_definitions(win32_stubs PRIVATE ARGV0="wazuh-agent"
+target_compile_definitions(win32_stubs PRIVATE ARGV0="guardsarm-agent"
                                                _WIN32_WINNT=0x600)
 
-# win32_ui: UI source files compiled with ARGV0="wazuh-win32ui" and no OSSECHIDS
+# win32_ui: UI source files compiled with ARGV0="guardsarm-win32ui" and no OSSECHIDS
 add_library(win32_ui OBJECT ${CMAKE_CURRENT_SOURCE_DIR}/ui/os_win32ui.c
                             ${CMAKE_CURRENT_SOURCE_DIR}/ui/common.c)
-target_compile_definitions(win32_ui PRIVATE ARGV0="wazuh-win32ui"
+target_compile_definitions(win32_ui PRIVATE ARGV0="guardsarm-win32ui"
                                             _WIN32_WINNT=0x600)
 target_include_directories(win32_ui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ui/
                                             ${SRC_FOLDER}/syscheckd/include/)
@@ -121,60 +121,60 @@ if(UNIT_TEST)
   return()
 endif()
 
-# --- wazuh-agent.exe ---
+# --- guardsarm-agent.exe ---
 add_executable(
-  wazuh-agent
-  $<TARGET_OBJECTS:win32_common> ${CMAKE_CURRENT_SOURCE_DIR}/wazuh-agent.rc
+  guardsarm-agent
+  $<TARGET_OBJECTS:win32_common> ${CMAKE_CURRENT_SOURCE_DIR}/guardsarm-agent.rc
   ${CMAKE_CURRENT_SOURCE_DIR}/icofile.rc ${RESOURCE_OBJ_APP})
-target_compile_definitions(wazuh-agent PRIVATE OSSECHIDS ARGV0="wazuh-agent"
+target_compile_definitions(guardsarm-agent PRIVATE OSSECHIDS ARGV0="guardsarm-agent"
                                                _WIN32_WINNT=0x600)
 set_target_properties(
-  wazuh-agent PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/bin
-                         OUTPUT_NAME wazuh-agent)
+  guardsarm-agent PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/bin
+                         OUTPUT_NAME guardsarm-agent)
 target_link_libraries(
-  wazuh-agent
+  guardsarm-agent
   PRIVATE dbsync
-          wazuh-agentd
-          wazuh-logcollector
-          wazuh-execd
-          wazuh-syscheckd
+          guardsarm-agentd
+          guardsarm-logcollector
+          guardsarm-execd
+          guardsarm-syscheckd
           fimdb
           agent_metadata
           agent_sync_protocol
           schema_validator
           config
-          wazuh-modulesd
-          wazuh
+          guardsarm-modulesd
+          guardsarm
           rootcheck
           ${WIN_SYSTEM_LIBS})
 
-# --- wazuh-agent-eventchannel.exe ---
+# --- guardsarm-agent-eventchannel.exe ---
 add_executable(
-  wazuh-agent-eventchannel
+  guardsarm-agent-eventchannel
   $<TARGET_OBJECTS:win32_common>
-  ${CMAKE_CURRENT_SOURCE_DIR}/wazuh-agent-eventchannel.rc
+  ${CMAKE_CURRENT_SOURCE_DIR}/guardsarm-agent-eventchannel.rc
   ${CMAKE_CURRENT_SOURCE_DIR}/icofile.rc ${RESOURCE_OBJ_APP})
 target_compile_definitions(
-  wazuh-agent-eventchannel PRIVATE OSSECHIDS ARGV0="wazuh-agent"
+  guardsarm-agent-eventchannel PRIVATE OSSECHIDS ARGV0="guardsarm-agent"
                                    EVENTCHANNEL_SUPPORT _WIN32_WINNT=0x600)
 set_target_properties(
-  wazuh-agent-eventchannel
+  guardsarm-agent-eventchannel
   PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/bin
-             OUTPUT_NAME wazuh-agent-eventchannel)
+             OUTPUT_NAME guardsarm-agent-eventchannel)
 target_link_libraries(
-  wazuh-agent-eventchannel
+  guardsarm-agent-eventchannel
   PRIVATE dbsync
-          wazuh-agentd
-          wazuh-logcollector-event
-          wazuh-execd
-          wazuh-syscheckd-event
+          guardsarm-agentd
+          guardsarm-logcollector-event
+          guardsarm-execd
+          guardsarm-syscheckd-event
           fimdb
           agent_metadata
           agent_sync_protocol
           schema_validator
           config
-          wazuh-modulesd
-          wazuh
+          guardsarm-modulesd
+          guardsarm
           rootcheck
           ${WIN_SYSTEM_LIBS})
 
@@ -188,7 +188,7 @@ target_compile_definitions(setup-windows PRIVATE ARGV0="setup-windows"
 set_target_properties(
   setup-windows PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/bin
                            OUTPUT_NAME setup-windows)
-target_link_libraries(setup-windows PRIVATE wazuh ${WIN_SYSTEM_LIBS})
+target_link_libraries(setup-windows PRIVATE guardsarm ${WIN_SYSTEM_LIBS})
 
 # --- setup-syscheck.exe ---
 add_executable(
@@ -200,7 +200,7 @@ target_compile_definitions(setup-syscheck PRIVATE ARGV0="setup-syscheck"
 set_target_properties(
   setup-syscheck PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/bin
                             OUTPUT_NAME setup-syscheck)
-target_link_libraries(setup-syscheck PRIVATE wazuh ${WIN_SYSTEM_LIBS})
+target_link_libraries(setup-syscheck PRIVATE guardsarm ${WIN_SYSTEM_LIBS})
 
 # --- setup-iis.exe ---
 add_executable(setup-iis $<TARGET_OBJECTS:win32_service_rk>
@@ -210,13 +210,13 @@ target_compile_definitions(setup-iis PRIVATE ARGV0="setup-iis"
 set_target_properties(
   setup-iis PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/bin
                        OUTPUT_NAME setup-iis)
-target_link_libraries(setup-iis PRIVATE wazuh ${WIN_SYSTEM_LIBS})
+target_link_libraries(setup-iis PRIVATE guardsarm ${WIN_SYSTEM_LIBS})
 
 # --- os_win32ui.exe ---
 add_executable(
   os_win32ui $<TARGET_OBJECTS:win32_service_rk> $<TARGET_OBJECTS:win32_ui>
              ${CMAKE_CURRENT_SOURCE_DIR}/ui/win32ui.rc ${RESOURCE_OBJ_APP})
-target_compile_definitions(os_win32ui PRIVATE ARGV0="wazuh-win32ui"
+target_compile_definitions(os_win32ui PRIVATE ARGV0="guardsarm-win32ui"
                                               _WIN32_WINNT=0x600)
 target_include_directories(os_win32ui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ui/
                                               ${SRC_FOLDER}/syscheckd/include/)
@@ -224,4 +224,4 @@ set_target_properties(
   os_win32ui PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/bin
                         OUTPUT_NAME os_win32ui)
 target_link_options(os_win32ui PRIVATE -mwindows)
-target_link_libraries(os_win32ui PRIVATE wazuh ${WIN_SYSTEM_LIBS})
+target_link_libraries(os_win32ui PRIVATE guardsarm ${WIN_SYSTEM_LIBS})

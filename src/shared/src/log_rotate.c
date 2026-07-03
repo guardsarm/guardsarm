@@ -53,7 +53,7 @@ void w_rotate_log(int compress, int keep_log_days, int new_day, int rotate_json,
 #ifdef CLIENT
     const char * prefix = "ossec";
 #else
-    const char * prefix = "wazuh";
+    const char * prefix = "guardsarm";
 #endif
 
     if (new_day)
@@ -73,19 +73,19 @@ void w_rotate_log(int compress, int keep_log_days, int new_day, int rotate_json,
     localtime_r(&now, &tm);
 
 #ifdef WIN32
-    // wazuh log file
+    // guardsarm log file
     snprintf(old_path, PATH_MAX, "%s", LOGFILE);
     // ossec.json
     snprintf(old_path_json, PATH_MAX, "%s", LOGJSONFILE);
     // logs
     strcpy(base_dir, "logs");
 #else
-    // /var/wazuh-manager/logs/wazuh-manager.log
+    // /var/guardsarm-manager/logs/guardsarm-manager.log
     snprintf(old_path, PATH_MAX, "%s", LOGFILE);
-    // /var/wazuh-manager/logs/wazuh-manager.json
+    // /var/guardsarm-manager/logs/guardsarm-manager.json
     snprintf(old_path_json, PATH_MAX, "%s", LOGJSONFILE);
-    // /var/wazuh-manager/logs/wazuh-manager
-    snprintf(base_dir, PATH_MAX, "logs/wazuh");
+    // /var/guardsarm-manager/logs/guardsarm-manager
+    snprintf(base_dir, PATH_MAX, "logs/guardsarm");
 #endif
 
     os_snprintf(year_dir, PATH_MAX, "%s/%d", base_dir, tm.tm_year + 1900);
@@ -294,7 +294,7 @@ void remove_old_logs_m(const char * base_dir, int year, int month, time_t thresh
 #ifdef CLIENT
         if (sscanf(dirent->d_name, "ossec-%02d.log", &day) > 0) {
 #else
-        if (sscanf(dirent->d_name, "wazuh-%02d.log", &day) > 0) {
+        if (sscanf(dirent->d_name, "guardsarm-%02d.log", &day) > 0) {
 #endif
             tm.tm_mday = day;
 
@@ -311,7 +311,7 @@ void remove_old_logs_m(const char * base_dir, int year, int month, time_t thresh
 #ifdef CLIENT
         if (sscanf(dirent->d_name, "ossec-%02d-%03d.log", &day, &counter) > 0) {
 #else
-        if (sscanf(dirent->d_name, "wazuh-%02d-%03d.log", &day, &counter) > 0) {
+        if (sscanf(dirent->d_name, "guardsarm-%02d-%03d.log", &day, &counter) > 0) {
 #endif
             tm.tm_mday = day;
 
@@ -328,7 +328,7 @@ void remove_old_logs_m(const char * base_dir, int year, int month, time_t thresh
 #ifdef CLIENT
         if (sscanf(dirent->d_name, "ossec-%02d.json", &day) > 0) {
 #else
-        if (sscanf(dirent->d_name, "wazuh-%02d.json", &day) > 0) {
+        if (sscanf(dirent->d_name, "guardsarm-%02d.json", &day) > 0) {
 #endif
             tm.tm_mday = day;
 
@@ -345,7 +345,7 @@ void remove_old_logs_m(const char * base_dir, int year, int month, time_t thresh
 #ifdef CLIENT
         if (sscanf(dirent->d_name, "ossec-%02d-%03d.json", &day, &counter) > 0) {
 #else
-        if (sscanf(dirent->d_name, "wazuh-%02d-%03d.json", &day, &counter) > 0) {
+        if (sscanf(dirent->d_name, "guardsarm-%02d-%03d.json", &day, &counter) > 0) {
 #endif
             tm.tm_mday = day;
 

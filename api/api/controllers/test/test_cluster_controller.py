@@ -10,21 +10,21 @@ from connexion.lifecycle import ConnexionResponse
 
 from api.controllers.test.utils import CustomAffectedItems
 
-with patch('wazuh.common.wazuh_uid'):
-    with patch('wazuh.common.wazuh_gid'):
-        sys.modules['wazuh.rbac.orm'] = MagicMock()
-        import wazuh.rbac.decorators
+with patch('guardsarm.common.guardsarm_uid'):
+    with patch('guardsarm.common.guardsarm_gid'):
+        sys.modules['guardsarm.rbac.orm'] = MagicMock()
+        import guardsarm.rbac.decorators
         from api.controllers.cluster_controller import (
             get_api_config, get_cluster_node, get_cluster_nodes,
             get_conf_validation, get_config, get_configuration_node,
             get_healthcheck, get_info_node, get_log_node, get_log_summary_node,
             get_node_config, get_daemon_stats_node,
             get_status, get_status_node, put_restart, put_reload, update_configuration)
-        from wazuh import cluster, manager, stats
-        from wazuh.tests.util import RBAC_bypasser
+        from guardsarm import cluster, manager, stats
+        from guardsarm.tests.util import RBAC_bypasser
 
-        wazuh.rbac.decorators.expose_resources = RBAC_bypasser
-        del sys.modules['wazuh.rbac.orm']
+        guardsarm.rbac.decorators.expose_resources = RBAC_bypasser
+        del sys.modules['guardsarm.rbac.orm']
 
 
 @pytest.mark.asyncio
@@ -390,7 +390,7 @@ async def test_put_restart(mock_dapi, mock_remove, mock_dfunc, mock_request):
     system_nodes_mock.return_value = ['master-node', 'worker-node']
     with patch('api.controllers.cluster_controller.get_system_nodes', return_value=system_nodes_mock), \
     patch('api.controllers.cluster_controller.raise_if_exc', return_value=system_nodes_mock.return_value), \
-    patch('wazuh.manager.manager_restart'):
+    patch('guardsarm.manager.manager_restart'):
         result = await put_restart(nodes_list='worker-node')
         f_kwargs = {'node_list': 'worker-node'}
         mock_dapi.assert_called_once_with(f=manager.restart,
@@ -418,7 +418,7 @@ async def test_put_reload(mock_dapi, mock_remove, mock_dfunc, mock_request):
     system_nodes_mock.return_value = ['master-node', 'worker-node']
     with patch('api.controllers.cluster_controller.get_system_nodes', return_value=system_nodes_mock), \
     patch('api.controllers.cluster_controller.raise_if_exc', return_value=system_nodes_mock.return_value), \
-    patch('wazuh.manager.manager_reload'):
+    patch('guardsarm.manager.manager_reload'):
         result = await put_reload(nodes_list='worker-node')
         f_kwargs = {'node_list': 'worker-node'}
         mock_dapi.assert_called_once_with(f=manager.reload,

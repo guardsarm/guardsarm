@@ -1,5 +1,5 @@
 /*
- * Wazuh - Content Merge Tool
+ * GuardSarm - Content Merge Tool
  * Copyright (C) 2015, Wazuh Inc.
  * January 10, 2023.
  *

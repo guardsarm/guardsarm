@@ -8,7 +8,7 @@
 #include <cmocka.h>
 
 #include "../wrappers/posix/dirent_wrappers.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
 
 #include "shared.h"
 #include "remoted_op.h"
@@ -356,7 +356,7 @@ void test_parse_uname_string_windows_missing_bracket(void **state)
 
 void test_parse_agent_update_msg_missing_uname(void **state)
 {
-    char *msg = "No system info available - Wazuh v3.13.2 / ab73af41699f13fdd81903b5f23d8d00\n\
+    char *msg = "No system info available - GuardSarm v3.13.2 / ab73af41699f13fdd81903b5f23d8d00\n\
 fd756ba04d9c32c8848d4608bec41251 merged.mg\n#\"_agent_ip\":192.168.0.133\n";
 
     agent_info_data *agent_data = NULL;
@@ -365,7 +365,7 @@ fd756ba04d9c32c8848d4608bec41251 merged.mg\n#\"_agent_ip\":192.168.0.133\n";
     int result = parse_agent_update_msg(msg, agent_data);
 
     assert_int_equal(OS_SUCCESS, result);
-    assert_string_equal("Wazuh v3.13.2", agent_data->version);
+    assert_string_equal("GuardSarm v3.13.2", agent_data->version);
     assert_null(agent_data->osd->os_name);
     assert_null(agent_data->osd->os_major);
     assert_null(agent_data->osd->os_minor);
@@ -380,7 +380,7 @@ fd756ba04d9c32c8848d4608bec41251 merged.mg\n#\"_agent_ip\":192.168.0.133\n";
 
 void test_parse_agent_update_msg_missing_config_sum(void **state)
 {
-    char *msg = "Linux |ubuntu2204 |5.15.0-58-generic |#64-Ubuntu SMP Thu Jan 5 11:43:13 UTC 2023 |x86_64 [Ubuntu|ubuntu: 22.04 LTS (Jammy Jellyfish)] - Wazuh v3.13.2\n\
+    char *msg = "Linux |ubuntu2204 |5.15.0-58-generic |#64-Ubuntu SMP Thu Jan 5 11:43:13 UTC 2023 |x86_64 [Ubuntu|ubuntu: 22.04 LTS (Jammy Jellyfish)] - GuardSarm v3.13.2\n\
 fd756ba04d9c32c8848d4608bec41251 merged.mg\n#\"_agent_ip\":192.168.0.133\n";
 
     agent_info_data *agent_data = NULL;
@@ -389,7 +389,7 @@ fd756ba04d9c32c8848d4608bec41251 merged.mg\n#\"_agent_ip\":192.168.0.133\n";
     int result = parse_agent_update_msg(msg, agent_data);
 
     assert_int_equal(OS_SUCCESS, result);
-    assert_string_equal("Wazuh v3.13.2", agent_data->version);
+    assert_string_equal("GuardSarm v3.13.2", agent_data->version);
     assert_string_equal("Ubuntu", agent_data->osd->os_name);
     assert_string_equal("22", agent_data->osd->os_major);
     assert_string_equal("04", agent_data->osd->os_minor);
@@ -404,7 +404,7 @@ fd756ba04d9c32c8848d4608bec41251 merged.mg\n#\"_agent_ip\":192.168.0.133\n";
 
 void test_parse_agent_update_msg_missing_merged_sum(void **state)
 {
-    char *msg = "Linux |ubuntu2204 |5.15.0-58-generic |#64-Ubuntu SMP Thu Jan 5 11:43:13 UTC 2023 |x86_64 [Ubuntu|ubuntu: 22.04 LTS (Jammy Jellyfish)] - Wazuh v3.13.2\
+    char *msg = "Linux |ubuntu2204 |5.15.0-58-generic |#64-Ubuntu SMP Thu Jan 5 11:43:13 UTC 2023 |x86_64 [Ubuntu|ubuntu: 22.04 LTS (Jammy Jellyfish)] - GuardSarm v3.13.2\
  / ab73af41699f13fdd81903b5f23d8d00\nx merged.mg\n#\"_agent_ip\":192.168.0.133\n";
 
     agent_info_data *agent_data = NULL;
@@ -413,7 +413,7 @@ void test_parse_agent_update_msg_missing_merged_sum(void **state)
     int result = parse_agent_update_msg(msg, agent_data);
 
     assert_int_equal(OS_SUCCESS, result);
-    assert_string_equal("Wazuh v3.13.2", agent_data->version);
+    assert_string_equal("GuardSarm v3.13.2", agent_data->version);
     assert_string_equal("Ubuntu", agent_data->osd->os_name);
     assert_string_equal("22", agent_data->osd->os_major);
     assert_string_equal("04", agent_data->osd->os_minor);
@@ -429,7 +429,7 @@ void test_parse_agent_update_msg_missing_merged_sum(void **state)
 void test_parse_agent_update_msg_ok_debian(void **state)
 {
     char *msg = "Linux |debian10 |4.19.0-9-amd64 |#1 SMP Debian 4.19.118-2+deb10u1 (2020-06-07) |x86_64 \
-[Debian GNU/Linux|debian: 10 (buster)] - Wazuh v3.13.0 / ab73af41699f13fdd81903b5f23d8d00\nfd756ba04d9c32c8848d4608bec41251 \
+[Debian GNU/Linux|debian: 10 (buster)] - GuardSarm v3.13.0 / ab73af41699f13fdd81903b5f23d8d00\nfd756ba04d9c32c8848d4608bec41251 \
 merged.mg\n#\"_agent_ip\":192.168.0.143\n";
 
     agent_info_data *agent_data = NULL;
@@ -438,7 +438,7 @@ merged.mg\n#\"_agent_ip\":192.168.0.143\n";
     int result = parse_agent_update_msg(msg, agent_data);
 
     assert_int_equal(OS_SUCCESS, result);
-    assert_string_equal("Wazuh v3.13.0", agent_data->version);
+    assert_string_equal("GuardSarm v3.13.0", agent_data->version);
     assert_string_equal("Debian GNU/Linux", agent_data->osd->os_name);
     assert_string_equal("10", agent_data->osd->os_major);
     assert_null(agent_data->osd->os_minor);
@@ -454,7 +454,7 @@ merged.mg\n#\"_agent_ip\":192.168.0.143\n";
 void test_parse_agent_update_msg_ok_ubuntu(void **state)
 {
     char *msg = "Linux |ubuntu2004 |5.4.0-42-generic |#46-Ubuntu SMP Fri Jul 10 00:24:02 UTC 2020 |x86_64 \
-[Ubuntu|ubuntu: 20.04 LTS (Focal Fossa)] - Wazuh v3.13.1 / ab73af41699f13fdd81903b5f23d8d00\nfd756ba04d9c32c8848d4608bec41251 \
+[Ubuntu|ubuntu: 20.04 LTS (Focal Fossa)] - GuardSarm v3.13.1 / ab73af41699f13fdd81903b5f23d8d00\nfd756ba04d9c32c8848d4608bec41251 \
 merged.mg\n#\"_agent_ip\":192.168.0.133\n";
 
     agent_info_data *agent_data = NULL;
@@ -463,7 +463,7 @@ merged.mg\n#\"_agent_ip\":192.168.0.133\n";
     int result = parse_agent_update_msg(msg, agent_data);
 
     assert_int_equal(OS_SUCCESS, result);
-    assert_string_equal("Wazuh v3.13.1", agent_data->version);
+    assert_string_equal("GuardSarm v3.13.1", agent_data->version);
     assert_string_equal("Ubuntu", agent_data->osd->os_name);
     assert_string_equal("20", agent_data->osd->os_major);
     assert_string_equal("04", agent_data->osd->os_minor);
@@ -479,7 +479,7 @@ merged.mg\n#\"_agent_ip\":192.168.0.133\n";
 void test_parse_agent_update_msg_ok_archlinux(void **state)
 {
     char *msg = "Linux |archlinux |5.15.2-arch1-1 |#1 SMP PREEMPT Fri, 12 Nov 2021 19:22:10 +0000 |x86_64 \
-[Arch Linux|arch: ] - Wazuh v4.3.0 / ab73af41699f13fdd81903b5f23d8d00\n4a8724b20dee0124ff9656783c490c4e \
+[Arch Linux|arch: ] - GuardSarm v4.3.0 / ab73af41699f13fdd81903b5f23d8d00\n4a8724b20dee0124ff9656783c490c4e \
 merged.mg\n#\"_agent_ip\":192.168.33.18\n";
 
     agent_info_data *agent_data = NULL;
@@ -488,7 +488,7 @@ merged.mg\n#\"_agent_ip\":192.168.33.18\n";
     int result = parse_agent_update_msg(msg, agent_data);
 
     assert_int_equal(OS_SUCCESS, result);
-    assert_string_equal("Wazuh v4.3.0", agent_data->version);
+    assert_string_equal("GuardSarm v4.3.0", agent_data->version);
     assert_string_equal("Arch Linux", agent_data->osd->os_name);
     assert_null(agent_data->osd->os_major);
     assert_null(agent_data->osd->os_minor);
@@ -504,7 +504,7 @@ merged.mg\n#\"_agent_ip\":192.168.33.18\n";
 void test_parse_agent_update_msg_ok_macos(void **state)
 {
     char *msg = "Darwin |TESTmac.local |19.6.0 |Darwin Kernel Version 19.6.0: Thu Jun 18 20:49:00 PDT 2020; \
-root:xnu-6153.141.1~1/RELEASE_X86_64 |x86_64 [Mac OS X|darwin: 10.15.6 (Catalina)] - Wazuh v3.13.1 / \
+root:xnu-6153.141.1~1/RELEASE_X86_64 |x86_64 [Mac OS X|darwin: 10.15.6 (Catalina)] - GuardSarm v3.13.1 / \
 ab73af41699f13fdd81903b5f23d8d00\nfd756ba04d9c32c8848d4608bec41251 merged.mg\n#\"_agent_ip\":192.168.0.123\n";
 
     agent_info_data *agent_data = NULL;
@@ -513,7 +513,7 @@ ab73af41699f13fdd81903b5f23d8d00\nfd756ba04d9c32c8848d4608bec41251 merged.mg\n#\
     int result = parse_agent_update_msg(msg, agent_data);
 
     assert_int_equal(OS_SUCCESS, result);
-    assert_string_equal("Wazuh v3.13.1", agent_data->version);
+    assert_string_equal("GuardSarm v3.13.1", agent_data->version);
     assert_string_equal("Mac OS X", agent_data->osd->os_name);
     assert_string_equal("10", agent_data->osd->os_major);
     assert_string_equal("15", agent_data->osd->os_minor);
@@ -528,7 +528,7 @@ ab73af41699f13fdd81903b5f23d8d00\nfd756ba04d9c32c8848d4608bec41251 merged.mg\n#\
 
 void test_parse_agent_update_msg_ok_windows(void **state)
 {
-    char *msg = "Microsoft Windows 10 Enterprise [Ver: 10.0.14393] - Wazuh v3.13.1 \
+    char *msg = "Microsoft Windows 10 Enterprise [Ver: 10.0.14393] - GuardSarm v3.13.1 \
 / ab73af41699f13fdd81903b5f23d8d00\nfd756ba04d9c32c8848d4608bec41251 \
 merged.mg\n#\"_agent_ip\":192.168.0.164\n";
 
@@ -538,7 +538,7 @@ merged.mg\n#\"_agent_ip\":192.168.0.164\n";
     int result = parse_agent_update_msg(msg, agent_data);
 
     assert_int_equal(OS_SUCCESS, result);
-    assert_string_equal("Wazuh v3.13.1", agent_data->version);
+    assert_string_equal("GuardSarm v3.13.1", agent_data->version);
     assert_string_equal("Microsoft Windows 10 Enterprise", agent_data->osd->os_name);
     assert_string_equal("10", agent_data->osd->os_major);
     assert_string_equal("0", agent_data->osd->os_minor);
@@ -609,7 +609,7 @@ void test_parse_json_keepalive_linux_complete(void **state)
     wdb_free_agent_info_data(agent_data);
 }
 
-void test_parse_json_keepalive_linux_codename_with_wazuh_suffix(void **state)
+void test_parse_json_keepalive_linux_codename_with_guardsarm_suffix(void **state)
 {
     char* json = "{\"version\":\"1.0\",\"agent\":{\"id\":\"002\",\"name\":\"agent2\",\"version\":\"v5.0.0\",\
 \"config_sum\":\"ab73af41699f13fdd81903b5f23d8d00\",\"merged_sum\":\"fd756ba04d9c32c8848d4608bec41251\"},\
@@ -1123,7 +1123,7 @@ int main()
         cmocka_unit_test_setup_teardown(test_parse_json_keepalive_invalid_json, setup_remoted_op, teardown_remoted_op),
         cmocka_unit_test_setup_teardown(test_parse_json_keepalive_missing_agent, setup_remoted_op, teardown_remoted_op),
         cmocka_unit_test_setup_teardown(test_parse_json_keepalive_linux_complete, setup_remoted_op, teardown_remoted_op),
-        cmocka_unit_test_setup_teardown(test_parse_json_keepalive_linux_codename_with_wazuh_suffix, setup_remoted_op, teardown_remoted_op),
+        cmocka_unit_test_setup_teardown(test_parse_json_keepalive_linux_codename_with_guardsarm_suffix, setup_remoted_op, teardown_remoted_op),
         cmocka_unit_test_setup_teardown(test_parse_json_keepalive_windows, setup_remoted_op, teardown_remoted_op),
         cmocka_unit_test_setup_teardown(test_parse_json_keepalive_minimal, setup_remoted_op, teardown_remoted_op),
         cmocka_unit_test_setup_teardown(test_parse_json_keepalive_with_groups, setup_remoted_op, teardown_remoted_op),

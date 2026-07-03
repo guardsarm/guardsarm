@@ -6,14 +6,14 @@ This program is free software; you can redistribute it and/or modify it under th
 import pytest
 import time
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.utils.callbacks import generate_callback
-from wazuh_testing.utils.agent_groups import create_group, delete_group
-from wazuh_testing.tools.monitors import file_monitor
-from wazuh_testing.modules.authd import PREFIX
-from wazuh_testing.constants.daemons import AUTHD_DAEMON
-from wazuh_testing.utils import mocking
-from wazuh_testing.utils.services import control_service
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.utils.callbacks import generate_callback
+from guardsarm_testing.utils.agent_groups import create_group, delete_group
+from guardsarm_testing.tools.monitors import file_monitor
+from guardsarm_testing.modules.authd import PREFIX
+from guardsarm_testing.constants.daemons import AUTHD_DAEMON
+from guardsarm_testing.utils import mocking
+from guardsarm_testing.utils.services import control_service
 
 
 AUTHD_STARTUP_TIMEOUT = 30
@@ -29,7 +29,7 @@ def stop_authd():
 @pytest.fixture()
 def wait_for_authd_startup():
     """Wait until authd has begun with function scope"""
-    log_monitor = file_monitor.FileMonitor(WAZUH_LOG_PATH)
+    log_monitor = file_monitor.FileMonitor(GUARDSARM_LOG_PATH)
     log_monitor.start(timeout=AUTHD_STARTUP_TIMEOUT, encoding="utf-8",
                       callback=generate_callback(rf'{PREFIX}Accepting connections on port 1515'))
     assert log_monitor.callback_result

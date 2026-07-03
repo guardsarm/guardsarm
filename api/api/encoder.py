@@ -8,12 +8,12 @@ import six
 from connexion.jsonifier import JSONEncoder
 
 from api.models.base_model_ import Model
-from wazuh.core.results import AbstractWazuhResult
+from guardsarm.core.results import AbstractGuardSarmResult
 
 
-class WazuhAPIJSONEncoder(JSONEncoder):
+class GuardSarmAPIJSONEncoder(JSONEncoder):
     """"
-    Define the custom Wazuh API JSON encoder class.
+    Define the custom GuardSarm API JSON encoder class.
     """
     include_nulls = False
 
@@ -39,7 +39,7 @@ class WazuhAPIJSONEncoder(JSONEncoder):
                 attr = o.attribute_map[attr]
                 result[attr] = value
             return result
-        elif isinstance(o, AbstractWazuhResult):
+        elif isinstance(o, AbstractGuardSarmResult):
             return o.render()
         return JSONEncoder.default(self, o)
 
@@ -60,7 +60,7 @@ def dumps(obj: object) -> str:
     -------
     str
     """
-    return json.dumps(obj, cls=WazuhAPIJSONEncoder)
+    return json.dumps(obj, cls=GuardSarmAPIJSONEncoder)
 
 
 def prettify(obj: object) -> str:
@@ -79,4 +79,4 @@ def prettify(obj: object) -> str:
     -------
     str
     """
-    return json.dumps(obj, cls=WazuhAPIJSONEncoder, indent=3)
+    return json.dumps(obj, cls=GuardSarmAPIJSONEncoder, indent=3)

@@ -10,7 +10,7 @@
 
 namespace
 {
-constexpr std::string_view JPATH_ORIGIN_SPACE = "/wazuh/space/name"; ///< wazuh.space.name
+constexpr std::string_view JPATH_ORIGIN_SPACE = "/guardsarm/space/name"; ///< guardsarm.space.name
 const std::string ENRICHMENT_SPACE_TRACEABLE_NAME = "enrichment/OriginSpace";
 const std::string DISCARDED_EVENTS_FILTER_TRACEABLE_NAME = "filter/DiscardedEvents";
 const std::string CLEANUP_DECODER_VARIABLES_TRACEABLE_NAME = "cleanup/DecoderTemporaryVariables";
@@ -18,10 +18,10 @@ const std::string CLEANUP_DECODER_VARIABLES_TRACEABLE_NAME = "cleanup/DecoderTem
 constexpr auto POSITIVE_INDEXED_BY_DISCARDED_TRUE =
     "Discard_event() -> Success: Event will be indexed (index_discarded_events=true)";
 constexpr auto NEGATIVE_INDEXED_BY_DISCARDED_TRUE_FIELD_FALSE =
-    "Discard_event() -> Failure: Event won't be indexed (wazuh.space.event_discarded=true and "
+    "Discard_event() -> Failure: Event won't be indexed (guardsarm.space.event_discarded=true and "
     "index_discarded_events=false)";
 constexpr auto POSITIVE_INDEXED_BY_DISCARDED_FALSE =
-    "Discard_event() -> Success: Event will be indexed (wazuh.space.event_discarded=false)";
+    "Discard_event() -> Success: Event will be indexed (guardsarm.space.event_discarded=false)";
 
 } // namespace
 namespace builder::builders::enrichment
@@ -38,7 +38,7 @@ std::pair<base::Expression, std::string> getSpaceEnrichment(const cm::store::dat
             event->setString(originSpace, JPATH_ORIGIN_SPACE);
             if (isTestMode)
             {
-                return base::result::makeSuccess<decltype(event)>(event, "[map: $wazuh.space.name] -> Success");
+                return base::result::makeSuccess<decltype(event)>(event, "[map: $guardsarm.space.name] -> Success");
             }
             return base::result::makeSuccess<decltype(event)>(event);
         });

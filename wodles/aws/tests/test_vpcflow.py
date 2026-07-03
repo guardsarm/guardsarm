@@ -67,7 +67,7 @@ def test_aws_vpc_flow_bucket_load_information_from_file():
         assert instance.load_information_from_file(utils.TEST_LOG_KEY) == list(expected_result)
 
 
-@patch('wazuh_integration.WazuhIntegration.get_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_client')
 def test_aws_vpc_flow_bucket_get_ec2_client(mock_get_client):
     """Test 'get_ec2_client' method instantiates a boto3.Session object with the proper arguments.
 

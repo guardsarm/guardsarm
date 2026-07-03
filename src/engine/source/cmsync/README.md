@@ -2,10 +2,10 @@
 
 ## Overview
 
-The **cmsync** module is the **Content Manager Synchronization Service**. It keeps the engine's local content (namespaces, policies, decoders, integrations, KVDBs) in sync with the wazuh-indexer. On each synchronization cycle it:
+The **cmsync** module is the **Content Manager Synchronization Service**. It keeps the engine's local content (namespaces, policies, decoders, integrations, KVDBs) in sync with the guardsarm-indexer. On each synchronization cycle it:
 
 1. Checks whether each configured remote *space* has changed (comparing SHA-256 hashes).
-2. Downloads updated content from the wazuh-indexer via `wiconnector`.
+2. Downloads updated content from the guardsarm-indexer via `wiconnector`.
 3. Imports it into a new local namespace via `cmcrud`.
 4. Hot-swaps the router route to point at the fresh namespace.
 5. Cleans up the old namespace.
@@ -41,7 +41,7 @@ The module persists its own state (which spaces are tracked and their current na
          │
          ▼
   ┌──────────────┐
-  │wazuh-indexer │
+  │guardsarm-indexer │
   └──────────────┘
 ```
 
@@ -49,10 +49,10 @@ The module persists its own state (which spaces are tracked and their current na
 
 ### Consumer Validation for Consistency
 
-To prevent partial policy downloads when the wazuh-indexer is mid-update, `CMSync` implements **consumer validation via Point-In-Time (PIT)**:
+To prevent partial policy downloads when the guardsarm-indexer is mid-update, `CMSync` implements **consumer validation via Point-In-Time (PIT)**:
 
 1. **Hash check phase**: `getPolicyHashAndEnabledFromRemote()` passes `STANDARD_RULESET_CONSUMER_ID` to the indexer connector.
-   - The connector creates a multi-index PIT (policy indices + `.wazuh-cti-consumers`).
+   - The connector creates a multi-index PIT (policy indices + `.guardsarm-cti-consumers`).
    - It validates the consumer is in the `idle` status within that PIT snapshot.
    - If idle: returns the hash and enabled status (and the check is consistent).
    - If not idle: returns `std::nullopt` → sync cycle is skipped.
@@ -83,7 +83,7 @@ An internal class (defined in `cmsync.cpp`) that tracks the state of a single sy
 
 | Field | Description |
 |---|---|
-| `m_originSpace` | Remote space name in the wazuh-indexer (e.g. `"standard"`, `"custom"`) |
+| `m_originSpace` | Remote space name in the guardsarm-indexer (e.g. `"standard"`, `"custom"`) |
 | `m_routeName` | Derived router route name (`"cmsync_<space>"`) |
 | `m_nsId` | Local `NamespaceId` in `cmstore` (or `DUMMY_NAMESPACE_ID` before first sync) |
 
@@ -93,7 +93,7 @@ An internal class (defined in `cmsync.cpp`) that tracks the state of a single sy
 
 `downloadAndEnrichNamespace()` performs a two-phase operation with consumer validation:
 
-1. **Download** — fetches KVDBs, decoders, integrations, and the policy from the wazuh-indexer via `wiconnector::getPolicy(consumerIdToValidate=STANDARD_RULESET_CONSUMER_ID)`, then imports them into a new namespace via `cmcrud::importNamespace()` with `softValidation = true`.
+1. **Download** — fetches KVDBs, decoders, integrations, and the policy from the guardsarm-indexer via `wiconnector::getPolicy(consumerIdToValidate=STANDARD_RULESET_CONSUMER_ID)`, then imports them into a new namespace via `cmcrud::importNamespace()` with `softValidation = true`.
    - If the consumer is not idle (returns `std::nullopt`), download is skipped and `std::nullopt` is returned (sync cycle aborts gracefully).
 2. **Enrich** — placeholder for adding local-only assets (outputs, default filters) that don't come from the indexer.
 

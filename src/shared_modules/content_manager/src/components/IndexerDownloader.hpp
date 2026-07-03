@@ -1,5 +1,5 @@
 /*
- * Wazuh content manager
+ * GuardSarm content manager
  * Copyright (C) 2015, Wazuh Inc.
  *
  * This program is free software; you can redistribute it
@@ -31,7 +31,7 @@
 /**
  * @class IndexerDownloader
  *
- * @brief Downloads CVE data from the Wazuh Indexer and feeds it directly to the
+ * @brief Downloads CVE data from the GuardSarm Indexer and feeds it directly to the
  *        fileProcessingCallback without writing intermediate files to disk.
  *
  * Replaces CtiOffsetDownloader and CtiSnapshotDownloader.
@@ -50,8 +50,8 @@
  *
  * Configuration expected under configData["indexer"]:
  * {
- *   "index":               ".wazuh-threatintel-vulnerabilities", // Indexer CVE index name
- *   "consumerStatusIndex": ".wazuh-cti-consumers",    // Consumer status index (optional)
+ *   "index":               ".guardsarm-threatintel-vulnerabilities", // Indexer CVE index name
+ *   "consumerStatusIndex": ".guardsarm-cti-consumers",    // Consumer status index (optional)
  *   "consumerStatusId":    "cti:catalog:consumer:vulnerabilities", // Consumer status document id (optional)
  *   "pageSize":            250,                       // Documents per page (optional, default 250)
  *   "numSlices":           2,                         // Parallel PIT slices (optional, default 2)
@@ -129,7 +129,7 @@ private:
     }
 
     /**
-     * @brief Reads the consumer status from `.wazuh-cti-consumers`: "ready" (safe to query),
+     * @brief Reads the consumer status from `.guardsarm-cti-consumers`: "ready" (safe to query),
      *        "running" (indexing, wait), "failed", or empty/missing (not ready yet).
      *
      * @param outRawStatus If non-null, receives the raw status string for logging.

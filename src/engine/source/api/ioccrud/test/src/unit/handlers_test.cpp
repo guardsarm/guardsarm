@@ -76,7 +76,7 @@ protected:
 
     httplib::Request createValidRequest(const std::string& path, const std::string& hash = "abc123")
     {
-        com::wazuh::api::engine::ioc::UpdateIoc_Request protoReq;
+        com::guardsarm::api::engine::ioc::UpdateIoc_Request protoReq;
         protoReq.set_path(path);
         protoReq.set_hash(hash);
         return api::adapter::createRequest(protoReq);
@@ -96,7 +96,7 @@ TEST_F(SyncIocHandlerTest, EmptyPath_Returns400)
 {
     auto handler = syncIoc(m_kvdbManager, m_scheduler, m_store);
 
-    com::wazuh::api::engine::ioc::UpdateIoc_Request protoReq;
+    com::guardsarm::api::engine::ioc::UpdateIoc_Request protoReq;
     protoReq.set_path("");
     protoReq.set_hash("somehash");
 
@@ -117,7 +117,7 @@ TEST_F(SyncIocHandlerTest, EmptyHash_Returns400)
     TempIOCFile tempFile;
     auto handler = syncIoc(m_kvdbManager, m_scheduler, m_store);
 
-    com::wazuh::api::engine::ioc::UpdateIoc_Request protoReq;
+    com::guardsarm::api::engine::ioc::UpdateIoc_Request protoReq;
     protoReq.set_path(tempFile.path());
     protoReq.set_hash("");
 

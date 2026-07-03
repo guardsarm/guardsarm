@@ -13,7 +13,7 @@
 namespace api::adapter
 {
 using RouteHandler = std::function<void(const httplib::Request&, httplib::Response&)>;
-namespace eEngine = ::com::wazuh::api::engine;
+namespace eEngine = ::com::guardsarm::api::engine;
 
 struct Error
 {

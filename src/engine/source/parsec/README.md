@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **parsec** module is a header-only parser combinator library for the Wazuh engine. It provides a set of composable, type-safe building blocks for constructing text parsers from small, reusable units.
+The **parsec** module is a header-only parser combinator library for the GuardSarm engine. It provides a set of composable, type-safe building blocks for constructing text parsers from small, reusable units.
 
 A parser is a function that takes a `string_view` and a position index, and returns a typed `Result<T>` — either a parsed value on success or an error message on failure. Parsers are combined using operators and higher-order functions (combinators) to build complex grammars without separate lexer/parser phases.
 

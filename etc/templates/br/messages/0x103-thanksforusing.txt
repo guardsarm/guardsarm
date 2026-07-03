@@ -1,12 +1,12 @@
 
-   Obrigado por usar Wazuh.
+   Obrigado por usar GuardSarm.
    Se você tiver alguma pergunta, sugestão ou encontrar algum
    "bug", contate-nos.
 
    Use nossa lista de correio público em:
-      https://groups.google.com/forum/#!forum/wazuh
+      https://groups.google.com/forum/#!forum/guardsarm
 
    Maiores informações podem ser encontradas em:
-          - http://www.wazuh.com
+          - http://guardsarm.com
 
        ---  Pressione ENTER para continuar  ---

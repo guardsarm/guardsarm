@@ -89,13 +89,13 @@ def run(args):
     log_dir = Path(args['log_dir'])
     port = args['port']
 
-    print(f"Wazuh Engine Metrics Dashboard")
+    print(f"GuardSarm Engine Metrics Dashboard")
     print(f"  Log directory: {log_dir}")
     print(f"  Port: {port}")
     print()
 
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'wazuh-metrics-dashboard'
+    app.config['SECRET_KEY'] = 'guardsarm-metrics-dashboard'
     socketio = SocketIO(app, cors_allowed_origins="*", logger=False, engineio_logger=False)
 
     # Suppress Flask/Werkzeug startup banner

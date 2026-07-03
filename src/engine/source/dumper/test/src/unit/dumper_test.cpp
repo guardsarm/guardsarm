@@ -21,7 +21,7 @@ using ::testing::StrictMock;
 namespace
 {
 const streamlog::RotationConfig TEST_CHANNEL_CONFIG {.basePath = "/tmp/test-logs",
-                                                     .pattern = "${YYYY}/${MMM}/wazuh-${name}-${DD}.json",
+                                                     .pattern = "${YYYY}/${MMM}/guardsarm-${name}-${DD}.json",
                                                      .maxSize = 0,
                                                      .bufferSize = 1 << 20,
                                                      .shouldCompress = false,

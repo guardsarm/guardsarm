@@ -1,11 +1,11 @@
 # Migrating from Agentless to Supported Alternatives
 
-In Wazuh 4.x, the **Agentless** module (`wazuh-agentlessd`) allowed the Wazuh
-manager to monitor remote hosts directly over SSH without deploying a Wazuh
+In GuardSarm 4.x, the **Agentless** module (`guardsarm-agentlessd`) allowed the GuardSarm
+manager to monitor remote hosts directly over SSH without deploying a GuardSarm
 agent on them. The daemon ran on the manager, established SSH sessions using
 Expect scripts, and forwarded results to the analysis pipeline.
 
-Starting with Wazuh 5.0, the Agentless module has been fully removed. This
+Starting with GuardSarm 5.0, the Agentless module has been fully removed. This
 guide describes what Agentless did, identifies the most common use cases, and
 maps each one to a supported alternative available in 5.0.
 
@@ -15,14 +15,14 @@ maps each one to a supported alternative available in 5.0.
 
 ## What Agentless did in 4.x
 
-The `wazuh-agentlessd` daemon was configured through `<agentless>` blocks in
+The `guardsarm-agentlessd` daemon was configured through `<agentless>` blocks in
 the manager's `ossec.conf`. Each block described a remote host (or set of
 hosts), a built-in SSH script, and an operational mode.
 
 ### Configuration format
 
 ```xml
-<!-- Wazuh 4.x: ossec.conf (manager) -->
+<!-- GuardSarm 4.x: ossec.conf (manager) -->
 <agentless>
   <type>ssh_integrity_check_linux</type>
   <frequency>3600</frequency>
@@ -45,7 +45,7 @@ hosts), a built-in SSH script, and an operational mode.
 
 | Mode | Description |
 |------|-------------|
-| `periodic` | Output from each check is analyzed with the Wazuh ruleset as if a monitored log. |
+| `periodic` | Output from each check is analyzed with the GuardSarm ruleset as if a monitored log. |
 | `periodic_diff` | Output from each agentless check is compared to the output of the previous run. Changes are alerted on, similar to file integrity monitoring. |
 
 ### Built-in scripts
@@ -75,22 +75,22 @@ SSH-key authentication (passphrase-less keys) required no registration.
 ## Use-case mapping
 
 The table below lists the most common Agentless use cases and their recommended
-replacement in Wazuh 5.0.
+replacement in GuardSarm 5.0.
 
 | 4.x use case | Recommended 5.0 alternative |
 |---|---|
-| File integrity monitoring on remote Linux/Unix hosts | Wazuh agent + FIM module |
+| File integrity monitoring on remote Linux/Unix hosts | GuardSarm agent + FIM module |
 | File integrity monitoring on remote hosts (agent not installable) | Custom SSH script on a relay agent + Logcollector `command` |
 | Configuration diff on network devices (ASA, PIX, Foundry) | Custom SSH script on a relay agent + Logcollector `full_command` |
 | Periodic command execution on remote hosts | Custom SSH script on a relay agent + Logcollector `command` or `<wodle name="command">` |
-| Configuration assessment on remote Linux/Unix hosts | Wazuh agent + SCA module |
+| Configuration assessment on remote Linux/Unix hosts | GuardSarm agent + SCA module |
 
 ---
 
-## Alternative 1: Wazuh agent (preferred)
+## Alternative 1: GuardSarm agent (preferred)
 
 For any remote host running a supported OS,
-the preferred migration path is to install a Wazuh agent directly on that host.
+the preferred migration path is to install a GuardSarm agent directly on that host.
 The agent provides:
 
 - **FIM** (`<syscheck>`), replaces `ssh_integrity_check_linux` / `ssh_integrity_check_bsd`
@@ -103,7 +103,7 @@ and enroll agents.
 ### FIM configuration replacing ssh_integrity_check_linux
 
 ```xml
-<!-- Wazuh 5.0: agent ossec.conf -->
+<!-- GuardSarm 5.0: agent ossec.conf -->
 <syscheck>
   <disabled>no</disabled>
   <frequency>3600</frequency>
@@ -117,7 +117,7 @@ Enable SCA on the agent and choose a policy for the OS. Built-in policies are
 located in `/var/ossec/ruleset/sca/` on the agent.
 
 ```xml
-<!-- Wazuh 5.0: agent ossec.conf -->
+<!-- GuardSarm 5.0: agent ossec.conf -->
 <sca>
   <enabled>yes</enabled>
   <scan_on_start>yes</scan_on_start>
@@ -132,14 +132,14 @@ policy format changes between 4.x and 5.x.
 
 ## Alternative 2: Logcollector command monitoring on a relay agent
 
-When a Wazuh agent cannot be installed on the target host (network appliances,
+When a GuardSarm agent cannot be installed on the target host (network appliances,
 embedded devices, legacy systems), run an SSH command from a **relay host** that
-does have a Wazuh agent. The agent collects the output with Logcollector and
+does have a GuardSarm agent. The agent collects the output with Logcollector and
 forwards it to the manager for analysis.
 
 This covers the `periodic` mode and all `ssh_*_diff` scripts.
 
-> **These scripts are not provided by Wazuh 5.x.** The code blocks below are
+> **These scripts are not provided by GuardSarm 5.x.** The code blocks below are
 > reference templates that you must create and deploy on the relay agent.
 > Adjust paths, credentials, and target addresses to match your environment.
 
@@ -172,12 +172,12 @@ ssh -i /var/ossec/agentless/keys/relay_key \
 > **Linux targets only.** The remote commands above (`md5sum`, `sha1sum`,
 > `stat --printf`) are GNU coreutils and are not available on BSD systems.
 > On FreeBSD or OpenBSD targets, the equivalent commands are `md5 -q`,
-> `sha1 -q`, and `stat -f '%z:%p:%u:%g'`. Install a Wazuh agent directly on
+> `sha1 -q`, and `stat -f '%z:%p:%u:%g'`. Install a GuardSarm agent directly on
 > BSD hosts where possible (Alternative 1); if that is not an option, adapt
 > the remote commands before deploying the script.
 
 ```xml
-<!-- Wazuh 5.0: relay agent ossec.conf -->
+<!-- GuardSarm 5.0: relay agent ossec.conf -->
 <localfile>
   <log_format>command</log_format>
   <command>/var/ossec/agentless/agentless_fim.sh user@192.168.1.10 /etc /usr/bin /usr/sbin</command>
@@ -188,7 +188,7 @@ ssh -i /var/ossec/agentless/keys/relay_key \
 
 > The `<frequency>` value is in seconds. The equivalent `<wodle name="command">`
 > would use `<interval>1h</interval>` — see
-> [Alternative 3](#alternative-3-wazuh-command-wodle) for the suffix syntax.
+> [Alternative 3](#alternative-3-guardsarm-command-wodle) for the suffix syntax.
 
 ### Replacing ssh_generic_diff (periodic_diff mode)
 
@@ -233,7 +233,7 @@ echo "$CURRENT" > "$SNAPSHOT"
 ```
 
 ```xml
-<!-- Wazuh 5.0: relay agent ossec.conf -->
+<!-- GuardSarm 5.0: relay agent ossec.conf -->
 <localfile>
   <log_format>full_command</log_format>
   <command>/var/ossec/agentless/agentless_diff.sh admin@192.168.1.1 "show running-config" /var/ossec/agentless/snapshots/firewall_192.168.1.1.snap</command>
@@ -285,7 +285,7 @@ Example for a Cisco ASA using `sshpass` (install it on the relay host first:
 
 > **Security note:** With `-f`, `sshpass` reads the password from a file rather
 > than from the process environment or command line. The risk is file exposure:
-> set ownership to `wazuh:wazuh` and permissions to `600` on the password file.
+> set ownership to `guardsarm:guardsarm` and permissions to `600` on the password file.
 > Restrict access to the relay host accordingly and prefer key-based
 > authentication whenever the device firmware supports it.
 
@@ -330,7 +330,7 @@ echo "$CURRENT" > "$SNAPSHOT"
 
 ---
 
-## Alternative 3: Wazuh command wodle
+## Alternative 3: GuardSarm command wodle
 
 For periodic command execution with checksum-verified scripts, use
 `<wodle name="command">` on the relay agent. This is equivalent to the
@@ -338,7 +338,7 @@ For periodic command execution with checksum-verified scripts, use
 events rather than plain log lines.
 
 ```xml
-<!-- Wazuh 5.0: relay agent ossec.conf -->
+<!-- GuardSarm 5.0: relay agent ossec.conf -->
 <wodle name="command">
   <disabled>no</disabled>
   <tag>agentless_remote_check</tag>
@@ -375,7 +375,7 @@ on the relay host:
 1. Create the directory and generate a dedicated key pair for the relay host:
    ```sh
    mkdir -p /var/ossec/agentless/keys
-   chown wazuh:wazuh /var/ossec/agentless/keys
+   chown guardsarm:guardsarm /var/ossec/agentless/keys
    chmod 700 /var/ossec/agentless/keys
    ssh-keygen -t ed25519 -f /var/ossec/agentless/keys/relay_key -N ""
    ```
@@ -388,7 +388,7 @@ on the relay host:
    `StrictHostKeyChecking=yes`:
    ```sh
    ssh-keyscan -H 192.168.1.10 >> /var/ossec/agentless/keys/known_hosts
-   chown wazuh:wazuh /var/ossec/agentless/keys/known_hosts
+   chown guardsarm:guardsarm /var/ossec/agentless/keys/known_hosts
    chmod 600 /var/ossec/agentless/keys/known_hosts
    ```
    Without this step, the first connection attempt fails with "Host key
@@ -396,13 +396,13 @@ on the relay host:
 4. Restrict the key on the remote `authorized_keys` to the specific command it
    needs to run (if the target is a full Unix host). Place the full monitoring
    logic in a fixed script on the target (e.g.
-   `/usr/local/bin/wazuh-fim-check`) and point `command=` at that wrapper.
+   `/usr/local/bin/guardsarm-fim-check`) and point `command=` at that wrapper.
    Inlining the full stat/checksum loop directly in `authorized_keys` is
    fragile because any change to the directories being monitored also requires
    updating `authorized_keys`. When a forced command is set, SSH ignores the
    command sent by the client and always executes `command=` instead:
    ```
-   command="/usr/local/bin/wazuh-fim-check",no-port-forwarding,no-pty ssh-ed25519 AAAA... relay
+   command="/usr/local/bin/guardsarm-fim-check",no-port-forwarding,no-pty ssh-ed25519 AAAA... relay
    ```
 5. Use `StrictHostKeyChecking=yes` (shown in the examples above) to prevent
    man-in-the-middle attacks.
@@ -411,14 +411,14 @@ on the relay host:
    ownership and mode immediately after creating the snapshot directory:
    ```sh
    mkdir -p /var/ossec/agentless/snapshots
-   chown wazuh:wazuh /var/ossec/agentless/snapshots
+   chown guardsarm:guardsarm /var/ossec/agentless/snapshots
    chmod 700 /var/ossec/agentless/snapshots
    ```
    Any snapshot file written by the scripts (e.g. `firewall_192.168.1.1.snap`)
    will inherit the directory's restricted access. If you create snapshot files
    manually or outside the scripts, set their permissions explicitly:
    ```sh
-   chown wazuh:wazuh /var/ossec/agentless/snapshots/*.snap
+   chown guardsarm:guardsarm /var/ossec/agentless/snapshots/*.snap
    chmod 600 /var/ossec/agentless/snapshots/*.snap
    ```
 

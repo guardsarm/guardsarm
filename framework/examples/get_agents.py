@@ -2,7 +2,7 @@
 
 ###
 #  Copyright (C) 2015, Wazuh Inc.All rights reserved.
-#  Wazuh.com
+#  GuardSarm.com
 #
 #  This program is free software; you can redistribute it
 #  and/or modify it under the terms of the GNU General Public
@@ -11,11 +11,11 @@
 ###
 
 # Instructions:
-#  - Use the embedded interpreter to run the script: {wazuh_path}/framework/python/bin/python3 get_agents.py
+#  - Use the embedded interpreter to run the script: {guardsarm_path}/framework/python/bin/python3 get_agents.py
 
 import json
 
-import wazuh.agent as agent
+import guardsarm.agent as agent
 
 if __name__ == "__main__":
 

@@ -30,9 +30,9 @@ int CreateThreadJoinable(pthread_t *lthread, void * (*function_pointer)(void *),
     }
 
 #ifdef CLIENT
-    read_size = 1024 * (size_t)getDefine_Int("wazuh", "thread_stack_size", 2048, 65536);
+    read_size = 1024 * (size_t)getDefine_Int("guardsarm", "thread_stack_size", 2048, 65536);
 #else
-    read_size = 1024 * (size_t)getDefine_Int_default("wazuh", "thread_stack_size", 2048, 65536, 8192);
+    read_size = 1024 * (size_t)getDefine_Int_default("guardsarm", "thread_stack_size", 2048, 65536, 8192);
 #endif
 
     /* Set the maximum stack limit to new threads */

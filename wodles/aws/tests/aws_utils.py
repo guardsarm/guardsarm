@@ -8,7 +8,7 @@ import copy
 from unittest.mock import patch
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
-import wazuh_integration
+import guardsarm_integration
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'buckets_s3'))
 import aws_bucket
@@ -70,9 +70,9 @@ LIST_OBJECT_V2_NO_PREFIXES = {'Contents': [{
 LIST_OBJECT_V2_TRUNCATED = copy.deepcopy(LIST_OBJECT_V2_NO_PREFIXES)
 LIST_OBJECT_V2_TRUNCATED.update({'IsTruncated': True, 'NextContinuationToken': 'Token'})
 
-WAZUH_VERSION = "4.5.0"
+GUARDSARM_VERSION = "4.5.0"
 
-TEST_WAZUH_PATH = "/var/ossec"
+TEST_GUARDSARM_PATH = "/var/ossec"
 TEST_DATABASE = "test"
 TEST_MESSAGE = "test_message"
 QUEUE_PATH = 'queue/sockets/queue'
@@ -103,13 +103,13 @@ UNABLE_TO_FETCH_DELETE_FROM_QUEUE = 21
 INVALID_REGION_ERROR_CODE = 22
 
 
-def get_wazuh_integration_parameters(service_name: str = TEST_SERVICE_NAME, profile: str = TEST_AWS_PROFILE,
+def get_guardsarm_integration_parameters(service_name: str = TEST_SERVICE_NAME, profile: str = TEST_AWS_PROFILE,
                                      access_key: str = None, secret_key: str = None,
                                      iam_role_arn: str = None, region: str = None, discard_field: str = None,
                                      discard_regex: str = None, sts_endpoint: str = None, service_endpoint: str = None,
                                      iam_role_duration: str = None, external_id: str = None,
                                      skip_on_error: bool = False):
-    """Return a dict containing every parameter supported by WazuhIntegration. Used to simulate different ossec.conf
+    """Return a dict containing every parameter supported by GuardSarmIntegration. Used to simulate different ossec.conf
     configurations.
 
     Parameters
@@ -153,12 +153,12 @@ def get_wazuh_integration_parameters(service_name: str = TEST_SERVICE_NAME, prof
             'external_id': external_id, 'skip_on_error': skip_on_error}
 
 
-def get_wazuh_aws_database_parameters(service_name: str = TEST_SERVICE_NAME, profile: str = TEST_AWS_PROFILE,
+def get_guardsarm_aws_database_parameters(service_name: str = TEST_SERVICE_NAME, profile: str = TEST_AWS_PROFILE,
                                       db_name: str = TEST_DATABASE, access_key: str = None, secret_key: str = None,
                                       iam_role_arn: str = None, region: str = None, discard_field: str = None,
                                       discard_regex: str = None, sts_endpoint: str = None, service_endpoint: str = None,
                                       iam_role_duration: str = None, external_id: str = None):
-    """Return a dict containing every parameter supported by WazuhAWSDatabase.
+    """Return a dict containing every parameter supported by GuardSarmAWSDatabase.
 
     Parameters
     ----------
@@ -382,54 +382,54 @@ def get_aws_s3_log_handler_parameters(iam_role_arn: str = None, iam_role_duratio
             'sts_endpoint': sts_endpoint, 'service_endpoint': service_endpoint}
 
 
-def get_mocked_wazuh_integration(**kwargs):
-    with patch('wazuh_integration.WazuhIntegration.get_client'), \
-            patch('wazuh_integration.sqlite3.connect'), \
-            patch('wazuh_integration.utils.find_wazuh_path', return_value=TEST_WAZUH_PATH), \
-            patch('wazuh_integration.utils.get_wazuh_version', return_value=WAZUH_VERSION):
-        return wazuh_integration.WazuhIntegration(**get_wazuh_integration_parameters(**kwargs))
+def get_mocked_guardsarm_integration(**kwargs):
+    with patch('guardsarm_integration.GuardSarmIntegration.get_client'), \
+            patch('guardsarm_integration.sqlite3.connect'), \
+            patch('guardsarm_integration.utils.find_guardsarm_path', return_value=TEST_GUARDSARM_PATH), \
+            patch('guardsarm_integration.utils.get_guardsarm_version', return_value=GUARDSARM_VERSION):
+        return guardsarm_integration.GuardSarmIntegration(**get_guardsarm_integration_parameters(**kwargs))
 
 
-def get_mocked_wazuh_aws_database(**kwargs):
-    with patch('wazuh_integration.WazuhAWSDatabase.check_metadata_version'), \
-            patch('wazuh_integration.WazuhIntegration.get_client'), \
-            patch('wazuh_integration.sqlite3.connect'), \
-            patch('wazuh_integration.utils.find_wazuh_path', return_value=TEST_WAZUH_PATH), \
-            patch('wazuh_integration.utils.get_wazuh_version', return_value=WAZUH_VERSION):
-        return wazuh_integration.WazuhAWSDatabase(**get_wazuh_aws_database_parameters(**kwargs))
+def get_mocked_guardsarm_aws_database(**kwargs):
+    with patch('guardsarm_integration.GuardSarmAWSDatabase.check_metadata_version'), \
+            patch('guardsarm_integration.GuardSarmIntegration.get_client'), \
+            patch('guardsarm_integration.sqlite3.connect'), \
+            patch('guardsarm_integration.utils.find_guardsarm_path', return_value=TEST_GUARDSARM_PATH), \
+            patch('guardsarm_integration.utils.get_guardsarm_version', return_value=GUARDSARM_VERSION):
+        return guardsarm_integration.GuardSarmAWSDatabase(**get_guardsarm_aws_database_parameters(**kwargs))
 
 
 def get_mocked_aws_bucket(**kwargs):
-    with patch('wazuh_integration.WazuhAWSDatabase.check_metadata_version'), \
-            patch('wazuh_integration.WazuhIntegration.get_client'), \
-            patch('wazuh_integration.sqlite3.connect'), \
-            patch('wazuh_integration.utils.find_wazuh_path', return_value=TEST_WAZUH_PATH), \
-            patch('wazuh_integration.utils.get_wazuh_version', return_value=WAZUH_VERSION):
+    with patch('guardsarm_integration.GuardSarmAWSDatabase.check_metadata_version'), \
+            patch('guardsarm_integration.GuardSarmIntegration.get_client'), \
+            patch('guardsarm_integration.sqlite3.connect'), \
+            patch('guardsarm_integration.utils.find_guardsarm_path', return_value=TEST_GUARDSARM_PATH), \
+            patch('guardsarm_integration.utils.get_guardsarm_version', return_value=GUARDSARM_VERSION):
         return aws_bucket.AWSBucket(**get_aws_bucket_parameters(**kwargs))
 
 
 def get_mocked_bucket(class_=aws_bucket.AWSBucket, **kwargs):
-    with patch('wazuh_integration.WazuhAWSDatabase.check_metadata_version'), \
-            patch('wazuh_integration.WazuhIntegration.get_client'), \
-            patch('wazuh_integration.sqlite3.connect'), \
-            patch('wazuh_integration.utils.find_wazuh_path', return_value=TEST_WAZUH_PATH), \
-            patch('wazuh_integration.utils.get_wazuh_version', return_value=WAZUH_VERSION):
+    with patch('guardsarm_integration.GuardSarmAWSDatabase.check_metadata_version'), \
+            patch('guardsarm_integration.GuardSarmIntegration.get_client'), \
+            patch('guardsarm_integration.sqlite3.connect'), \
+            patch('guardsarm_integration.utils.find_guardsarm_path', return_value=TEST_GUARDSARM_PATH), \
+            patch('guardsarm_integration.utils.get_guardsarm_version', return_value=GUARDSARM_VERSION):
         return class_(**get_aws_bucket_parameters(**kwargs))
 
 
 def get_mocked_service(class_=aws_service.AWSService, **kwargs):
-    with patch('wazuh_integration.WazuhAWSDatabase.check_metadata_version'), \
-            patch('wazuh_integration.WazuhIntegration.get_client'), \
-            patch('wazuh_integration.sqlite3.connect'), \
-            patch('wazuh_integration.utils.find_wazuh_path', return_value=TEST_WAZUH_PATH), \
-            patch('wazuh_integration.utils.get_wazuh_version', return_value=WAZUH_VERSION):
+    with patch('guardsarm_integration.GuardSarmAWSDatabase.check_metadata_version'), \
+            patch('guardsarm_integration.GuardSarmIntegration.get_client'), \
+            patch('guardsarm_integration.sqlite3.connect'), \
+            patch('guardsarm_integration.utils.find_guardsarm_path', return_value=TEST_GUARDSARM_PATH), \
+            patch('guardsarm_integration.utils.get_guardsarm_version', return_value=GUARDSARM_VERSION):
         return class_(**get_aws_service_parameters(**kwargs))
 
 
 def get_mocked_aws_sqs_queue(**kwargs):
-    with patch('wazuh_integration.WazuhIntegration.get_client'), \
-            patch('wazuh_integration.utils.find_wazuh_path', return_value=TEST_WAZUH_PATH), \
-            patch('wazuh_integration.utils.get_wazuh_version', return_value=WAZUH_VERSION), \
+    with patch('guardsarm_integration.GuardSarmIntegration.get_client'), \
+            patch('guardsarm_integration.utils.find_guardsarm_path', return_value=TEST_GUARDSARM_PATH), \
+            patch('guardsarm_integration.utils.get_guardsarm_version', return_value=GUARDSARM_VERSION), \
             patch('s3_log_handler.AWSS3LogHandler.__init__') as mocked_handler, \
             patch('sqs_message_processor.AWSQueueMessageProcessor.__init__') as mocked_processor:
         return sqs_queue.AWSSQSQueue(message_processor=mocked_processor, bucket_handler=mocked_handler,
@@ -437,9 +437,9 @@ def get_mocked_aws_sqs_queue(**kwargs):
 
 
 def get_mocked_aws_sl_subscriber_bucket(**kwargs):
-    with patch('wazuh_integration.WazuhIntegration.get_client'), \
-            patch('wazuh_integration.utils.find_wazuh_path', return_value=TEST_WAZUH_PATH), \
-            patch('wazuh_integration.utils.get_wazuh_version', return_value=WAZUH_VERSION):
+    with patch('guardsarm_integration.GuardSarmIntegration.get_client'), \
+            patch('guardsarm_integration.utils.find_guardsarm_path', return_value=TEST_GUARDSARM_PATH), \
+            patch('guardsarm_integration.utils.get_guardsarm_version', return_value=GUARDSARM_VERSION):
         return s3_log_handler.AWSSLSubscriberBucket(**get_aws_s3_log_handler_parameters(**kwargs))
 
 

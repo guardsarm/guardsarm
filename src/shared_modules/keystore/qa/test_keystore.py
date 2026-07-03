@@ -10,8 +10,8 @@ import trustme
 from pathlib import Path
 
 LOGGER = logging.getLogger(__name__)
-KEYSTORE_BINARY = "./wazuh-manager-keystore"
-KEYSTORE_TESTTOOL_BINARY = "./wazuh-keystore-testtool"
+KEYSTORE_BINARY = "./guardsarm-manager-keystore"
+KEYSTORE_TESTTOOL_BINARY = "./guardsarm-keystore-testtool"
 CERTS_PATH = 'etc/'
 PRIVATE_KEY_FILE = "etc/sslmanager.key"
 CERTIFICATE_FILE ="etc/sslmanager.cert"

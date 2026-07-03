@@ -1,6 +1,6 @@
 # Integrations
 
-This section describes the Wazuh integrations with cloud services and third-party platforms for log collection, security monitoring, and threat detection.
+This section describes the GuardSarm integrations with cloud services and third-party platforms for log collection, security monitoring, and threat detection.
 
 ## Cloud service integrations
 

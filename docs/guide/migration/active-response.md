@@ -1,6 +1,6 @@
 # Active Response migration guide (4.x to 5.x)
 
-Active Response (AR) is rebuilt in 5.x. The 4.x XML in `ossec.conf`, the agent-side `ar.conf`, rule-based matching, and the `PUT /active-response` API are all removed. 5.x replaces them with channels managed in the dashboard, an Alerting monitor that triggers them, a `wazuh-active-responses` data stream that records executions, and a manager-side poller that dispatches to agents over `wazuh-manager-remoted`.
+Active Response (AR) is rebuilt in 5.x. The 4.x XML in `ossec.conf`, the agent-side `ar.conf`, rule-based matching, and the `PUT /active-response` API are all removed. 5.x replaces them with channels managed in the dashboard, an Alerting monitor that triggers them, a `guardsarm-active-responses` data stream that records executions, and a manager-side poller that dispatches to agents over `guardsarm-manager-remoted`.
 
 > **Manual migration only.** No converter, importer, or compatibility shim is provided. Every 4.x AR must be recreated as a 5.x active response; every custom script must be rewritten for the new JSON contract.
 
@@ -9,10 +9,10 @@ Active Response (AR) is rebuilt in 5.x. The 4.x XML in `ossec.conf`, the agent-s
 - `ossec.conf` `<command>` / `<active-response>` blocks are no longer parsed. `ar.conf` is removed from the agent.
 - AR is created under **Explore → Active Responses**. Each channel carries `name`, `description`, `enabled`, `executable`, `extra_arguments`, `type` (`stateful` / `stateless`), `stateful_timeout` (default `180s`), `location` (`local` / `defined-agent` / `all`), `agent_id`.
 - Matching (`<rules_id>` / `<level>` / `<rules_group>`) moves to the query of an Alerting monitor of type **Active Response**.
-- `PUT /active-response` is removed with no replacement. Dispatch is document-driven: a monitor action writes into `wazuh-active-responses`; the manager polls every 60 s (batches of 100) and forwards via `wazuh-manager-remoted`. Pre-5.0 agents are filtered out.
-- Executions land as structured documents in the `wazuh-active-responses` data stream (backing data stream `.ds-wazuh-active-responses`, 3-day ISM retention via `stream-active-responses-policy`).
-- The JSON delivered to scripts changed shape: `command` ∈ `enable` / `disable` (was `add` / `delete`); alert fields use flat WCS paths (`source.ip`, `user.name`, …); AR metadata sits under `wazuh.active_response.*`.
-- Default firewall scripts (`firewall-drop`, `firewalld-drop`, `pf`, `npf`, `ipfw`, `netsh`, `route-null`, `host-deny`) are folded into a single `block-ip` executable. `restart-wazuh` moves to the Control Module. `wazuh-slack` is removed.
+- `PUT /active-response` is removed with no replacement. Dispatch is document-driven: a monitor action writes into `guardsarm-active-responses`; the manager polls every 60 s (batches of 100) and forwards via `guardsarm-manager-remoted`. Pre-5.0 agents are filtered out.
+- Executions land as structured documents in the `guardsarm-active-responses` data stream (backing data stream `.ds-guardsarm-active-responses`, 3-day ISM retention via `stream-active-responses-policy`).
+- The JSON delivered to scripts changed shape: `command` ∈ `enable` / `disable` (was `add` / `delete`); alert fields use flat WCS paths (`source.ip`, `user.name`, …); AR metadata sits under `guardsarm.active_response.*`.
+- Default firewall scripts (`firewall-drop`, `firewalld-drop`, `pf`, `npf`, `ipfw`, `netsh`, `route-null`, `host-deny`) are folded into a single `block-ip` executable. `restart-guardsarm` moves to the Control Module. `guardsarm-slack` is removed.
 - `<location>server</location>`, `<repeated_offenders>`, `<timeout_allowed>` have no direct equivalent.
 - `<disabled>` is replaced by the channel `enabled` field plus a **Mute / Unmute** runtime toggle.
 
@@ -20,10 +20,10 @@ Active Response (AR) is rebuilt in 5.x. The 4.x XML in `ossec.conf`, the agent-s
 
 ## Compatibility matrix
 
-| Wazuh Version | AR configuration source | Dashboard Platform        | Manager / Indexer |
+| GuardSarm Version | AR configuration source | Dashboard Platform        | Manager / Indexer |
 | ------------- | ----------------------- | ------------------------- | ----------------- |
-| 4.x           | `ossec.conf` XML blocks | OpenSearch Dashboards 2.x | Wazuh 4.x         |
-| 5.0.x         | Dashboard entity (UI)   | OpenSearch Dashboards 3.x | Wazuh 5.x         |
+| 4.x           | `ossec.conf` XML blocks | OpenSearch Dashboards 2.x | GuardSarm 4.x         |
+| 5.0.x         | Dashboard entity (UI)   | OpenSearch Dashboards 3.x | GuardSarm 5.x         |
 
 Mixed-version fleets may execute inconsistently — coordinate manager and agent upgrades.
 
@@ -45,9 +45,9 @@ For each `<command>` and `<active-response>` block in `/var/ossec/etc/ossec.conf
 - `<command>`: `<name>`, `<executable>`, `<extra_args>`, `<timeout_allowed>`.
 - `<active-response>`: the linked command, `<location>`, `<agent_id>`, the matching condition (`<rules_id>` / `<rules_group>` / `<level>`), `<timeout>`, `<repeated_offenders>`, `<disabled>`.
 
-Historical AR records are not migrated to the 5.x `wazuh-active-responses` data stream. In 4.x they live in two places:
+Historical AR records are not migrated to the 5.x `guardsarm-active-responses` data stream. In 4.x they live in two places:
 
-- Alerts in your `wazuh-alerts-*` indices, filtered by `rule.groups: active_response`.
+- Alerts in your `guardsarm-alerts-*` indices, filtered by `rule.groups: active_response`.
 - Lines in `/var/ossec/logs/active-responses.log` on each agent.
 
 If you need long-term records, export them from your 4.x indexer using your standard data-export procedure before upgrading.
@@ -71,41 +71,41 @@ If you need long-term records, export them from your 4.x indexer using your stan
 | `<active-response><timeout>`                                | **Stateful timeout**                | Same unit (seconds). Forces `Type = Stateful`. Default `180s`.                                      |
 | `<active-response><repeated_offenders>`                     | _(no replacement)_                  | See [`<repeated_offenders>` is gone](#repeated_offenders-is-gone).                                  |
 | `<active-response><disabled>`                               | `enabled` field + **Mute / Unmute** | `enabled` is the persistent flag; **Mute / Unmute** is the runtime toggle.                          |
-| `ar.conf`                                                   | _(deleted)_                         | `wazuh-execd` reads the JSON message directly.                                                      |
+| `ar.conf`                                                   | _(deleted)_                         | `guardsarm-execd` reads the JSON message directly.                                                      |
 
 ## Triggering model
 
 | Aspect              | 4.x                                                               | 5.x                                                                            |
 | ------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | Where matching runs | Manager rules engine                                              | Alerting monitor (indexer / dashboard plane)                                   |
-| How to express it   | `<rules_id>` / `<level>` / `<rules_group>` in `<active-response>` | Monitor of type **Active Response** with a query against `wazuh-findings-v5-*` |
+| How to express it   | `<rules_id>` / `<level>` / `<rules_group>` in `<active-response>` | Monitor of type **Active Response** with a query against `guardsarm-findings-v5-*` |
 | What invokes the AR | The alert fires the AR directly                                   | The trigger's **Add active response** action invokes the channel               |
-| Visibility          | Manager logs                                                      | Alerting evaluation + execution record in `wazuh-active-responses*`            |
+| Visibility          | Manager logs                                                      | Alerting evaluation + execution record in `guardsarm-active-responses*`            |
 
 Each 4.x `<active-response>` becomes two artifacts in 5.x: the AR channel (the **what**) and an Alerting monitor (the **when**). The monitor query encodes the matching condition that used to live in `<rules_id>` / `<level>` / `<rules_group>`; the monitor's trigger then carries an **Add active response** action pointing at the channel. End-to-end wiring is covered in [Migration steps](#migration-steps), steps 4 and 5 below.
 
 > The monitor type **must** be `Active Response`. No other type exposes the **Add active response** action.
 
-**Writing the monitor query.** The 4.x numeric rule ID does not carry over. Detection in 5.x is indexed under `wazuh-findings-v5-*` indices (split by category, e.g. `wazuh-findings-v5-system-activity*`, `wazuh-findings-v5-security*`, etc...), where a finding's rule identity is **`wazuh.rule.title`** (a human-readable string) and **`wazuh.rule.id`** (a UUID — not a number). So the query is **not** `wazuh.rule.id: 5763`. Pick the findings index that carries your events and match on:
+**Writing the monitor query.** The 4.x numeric rule ID does not carry over. Detection in 5.x is indexed under `guardsarm-findings-v5-*` indices (split by category, e.g. `guardsarm-findings-v5-system-activity*`, `guardsarm-findings-v5-security*`, etc...), where a finding's rule identity is **`guardsarm.rule.title`** (a human-readable string) and **`guardsarm.rule.id`** (a UUID — not a number). So the query is **not** `guardsarm.rule.id: 5763`. Pick the findings index that carries your events and match on:
 
-- **`wazuh.rule.title`** — recommended for monitors, e.g. `wazuh.rule.title is "Docker secret removed"`. Readable, but note that titles can change between ruleset versions.
-- **`wazuh.rule.id`** — the stable UUID, but it is mapped as text; an exact-match (`is`) operator may fail to match the dashed UUID. Prefer `wazuh.rule.title` unless you confirm `wazuh.rule.id.keyword` works in your build.
+- **`guardsarm.rule.title`** — recommended for monitors, e.g. `guardsarm.rule.title is "Docker secret removed"`. Readable, but note that titles can change between ruleset versions.
+- **`guardsarm.rule.id`** — the stable UUID, but it is mapped as text; an exact-match (`is`) operator may fail to match the dashed UUID. Prefer `guardsarm.rule.title` unless you confirm `guardsarm.rule.id.keyword` works in your build.
 
-The 4.x numeric IDs (`5763`, `5760`, …) have no 1:1 equivalent — locate the 5.x rule that detects the same condition by its `wazuh.rule.title` in `wazuh-findings-v5-*` (e.g. with `GET wazuh-findings-v5-*/_search`).
+The 4.x numeric IDs (`5763`, `5760`, …) have no 1:1 equivalent — locate the 5.x rule that detects the same condition by its `guardsarm.rule.title` in `guardsarm-findings-v5-*` (e.g. with `GET guardsarm-findings-v5-*/_search`).
 
 ## Audit and visibility
 
 | Surface               | 4.x                                                                                                       | 5.x                                                                                                                                                        |
 | --------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Executions land in    | `/var/ossec/logs/active-responses.log` + events from the `active_response` rule group in `wazuh-alerts-*` | `wazuh-active-responses` alias (`.wazuh-active-responses-v5` backing data stream). Agent log unchanged.                                                    |
-| Structured fields     | Free text                                                                                                 | `wazuh.active_response.{name,type,executable,extra_arguments,stateful_timeout,location,agent_id}` + `event.doc_id` / `event.index`.                        |
+| Executions land in    | `/var/ossec/logs/active-responses.log` + events from the `active_response` rule group in `guardsarm-alerts-*` | `guardsarm-active-responses` alias (`.guardsarm-active-responses-v5` backing data stream). Agent log unchanged.                                                    |
+| Structured fields     | Free text                                                                                                 | `guardsarm.active_response.{name,type,executable,extra_arguments,stateful_timeout,location,agent_id}` + `event.doc_id` / `event.index`.                        |
 | `@timestamp`          | Event time                                                                                                | Indexing time. For event-time correlation use the linked alert via `event.doc_id`.                                                                         |
 | Default retention     | Alerts ILM policy                                                                                         | 3 days (`stream-active-responses-policy`, priority 100). Adjust the policy for longer retention.                                                           |
 | Pivot to source alert | Manual                                                                                                    | Each execution record carries `event.doc_id` + `event.index`; switch Discover to that index and filter `_id:<event.doc_id>` in the search bar to open the triggering alert. |
 
 ## API change
 
-`PUT /active-response` is removed with no replacement endpoint. Integrations that previously fired AR via the API must now emit an alert document and let an Alerting Active Response monitor pick it up. The manager keeps a bookmark at `/var/wazuh-manager/queue/cluster/ar_bookmark.json`.
+`PUT /active-response` is removed with no replacement endpoint. Integrations that previously fired AR via the API must now emit an alert document and let an Alerting Active Response monitor pick it up. The manager keeps a bookmark at `/var/guardsarm-manager/queue/cluster/ar_bookmark.json`.
 
 ---
 
@@ -120,7 +120,7 @@ The discovery path is unchanged on Unix agents (`/var/ossec/active-response/bin/
 ```json
 {
   "version": 1,
-  "origin": { "name": "node01", "module": "wazuh-analysisd" },
+  "origin": { "name": "node01", "module": "guardsarm-analysisd" },
   "command": "add",
   "parameters": {
     "extra_args": [],
@@ -137,7 +137,7 @@ The discovery path is unchanged on Unix agents (`/var/ossec/active-response/bin/
 
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "active_response": {
       "name": "block-ip",
       "executable": "block-ip",
@@ -157,16 +157,16 @@ Changes:
 
 - `command` ∈ `enable` / `disable`. `disable` messages additionally carry `stateful_timeout` at the root.
 - Alert fields are flat WCS 9.1 paths (`source.ip`, `source.port`, `user.name`). `parameters.alert.data.*` is gone.
-- AR metadata under `wazuh.active_response.*`. `wazuh-execd` reads `.executable`, `.type`, `.stateful_timeout` before invoking the script.
+- AR metadata under `guardsarm.active_response.*`. `guardsarm-execd` reads `.executable`, `.type`, `.stateful_timeout` before invoking the script.
 
 ### Migration recipe
 
 For each custom script:
 
 1. Re-map field reads to WCS paths (`parameters.alert.data.srcip` → `source.ip`, etc.).
-2. Replace the inbound command handling: the 4.x `case "$COMMAND" in add) ... delete)` becomes `enable) ... disable)`. The manager dispatches exactly one of those values — `add` / `delete` in 4.x, `enable` / `disable` in 5.x. `continue` appears only as the `check_keys` deduplication reply: `wazuh-execd` answers `continue` or `abort` to a script that sends a `check_keys` control message, and this protocol is unchanged from 4.x, so scripts that issue `check_keys` keep comparing the response against `"continue"` exactly as before.
-3. Read `<extra_args>` values from `wazuh.active_response.extra_arguments` instead of positional shell arguments (`$1`, `$2`, …) — in 5.x the manager serializes them into the JSON payload, not into argv. Other AR metadata in the same object is also accessible to the script when needed: `.wazuh.active_response.{name,executable,type,stateful_timeout,location,agent_id}`. See the rewritten script in [Example 2 — Step 3](#example-2--custom-ssh-blocker-with-extra_arguments-rule-5760) for the `extra_arguments` accessor in use.
-4. Capture stdin **inside the script itself** — `read -r INPUT_JSON; echo "$INPUT_JSON" > /tmp/ar-input.json` — on a real dispatch to confirm the shape. **Do not** wrap as `tee /tmp/ar-input.json | impl.sh`: `wazuh-execd` keeps stdin open after sending the payload (it expects the script to optionally respond with a `check_keys` control message and read back the `continue`/`abort` answer), so `tee` never receives EOF and the dispatch hangs forever. See [Custom script hangs and AR queue stalls](#custom-script-hangs-and-ar-queue-stalls).
+2. Replace the inbound command handling: the 4.x `case "$COMMAND" in add) ... delete)` becomes `enable) ... disable)`. The manager dispatches exactly one of those values — `add` / `delete` in 4.x, `enable` / `disable` in 5.x. `continue` appears only as the `check_keys` deduplication reply: `guardsarm-execd` answers `continue` or `abort` to a script that sends a `check_keys` control message, and this protocol is unchanged from 4.x, so scripts that issue `check_keys` keep comparing the response against `"continue"` exactly as before.
+3. Read `<extra_args>` values from `guardsarm.active_response.extra_arguments` instead of positional shell arguments (`$1`, `$2`, …) — in 5.x the manager serializes them into the JSON payload, not into argv. Other AR metadata in the same object is also accessible to the script when needed: `.guardsarm.active_response.{name,executable,type,stateful_timeout,location,agent_id}`. See the rewritten script in [Example 2 — Step 3](#example-2--custom-ssh-blocker-with-extra_arguments-rule-5760) for the `extra_arguments` accessor in use.
+4. Capture stdin **inside the script itself** — `read -r INPUT_JSON; echo "$INPUT_JSON" > /tmp/ar-input.json` — on a real dispatch to confirm the shape. **Do not** wrap as `tee /tmp/ar-input.json | impl.sh`: `guardsarm-execd` keeps stdin open after sending the payload (it expects the script to optionally respond with a `check_keys` control message and read back the `continue`/`abort` answer), so `tee` never receives EOF and the dispatch hangs forever. See [Custom script hangs and AR queue stalls](#custom-script-hangs-and-ar-queue-stalls).
 
 ### Example diff
 
@@ -183,7 +183,7 @@ logmsg(){
   echo "$(date '+%Y-%m-%d %H:%M:%S') - custom-ar-sh - $msg" >> "$LOGFILE"
 }
 
-# Read AR input (wazuh-execd writes a single line terminated by \n)
+# Read AR input (guardsarm-execd writes a single line terminated by \n)
 read -r INPUT_JSON
 
 logmsg "$INPUT_JSON"
@@ -231,7 +231,7 @@ logmsg(){
   echo "$(date '+%Y-%m-%d %H:%M:%S') - custom-ar-sh - $msg" >> "$LOGFILE"
 }
 
-# Read AR input (wazuh-execd writes a single line terminated by \n)
+# Read AR input (guardsarm-execd writes a single line terminated by \n)
 read -r INPUT_JSON
 
 logmsg "$INPUT_JSON"
@@ -269,11 +269,11 @@ exit 0
 Ownership and permissions are unchanged:
 
 ```bash
-sudo chown root:wazuh /var/ossec/active-response/bin/<script>
+sudo chown root:guardsarm /var/ossec/active-response/bin/<script>
 sudo chmod 750 /var/ossec/active-response/bin/<script>
 ```
 
-The 4.x manager `<command>` / `<active-response>` registration is replaced by a channel created in **Explore → Active Responses** and an Alerting monitor whose query matches the rule by `wazuh.rule.title` over `wazuh-findings-v5-*` (the 4.x numeric `rule.id` is gone — see [Triggering model](#triggering-model)) and whose trigger's **Add active response** action points at the channel. `<repeated_offenders>` has no direct replacement — see [`<repeated_offenders>` is gone](#repeated_offenders-is-gone).
+The 4.x manager `<command>` / `<active-response>` registration is replaced by a channel created in **Explore → Active Responses** and an Alerting monitor whose query matches the rule by `guardsarm.rule.title` over `guardsarm-findings-v5-*` (the 4.x numeric `rule.id` is gone — see [Triggering model](#triggering-model)) and whose trigger's **Add active response** action points at the channel. `<repeated_offenders>` has no direct replacement — see [`<repeated_offenders>` is gone](#repeated_offenders-is-gone).
 
 ---
 
@@ -285,8 +285,8 @@ The 4.x manager `<command>` / `<active-response>` registration is replaced by a 
 | `route-null`, `host-deny`                                                                    | `block-ip` (route / hosts.deny fallbacks)              | Used when no native firewall is available.                          |
 | `ip-customblock`                                                                             | `block-ip` (or a custom script using the new contract) | Folded.                                                             |
 | `disable-account`                                                                            | `disable-account`                                      | Retained. Rewrite only if wrapped by a custom JSON-parsing script.  |
-| `restart-wazuh`                                                                              | _(removed from AR)_                                    | Agent restart belongs to the Control Module.                        |
-| `wazuh-slack`                                                                                | _(removed)_                                            | Use **Explore → Notifications → Channels** for Slack notifications. |
+| `restart-guardsarm`                                                                              | _(removed from AR)_                                    | Agent restart belongs to the Control Module.                        |
+| `guardsarm-slack`                                                                                | _(removed)_                                            | Use **Explore → Notifications → Channels** for Slack notifications. |
 
 For every migrated AR that referenced a consolidated script, set **Executable** to `block-ip` (or `disable-account`).
 
@@ -295,7 +295,7 @@ For every migrated AR that referenced a consolidated script, set **Executable** 
 ## Migration steps
 
 1. **Finish the stack upgrade** through dashboard startup. AR can only be validated once the manager and indexer are on 5.x.
-2. **Rewrite custom scripts** following the [recipe above](#migration-recipe). Re-apply `root:wazuh` ownership and `750` permissions.
+2. **Rewrite custom scripts** following the [recipe above](#migration-recipe). Re-apply `root:guardsarm` ownership and `750` permissions.
 3. **Recreate each 4.x AR** under **Explore → Active Responses → Create active response**, using the [field mapping table](#field-mapping-4x-xml--5x-active-response) and the [Default scripts](#default-scripts) translation.
 
    ![Side menu — Explore → Active Responses](../images/ar-explore-menu-entry.png)
@@ -304,7 +304,7 @@ For every migrated AR that referenced a consolidated script, set **Executable** 
 
    ![Create active response — Configurations panel](../images/ar-create-form-configurations.png)
 
-4. **Wire each channel to a monitor** of type **Active Response**, encoding the 4.x match condition as the monitor query — by `wazuh.rule.title` over `wazuh-findings-v5-*` (the 4.x numeric `rule.id` has no 5.x equivalent; see [Triggering model](#triggering-model)). The monitor type **must** be `Active Response` — no other type exposes the **Add active response** action.
+4. **Wire each channel to a monitor** of type **Active Response**, encoding the 4.x match condition as the monitor query — by `guardsarm.rule.title` over `guardsarm-findings-v5-*` (the 4.x numeric `rule.id` has no 5.x equivalent; see [Triggering model](#triggering-model)). The monitor type **must** be `Active Response` — no other type exposes the **Add active response** action.
 
    ![Monitor type — Active Response](../images/ar-monitor-type-active-response.png)
 
@@ -315,10 +315,10 @@ For every migrated AR that referenced a consolidated script, set **Executable** 
 5. **Restart and smoke-test:**
 
    ```bash
-   sudo systemctl restart wazuh-manager
+   sudo systemctl restart guardsarm-manager
    ```
 
-   Generate the triggering event and open **Discover** with the `wazuh-active-responses*` index pattern. Within ~60 s an execution document appears; expand it to confirm `wazuh.active_response.{name,type,executable,location}` match the channel, and that `event.doc_id` / `event.index` point back to the source alert. For stateful AR, wait `stateful_timeout` seconds and verify the revert (a second log line in `/var/ossec/logs/active-responses.log` on the agent, plus restored connectivity for `block-ip`).
+   Generate the triggering event and open **Discover** with the `guardsarm-active-responses*` index pattern. Within ~60 s an execution document appears; expand it to confirm `guardsarm.active_response.{name,type,executable,location}` match the channel, and that `event.doc_id` / `event.index` point back to the source alert. For stateful AR, wait `stateful_timeout` seconds and verify the revert (a second log line in `/var/ossec/logs/active-responses.log` on the agent, plus restored connectivity for `block-ip`).
 
    ![Discover — Expanded active response document](../images/ar-discover-document-expanded.png)
 
@@ -358,8 +358,8 @@ What this does in 4.x: when rule `5763` (composite SSH brute force — fires aft
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2 — Rewrite custom scripts | Not applicable — uses the default script.                                                                                                                                                                                                                                                                                                                             |
 | 3 — Recreate as active response    | Use the field values in the table below.                                                                                                                                                                                                                                                                                                                              |
-| 4 — Wire to monitor        | Create an `Active Response` monitor over `wazuh-findings-v5-system-activity` index alias with query `wazuh.rule.title is "<5.x rule title for the SSH auth failure>"` — **not** `wazuh.rule.id: 5763` (the 4.x numeric ID has no 5.x equivalent; match by `wazuh.rule.title`, see [Triggering model](#triggering-model)). In the trigger choose **Add active response** → the channel above. |
-| 5 — Restart and smoke-test | Trigger an SSH authentication failure on the agent; expect a document in `wazuh-active-responses*` within ~1-2 min (allow for ingest latency + the monitor interval).                                                                                                                                                                                                 |
+| 4 — Wire to monitor        | Create an `Active Response` monitor over `guardsarm-findings-v5-system-activity` index alias with query `guardsarm.rule.title is "<5.x rule title for the SSH auth failure>"` — **not** `guardsarm.rule.id: 5763` (the 4.x numeric ID has no 5.x equivalent; match by `guardsarm.rule.title`, see [Triggering model](#triggering-model)). In the trigger choose **Add active response** → the channel above. |
+| 5 — Restart and smoke-test | Trigger an SSH authentication failure on the agent; expect a document in `guardsarm-active-responses*` within ~1-2 min (allow for ingest latency + the monitor interval).                                                                                                                                                                                                 |
 
 **Step 4 — channel field values:**
 
@@ -378,19 +378,19 @@ What this does in 4.x: when rule `5763` (composite SSH brute force — fires aft
 **Expected outcome after Step 5:**
 
 1. Agent's `/var/ossec/logs/active-responses.log` shows two lines for the same source IP: a BLOCK at firing time, then an UNBLOCK ~60 s later.
-2. The indexer's `wazuh-active-responses*` data stream gets one document. The `enable` document looks like:
+2. The indexer's `guardsarm-active-responses*` data stream gets one document. The `enable` document looks like:
 
    ```json
     {
       "@timestamp": "<indexing time, not event time>",
       "event": {
         "doc_id": "X2cQrZ4BDAFZz_TTUaKz",
-        "index": ".ds-wazuh-findings-v5-system-activity-000001"
+        "index": ".ds-guardsarm-findings-v5-system-activity-000001"
       },
-      "wazuh": {
+      "guardsarm": {
         "cluster": {
           "node": "node01",
-          "name": "wazuh"
+          "name": "guardsarm"
         },
         "protocol": {
           "location": "journald",
@@ -417,7 +417,7 @@ What this does in 4.x: when rule `5763` (composite SSH brute force — fires aft
         "integration": {
           "name": "linux",
           "decoders": [
-            "decoder/core-wazuh-message/0",
+            "decoder/core-guardsarm-message/0",
             "decoder/syslog/0",
             "decoder/system-auth/0"
           ],
@@ -501,7 +501,7 @@ What this does in 4.x: when rule `5763` (composite SSH brute force — fires aft
           "title": "Failed authentication attempt - vagrant from 192.168.56.1",
           "tags": [
             "low",
-            "wazuh-generic",
+            "guardsarm-generic",
             "attack.credential-access",
             "attack.initial-access",
             "attack.t1110",
@@ -528,7 +528,7 @@ What this does in 4.x: when rule `5763` (composite SSH brute force — fires aft
     }
    ```
 
-3. Switching Discover to `wazuh-findings-v5*` and filtering in the search bar `_id:<event.doc_id>` opens the originating finding.
+3. Switching Discover to `guardsarm-findings-v5*` and filtering in the search bar `_id:<event.doc_id>` opens the originating finding.
 
 ### Example 2 — Custom SSH blocker with `extra_arguments` (rule 5760)
 
@@ -589,10 +589,10 @@ exit 0
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2 — Rewrite custom script  | Apply the diff below: `parameters.alert.data.srcip` → `source.ip`; `add`/`delete` → `enable`/`disable`.                                                                                                                                                                      |
 | 3 — Recreate as active response    | Use the field values in the table below.                                                                                                                                                                                                                                     |
-| 4 — Wire to monitor        | Monitor over `wazuh-findings-v5-*` with a `wazuh.rule.title` query (4.x numeric `5760` has no 5.x equivalent — see [Triggering model](#triggering-model)); trigger action = **Add active response**. |
-| 5 — Restart and smoke-test | Trigger the rule; expect the rewritten script to run and a document in `wazuh-active-responses*`.                                                                                                                                                                            |
+| 4 — Wire to monitor        | Monitor over `guardsarm-findings-v5-*` with a `guardsarm.rule.title` query (4.x numeric `5760` has no 5.x equivalent — see [Triggering model](#triggering-model)); trigger action = **Add active response**. |
+| 5 — Restart and smoke-test | Trigger the rule; expect the rewritten script to run and a document in `guardsarm-active-responses*`.                                                                                                                                                                            |
 
-**Step 3 — rewritten script** (`/var/ossec/active-response/bin/block-ssh.sh`, `chown root:wazuh`, `chmod 750`):
+**Step 3 — rewritten script** (`/var/ossec/active-response/bin/block-ssh.sh`, `chown root:guardsarm`, `chmod 750`):
 
 ```bash
 #!/bin/bash
@@ -600,8 +600,8 @@ LOGFILE="/var/ossec/logs/active-responses.log"
 read -r INPUT_JSON   # one line; do NOT use $(cat) — execd keeps stdin open and $(cat) hangs.
 COMMAND=$(echo "$INPUT_JSON" | jq -r '.command')
 SRC_IP=$(echo  "$INPUT_JSON" | jq -r '.source.ip')
-AR_NAME=$(echo "$INPUT_JSON" | jq -r '.wazuh.active_response.name')
-EXTRA=$(echo   "$INPUT_JSON" | jq -r '.wazuh.active_response.extra_arguments')
+AR_NAME=$(echo "$INPUT_JSON" | jq -r '.guardsarm.active_response.name')
+EXTRA=$(echo   "$INPUT_JSON" | jq -r '.guardsarm.active_response.extra_arguments')
 
 # Guard against missing source IP — jq prints "null" when the field is absent.
 [ -z "$SRC_IP" ] || [ "$SRC_IP" = "null" ] && exit 0
@@ -639,7 +639,7 @@ The JSON written to the script's stdin (capture inside the script with `read -r 
 {
   "command": "enable",
   "source": { "ip": "1.2.3.4" },
-  "wazuh": {
+  "guardsarm": {
     "active_response": {
       "name": "block-ssh-args-local",
       "executable": "block-ssh.sh",
@@ -648,7 +648,7 @@ The JSON written to the script's stdin (capture inside the script with `read -r 
       "stateful_timeout": 60,
       "location": "local"
     },
-    "agent": { "id": "001", "name": "wazuh-agent" }
+    "agent": { "id": "001", "name": "guardsarm-agent" }
   }
 }
 ```
@@ -657,23 +657,23 @@ The `disable` payload sent at +60 s additionally carries `stateful_timeout` at t
 
 ---
 
-Together these two examples exercise every concrete shape you will encounter: a default consolidated script (`block-ip`), a custom script needing a JSON rewrite, the field-mapping table, monitor wiring, `extra_arguments` propagation, the `wazuh-active-responses` data-stream record, the `event.doc_id` pivot back to the originating alert. Anything more complex (multiple ARs, non-shell scripts, Windows agents) follows the same pattern: **4.x XML → field-mapping table → 5.x active response + monitor → JSON contract → execution document**.
+Together these two examples exercise every concrete shape you will encounter: a default consolidated script (`block-ip`), a custom script needing a JSON rewrite, the field-mapping table, monitor wiring, `extra_arguments` propagation, the `guardsarm-active-responses` data-stream record, the `event.doc_id` pivot back to the originating alert. Anything more complex (multiple ARs, non-shell scripts, Windows agents) follows the same pattern: **4.x XML → field-mapping table → 5.x active response + monitor → JSON contract → execution document**.
 
 ## Other 4.14 AR scenarios
 
-Examples 1 and 2 cover the two most common shapes (default consolidated script, custom shell script with `extra_arguments`). For every other scenario described in the [Wazuh 4.14 AR reference](https://documentation.wazuh.com/4.14/user-manual/capabilities/active-response/), the table below lists the 5.x migration approach.
+Examples 1 and 2 cover the two most common shapes (default consolidated script, custom shell script with `extra_arguments`). For every other scenario described in the [GuardSarm 4.14 AR reference](https://documentation.guardsarm.com/4.14/user-manual/capabilities/active-response/), the table below lists the 5.x migration approach.
 
 | 4.14 feature                                                                     | 5.x migration approach                                                                                                                                                              |
 | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Default `disable-account` (retained)                                             | `disable-account` channel (same executable name — see [Default scripts](#default-scripts))                                                                                          |
-| Trigger by `<level>`                                                             | Monitor query `wazuh.rule.level >= N` (see [Triggering model](#triggering-model))                                                                                                   |
-| Trigger by `<rules_group>`                                                       | Monitor query `wazuh.rule.groups: <group>` (see [Triggering model](#triggering-model))                                                                                              |
+| Trigger by `<level>`                                                             | Monitor query `guardsarm.rule.level >= N` (see [Triggering model](#triggering-model))                                                                                                   |
+| Trigger by `<rules_group>`                                                       | Monitor query `guardsarm.rule.groups: <group>` (see [Triggering model](#triggering-model))                                                                                              |
 | `<location>defined-agent</location>` + `<agent_id>`                              | `Location = Defined agent` + Agent ID (see [Field mapping](#field-mapping-4x-xml--5x-active-response))                                                                                      |
 | `<location>all</location>`                                                       | `Location = All`                                                                                                                                                                    |
 | `<location>server</location>` (removed)                                          | Co-located agent on manager + `Location = Defined agent` (see [`Location = server`](#location--server-from-4x))                                                                     |
 | `firewalld-drop`, `pf`, `npf`, `ipfw`, `netsh`, `route-null`, `host-deny`        | Folded into `block-ip` (see [Default scripts](#default-scripts))                                                                                                                    |
-| `restart-wazuh` (removed from AR)                                                | Control Module (see [Default scripts](#default-scripts))                                                                                                                            |
-| `wazuh-slack` (removed)                                                          | Notifications → Channels                                                                                                                                                            |
+| `restart-guardsarm` (removed from AR)                                                | Control Module (see [Default scripts](#default-scripts))                                                                                                                            |
+| `guardsarm-slack` (removed)                                                          | Notifications → Channels                                                                                                                                                            |
 | Stateless AR (no `<timeout>`)                                                    | `Type = Stateless`                                                                                                                                                                  |
 | `<repeated_offenders>` (no direct equivalent)                                    | No 1:1 substitute for escalating timeouts; upstream gating reduces noise, multi-channel approximates escalation (see [`<repeated_offenders>` is gone](#repeated_offenders-is-gone)) |
 | `<disabled>yes</disabled>` (persistent disable)                                  | `enabled = false` + **Mute / Unmute** (see [Field mapping](#field-mapping-4x-xml--5x-active-response))                                                                                      |
@@ -705,7 +705,7 @@ Items below are specific to the 4.x → 5.x migration. For symptoms that are not
 | Record present but no effect on the agent       | Manager did not deliver the command, or the agent is disconnected | Check the manager service and the agent connection                     |
 | A stateful AR does not revert after the timeout | Timeout too large, or the executable does not support reversal    | Confirm the timeout; ask your administrator to verify reversal support |
 
-**AR entities not visible after upgrade.** Open **Dashboard Management → Index Patterns** and verify the `wazuh-active-responses*` pattern exists. If it is missing, ask your administrator to inspect the dashboard logs.
+**AR entities not visible after upgrade.** Open **Dashboard Management → Index Patterns** and verify the `guardsarm-active-responses*` pattern exists. If it is missing, ask your administrator to inspect the dashboard logs.
 
 **Custom script silently does nothing.** The script still parses the 4.x JSON. `command` is now `enable`, not `add`; `parameters.alert.data.srcip` no longer exists (use `source.ip`). Re-apply the [recipe](#migration-recipe).
 
@@ -714,7 +714,7 @@ Items below are specific to the 4.x → 5.x migration. For symptoms that are not
 **Permission errors on custom scripts.** Re-apply:
 
 ```bash
-sudo chown root:wazuh /var/ossec/active-response/bin/<script>
+sudo chown root:guardsarm /var/ossec/active-response/bin/<script>
 sudo chmod 750 /var/ossec/active-response/bin/<script>
 ```
 
@@ -722,7 +722,7 @@ sudo chmod 750 /var/ossec/active-response/bin/<script>
 
 If a custom AR script appears to do nothing on the first fire and **subsequent fires for the same AR silently never reach the script** (no new entries in `active-responses.log`, no new stdin capture file under `/tmp`), check for two failure modes that usually compound. Both apply equally to the 4.x stdin contract and the 5.x stdin contract — the wire protocol around stdin is the same in both versions.
 
-1. **stdin readers that wait for EOF.** `wazuh-execd` writes the payload (one JSON line) and keeps stdin open, waiting for an optional `check_keys` round trip from the script. Anything that reads until EOF — `INPUT_JSON=$(cat)`, `tee /tmp/x | impl.sh`, `xargs`, `mapfile`, `while read line; do ...; done` without a `break` — blocks forever and the rest of the script never runs. Use `read -r INPUT_JSON` to consume exactly one line and exit; capture the payload from inside the same script, not via a pipeline:
+1. **stdin readers that wait for EOF.** `guardsarm-execd` writes the payload (one JSON line) and keeps stdin open, waiting for an optional `check_keys` round trip from the script. Anything that reads until EOF — `INPUT_JSON=$(cat)`, `tee /tmp/x | impl.sh`, `xargs`, `mapfile`, `while read line; do ...; done` without a `break` — blocks forever and the rest of the script never runs. Use `read -r INPUT_JSON` to consume exactly one line and exit; capture the payload from inside the same script, not via a pipeline:
 
     ```bash
     #!/bin/bash
@@ -732,13 +732,13 @@ If a custom AR script appears to do nothing on the first fire and **subsequent f
     exit 0
     ```
 
-2. **Per-AR serialization on the agent.** `wazuh-execd` queues dispatches per AR name per agent. A hanging script holds the lock; **all subsequent fires of the same AR are silently dropped** — there is no warning in the agent's `ossec.log` and no record on the agent side. The visible symptom: the rule keeps firing on the manager (`firedtimes` increments in `wazuh-alerts-*`), but the agent never receives the dispatch and no stdin capture file appears under `/tmp`.
+2. **Per-AR serialization on the agent.** `guardsarm-execd` queues dispatches per AR name per agent. A hanging script holds the lock; **all subsequent fires of the same AR are silently dropped** — there is no warning in the agent's `ossec.log` and no record on the agent side. The visible symptom: the rule keeps firing on the manager (`firedtimes` increments in `guardsarm-alerts-*`), but the agent never receives the dispatch and no stdin capture file appears under `/tmp`.
 
     Recovery on the agent:
 
     ```bash
     sudo pkill -9 -f <script-name>      # release any hanging instance
-    sudo systemctl restart wazuh-agent  # drain stale dispatches from execd's in-memory queue
+    sudo systemctl restart guardsarm-agent  # drain stale dispatches from execd's in-memory queue
     ```
 
     Then re-fire with a fresh trigger (e.g. a different `srcip`) to confirm dispatch works. The underlying fix is always (1) — without `read -r` the hang reappears on the next fire.
@@ -747,7 +747,7 @@ If a custom AR script appears to do nothing on the first fire and **subsequent f
 
 A stateful AR (a 4.x `<active-response>` with `<timeout>`) applies the block but the matching `delete` never fires — the block stays until you clear it manually, and no second stdin dispatch arrives at the script.
 
-The cause is a custom script that does **not** complete a `check_keys` round trip for the `add` command. `wazuh-execd` schedules the timeout reversal off the key it registers during `check_keys`; a script that applies the block and exits without issuing `check_keys` is never recorded as a stateful session, so `<timeout_allowed>yes</timeout_allowed>` + `<timeout>` are silently ignored and no `delete` is dispatched. The default `firewall-drop` does the round trip internally; custom scripts must do it explicitly:
+The cause is a custom script that does **not** complete a `check_keys` round trip for the `add` command. `guardsarm-execd` schedules the timeout reversal off the key it registers during `check_keys`; a script that applies the block and exits without issuing `check_keys` is never recorded as a stateful session, so `<timeout_allowed>yes</timeout_allowed>` + `<timeout>` are silently ignored and no `delete` is dispatched. The default `firewall-drop` does the round trip internally; custom scripts must do it explicitly:
 
 ```bash
 if [ "$COMMAND" = "add" ]; then
@@ -758,13 +758,13 @@ fi
 # ... apply the block only after a "continue" response ...
 ```
 
-To confirm the round trip: after the script sends `check_keys`, `wazuh-execd` writes a second line to stdin — `{"command":"continue", ...}` (or `"abort"` for a duplicate key). Capture it (`read -r RESPONSE; echo "$RESPONSE" > /tmp/resp.json`); seeing `"command":"continue"` means execd registered the session and will dispatch `delete` at the timeout. The `keys` array must carry the value you are protecting (here the source IP) — that is the handle execd tracks for the reversal.
+To confirm the round trip: after the script sends `check_keys`, `guardsarm-execd` writes a second line to stdin — `{"command":"continue", ...}` (or `"abort"` for a duplicate key). Capture it (`read -r RESPONSE; echo "$RESPONSE" > /tmp/resp.json`); seeing `"command":"continue"` means execd registered the session and will dispatch `delete` at the timeout. The `keys` array must carry the value you are protecting (here the source IP) — that is the handle execd tracks for the reversal.
 
 > **Note:** the default `block-ip` already performs this `check_keys` round trip internally (verified end-to-end on 5.0: the script emits `{"command":"check_keys","parameters":{"keys":["<ip>"]}}` on `enable` and acts on the `continue` reply). Only custom scripts must implement it.
 
 ### Channel dispatches but the script never runs
 
-The execution record lands in `wazuh-active-responses*` (so the monitor fired and the manager dispatched), but the agent's `active-responses.log` shows nothing and no firewall rule appears. The usual cause is a malformed **Executable** field on the channel — most often a **leading or trailing space** (e.g. `" block-ip"`). The agent looks for an executable named literally `" block-ip"` under `/var/ossec/active-response/bin/`, does not find it, and silently does nothing. Edit the channel (**Explore → Active Responses → <channel> → Actions → Edit**) and ensure **Executable** is exactly the script name with no surrounding whitespace.
+The execution record lands in `guardsarm-active-responses*` (so the monitor fired and the manager dispatched), but the agent's `active-responses.log` shows nothing and no firewall rule appears. The usual cause is a malformed **Executable** field on the channel — most often a **leading or trailing space** (e.g. `" block-ip"`). The agent looks for an executable named literally `" block-ip"` under `/var/ossec/active-response/bin/`, does not find it, and silently does nothing. Edit the channel (**Explore → Active Responses → <channel> → Actions → Edit**) and ensure **Executable** is exactly the script name with no surrounding whitespace.
 
 ### `block-ip` uses firewalld, not raw iptables
 
@@ -798,7 +798,7 @@ In 5.x `execd` keeps an in-memory dedup table but exposes no escalating-timeout 
 
 ### `Location = server` from 4.x
 
-Manager-side execution does not exist in 5.x. If the manager host runs a co-located Wazuh agent, use **Location** = `Defined agent` with that agent's ID. Otherwise install an agent on the manager host or relocate the action elsewhere.
+Manager-side execution does not exist in 5.x. If the manager host runs a co-located GuardSarm agent, use **Location** = `Defined agent` with that agent's ID. Otherwise install an agent on the manager host or relocate the action elsewhere.
 
 ---
 

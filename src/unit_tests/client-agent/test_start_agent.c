@@ -15,15 +15,15 @@
 #include <string.h>
 
 #include "../wrappers/common.h"
-#include "../wrappers/wazuh/client-agent/start_agent.h"
-#include "../wrappers/wazuh/os_net/os_net_wrappers.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/shared/validate_op_wrappers.h"
-#include "../wrappers/wazuh/monitord/monitord_wrappers.h"
+#include "../wrappers/guardsarm/client-agent/start_agent.h"
+#include "../wrappers/guardsarm/os_net/os_net_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/validate_op_wrappers.h"
+#include "../wrappers/guardsarm/monitord/monitord_wrappers.h"
 #include "../../os_crypto/md5/md5_op.h"
 
 #ifdef TEST_WINAGENT
-#include "../wrappers/wazuh/shared/randombytes_wrappers.h"
+#include "../wrappers/guardsarm/shared/randombytes_wrappers.h"
 #endif
 
 #include "agentd.h"
@@ -767,8 +767,8 @@ static void test_parse_handshake_json_with_cluster_name(void **state) {
             "},"
             "\"sca\":{\"checks\":10000}"
         "},"
-        "\"cluster_name\":\"wazuh-cluster\","
-        "\"cluster_node\":\"wazuh-node\","
+        "\"cluster_name\":\"guardsarm-cluster\","
+        "\"cluster_node\":\"guardsarm-node\","
         "\"agent_groups\":[\"default\"]"
         "}";
 
@@ -778,7 +778,7 @@ static void test_parse_handshake_json_with_cluster_name(void **state) {
                                agent_groups, sizeof(agent_groups), NULL, 0);
 
     assert_int_equal(ret, 0);
-    assert_string_equal(cluster_name, "wazuh-cluster");
+    assert_string_equal(cluster_name, "guardsarm-cluster");
 }
 
 static void test_parse_handshake_json_no_cluster_name(void **state) {
@@ -802,7 +802,7 @@ static void test_parse_handshake_json_no_cluster_name(void **state) {
             "},"
             "\"sca\":{\"checks\":10000}"
         "},"
-        "\"cluster_node\":\"wazuh-node\","
+        "\"cluster_node\":\"guardsarm-node\","
         "\"agent_groups\":[\"default\"]"
         "}";
 
@@ -915,8 +915,8 @@ static void test_parse_handshake_json_with_cluster_node(void **state) {
             "},"
             "\"sca\":{\"checks\":10000}"
         "},"
-        "\"cluster_name\":\"wazuh-cluster\","
-        "\"cluster_node\":\"wazuh-node-01\","
+        "\"cluster_name\":\"guardsarm-cluster\","
+        "\"cluster_node\":\"guardsarm-node-01\","
         "\"agent_groups\":[\"default\"]"
         "}";
 
@@ -926,8 +926,8 @@ static void test_parse_handshake_json_with_cluster_node(void **state) {
                                agent_groups, sizeof(agent_groups), NULL, 0);
 
     assert_int_equal(ret, 0);
-    assert_string_equal(cluster_name, "wazuh-cluster");
-    assert_string_equal(cluster_node, "wazuh-node-01");
+    assert_string_equal(cluster_name, "guardsarm-cluster");
+    assert_string_equal(cluster_node, "guardsarm-node-01");
 }
 
 static void test_parse_handshake_json_no_cluster_node(void **state) {
@@ -951,7 +951,7 @@ static void test_parse_handshake_json_no_cluster_node(void **state) {
             "},"
             "\"sca\":{\"checks\":10000}"
         "},"
-        "\"cluster_name\":\"wazuh-cluster\","
+        "\"cluster_name\":\"guardsarm-cluster\","
         "\"agent_groups\":[\"default\"]"
         "}";
 
@@ -985,8 +985,8 @@ static void test_parse_handshake_json_no_agent_groups(void **state) {
             "},"
             "\"sca\":{\"checks\":10000}"
         "},"
-        "\"cluster_name\":\"wazuh-cluster\","
-        "\"cluster_node\":\"wazuh-node\""
+        "\"cluster_name\":\"guardsarm-cluster\","
+        "\"cluster_node\":\"guardsarm-node\""
         "}";
 
     module_limits_init(&limits);
@@ -1019,8 +1019,8 @@ static void test_parse_handshake_json_empty_agent_groups(void **state) {
             "},"
             "\"sca\":{\"checks\":10000}"
         "},"
-        "\"cluster_name\":\"wazuh-cluster\","
-        "\"cluster_node\":\"wazuh-node\","
+        "\"cluster_name\":\"guardsarm-cluster\","
+        "\"cluster_node\":\"guardsarm-node\","
         "\"agent_groups\":[]"
         "}";
 
@@ -1058,8 +1058,8 @@ static void test_parse_handshake_json_invalid_merged_sum(void **state) {
             "},"
             "\"sca\":{\"checks\":10000}"
         "},"
-        "\"cluster_name\":\"wazuh-cluster\","
-        "\"cluster_node\":\"wazuh-node\","
+        "\"cluster_name\":\"guardsarm-cluster\","
+        "\"cluster_node\":\"guardsarm-node\","
         "\"agent_groups\":[\"default\"],"
         "\"merged_sum\":\"0123456789abcdef0123456789abcdez\""
         "}";

@@ -22,7 +22,7 @@
 #include "agent_sync_protocol_c_interface.h"
 #include "schemaValidator_c.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 #include "../../../unit_tests/wrappers/windows/winreg_wrappers.h"
 // Remove static qualifier when unit testing
 #define STATIC

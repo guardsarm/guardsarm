@@ -1,4 +1,4 @@
-name: 4.X - Package - Build multiple Wazuh Manager Packages
+name: 4.X - Package - Build multiple GuardSarm Manager Packages
 
 on:
   workflow_dispatch:

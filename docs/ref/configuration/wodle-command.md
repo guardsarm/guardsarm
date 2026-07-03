@@ -2,7 +2,7 @@
 
 The `<wodle name="command">` section runs a configured OS command on a schedule and optionally forwards its output for analysis. Multiple instances can be configured.
 
-Configuration file: `/var/wazuh-manager/etc/wazuh-manager.conf`
+Configuration file: `/var/guardsarm-manager/etc/guardsarm-manager.conf`
 
 Parser: `src/config/src/wmodules-command.c`
 

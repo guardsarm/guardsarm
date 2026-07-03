@@ -8,21 +8,21 @@
 
 set -euo pipefail
 
-WAZUH_HOST_DIR=/wazuh_host
-WAZUH_ROOT_DIR=/wazuh #Important: Do not change this path
-WAZUH_INSTALLDIR=/var/wazuh-manager
-CPYTHON_DIR=$WAZUH_ROOT_DIR/src/external/cpython
+GUARDSARM_HOST_DIR=/guardsarm_host
+GUARDSARM_ROOT_DIR=/guardsarm #Important: Do not change this path
+GUARDSARM_INSTALLDIR=/var/guardsarm-manager
+CPYTHON_DIR=$GUARDSARM_ROOT_DIR/src/external/cpython
 OUTPUT_DIR=/output
 
 main() {
     # Parse script arguments
     parse_args "$@" || exit 1
-    # Get wazuh repository
-    get_wazuh_repo
-    # Download wazuh precompiled dependencies
-    make -C "$WAZUH_ROOT_DIR/src" PYTHON_SOURCE=y deps -j
+    # Get guardsarm repository
+    get_guardsarm_repo
+    # Download guardsarm precompiled dependencies
+    make -C "$GUARDSARM_ROOT_DIR/src" PYTHON_SOURCE=y deps -j
 
-    PYTHON_VERSION=$(cat $WAZUH_ROOT_DIR/framework/.python-version)
+    PYTHON_VERSION=$(cat $GUARDSARM_ROOT_DIR/framework/.python-version)
 
     if $BUILD_CPYTHON; then
         # Build CPython from sources
@@ -36,18 +36,18 @@ main() {
         download_wheels
     fi
 
-    mimic_full_wazuh_installation
+    mimic_full_guardsarm_installation
     generate_artifacts
 }
 
-get_wazuh_repo() {
-    if [ -z "${WAZUH_BRANCH:-}" ]; then
-        cp -rf $WAZUH_HOST_DIR $WAZUH_ROOT_DIR
+get_guardsarm_repo() {
+    if [ -z "${GUARDSARM_BRANCH:-}" ]; then
+        cp -rf $GUARDSARM_HOST_DIR $GUARDSARM_ROOT_DIR
         # Clean previous builds
-        find "$WAZUH_ROOT_DIR/src/external" -mindepth 1 ! -name 'CMakeLists.txt' -exec rm -rf {} +
-        make clean -j -C "$WAZUH_ROOT_DIR/src"
+        find "$GUARDSARM_ROOT_DIR/src/external" -mindepth 1 ! -name 'CMakeLists.txt' -exec rm -rf {} +
+        make clean -j -C "$GUARDSARM_ROOT_DIR/src"
     else
-        git clone --branch "$WAZUH_BRANCH" --depth 1 https://github.com/wazuh/wazuh.git  "$WAZUH_ROOT_DIR"
+        git clone --branch "$GUARDSARM_BRANCH" --depth 1 https://github.com/guardsarm/guardsarm.git  "$GUARDSARM_ROOT_DIR"
     fi
 }
 
@@ -56,29 +56,29 @@ download_cpython() {
 }
 
 customize_cpython() {
-    cp -f $WAZUH_ROOT_DIR/framework/cpython/custom/Setup.local $CPYTHON_DIR/Modules
-    cp -f $WAZUH_ROOT_DIR/framework/cpython/custom/Setup.stdlib.in $CPYTHON_DIR/Modules
+    cp -f $GUARDSARM_ROOT_DIR/framework/cpython/custom/Setup.local $CPYTHON_DIR/Modules
+    cp -f $GUARDSARM_ROOT_DIR/framework/cpython/custom/Setup.stdlib.in $CPYTHON_DIR/Modules
 }
 
 build_cpython() {
-    make -j -C "$WAZUH_ROOT_DIR/src" build_python TARGET=manager INSTALLDIR=$WAZUH_INSTALLDIR OPTIMIZE_CPYTHON=yes
+    make -j -C "$GUARDSARM_ROOT_DIR/src" build_python TARGET=manager INSTALLDIR=$GUARDSARM_INSTALLDIR OPTIMIZE_CPYTHON=yes
 }
 
-mimic_full_wazuh_installation() {
-    # Force build of libwazuhext
-    make -j -C "$WAZUH_ROOT_DIR/src" build-external TARGET=manager INSTALLDIR=$WAZUH_INSTALLDIR
-    # Install only libwazuhext to avoid full server compilation & installation
-    mkdir -p "$WAZUH_INSTALLDIR/lib"
-    install -m 0750 $WAZUH_ROOT_DIR/src/build/lib/libwazuhext.so "$WAZUH_INSTALLDIR/lib"
+mimic_full_guardsarm_installation() {
+    # Force build of libguardsarmext
+    make -j -C "$GUARDSARM_ROOT_DIR/src" build-external TARGET=manager INSTALLDIR=$GUARDSARM_INSTALLDIR
+    # Install only libguardsarmext to avoid full server compilation & installation
+    mkdir -p "$GUARDSARM_INSTALLDIR/lib"
+    install -m 0750 $GUARDSARM_ROOT_DIR/src/build/lib/libguardsarmext.so "$GUARDSARM_INSTALLDIR/lib"
     # Install python interpreter and its dependencies
-    make -j -C "$WAZUH_ROOT_DIR/src" install_dependencies INSTALLDIR=$WAZUH_INSTALLDIR
+    make -j -C "$GUARDSARM_ROOT_DIR/src" install_dependencies INSTALLDIR=$GUARDSARM_INSTALLDIR
 }
 
 generate_artifacts() {
     # Compress built cpython
-    cd $WAZUH_ROOT_DIR/src/external && tar -zcf "$OUTPUT_DIR/cpython_$ARCH.tar.gz" --owner=0 --group=0 cpython
+    cd $GUARDSARM_ROOT_DIR/src/external && tar -zcf "$OUTPUT_DIR/cpython_$ARCH.tar.gz" --owner=0 --group=0 cpython
     # Compress ready-to-use CPython
-    cd $WAZUH_INSTALLDIR/framework/python && tar -zcf "$OUTPUT_DIR/cpython.tar.gz" --owner=0 --group=0 .
+    cd $GUARDSARM_INSTALLDIR/framework/python && tar -zcf "$OUTPUT_DIR/cpython.tar.gz" --owner=0 --group=0 .
 }
 
 download_wheels() {
@@ -90,7 +90,7 @@ download_wheels() {
     # Create dependencies directory
     mkdir -p "$CPYTHON_DIR/Dependencies"
     # Download wheels
-    python3 -m pip download --requirement "$WAZUH_ROOT_DIR/framework/requirements.txt"  --no-deps --dest "$CPYTHON_DIR/Dependencies"  --python-version "$PYTHON_VERSION" --no-cache-dir
+    python3 -m pip download --requirement "$GUARDSARM_ROOT_DIR/framework/requirements.txt"  --no-deps --dest "$CPYTHON_DIR/Dependencies"  --python-version "$PYTHON_VERSION" --no-cache-dir
     # Create index
     python3 -m pip install piprepo && piprepo build "$CPYTHON_DIR/Dependencies"
 }
@@ -107,8 +107,8 @@ parse_args() {
             --build-deps)
                 BUILD_DEPS=true
                 ;;
-            --wazuh-branch)
-                WAZUH_BRANCH="$2"
+            --guardsarm-branch)
+                GUARDSARM_BRANCH="$2"
                 ;;
             *)
                 echo "ERROR: Unrecognized parameter: $1" >&2

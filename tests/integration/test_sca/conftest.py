@@ -12,23 +12,23 @@ import sys
 import time
 from pathlib import Path
 
-from wazuh_testing.constants.daemons import AGENT_DAEMON, WAZUH_AGENT_WIN
-from wazuh_testing.constants.paths import WAZUH_PATH
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.constants.platforms import WINDOWS
-from wazuh_testing.modules.modulesd.sca import patterns
-from wazuh_testing.tools.monitors import file_monitor
-from wazuh_testing.utils import callbacks, services
-from wazuh_testing.utils.services import control_service
+from guardsarm_testing.constants.daemons import AGENT_DAEMON, GUARDSARM_AGENT_WIN
+from guardsarm_testing.constants.paths import GUARDSARM_PATH
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.constants.platforms import WINDOWS
+from guardsarm_testing.modules.modulesd.sca import patterns
+from guardsarm_testing.tools.monitors import file_monitor
+from guardsarm_testing.utils import callbacks, services
+from guardsarm_testing.utils.services import control_service
 
 
-SCA_DB_DIR = Path(WAZUH_PATH, 'queue', 'sca', 'db')
+SCA_DB_DIR = Path(GUARDSARM_PATH, 'queue', 'sca', 'db')
 
-_WAZUH_AGENT_PROCESS_NAMES = {AGENT_DAEMON, WAZUH_AGENT_WIN, 'WazuhSvc.exe'}
+_GUARDSARM_AGENT_PROCESS_NAMES = {AGENT_DAEMON, GUARDSARM_AGENT_WIN, 'GuardSarmSvc.exe'}
 
 
 def _wait_for_agent_gone(timeout: int = 60, raise_on_timeout: bool = False) -> None:
-    """Block until no wazuh-agent process is alive or timeout expires.
+    """Block until no guardsarm-agent process is alive or timeout expires.
 
     Windows SCM reports STOPPED before the process fully exits. Starting a new
     service instance while the old process is alive causes both to compete for
@@ -45,13 +45,13 @@ def _wait_for_agent_gone(timeout: int = 60, raise_on_timeout: bool = False) -> N
     deadline = time.time() + timeout
     while time.time() < deadline:
         alive = [p.info['name'] for p in psutil.process_iter(attrs=['name'])
-                 if (p.info.get('name') or '') in _WAZUH_AGENT_PROCESS_NAMES]
+                 if (p.info.get('name') or '') in _GUARDSARM_AGENT_PROCESS_NAMES]
         if not alive:
             return
         time.sleep(0.5)
     if raise_on_timeout:
         raise TimeoutError(
-            f"Wazuh agent process still alive after {timeout}s: {alive}. "
+            f"GuardSarm agent process still alive after {timeout}s: {alive}. "
             f"IPC endpoint will collide with the next service start."
         )
 
@@ -68,13 +68,13 @@ def wait_for_agent_gone():
 # agentd via agcom_dispatch') and zero for 'Module limits received from
 # manager', it is not a test flake: the agent's handshake with the manager
 # never produced a 'limits.sca' block, so SCA stays forever in the loop at
-# src/wazuh_modules/src/wm_sca.c:590-601 waiting for agent_module_limits.
+# src/guardsarm_modules/src/wm_sca.c:590-601 waiting for agent_module_limits.
 # limits_received to flip to true (src/client-agent/src/start_agent.c:142).
 _SCA_STARTUP_HIGHLIGHTS = {
     'SCA tagged lines': r':sca\b',
-    'SCA module enabled (DEBUG)': r'wazuh-modulesd:sca:.*Module enabled',
+    'SCA module enabled (DEBUG)': r'guardsarm-modulesd:sca:.*Module enabled',
     'SCA module running (DEBUG)': r'SCA module running',
-    'Starting SCA module': r'wazuh-modulesd:sca:.*Starting module',
+    'Starting SCA module': r'guardsarm-modulesd:sca:.*Starting module',
     'agcom_dispatch failure': r'Failed to query agentd via agcom_dispatch',
     'AGCOM limits not configured': r'AGCOM Module limits not configured',
     'AGCOM err response': r'Agentd returned error',
@@ -91,7 +91,7 @@ def _collect_service_diagnostics(log_path: str, highlight_patterns: dict) -> dic
     """Gather service state, processes and log highlights for failure messages.
 
     Replacement for ``services.collect_service_diagnostics`` (which is not
-    exported by the installed ``wazuh_testing`` package). Kept local to avoid
+    exported by the installed ``guardsarm_testing`` package). Kept local to avoid
     swallowing the real timeout error with an ``AttributeError``.
     """
     diag: dict = {}
@@ -99,7 +99,7 @@ def _collect_service_diagnostics(log_path: str, highlight_patterns: dict) -> dic
     if sys.platform == WINDOWS:
         try:
             proc = subprocess.run(
-                ['sc', 'query', 'WazuhSvc'],
+                ['sc', 'query', 'GuardSarmSvc'],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=10,
             )
             raw = proc.stdout.decode(errors='ignore')
@@ -111,9 +111,9 @@ def _collect_service_diagnostics(log_path: str, highlight_patterns: dict) -> dic
             diag['service_raw'] = f"sc query failed: {exc}"
     else:
         try:
-            from wazuh_testing.constants.paths.binaries import WAZUH_CONTROL_PATH
+            from guardsarm_testing.constants.paths.binaries import GUARDSARM_CONTROL_PATH
             proc = subprocess.run(
-                [WAZUH_CONTROL_PATH, 'status'],
+                [GUARDSARM_CONTROL_PATH, 'status'],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=10,
             )
             raw = proc.stdout.decode(errors='ignore')
@@ -125,10 +125,10 @@ def _collect_service_diagnostics(log_path: str, highlight_patterns: dict) -> dic
             diag['service_raw'] = raw
         except Exception as exc:
             diag['service_state'] = 'UNKNOWN'
-            diag['service_raw'] = f"wazuh-control status failed: {exc}"
+            diag['service_raw'] = f"guardsarm-control status failed: {exc}"
 
     procs = sorted({(p.info.get('name') or '') for p in psutil.process_iter(attrs=['name'])
-                    if (p.info.get('name') or '').lower().startswith('wazuh')})
+                    if (p.info.get('name') or '').lower().startswith('guardsarm')})
     diag['processes'] = ', '.join(procs) if procs else '(none)'
 
     try:
@@ -157,10 +157,10 @@ def _collect_service_diagnostics(log_path: str, highlight_patterns: dict) -> dic
 
 
 def _wait_service_running(timeout: int) -> None:
-    """Poll until the Wazuh service reports RUNNING.
+    """Poll until the GuardSarm service reports RUNNING.
 
     On Windows, delegates to ``wait_expected_daemon_status`` which queries
-    SCM (no socket validation). On Linux, polls ``wazuh-control status``
+    SCM (no socket validation). On Linux, polls ``guardsarm-control status``
     directly, checking only that every daemon line says "is running…" —
     without validating that sockets exist on disk (which fails on agents
     that don't create manager-only sockets like ``download`` / ``control``).
@@ -169,12 +169,12 @@ def _wait_service_running(timeout: int) -> None:
         services.wait_expected_daemon_status(running_condition=True, timeout=timeout)
         return
 
-    from wazuh_testing.constants.paths.binaries import WAZUH_CONTROL_PATH
+    from guardsarm_testing.constants.paths.binaries import GUARDSARM_CONTROL_PATH
     deadline = time.time() + timeout
     while time.time() < deadline:
         try:
             proc = subprocess.run(
-                [WAZUH_CONTROL_PATH, 'status'],
+                [GUARDSARM_CONTROL_PATH, 'status'],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=10,
             )
             lines = [l for l in proc.stdout.decode(errors='ignore').splitlines() if l.strip()]
@@ -190,7 +190,7 @@ def _format_diagnostics(diag: dict) -> str:
     """Render a diagnostics dict from collect_service_diagnostics as a block."""
     sections = [
         f"Service state: {diag.get('service_state')}",
-        f"Wazuh processes: {diag.get('processes')}",
+        f"GuardSarm processes: {diag.get('processes')}",
         "--- service query raw ---",
         diag.get('service_raw', '').strip(),
     ]
@@ -282,7 +282,7 @@ def wait_for_sca_enabled():
 
       Phase 1 — Service RUNNING:
           Poll the platform authority (SCM via sc query on Windows,
-          wazuh-control on Linux) until the service is RUNNING. On Linux
+          guardsarm-control on Linux) until the service is RUNNING. On Linux
           this checks only process status, not socket existence (agent
           builds don't create manager-only sockets). Starting a
           FileMonitor before the service is ready burns timeout budget
@@ -309,7 +309,7 @@ def wait_for_sca_enabled():
           already in the log, avoiding races on slow CI machines.
 
     On timeout each phase raises AssertionError with a snapshot of service
-    state, Wazuh process list and the tail of ossec.log, so CI failures are
+    state, GuardSarm process list and the tail of ossec.log, so CI failures are
     self-diagnosing.
     '''
     service_timeout = 90 if sys.platform == WINDOWS else 30
@@ -321,13 +321,13 @@ def wait_for_sca_enabled():
         _wait_service_running(service_timeout)
     except TimeoutError:
         diag = _collect_service_diagnostics(
-            log_path=WAZUH_LOG_PATH, highlight_patterns=_SCA_STARTUP_HIGHLIGHTS)
+            log_path=GUARDSARM_LOG_PATH, highlight_patterns=_SCA_STARTUP_HIGHLIGHTS)
         raise AssertionError(
-            f"[Phase 1] Wazuh service did not reach RUNNING within {service_timeout}s.\n"
+            f"[Phase 1] GuardSarm service did not reach RUNNING within {service_timeout}s.\n"
             f"{_format_diagnostics(diag)}"
         )
 
-    log_monitor = file_monitor.FileMonitor(WAZUH_LOG_PATH)
+    log_monitor = file_monitor.FileMonitor(GUARDSARM_LOG_PATH)
 
     # Phase 2 — wm_sca_main entered (pre-C++-init anchor)
     log_monitor.start(
@@ -337,7 +337,7 @@ def wait_for_sca_enabled():
     )
     if not log_monitor.callback_result:
         diag = _collect_service_diagnostics(
-            log_path=WAZUH_LOG_PATH, highlight_patterns=_SCA_STARTUP_HIGHLIGHTS)
+            log_path=GUARDSARM_LOG_PATH, highlight_patterns=_SCA_STARTUP_HIGHLIGHTS)
         raise AssertionError(
             f"[Phase 2] SCA module did not emit '{patterns.SCA_ENABLED}' within {enabled_timeout}s. "
             f"Service is RUNNING but wm_sca_main was never reached — the hang is upstream of SCA "
@@ -353,7 +353,7 @@ def wait_for_sca_enabled():
     )
     if not log_monitor.callback_result:
         diag = _collect_service_diagnostics(
-            log_path=WAZUH_LOG_PATH, highlight_patterns=_SCA_STARTUP_HIGHLIGHTS)
+            log_path=GUARDSARM_LOG_PATH, highlight_patterns=_SCA_STARTUP_HIGHLIGHTS)
         raise AssertionError(
             f"[Phase 3] SCA module did not emit '{patterns.SCA_RUNNING}' within {running_timeout}s. "
             f"wm_sca_main started (SCA_ENABLED seen) but SCA::Run() was never reached — the hang "
@@ -375,7 +375,7 @@ def wait_for_sca_enabled():
     )
     if not log_monitor.callback_result:
         diag = _collect_service_diagnostics(
-            log_path=WAZUH_LOG_PATH, highlight_patterns=_SCA_STARTUP_HIGHLIGHTS)
+            log_path=GUARDSARM_LOG_PATH, highlight_patterns=_SCA_STARTUP_HIGHLIGHTS)
         raise AssertionError(
             f"[Phase 4] SCA scan did not start within {scan_start_timeout}s. "
             f"SCA module is running but no policy scan was triggered.\n"

@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """
-Process resource monitor for Wazuh Manager benchmarks.
+Process resource monitor for GuardSarm Manager benchmarks.
 
-Monitors all Wazuh manager processes by default and writes periodic resource
+Monitors all GuardSarm manager processes by default and writes periodic resource
 samples to per-process CSV files inside an output directory.  Disk usage is
 tracked independently in a separate ``disk_usage.csv``.
 
 Usage:
-    # Monitor all default Wazuh processes with default disk paths
+    # Monitor all default GuardSarm processes with default disk paths
     python3 monitor.py
 
     # Monitor specific processes by executable path
-    python3 monitor.py --exe /var/wazuh-manager/bin/wazuh-manager-analysisd \
-                       --exe /var/wazuh-manager/bin/wazuh-manager-remoted
+    python3 monitor.py --exe /var/guardsarm-manager/bin/guardsarm-manager-analysisd \
+                       --exe /var/guardsarm-manager/bin/guardsarm-manager-remoted
 
     # Legacy: monitor single process by name
-    python3 monitor.py -n wazuh-modulesd -o monitor.csv -s 1
+    python3 monitor.py -n guardsarm-modulesd -o monitor.csv -s 1
 
     # Stop a running monitor
     kill $(cat monitor.pid)
@@ -44,32 +44,32 @@ import psutil
 # Defaults
 # ---------------------------------------------------------------------------
 DEFAULT_EXECUTABLES = [
-    "/var/wazuh-manager/bin/wazuh-manager-analysisd",
-    "/var/wazuh-manager/bin/wazuh-manager-monitord",
-    "/var/wazuh-manager/api/scripts/wazuh_manager_apid.py",
-    "/var/wazuh-manager/framework/scripts/wazuh_manager_clusterd.py",
-    "/var/wazuh-manager/bin/wazuh-manager-db",
-    "/var/wazuh-manager/bin/wazuh-manager-modulesd",
-    "/var/wazuh-manager/bin/wazuh-manager-remoted",
+    "/var/guardsarm-manager/bin/guardsarm-manager-analysisd",
+    "/var/guardsarm-manager/bin/guardsarm-manager-monitord",
+    "/var/guardsarm-manager/api/scripts/guardsarm_manager_apid.py",
+    "/var/guardsarm-manager/framework/scripts/guardsarm_manager_clusterd.py",
+    "/var/guardsarm-manager/bin/guardsarm-manager-db",
+    "/var/guardsarm-manager/bin/guardsarm-manager-modulesd",
+    "/var/guardsarm-manager/bin/guardsarm-manager-remoted",
 ]
 
-# wazuh-indexer is co-located only in all-in-one deployments. The monitor
+# guardsarm-indexer is co-located only in all-in-one deployments. The monitor
 # probes for its executable at startup and silently skips it if absent.
-INDEXER_EXECUTABLE = "/usr/share/wazuh-indexer/jdk/bin/java"
+INDEXER_EXECUTABLE = "/usr/share/guardsarm-indexer/jdk/bin/java"
 
 DEFAULT_DISK_PATHS = [
-    "/var/wazuh-manager/queue/inventory_sync",
-    "/var/wazuh-manager/queue/engine-output",
-    "/var/wazuh-manager/queue/vd",
-    "/var/wazuh-manager/",
+    "/var/guardsarm-manager/queue/inventory_sync",
+    "/var/guardsarm-manager/queue/engine-output",
+    "/var/guardsarm-manager/queue/vd",
+    "/var/guardsarm-manager/",
 ]
 
-DEFAULT_REMOTED_SOCKET = "/var/wazuh-manager/queue/sockets/remote"
+DEFAULT_REMOTED_SOCKET = "/var/guardsarm-manager/queue/sockets/remote"
 REMOTED_STATS_CSV = "stats-api-remoted.csv"
 REMOTED_QUERY = {"command": "getstats"}
 REMOTED_MAX_RESPONSE_SIZE = 4 * 1024 * 1024
 
-DEFAULT_ANALYSISD_SOCKET = "/var/wazuh-manager/queue/sockets/analysis"
+DEFAULT_ANALYSISD_SOCKET = "/var/guardsarm-manager/queue/sockets/analysis"
 ANALYSISD_STATS_CSV = "stats-api-analysisd.csv"
 ANALYSISD_MAX_RESPONSE_SIZE = 4 * 1024 * 1024
 ANALYSISD_HEADER = [
@@ -239,7 +239,7 @@ def find_process_by_exe(exe_path: str) -> psutil.Process | None:
         logger.warning(
             "Multiple %s instances detected. Attaching to PID %d (newest, "
             "started %s). Stale instances: %s. Consider "
-            "'pkill -9 -f %s && service wazuh-manager restart' before re-running.",
+            "'pkill -9 -f %s && service guardsarm-manager restart' before re-running.",
             os.path.basename(exe_path), chosen.pid,
             time.ctime(chosen.create_time()), others,
             os.path.basename(exe_path),
@@ -302,7 +302,7 @@ BASE_CSV_HEADER = [
 def disk_col_name(path: str) -> str:
     """Stable CSV column name derived from a directory path.
 
-    Example: /var/wazuh-manager/queue/inventory_sync/  ->  dir_inventory_sync_mb
+    Example: /var/guardsarm-manager/queue/inventory_sync/  ->  dir_inventory_sync_mb
     """
     basename = os.path.basename(os.path.normpath(path)) or "root"
     safe = re.sub(r"[^A-Za-z0-9_]", "_", basename)
@@ -784,9 +784,9 @@ def analysisd_api_monitor_loop(csv_path: str, interval: float, socket_path: str,
 
 
 # Friendly CSV filename overrides for processes whose basename is generic.
-# e.g. wazuh-indexer runs as "java" — we want wazuh-indexer.csv instead.
+# e.g. guardsarm-indexer runs as "java" — we want guardsarm-indexer.csv instead.
 _EXE_CSV_ALIAS: dict[str, str] = {
-    INDEXER_EXECUTABLE: "wazuh-indexer",
+    INDEXER_EXECUTABLE: "guardsarm-indexer",
 }
 
 
@@ -871,7 +871,7 @@ def monitor_multi(processes: dict[str, psutil.Process], output_dir: str,
 # ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="Monitor Wazuh manager process resource usage during benchmarks.",
+        description="Monitor GuardSarm manager process resource usage during benchmarks.",
     )
     # --- multi-process mode (default) ---
     p.add_argument(
@@ -880,7 +880,7 @@ def parse_args() -> argparse.Namespace:
         default=None,
         metavar="PATH",
         help="Executable path to monitor. Repeat for multiple. "
-             "If omitted, monitors all default Wazuh manager processes.",
+             "If omitted, monitors all default GuardSarm manager processes.",
     )
     p.add_argument(
         "--timeout",
@@ -906,7 +906,7 @@ def parse_args() -> argparse.Namespace:
         metavar="PATH",
         help="Recursive directory size to track. Repeat to track multiple. "
              "Each path adds a 'dir_<basename>_mb' column to the CSV. "
-             "If omitted, uses default Wazuh paths.",
+             "If omitted, uses default GuardSarm paths.",
     )
     p.add_argument(
         "--output-dir",
@@ -918,9 +918,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--log-path",
         type=str,
-        default=WAZUH_LOG_PATH,
+        default=GUARDSARM_LOG_PATH,
         help="Manager log path used for final InventorySync log extraction "
-             f"(default: {WAZUH_LOG_PATH})",
+             f"(default: {GUARDSARM_LOG_PATH})",
     )
     p.add_argument("-d", "--debug", action="store_true", help="Debug logging")
     return p.parse_args()
@@ -949,16 +949,16 @@ def main() -> None:
     # Multi-process mode (default)
     exe_list = args.exe if args.exe is not None else DEFAULT_EXECUTABLES
 
-    # Probe for wazuh-indexer (all-in-one only) — add it only when it is
+    # Probe for guardsarm-indexer (all-in-one only) — add it only when it is
     # actually running so the monitor works unchanged on manager-only hosts.
     if args.exe is None:
         indexer_proc = find_process_by_exe(INDEXER_EXECUTABLE)
         if indexer_proc is not None:
-            logger.info("wazuh-indexer detected (PID %d) — adding to monitored set",
+            logger.info("guardsarm-indexer detected (PID %d) — adding to monitored set",
                         indexer_proc.pid)
             exe_list = list(exe_list) + [INDEXER_EXECUTABLE]
         else:
-            logger.info("wazuh-indexer not found — skipping (manager-only host)")
+            logger.info("guardsarm-indexer not found — skipping (manager-only host)")
 
     processes = wait_for_processes(exe_list, timeout=args.timeout)
 
@@ -970,14 +970,14 @@ def main() -> None:
     monitor_start_time = datetime.now()
     monitor_multi(processes, output_dir, args.interval, disk_paths)
 
-    # Post-processing: extract InventorySync stats from wazuh-manager.log
+    # Post-processing: extract InventorySync stats from guardsarm-manager.log
     extract_invsync_logs(output_dir, log_path=args.log_path, start_time=monitor_start_time)
 
 
 # ---------------------------------------------------------------------------
 # InventorySync log extraction & event counting
 # ---------------------------------------------------------------------------
-WAZUH_LOG_PATH = "/var/wazuh-manager/logs/wazuh-manager.log"
+GUARDSARM_LOG_PATH = "/var/guardsarm-manager/logs/guardsarm-manager.log"
 
 _RE_QUEUE_STATS = re.compile(
     r"^(\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) .+InventorySync queue stats: (.+)$"
@@ -1085,9 +1085,9 @@ def _parse_flat_kv(text: str) -> dict[str, str]:
 
 
 def extract_invsync_logs(output_dir: str,
-                         log_path: str = WAZUH_LOG_PATH,
+                         log_path: str = GUARDSARM_LOG_PATH,
                          start_time: datetime | None = None) -> None:
-    """Parse wazuh-manager.log and produce three CSV outputs:
+    """Parse guardsarm-manager.log and produce three CSV outputs:
 
     1. ``logs.csv`` — per-second event counters + gauge values (replaces
        the former standalone log_parser.py).

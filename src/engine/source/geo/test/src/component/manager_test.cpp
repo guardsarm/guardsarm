@@ -152,12 +152,12 @@ TEST_F(GeoManagerTest, MultithreadLookup)
             }
             else
             {
-                if (res.value() != "Wazuh")
+                if (res.value() != "GuardSarm")
                 {
                     setError(
                         error,
                         errorMsg,
-                        fmt::format("Locator thread got response '{}' which is not 'Wazuh'", res.value()));
+                        fmt::format("Locator thread got response '{}' which is not 'GuardSarm'", res.value()));
                 }
             }
         }
@@ -207,12 +207,12 @@ TEST_F(GeoManagerTest, MultithreadListLookup)
             }
             else
             {
-                if (res.value() != "Wazuh")
+                if (res.value() != "GuardSarm")
                 {
                     setError(
                         error,
                         errorMsg,
-                        fmt::format("Locator thread got response '{}' which is not 'Wazuh'", res.value()));
+                        fmt::format("Locator thread got response '{}' which is not 'GuardSarm'", res.value()));
                 }
             }
         }
@@ -331,11 +331,11 @@ TEST_F(GeoManagerTest, ComplexUseCase)
                 }
                 else
                 {
-                    if (res.value() != "Wazuh")
+                    if (res.value() != "GuardSarm")
                     {
                         setError(error,
                                  errorMsg,
-                                 fmt::format("Locator thread got response '{}' which is not 'Wazuh'",
+                                 fmt::format("Locator thread got response '{}' which is not 'GuardSarm'",
                                              res.value()));
                     }
                 }

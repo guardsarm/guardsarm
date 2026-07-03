@@ -1,5 +1,5 @@
 /*
- * Wazuh Indexer Configuration
+ * GuardSarm Indexer Configuration
  * Copyright (C) 2015, Wazuh Inc.
  * August 31, 2023.
  *

@@ -1,5 +1,5 @@
 /*
- * Wazuh router - Interface tests
+ * GuardSarm router - Interface tests
  * Copyright (C) 2015, Wazuh Inc.
  * Apr 29, 2022.
  *

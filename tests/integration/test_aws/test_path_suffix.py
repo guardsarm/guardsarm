@@ -9,9 +9,9 @@ This module will contain all cases for the path suffix test suite
 import pytest
 
 # qa-integration-framework imports
-from wazuh_testing.constants.paths.aws import S3_CLOUDTRAIL_DB_PATH
-from wazuh_testing.utils.db_queries.aws_db import get_s3_db_row, table_exists_or_has_values
-from wazuh_testing.modules.aws.utils import path_exist
+from guardsarm_testing.constants.paths.aws import S3_CLOUDTRAIL_DB_PATH
+from guardsarm_testing.utils.db_queries.aws_db import get_s3_db_row, table_exists_or_has_values
+from guardsarm_testing.modules.aws.utils import path_exist
 
 # Local module imports
 from . import event_monitor
@@ -37,18 +37,18 @@ configurator.configure_test(configuration_file='configuration_path_suffix.yaml',
                          ids=configurator.cases_ids)
 def test_path_suffix(
         test_configuration, metadata,  create_test_bucket, manage_bucket_files,
-        set_wazuh_configuration, clean_s3_cloudtrail_db, configure_local_internal_options_function,
+        set_guardsarm_configuration, clean_s3_cloudtrail_db, configure_local_internal_options_function,
         truncate_monitored_files, daemons_handler, file_monitoring
 ):
     """
     description: Only logs within a path_suffix are processed.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has appeared calling the module with correct parameters.
             - If a path_suffix that does not exist was specified, make sure that a message is displayed in the ossec.log
@@ -56,10 +56,10 @@ def test_path_suffix(
             - Check the command was called with the correct parameters.
             - Check the database was created and updated accordingly.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
             - Delete the uploaded file.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -73,7 +73,7 @@ def test_path_suffix(
         - manage_bucket_files:
             type: fixture
             brief: S3 buckets manager.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - clean_s3_cloudtrail_db:
@@ -84,10 +84,10 @@ def test_path_suffix(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
-        - restart_wazuh_daemon_function:
+            brief: Truncate guardsarm logs.
+        - restart_guardsarm_daemon_function:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.

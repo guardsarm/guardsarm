@@ -17,14 +17,14 @@ if sys.platform == "win32":
 from typing import Any
 from pathlib import Path
 
-from wazuh_testing.constants.paths.databases import FIM_DB_PATH, FIM_SYNC_DB_DIR, FIM_SYNC_DB_FILES
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.constants.platforms import WINDOWS, MACOS, CENTOS, UBUNTU, DEBIAN
-from wazuh_testing.modules.fim.patterns import MONITORING_PATH, FIM_SCAN_END
-from wazuh_testing.modules.fim.utils import create_registry, delete_registry
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils import file, services
-from wazuh_testing.utils.callbacks import generate_callback
+from guardsarm_testing.constants.paths.databases import FIM_DB_PATH, FIM_SYNC_DB_DIR, FIM_SYNC_DB_FILES
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.constants.platforms import WINDOWS, MACOS, CENTOS, UBUNTU, DEBIAN
+from guardsarm_testing.modules.fim.patterns import MONITORING_PATH, FIM_SCAN_END
+from guardsarm_testing.modules.fim.utils import create_registry, delete_registry
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.utils import file, services
+from guardsarm_testing.utils.callbacks import generate_callback
 
 @pytest.fixture()
 def file_to_monitor(test_metadata: dict) -> Any:
@@ -101,8 +101,8 @@ def fill_folder_to_monitor(test_metadata: dict) -> None:
 
 @pytest.fixture()
 def start_monitoring() -> None:
-    FileMonitor(WAZUH_LOG_PATH).start(generate_callback(MONITORING_PATH))
-    FileMonitor(WAZUH_LOG_PATH).start(generate_callback(FIM_SCAN_END), timeout=60)
+    FileMonitor(GUARDSARM_LOG_PATH).start(generate_callback(MONITORING_PATH))
+    FileMonitor(GUARDSARM_LOG_PATH).start(generate_callback(FIM_SCAN_END), timeout=60)
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -199,9 +199,9 @@ def create_registry_key(test_metadata: dict) -> None:
 
 @pytest.fixture()
 def detect_end_scan(test_metadata: dict) -> None:
-    wazuh_log_monitor = FileMonitor(WAZUH_LOG_PATH)
-    wazuh_log_monitor.start(timeout=60, callback=generate_callback(FIM_SCAN_END))
-    assert wazuh_log_monitor.callback_result
+    guardsarm_log_monitor = FileMonitor(GUARDSARM_LOG_PATH)
+    guardsarm_log_monitor.start(timeout=60, callback=generate_callback(FIM_SCAN_END))
+    assert guardsarm_log_monitor.callback_result
 
 
 @pytest.fixture()
@@ -256,7 +256,7 @@ def clean_fim_sync_db():
     Works on both Linux and Windows agents.
     """
 
-    # Stop wazuh-service and ensure all daemons are stopped
+    # Stop guardsarm-service and ensure all daemons are stopped
     services.control_service('stop')
     services.wait_expected_daemon_status(running_condition=False, timeout=180)
 

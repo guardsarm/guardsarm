@@ -1,5 +1,5 @@
 /*
- * Wazuh content manager - Unit Tests
+ * GuardSarm content manager - Unit Tests
  * Copyright (C) 2015, Wazuh Inc.
  *
  * This program is free software; you can redistribute it

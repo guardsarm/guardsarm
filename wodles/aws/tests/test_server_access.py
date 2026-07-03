@@ -54,8 +54,8 @@ def test_aws_server_access_iter_files_in_bucket(mock_build_filter, mock_debug,
     object_list: dict
         Objects to be returned by list_objects_v2.
     """
-    with patch('wazuh_integration.WazuhIntegration.get_sts_client'), \
-            patch('wazuh_integration.WazuhAWSDatabase.__init__'):
+    with patch('guardsarm_integration.GuardSarmIntegration.get_sts_client'), \
+            patch('guardsarm_integration.GuardSarmAWSDatabase.__init__'):
 
         instance = utils.get_mocked_bucket(class_=server_access.AWSServerAccess, bucket=utils.TEST_BUCKET,
                                            delete_file=delete_file, reparse=reparse)
@@ -128,7 +128,7 @@ def test_aws_server_access_iter_files_in_bucket(mock_build_filter, mock_debug,
                     mock_build_filter.assert_any_call(aws_account_id, aws_region, True)
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 def test_aws_server_access_iter_files_in_bucket_handles_exceptions(mock_sts):
     """Test 'iter_files_in_bucket' method handles exceptions raised when the filename does not have the valid format
     or by an unexpected cause and exits with the expected exit code.
@@ -151,7 +151,7 @@ def test_aws_server_access_iter_files_in_bucket_handles_exceptions(mock_sts):
         assert e.value.code == utils.UNEXPECTED_ERROR_WORKING_WITH_S3
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 def test_aws_server_access_marker_only_logs_after(mock_sts):
     """Test 'marker_only_logs_after' method returns the expected marker using the `only_logs_after` value."""
     test_only_logs_after = utils.TEST_ONLY_LOGS_AFTER
@@ -166,7 +166,7 @@ def test_aws_server_access_marker_only_logs_after(mock_sts):
                      f"{test_only_logs_after[0:4]}-{test_only_logs_after[4:6]}-{test_only_logs_after[6:8]}"
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 def test_aws_server_access_check_bucket_handles_exceptions_when_empty_bucket(mock_sts):
     """Test 'check_bucket' method exits with the expected code when no files are found in the bucket."""
     instance = utils.get_mocked_bucket(class_=server_access.AWSServerAccess, bucket=utils.TEST_BUCKET)
@@ -184,7 +184,7 @@ def test_aws_server_access_check_bucket_handles_exceptions_when_empty_bucket(moc
     (aws_bucket.INVALID_REQUEST_TIME_ERROR_CODE, utils.INVALID_REQUEST_TIME_ERROR_CODE),
     ("OtherClientError", utils.UNKNOWN_ERROR_CODE)
 ])
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 def test_aws_server_access_check_bucket_handles_exceptions_on_client_error(mock_sts,
                                                                            error_code: str, exit_code: int):
     """Test 'check_bucket' method handles the different botocore exception and
@@ -239,7 +239,7 @@ def test_aws_server_access_load_information_from_file(mock_sts_client):
 
 
 @patch('aws_tools.debug')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('aws_bucket.AWSBucket.build_s3_filter_args')
 def test_aws_server_access_iter_files_in_bucket_uses_instance_account_id_when_none_given(mock_build, mock_sts, mock_debug):
     """Test iter_files_in_bucket uses self.aws_account_id when aws_account_id argument is None."""
@@ -256,7 +256,7 @@ def test_aws_server_access_iter_files_in_bucket_uses_instance_account_id_when_no
 
 @patch('aws_tools.debug')
 @patch('aws_bucket.AWSBucket._print_no_logs_to_process_message')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('aws_bucket.AWSBucket.build_s3_filter_args')
 def test_aws_server_access_iter_files_in_bucket_skips_folder_keys(mock_build, mock_sts, mock_print_no_logs, mock_debug):
     """Test iter_files_in_bucket skips bucket files whose key ends with '/'."""
@@ -276,7 +276,7 @@ def test_aws_server_access_iter_files_in_bucket_skips_folder_keys(mock_build, mo
 
 @patch('aws_tools.debug')
 @patch('aws_bucket.AWSBucket._print_no_logs_to_process_message')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('aws_bucket.AWSBucket.build_s3_filter_args')
 def test_aws_server_access_iter_files_in_bucket_skips_invalid_filename_when_skip_on_error(mock_build, mock_sts, mock_print_no_logs, mock_debug):
     """Test iter_files_in_bucket skips files with an invalid key format when skip_on_error is True."""
@@ -297,7 +297,7 @@ def test_aws_server_access_iter_files_in_bucket_skips_invalid_filename_when_skip
 
 
 @patch('aws_bucket.AWSBucket.build_s3_filter_args')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 def test_aws_server_access_iter_files_in_bucket_handles_exception_with_message_attr(mock_sts, mock_build):
     """Test iter_files_in_bucket logs err.message when the exception has a message attribute."""
     err = Exception("S3 error")

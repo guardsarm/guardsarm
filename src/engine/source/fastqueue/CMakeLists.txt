@@ -52,7 +52,7 @@ if(ENGINE_BUILD_TEST)
     GTest::gtest_main
     base
     fastqueue::fastqueue
-    # TODO: Until the indexer connector is unified with the rest of wazuh-manager
+    # TODO: Until the indexer connector is unified with the rest of guardsarm-manager
     # metrics::mocks
     base::test
   )

@@ -2,7 +2,7 @@
 
 set -e
 CURRENT_PATH="$( cd $(dirname $0) ; pwd -P )"
-WAZUH_PATH="$(cd $CURRENT_PATH/../../..; pwd -P)"
+GUARDSARM_PATH="$(cd $CURRENT_PATH/../../..; pwd -P)"
 ARCHITECTURE="amd64"
 OUTDIR="${CURRENT_PATH}/output"
 JOBS="2"
@@ -23,10 +23,10 @@ ctrl_c() {
 }
 
 install_geoip() {
-    local wazuh_path="$1"
+    local guardsarm_path="$1"
     local temp_dir="$2"
 
-    local geoip_src_path="${wazuh_path}/src/external/geo_db"
+    local geoip_src_path="${guardsarm_path}/src/external/geo_db"
     local mmdb_dst_dir="${temp_dir}/data/mmdb"
     local store_doc_dir="${temp_dir}/data/store/geo/mmdb"
     local store_doc="${store_doc_dir}/0"
@@ -93,10 +93,10 @@ EOF
 }
 
 install_tzdb() {
-    local wazuh_path="$1"
+    local guardsarm_path="$1"
     local temp_dir="$2"
 
-    local tzdata_src="${wazuh_path}/src/external/tzdata"
+    local tzdata_src="${guardsarm_path}/src/external/tzdata"
     local tzdb_dst="${temp_dir}/data/tzdb/iana"
 
     if [ ! -d "${tzdata_src}" ]; then
@@ -133,7 +133,7 @@ build_standalone() {
 
     # Build the Docker image if needed
     if [[ ${BUILD_DOCKER} == "yes" ]]; then
-        DOCKERFILE_PATH="${WAZUH_PATH}/packages/rpms/${PACKAGE_ARCH}/manager"
+        DOCKERFILE_PATH="${GUARDSARM_PATH}/packages/rpms/${PACKAGE_ARCH}/manager"
         if [ ! -d "${DOCKERFILE_PATH}" ]; then
             echo "Error: Dockerfile path not found: ${DOCKERFILE_PATH}"
             return 1
@@ -141,9 +141,9 @@ build_standalone() {
 
         # Copy the necessary files for Docker build
         echo "Copying necessary files for Docker build..."
-        cp ${WAZUH_PATH}/packages/build.sh ${DOCKERFILE_PATH}
-        cp ${WAZUH_PATH}/packages/rpms/utils/* ${DOCKERFILE_PATH}
-        cp ${WAZUH_PATH}/.github/scripts/run_with_retry.sh ${DOCKERFILE_PATH}/retry.sh
+        cp ${GUARDSARM_PATH}/packages/build.sh ${DOCKERFILE_PATH}
+        cp ${GUARDSARM_PATH}/packages/rpms/utils/* ${DOCKERFILE_PATH}
+        cp ${GUARDSARM_PATH}/.github/scripts/run_with_retry.sh ${DOCKERFILE_PATH}/retry.sh
 
         echo "Building Docker image ${CONTAINER_NAME}:${DOCKER_TAG}..."
         docker build -t ${CONTAINER_NAME}:${DOCKER_TAG} ${DOCKERFILE_PATH} || return 1
@@ -160,46 +160,46 @@ build_standalone() {
     fi
 
     # Build the standalone package with a Docker container
-    echo "Building Wazuh Engine Standalone package..."
-    docker run --entrypoint /workspace/wazuh/src/engine/standalone/docker-entrypoint.sh \
+    echo "Building GuardSarm Engine Standalone package..."
+    docker run --entrypoint /workspace/guardsarm/src/engine/standalone/docker-entrypoint.sh \
         -e BUILD_TYPE="${BUILD_TYPE}" \
         -e JOBS="${JOBS}" \
-        -t --rm -v ${WAZUH_PATH}:/workspace/wazuh:Z \
+        -t --rm -v ${GUARDSARM_PATH}:/workspace/guardsarm:Z \
         ${CONTAINER_NAME}:${DOCKER_TAG} || return 1
 
     # Restore workspace permissions after Docker build (container runs as root
     # and `:Z` SELinux relabeling can leave files unreadable by the host user)
     echo "Restoring workspace permissions after Docker build..."
-    chmod -R a+rX "${WAZUH_PATH}/src/external" 2>/dev/null \
-        || sudo chmod -R a+rX "${WAZUH_PATH}/src/external" 2>/dev/null \
+    chmod -R a+rX "${GUARDSARM_PATH}/src/external" 2>/dev/null \
+        || sudo chmod -R a+rX "${GUARDSARM_PATH}/src/external" 2>/dev/null \
         || echo "Warning: Could not restore permissions on src/external"
 
     # Get version
-    VERSION="$(grep '"version"' ${WAZUH_PATH}/VERSION.json | sed -E 's/.*"version": *"([^"]+)".*/\1/')"
+    VERSION="$(grep '"version"' ${GUARDSARM_PATH}/VERSION.json | sed -E 's/.*"version": *"([^"]+)".*/\1/')"
 
     # Create output directory if it doesn't exist
     mkdir -p ${OUTDIR}
 
     # Generate engine schemas
     echo "Generating engine schemas..."
-    python3 -m pip install -r ${WAZUH_PATH}/src/engine/tools/engine-schema/requirements.txt || return 1
-    python3 ${WAZUH_PATH}/src/engine/tools/engine-schema/engine_schema.py generate \
-        --output-dir ${WAZUH_PATH}/src/engine/ruleset/schemas/ \
-        --wcs-path ${WAZUH_PATH}/src/external/wcs-flat-files/ \
-        --decoder-template ${WAZUH_PATH}/src/engine/ruleset/schemas/wazuh-decoders.template.json \
-        --exclude-geo ${WAZUH_PATH}/src/engine/ruleset/schemas/exclude-enrichment-geo.json \
-        --ioc-enrichment-cfg ${WAZUH_PATH}/src/engine/ruleset/schemas/ioc-enrichment-cfg.json || return 1
+    python3 -m pip install -r ${GUARDSARM_PATH}/src/engine/tools/engine-schema/requirements.txt || return 1
+    python3 ${GUARDSARM_PATH}/src/engine/tools/engine-schema/engine_schema.py generate \
+        --output-dir ${GUARDSARM_PATH}/src/engine/ruleset/schemas/ \
+        --wcs-path ${GUARDSARM_PATH}/src/external/wcs-flat-files/ \
+        --decoder-template ${GUARDSARM_PATH}/src/engine/ruleset/schemas/guardsarm-decoders.template.json \
+        --exclude-geo ${GUARDSARM_PATH}/src/engine/ruleset/schemas/exclude-enrichment-geo.json \
+        --ioc-enrichment-cfg ${GUARDSARM_PATH}/src/engine/ruleset/schemas/ioc-enrichment-cfg.json || return 1
 
     # Create standalone package structure
     echo "Creating standalone package structure..."
-    TEMP_DIR="${OUTDIR}/wazuh-engine-standalone-${VERSION}"
+    TEMP_DIR="${OUTDIR}/guardsarm-engine-standalone-${VERSION}"
     rm -rf ${TEMP_DIR}
 
     install -d -m 770 \
         ${TEMP_DIR}/bin/lib \
         ${TEMP_DIR}/data/store/schema \
         ${TEMP_DIR}/data/store/schema/engine-schema \
-        ${TEMP_DIR}/data/store/schema/wazuh-logpar-overrides \
+        ${TEMP_DIR}/data/store/schema/guardsarm-logpar-overrides \
         ${TEMP_DIR}/data/store/schema/allowed-fields \
         ${TEMP_DIR}/data/store/enrichment/geo \
         ${TEMP_DIR}/data/store/enrichment/ioc \
@@ -220,38 +220,38 @@ build_standalone() {
     touch ${TEMP_DIR}/sockets/.keep
 
     # Copy schemas
-    cp -r ${WAZUH_PATH}/src/engine/ruleset/schemas/engine-schema.json ${TEMP_DIR}/data/store/schema/engine-schema/0
-    cp -r ${WAZUH_PATH}/src/engine/ruleset/schemas/wazuh-logpar-overrides.json ${TEMP_DIR}/data/store/schema/wazuh-logpar-overrides/0
-    cp -r ${WAZUH_PATH}/src/engine/ruleset/schemas/allowed-fields.json ${TEMP_DIR}/data/store/schema/allowed-fields/0
-    cp -r ${WAZUH_PATH}/src/engine/ruleset/schemas/wazuh-decoders.json ${TEMP_DIR}/schemas/
-    cp -r ${WAZUH_PATH}/src/engine/ruleset/schemas/wazuh-filters.json ${TEMP_DIR}/schemas/
+    cp -r ${GUARDSARM_PATH}/src/engine/ruleset/schemas/engine-schema.json ${TEMP_DIR}/data/store/schema/engine-schema/0
+    cp -r ${GUARDSARM_PATH}/src/engine/ruleset/schemas/guardsarm-logpar-overrides.json ${TEMP_DIR}/data/store/schema/guardsarm-logpar-overrides/0
+    cp -r ${GUARDSARM_PATH}/src/engine/ruleset/schemas/allowed-fields.json ${TEMP_DIR}/data/store/schema/allowed-fields/0
+    cp -r ${GUARDSARM_PATH}/src/engine/ruleset/schemas/guardsarm-decoders.json ${TEMP_DIR}/schemas/
+    cp -r ${GUARDSARM_PATH}/src/engine/ruleset/schemas/guardsarm-filters.json ${TEMP_DIR}/schemas/
 
     # Copy enrichments
-    cp -r ${WAZUH_PATH}/src/engine/ruleset/schemas/enrichment-geo.json ${TEMP_DIR}/data/store/enrichment/geo/0
-    cp -r ${WAZUH_PATH}/src/engine/ruleset/schemas/enrichment-ioc.json ${TEMP_DIR}/data/store/enrichment/ioc/0
+    cp -r ${GUARDSARM_PATH}/src/engine/ruleset/schemas/enrichment-geo.json ${TEMP_DIR}/data/store/enrichment/geo/0
+    cp -r ${GUARDSARM_PATH}/src/engine/ruleset/schemas/enrichment-ioc.json ${TEMP_DIR}/data/store/enrichment/ioc/0
 
     # Copy geo dbs
-    install_geoip "${WAZUH_PATH}" "${TEMP_DIR}"
-    install_tzdb "${WAZUH_PATH}" "${TEMP_DIR}"
+    install_geoip "${GUARDSARM_PATH}" "${TEMP_DIR}"
+    install_tzdb "${GUARDSARM_PATH}" "${TEMP_DIR}"
 
     # Copy scripts and README
-    cp -r ${WAZUH_PATH}/src/engine/standalone/run_engine.sh ${TEMP_DIR}/
+    cp -r ${GUARDSARM_PATH}/src/engine/standalone/run_engine.sh ${TEMP_DIR}/
     chmod +x ${TEMP_DIR}/run_engine.sh
-    cp ${WAZUH_PATH}/src/engine/standalone/README.md ${TEMP_DIR}/
+    cp ${GUARDSARM_PATH}/src/engine/standalone/README.md ${TEMP_DIR}/
 
     # Copy libraries and binaries
-    cp ${WAZUH_PATH}/src/external/rocksdb/build/librocksdb.so.8 ${TEMP_DIR}/bin/lib
-    cp ${WAZUH_PATH}/src/build/lib/libwazuhext.so ${TEMP_DIR}/bin/lib
-    cp ${WAZUH_PATH}/src/build/lib/libindexer_connector.so ${TEMP_DIR}/bin/lib
-    cp ${WAZUH_PATH}/gcc-libs/libstdc++.so.6* ${TEMP_DIR}/bin/lib/
-    cp ${WAZUH_PATH}/src/build/engine/wazuh-engine ${TEMP_DIR}/bin/
-    chmod +x ${TEMP_DIR}/bin/wazuh-engine
+    cp ${GUARDSARM_PATH}/src/external/rocksdb/build/librocksdb.so.8 ${TEMP_DIR}/bin/lib
+    cp ${GUARDSARM_PATH}/src/build/lib/libguardsarmext.so ${TEMP_DIR}/bin/lib
+    cp ${GUARDSARM_PATH}/src/build/lib/libindexer_connector.so ${TEMP_DIR}/bin/lib
+    cp ${GUARDSARM_PATH}/gcc-libs/libstdc++.so.6* ${TEMP_DIR}/bin/lib/
+    cp ${GUARDSARM_PATH}/src/build/engine/guardsarm-engine ${TEMP_DIR}/bin/
+    chmod +x ${TEMP_DIR}/bin/guardsarm-engine
 
     # Create zip package
-    PACKAGE_NAME="wazuh-engine-${VERSION}-linux-${PACKAGE_ARCH}.tar.gz"
+    PACKAGE_NAME="guardsarm-engine-${VERSION}-linux-${PACKAGE_ARCH}.tar.gz"
     echo "Creating package: ${PACKAGE_NAME}"
     cd ${OUTDIR}
-    tar czf ${PACKAGE_NAME} wazuh-engine-standalone-${VERSION}/ || return 1
+    tar czf ${PACKAGE_NAME} guardsarm-engine-standalone-${VERSION}/ || return 1
 
     echo "Package created successfully: ${OUTDIR}/${PACKAGE_NAME}"
 

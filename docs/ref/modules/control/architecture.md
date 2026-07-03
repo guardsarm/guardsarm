@@ -2,12 +2,12 @@
 
 ## Overview
 
-The Control Module provides control operations for both the Wazuh manager and agents. It implements Unix domain socket servers that accept control commands and execute system-level operations.
+The Control Module provides control operations for both the GuardSarm manager and agents. It implements Unix domain socket servers that accept control commands and execute system-level operations.
 
 The entire Unix-side implementation lives in a single file, `wm_control.c`, compiled differently per build target:
 
 - **Manager build** (`TARGET=manager`): `process_control()` runs directly in the main thread.
-- **Agent build** (`CLIENT` defined, Unix): `process_control()` is spawned as a worker thread within `wazuh-modulesd`.
+- **Agent build** (`CLIENT` defined, Unix): `process_control()` is spawned as a worker thread within `guardsarm-modulesd`.
 
 On **Windows agents**, `control_dispatch()` in `client-agent/src/control.c` handles control commands in-process (no separate socket listener thread).
 
@@ -17,7 +17,7 @@ On **Windows agents**, `control_dispatch()` in `client-agent/src/control.c` hand
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                          wazuh-modulesd                             │
+│                          guardsarm-modulesd                             │
 │                                                                     │
 │  ┌───────────────────────────────────────────────────────────────┐  │
 │  │                      wm_control Module                        │  │
@@ -40,19 +40,19 @@ On **Windows agents**, `control_dispatch()` in `client-agent/src/control.c` hand
          ▼                                           │
 ┌──────────────────────┐                  ┌─────────────────────┐
 │  systemctl/          │                  │   API / Framework   │
-│  wazuh-control       │                  │   Clients           │
+│  guardsarm-control       │                  │   Clients           │
 └──────────────────────┘                  └─────────────────────┘
 ```
 
 ### Agent Side (Unix)
 
-On Unix agents, `wm_control.c` is compiled with `CLIENT` defined. `wm_control_main()` spawns `process_control()` as a thread. The socket listener and dispatcher are identical to the manager side; only the service name passed to `wm_control_execute_action()` differs (`"wazuh-agent"` instead of `"wazuh-manager"`).
+On Unix agents, `wm_control.c` is compiled with `CLIENT` defined. `wm_control_main()` spawns `process_control()` as a thread. The socket listener and dispatcher are identical to the manager side; only the service name passed to `wm_control_execute_action()` differs (`"guardsarm-agent"` instead of `"guardsarm-manager"`).
 
-Incoming control commands from the manager arrive via `wazuh-agentd`'s `request.c`, which forwards `"control"` target messages to the `CONTROL_SOCK` Unix socket.
+Incoming control commands from the manager arrive via `guardsarm-agentd`'s `request.c`, which forwards `"control"` target messages to the `CONTROL_SOCK` Unix socket.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│            wazuh-modulesd (agent, CLIENT build)              │
+│            guardsarm-modulesd (agent, CLIENT build)              │
 │                                                              │
 │  ┌────────────────────────────────────────────────────────┐  │
 │  │              wm_control Module (CLIENT build)          │  │
@@ -65,7 +65,7 @@ Incoming control commands from the manager arrive via `wazuh-agentd`'s `request.
 │  │  └───────────────┘                 ▼                   │  │
 │  │                     ┌──────────────────────┐           │  │
 │  │                     │ wm_control_execute   │           │  │
-│  │                     │ _action("wazuh-agent")│           │  │
+│  │                     │ _action("guardsarm-agent")│           │  │
 │  │                     └──────────────────────┘           │  │
 │  └────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────┘
@@ -73,29 +73,29 @@ Incoming control commands from the manager arrive via `wazuh-agentd`'s `request.
          │ fork + execv                              │ CONTROL_SOCK
          ▼                                           │ (forwarded by agentd/request.c)
 ┌──────────────────────┐                  ┌────────────────────────┐
-│  systemctl/          │                  │ wazuh-manager-remoted/ │
-│  wazuh-control       │                  │ API / Framework        │
+│  systemctl/          │                  │ guardsarm-manager-remoted/ │
+│  guardsarm-control       │                  │ API / Framework        │
 └──────────────────────┘                  └────────────────────────┘
 ```
 
 ### Agent Side (Windows)
 
-On Windows, there is no separate socket listener. `wazuh-agentd`'s `request.c` calls `control_dispatch()` directly in-process when it receives a `"control"` target message.
+On Windows, there is no separate socket listener. `guardsarm-agentd`'s `request.c` calls `control_dispatch()` directly in-process when it receives a `"control"` target message.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│            wazuh-agentd (Windows)                            │
+│            guardsarm-agentd (Windows)                            │
 │                                                              │
 │  request.c                                                   │
 │  └─► control_dispatch()  (client-agent/src/control.c)        │
 │       └─► control_run_detached()                             │
 │            ├─► GetModuleFileNameA()                          │
-│            ├─► CreateProcessA("wazuh-agent.exe              │
+│            ├─► CreateProcessA("guardsarm-agent.exe              │
 │            │       service-restart", DETACHED_PROCESS)       │
 │            └─► return "ok " immediately                      │
 └──────────────────────────────────────────────────────────────┘
                                            ▲
-                                           │ via wazuh-manager-remoted
+                                           │ via guardsarm-manager-remoted
                                            │
                                 ┌──────────────────────┐
                                 │  API / Framework     │
@@ -108,9 +108,9 @@ On Windows, there is no separate socket listener. `wazuh-agentd`'s `request.c` c
 
 The socket listener is the main entry point for control commands on Unix (both manager and agent builds).
 
-**Socket Path** (both manager and agent): `CONTROL_SOCK = "queue/sockets/control"`, resolved relative to `WAZUH_HOME`.
+**Socket Path** (both manager and agent): `CONTROL_SOCK = "queue/sockets/control"`, resolved relative to `GUARDSARM_HOME`.
 
-- Default manager path: `/var/wazuh-manager/queue/sockets/control`
+- Default manager path: `/var/guardsarm-manager/queue/sockets/control`
 - Default agent path: `/var/ossec/queue/sockets/control`
 
 **Functionality**:
@@ -124,11 +124,11 @@ The socket listener is the main entry point for control commands on Unix (both m
 ```c
 // Socket creation with specific permissions (same for manager and agent)
 int sock = OS_BindUnixDomainWithPerms(
-    CONTROL_SOCK,        // "queue/sockets/control" (resolved relative to WAZUH_HOME)
+    CONTROL_SOCK,        // "queue/sockets/control" (resolved relative to GUARDSARM_HOME)
     SOCK_STREAM,         // Stream socket
     OS_MAXSTR,           // Max connections
     getuid(),            // Owner UID
-    wm_getGroupID(),     // Wazuh group GID
+    wm_getGroupID(),     // GuardSarm group GID
     0660                 // Permissions: rw-rw----
 );
 ```
@@ -148,9 +148,9 @@ The same `wm_control_dispatch()` function handles both manager and agent builds.
 ```c
 size_t wm_control_dispatch(char *command, char **output) {
 #ifdef CLIENT
-    const char *service = "wazuh-agent";
+    const char *service = "guardsarm-agent";
 #else
-    const char *service = "wazuh-manager";
+    const char *service = "guardsarm-manager";
 #endif
 
     if (strcmp(command, "restart") == 0) {
@@ -204,7 +204,7 @@ Executes restart/reload operations via system commands.
        │                   │
        ▼                   ▼
 ┌─────────────┐    ┌──────────────────┐
-│ systemctl   │    │ wazuh-control    │
+│ systemctl   │    │ guardsarm-control    │
 │ restart     │    │ restart          │
 │ <service>   │    │                  │
 └─────────────┘    └──────────────────┘
@@ -300,17 +300,17 @@ static bool wm_control_wait_for_service_active(const char *service) {
 
 ```
 1. API/Framework
-   └─► socket.connect("$WAZUH_HOME/queue/sockets/control")
+   └─► socket.connect("$GUARDSARM_HOME/queue/sockets/control")
 
 2. API/Framework
    └─► socket.send("restart")
 
 3. wm_control (manager build)
    └─► wm_control_dispatch("restart", &output)
-       └─► wm_control_execute_action("restart", "wazuh-manager", &output)
+       └─► wm_control_execute_action("restart", "guardsarm-manager", &output)
            ├─► Check systemd available?
            ├─► fork()
-           │   └─► Child: execv("systemctl restart wazuh-manager")
+           │   └─► Child: execv("systemctl restart guardsarm-manager")
            └─► Parent: return "ok "
 
 4. API/Framework
@@ -324,22 +324,22 @@ static bool wm_control_wait_for_service_active(const char *service) {
 
 ```
 1. API/Framework
-   └─► WazuhSocket(REMOTED_SOCKET).send("{agent_id} control restart")
+   └─► GuardSarmSocket(REMOTED_SOCKET).send("{agent_id} control restart")
 
-2. wazuh-manager-remoted
+2. guardsarm-manager-remoted
    └─► Forwards message to target agent
 
-3. wazuh-agentd (request.c, agent side)
+3. guardsarm-agentd (request.c, agent side)
    └─► Receives "control" target
        └─► Forwards to CONTROL_SOCK Unix socket
 
-4. wm_control thread (CLIENT build, in wazuh-modulesd)
+4. wm_control thread (CLIENT build, in guardsarm-modulesd)
    └─► process_control() receives command
        └─► wm_control_dispatch("restart", &output)
-           └─► wm_control_execute_action("restart", "wazuh-agent", &output)
+           └─► wm_control_execute_action("restart", "guardsarm-agent", &output)
                ├─► Check systemd available?
                ├─► fork()
-               │   └─► Child: execv("systemctl restart wazuh-agent")
+               │   └─► Child: execv("systemctl restart guardsarm-agent")
                └─► Parent: return "ok "
 
 5. Response propagated back to API/Framework
@@ -349,27 +349,27 @@ static bool wm_control_wait_for_service_active(const char *service) {
 
 ```
 1. API/Framework
-   └─► WazuhSocket(REMOTED_SOCKET).send("{agent_id} control restart")
+   └─► GuardSarmSocket(REMOTED_SOCKET).send("{agent_id} control restart")
 
-2. wazuh-manager-remoted
+2. guardsarm-manager-remoted
    └─► Forwards message to target agent
 
-3. wazuh-agentd (request.c, Windows)
+3. guardsarm-agentd (request.c, Windows)
    └─► Receives "control" target
        └─► Calls control_dispatch("restart", &output) in-process
            └─► control_run_detached("restart", &output)
-               ├─► GetModuleFileNameA() — resolves wazuh-agent.exe path
-               ├─► CreateProcessA("wazuh-agent.exe service-restart",
+               ├─► GetModuleFileNameA() — resolves guardsarm-agent.exe path
+               ├─► CreateProcessA("guardsarm-agent.exe service-restart",
                │       DETACHED_PROCESS | CREATE_NO_WINDOW)
                │   └─► Detached child:
                │         sleep(1s)              ← waits for "ok" to reach remoted
-               │         os_stop_service()      ← stops WazuhSvc
-               │         os_start_service()     ← starts WazuhSvc
+               │         os_stop_service()      ← stops GuardSarmSvc
+               │         os_start_service()     ← starts GuardSarmSvc
                │         exit(0)
                ├─► CloseHandle() — parent releases child handles
                └─► return "ok " immediately
 
-4. Response propagated back to API/Framework (before WazuhSvc stops)
+4. Response propagated back to API/Framework (before GuardSarmSvc stops)
 ```
 
 ## Thread Model
@@ -392,7 +392,7 @@ static bool wm_control_wait_for_service_active(const char *service) {
 
 ### Agent (Windows)
 
-No dedicated thread. `control_dispatch()` is called synchronously from the request handler thread in `wazuh-agentd`.
+No dedicated thread. `control_dispatch()` is called synchronously from the request handler thread in `guardsarm-agentd`.
 
 **Action Execution**: Fork-based process isolation (Unix) or detached process (Windows)
 - Parent/caller returns immediately
@@ -418,12 +418,12 @@ No dedicated thread. `control_dispatch()` is called synchronously from the reque
 
 **Access Control**:
 - Socket permissions: `0660` (owner and group only)
-- Socket group: Wazuh group (for API/framework access)
+- Socket group: GuardSarm group (for API/framework access)
 - No authentication required (filesystem permissions provide security)
 
 **Privilege Model**:
 - Module runs as root (within modulesd)
-- Can execute privileged commands (systemctl, wazuh-control)
+- Can execute privileged commands (systemctl, guardsarm-control)
 - No privilege escalation needed
 
 **Attack Surface**:
@@ -432,14 +432,14 @@ No dedicated thread. `control_dispatch()` is called synchronously from the reque
 - Limited command set (restart, reload)
 - No arbitrary command execution
 
-## Migration from wazuh-execd
+## Migration from guardsarm-execd
 
 ### Previous Architecture (v4.x)
 
-**Component**: `wazuh-execd` daemon
+**Component**: `guardsarm-execd` daemon
 - **Socket**: `/var/ossec/queue/sockets/com`
 - **Commands**: restart, reload, getconfig, check-manager-configuration, unmerge, uncompress, lock_restart
-- **Agent restart/reload**: Via Active Response scripts (`restart.sh`, `restart-wazuh.exe`)
+- **Agent restart/reload**: Via Active Response scripts (`restart.sh`, `restart-guardsarm.exe`)
 - **Responsibilities**:
   - Active Response execution
   - Configuration serving
@@ -449,17 +449,17 @@ No dedicated thread. `control_dispatch()` is called synchronously from the reque
 ### Current Architecture (v5.0)
 
 **Manager**: `wm_control` (within modulesd, manager build)
-- **Socket**: `$WAZUH_HOME/queue/sockets/control`
+- **Socket**: `$GUARDSARM_HOME/queue/sockets/control`
 - **Commands**: restart, reload
-- **Service name**: `wazuh-manager`
+- **Service name**: `guardsarm-manager`
 
 **Agent Unix**: `wm_control` (within modulesd, `CLIENT` build, thread)
-- **Socket**: `$WAZUH_HOME/queue/sockets/control`
+- **Socket**: `$GUARDSARM_HOME/queue/sockets/control`
 - **Commands**: restart, reload (dispatched by `wm_control_dispatch()`)
-- **Service name**: `wazuh-agent`
+- **Service name**: `guardsarm-agent`
 
-**Agent Windows**: `control_dispatch()` (within `wazuh-agentd`, in-process)
-- Handles restart/reload via `control_run_detached()`, which spawns a detached copy of `wazuh-agent.exe service-restart`. The detached process runs outside WazuhSvc, waits 1 second for the `"ok"` response to reach remoted, then calls `os_stop_service()` / `os_start_service()` and exits
+**Agent Windows**: `control_dispatch()` (within `guardsarm-agentd`, in-process)
+- Handles restart/reload via `control_run_detached()`, which spawns a detached copy of `guardsarm-agent.exe service-restart`. The detached process runs outside GuardSarmSvc, waits 1 second for the `"ok"` response to reach remoted, then calls `os_stop_service()` / `os_start_service()` and exits
 
 ### Changes
 
@@ -505,5 +505,5 @@ Potential improvements for future versions:
 ## See Also
 
 - [Control Module README](README.md) - Module overview
-- wazuh-manager-modulesd / wazuh-modulesd - Host daemon (no dedicated page yet; see the [Modules index](../README.md))
+- guardsarm-manager-modulesd / guardsarm-modulesd - Host daemon (no dedicated page yet; see the [Modules index](../README.md))
 - [Manager Installation](../../getting-started/installation.md) - Manager setup and systemctl

@@ -13,7 +13,7 @@
 #include "commonDefs.h"
 #include "loggerHelper.h"
 
-#include <base/libwazuhshared.hpp>
+#include <base/libguardsarmshared.hpp>
 #include <base/process.hpp>
 
 #define LAMBDA_SEPARATOR "::<lambda>"
@@ -33,7 +33,7 @@ constexpr auto STD_ERR_PATH {"/dev/stderr"};
  */
 constexpr auto STD_OUT_PATH {"/dev/stdout"};
 
-// constexpr auto WAZUH_LOG_HEADER {"%D %T wazuh-engine[%P] %s:%# at %!(): %l: %v"};
+// constexpr auto GUARDSARM_LOG_HEADER {"%D %T guardsarm-engine[%P] %s:%# at %!(): %l: %v"};
 
 /**
  * @brief Default log header format.
@@ -241,16 +241,16 @@ void stop();
  * SizeBasedTriggeringPolicy, and DefaultRolloverStrategy.
  *
  * Supported environment variables (Log4j2-compatible defaults):
- *   - WAZUH_STANDALONE_LOG_LEVEL                (default: "info")
- *   - WAZUH_STANDALONE_LOG_FILE_PATH            (default: /var/log/wazuh-indexer/wazuh-engine.log)
- *   - WAZUH_STANDALONE_LOG_ROTATION_ENABLED     (default: true)
- *   - WAZUH_STANDALONE_LOG_MAX_FILE_SIZE        (default: 134217728 = 128 MB, Log4j2: SizeBasedTriggeringPolicy)
- *   - WAZUH_STANDALONE_LOG_ROTATION_HOUR        (default: 0 = midnight, Log4j2: TimeBasedTriggeringPolicy)
- *   - WAZUH_STANDALONE_LOG_ROTATION_MINUTE      (default: 0, Log4j2: TimeBasedTriggeringPolicy)
- *   - WAZUH_STANDALONE_LOG_MAX_FILES            (default: 7, Log4j2: DefaultRolloverStrategy max)
- *   - WAZUH_STANDALONE_LOG_MAX_ACCUMULATED_SIZE (default: 2147483648 = 2 GB, Log4j2: IfAccumulatedFileSize)
- *   - WAZUH_STANDALONE_LOG_COMPRESSION_ENABLED  (default: true)
- *   - WAZUH_STANDALONE_LOG_COMPRESSION_LEVEL    (default: 5, gzip level 0-9)
+ *   - GUARDSARM_STANDALONE_LOG_LEVEL                (default: "info")
+ *   - GUARDSARM_STANDALONE_LOG_FILE_PATH            (default: /var/log/guardsarm-indexer/guardsarm-engine.log)
+ *   - GUARDSARM_STANDALONE_LOG_ROTATION_ENABLED     (default: true)
+ *   - GUARDSARM_STANDALONE_LOG_MAX_FILE_SIZE        (default: 134217728 = 128 MB, Log4j2: SizeBasedTriggeringPolicy)
+ *   - GUARDSARM_STANDALONE_LOG_ROTATION_HOUR        (default: 0 = midnight, Log4j2: TimeBasedTriggeringPolicy)
+ *   - GUARDSARM_STANDALONE_LOG_ROTATION_MINUTE      (default: 0, Log4j2: TimeBasedTriggeringPolicy)
+ *   - GUARDSARM_STANDALONE_LOG_MAX_FILES            (default: 7, Log4j2: DefaultRolloverStrategy max)
+ *   - GUARDSARM_STANDALONE_LOG_MAX_ACCUMULATED_SIZE (default: 2147483648 = 2 GB, Log4j2: IfAccumulatedFileSize)
+ *   - GUARDSARM_STANDALONE_LOG_COMPRESSION_ENABLED  (default: true)
+ *   - GUARDSARM_STANDALONE_LOG_COMPRESSION_LEVEL    (default: 5, gzip level 0-9)
  *
  * See implementation for detailed Log4j2 policy mapping table.
  *
@@ -302,16 +302,16 @@ extern "C"
 /**
  * @brief Get the default logging tag string.
  *
- * @return constexpr const char* The default tag ("wazuh-manager-analysisd").
+ * @return constexpr const char* The default tag ("guardsarm-manager-analysisd").
  */
 constexpr inline const char* default_tag()
 {
-    return "wazuh-manager-analysisd";
+    return "guardsarm-manager-analysisd";
 }
 
 /**
  * @brief Dispatches a fully composed log message to either spdlog (standalone)
- *        or the Wazuh logging callback (integrated mode).
+ *        or the GuardSarm logging callback (integrated mode).
  *
  * @param lvl      spdlog severity level (trace, debug, info, warn, err, critical).
  * @param file     Source file path of the logging call (typically `__FILE__`).
@@ -320,7 +320,7 @@ constexpr inline const char* default_tag()
  * @param text     Fully composed message to log; treated as literal data in both modes.
  *
  * @note This function assumes the logger has already been initialized in standalone mode
- *       (see `getDefaultLogger()`), and that the Wazuh logging symbols are available in
+ *       (see `getDefaultLogger()`), and that the GuardSarm logging symbols are available in
  *       callback mode. It does not perform formatting; callers should preformat when needed.
  *
  * @see isStandaloneModeEnable(), getDefaultLogger(), log_bridge()
@@ -373,10 +373,10 @@ inline bool should_log(logging::Level lvl)
         return getDefaultLogger()->should_log(SEVERITY_LEVEL.at(lvl));
     }
 
-    // If libwazuhshared is not loaded (e.g. unit tests that run in non-standalone mode),
+    // If libguardsarmshared is not loaded (e.g. unit tests that run in non-standalone mode),
     // mirror backend_log()'s Log::Logger::* fallback: those functions already guard with
     // if (GLOBAL_LOG_FUNCTION) and silently discard when unset, treating it as debug-level 0.
-    if (!base::libwazuhshared::isInitialized())
+    if (!base::libguardsarmshared::isInitialized())
     {
         switch (lvl)
         {
@@ -388,7 +388,7 @@ inline bool should_log(logging::Level lvl)
 
     // Cache the function pointer — calling getFunction() (dlsym) on every log check is too slow.
     using IsDebugFnType = int (*)();
-    static const IsDebugFnType isDebugFn = base::libwazuhshared::getFunction<IsDebugFnType>("isDebug");
+    static const IsDebugFnType isDebugFn = base::libguardsarmshared::getFunction<IsDebugFnType>("isDebug");
     const int debugLevel = isDebugFn();
 
     switch (lvl)
@@ -472,7 +472,7 @@ constexpr logging::Level verbosityToLevel(int v)
 void applyLevelStandalone(logging::Level target, int debugCount);
 
 /**
- * @brief Applies the effective log level when running in Wazuh callback mode, honoring CLI -d priority.
+ * @brief Applies the effective log level when running in GuardSarm callback mode, honoring CLI -d priority.
  *
  * @param target         Target log level when no -d is provided (i.e., when debugCount == 0). Typically
  *                       obtained from configuration; ignored if debugCount > 0.
@@ -480,14 +480,14 @@ void applyLevelStandalone(logging::Level target, int debugCount);
  *
  * @throw std::runtime_error If the `nowDebug` symbol cannot be resolved when the effective level is Debug/Trace.
  */
-void applyLevelWazuh(logging::Level target, int debugCount);
+void applyLevelGuardSarm(logging::Level target, int debugCount);
 
 /**
  * @brief Creates a spdlog-based logging function compatible with GLOBAL_LOG_FUNCTION signature
  *        for use in standalone mode.
  *
  * This function returns a logging function that uses spdlog internally and is compatible
- * with the GLOBAL_LOG_FUNCTION signature used throughout the Wazuh codebase.
+ * with the GLOBAL_LOG_FUNCTION signature used throughout the GuardSarm codebase.
  *
  * @return A function that can be used to log messages using spdlog in standalone mode.
  *         The returned function has the signature:

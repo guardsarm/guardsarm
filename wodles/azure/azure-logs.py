@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ###
-# Integration of Wazuh agent with Microsoft Azure
+# Integration of GuardSarm agent with Microsoft Azure
 # Copyright (C) 2015, Wazuh Inc.
 #
 # This program is free software; you can redistribute it and/or modify

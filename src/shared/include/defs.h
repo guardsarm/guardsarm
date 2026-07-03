@@ -66,18 +66,34 @@
 #define DATE_LENGTH     64                        /* Format date time %D %T           */
 #define OS_MAX_LOG_SIZE OS_MAXSTR - OS_LOG_HEADER /* Maximum log size with a header protection */
 
-/* Some global names */
-#define __wazuh_name    "Wazuh"
-#define __wazuh_version "v5.0.1"
+/* Some global names
+ *
+ * FROZEN backward-compatibility literals -- DO NOT route these through the
+ * GuardSarm branding layer and DO NOT bulk-rename them. __guardsarm_name and
+ * __guardsarm_version are consumed by wire/DB/metadata code paths that must remain
+ * interoperable with existing GuardSarm agents and stored records:
+ *   - remoted_op.c   : parses an agent's keepalive line via strstr(line, __guardsarm_name)
+ *   - guardsarmdb_queries_op.c : builds the agent `version` DB field "<name> <ver>"
+ *   - file_op.c      : composes stored OS/version metadata strings
+ *   - executionContext.hpp : builds the content-server HTTP User-Agent from __guardsarm_version
+ *   - enrollment/upgrade    : on-wire version (locally #undef'd to "v5.0.0" in protocol files)
+ * User-visible branding lives in the PRODUCT_* macros (branding.h), NOT here. */
+#define __guardsarm_name    "GuardSarm"       /* FROZEN: wire/DB/metadata literal -- see note above */
+#define __guardsarm_version "v5.0.1"      /* FROZEN: version compat literal -- see note above */
 #define __author        "Wazuh Inc."
-#define __contact       "info@wazuh.com"
-#define __site          "http://www.wazuh.com"
+#define __contact       "info@guardsarm.com"
+#define __site          "http://www.guardsarm.com"
 #define __license                                                                                                      \
     "\
 This program is free software; you can redistribute it and/or modify\n\
 it under the terms of the GNU General Public License (version 2) as \n\
 published by the Free Software Foundation. For more details, go to \n\
 https://www.gnu.org/licenses/gpl.html\n"
+
+/* GuardSarm user-visible branding layer (PRODUCT_* display macros). Included
+ * after the frozen literals above so PRODUCT_VERSION can fall back to
+ * __guardsarm_version when branding.json defines no display product_version. */
+#include "branding.h"
 
 /* Maximum allowed PID */
 #define MAX_PID 32768
@@ -93,7 +109,7 @@ https://www.gnu.org/licenses/gpl.html\n"
 
 /* User Configuration */
 #ifndef USER
-#define USER "wazuh"
+#define USER "guardsarm"
 #endif
 
 #ifndef ROOTUSER
@@ -101,7 +117,7 @@ https://www.gnu.org/licenses/gpl.html\n"
 #endif
 
 #ifndef GROUPGLOBAL
-#define GROUPGLOBAL "wazuh"
+#define GROUPGLOBAL "guardsarm"
 #endif
 
 // Standard super user UID and GID
@@ -109,12 +125,12 @@ https://www.gnu.org/licenses/gpl.html\n"
 
 #define ROOT_GID (0)
 
-// Wazuh home environment variable (target-specific to avoid clashes on
+// GuardSarm home environment variable (target-specific to avoid clashes on
 // co-hosted manager + agent installs).
 #ifdef CLIENT
-#define WAZUH_HOME_ENV "WAZUH_AGENT_HOME"
+#define GUARDSARM_HOME_ENV "GUARDSARM_AGENT_HOME"
 #else
-#define WAZUH_HOME_ENV "WAZUH_MANAGER_HOME"
+#define GUARDSARM_HOME_ENV "GUARDSARM_MANAGER_HOME"
 #endif
 
 /* Default queue */
@@ -174,7 +190,7 @@ https://www.gnu.org/licenses/gpl.html\n"
 #define DEFAULT_GROUP "default"
 
 /* Syscollector normalization configs */
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 #ifdef WIN32
 #define SYSCOLLECTOR_NORM_CONFIG_DISK_PATH ".\\norm_config.json"
 #else
@@ -182,7 +198,7 @@ https://www.gnu.org/licenses/gpl.html\n"
 #endif // WIN32
 #else
 #define SYSCOLLECTOR_NORM_CONFIG_DISK_PATH "queue/syscollector/norm_config.json"
-#endif // WAZUH_UNIT_TESTING
+#endif // GUARDSARM_UNIT_TESTING
 
 #if defined(__MACH__)
 #define SYSCOLLECTOR_NORM_TYPE "macos"
@@ -193,7 +209,7 @@ https://www.gnu.org/licenses/gpl.html\n"
 #endif // __MACH__
 
 /* Syscollector db directory */
-#ifndef WAZUH_UNIT_TESTING
+#ifndef GUARDSARM_UNIT_TESTING
 #define SYSCOLLECTOR_DB_DISK_PATH "queue/syscollector/db/local.db"
 #else
 #ifndef WIN32
@@ -201,9 +217,9 @@ https://www.gnu.org/licenses/gpl.html\n"
 #else
 #define SYSCOLLECTOR_DB_DISK_PATH ".\\local.db"
 #endif // WIN32
-#endif // WAZUH_UNIT_TESTING
+#endif // GUARDSARM_UNIT_TESTING
 
-/* Wazuh Database */
+/* GuardSarm Database */
 #define WDB_DIR              "var/db"
 #define WDB2_DIR             "queue/db"
 #define WDB_GLOB_NAME        "global"
@@ -244,16 +260,16 @@ https://www.gnu.org/licenses/gpl.html\n"
 /* Internal definitions files */
 #ifndef WIN32
 #ifdef CLIENT
-#define WAZUH_DEFINES  "etc/internal_options.conf"
-#define WAZUH_LDEFINES "etc/local_internal_options.conf"
+#define GUARDSARM_DEFINES  "etc/internal_options.conf"
+#define GUARDSARM_LDEFINES "etc/local_internal_options.conf"
 #else
 /* Manager: defaults live in code via getDefine_Int_default(); only the
- * user-overrides file is needed. WAZUH_DEFINES is intentionally not defined. */
-#define WAZUH_LDEFINES "etc/wazuh-manager-internal-options.conf"
+ * user-overrides file is needed. GUARDSARM_DEFINES is intentionally not defined. */
+#define GUARDSARM_LDEFINES "etc/guardsarm-manager-internal-options.conf"
 #endif
 #else
-#define WAZUH_DEFINES  "internal_options.conf"
-#define WAZUH_LDEFINES "local_internal_options.conf"
+#define GUARDSARM_DEFINES  "internal_options.conf"
+#define GUARDSARM_LDEFINES "local_internal_options.conf"
 #endif
 
 /* Authentication keys file */
@@ -300,27 +316,27 @@ https://www.gnu.org/licenses/gpl.html\n"
 
 /* Built-in defines */
 
-#ifndef WAZUHCONF
+#ifndef GUARDSARMCONF
 #ifndef WIN32
 #ifdef CLIENT
-#define WAZUHCONF "etc/ossec.conf"
+#define GUARDSARMCONF "etc/ossec.conf"
 #else
-#define WAZUHCONF "etc/wazuh-manager.conf"
+#define GUARDSARMCONF "etc/guardsarm-manager.conf"
 #endif
 #else
-#define WAZUHCONF "ossec.conf"
+#define GUARDSARMCONF "ossec.conf"
 #endif
 #endif
 
-#ifndef WAZUHCONFIG
+#ifndef GUARDSARMCONFIG
 #ifndef WIN32
 #ifdef CLIENT
-#define WAZUHCONFIG "ossec_config"
+#define GUARDSARMCONFIG "ossec_config"
 #else
-#define WAZUHCONFIG "wazuh_config"
+#define GUARDSARMCONFIG "guardsarm_config"
 #endif
 #else
-#define WAZUHCONFIG "ossec_config"
+#define GUARDSARMCONFIG "ossec_config"
 #endif
 #endif
 

@@ -1,3 +1,19 @@
+GuardSarm
+Copyright (C) 2026 GuardSarm, Inc.
+
+GuardSarm is a fork of the GuardSarm security platform. It builds on the work of
+everyone who contributed to GuardSarm and, before it, to OSSEC. The complete
+upstream contributor history below is retained in full. GuardSarm-specific
+contributors are added here without removing any prior attribution.
+
+-GuardSarm
+  - (add GuardSarm contributors here)
+
+
+---
+The following contributor history is retained from the upstream GuardSarm and
+OSSEC projects.
+
 OSSEC
 Copyright (C) 2014 Trend Micro Inc.
 

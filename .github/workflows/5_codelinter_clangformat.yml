@@ -10,8 +10,8 @@ on:
       - src/shared_modules/indexer_connector/**
       - src/shared_modules/content_manager/**
       - src/shared_modules/utils/**
-      - src/wazuh_modules/inventory_sync/**
-      - src/wazuh_modules/vulnerability_scanner/**
+      - src/guardsarm_modules/inventory_sync/**
+      - src/guardsarm_modules/vulnerability_scanner/**
       - .github/workflows/5_codelinter_clangformat.yml
       - .github/actions/clang_format/**
 
@@ -59,7 +59,7 @@ jobs:
         continue-on-error: true
         uses: ./.github/actions/clang_format
         with:
-          path: src/wazuh_modules/inventory_sync
+          path: src/guardsarm_modules/inventory_sync
           id: inventory_sync
 
       - name: Vulnerability scanner - Coding style
@@ -67,7 +67,7 @@ jobs:
         continue-on-error: true
         uses: ./.github/actions/clang_format
         with:
-          path: src/wazuh_modules/vulnerability_scanner
+          path: src/guardsarm_modules/vulnerability_scanner
           id: vulnerability_scanner
 
       - name: Utils - Coding style

@@ -1,5 +1,5 @@
 /*
- * Wazuh DBSYNC
+ * GuardSarm DBSYNC
  * Copyright (C) 2015, Wazuh Inc.
  * June 11, 2020.
  *

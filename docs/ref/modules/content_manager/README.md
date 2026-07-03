@@ -1,6 +1,6 @@
 # Content Manager
 
-The Content Manager is a shared library that fetches CTI (Cyber Threat Intelligence) data from the Wazuh Indexer and delivers it page-by-page to a registered callback. It is used by the Vulnerability Scanner to keep its local CVE database up to date.
+The Content Manager is a shared library that fetches CTI (Cyber Threat Intelligence) data from the GuardSarm Indexer and delivers it page-by-page to a registered callback. It is used by the Vulnerability Scanner to keep its local CVE database up to date.
 
 Source: `src/shared_modules/content_manager/`
 
@@ -14,7 +14,7 @@ IndexerDownloader  →  UpdateIndexerCursor
 
 **IndexerDownloader** — fetches CVE documents from the Indexer using Point-In-Time (PIT) pagination:
 
-- **Initial load** (no cursor stored): fetches all documents from `.wazuh-threatintel-vulnerabilities` using `match_all`, sorted by `(offset, _id)`, paginated with PIT + `search_after`.
+- **Initial load** (no cursor stored): fetches all documents from `.guardsarm-threatintel-vulnerabilities` using `match_all`, sorted by `(offset, _id)`, paginated with PIT + `search_after`.
 - **Incremental update** (cursor stored): fetches only documents where `offset > lastCursor`.
 - Supports parallel sliced PIT (`numSlices`) to speed up the initial load.
 - If `consumerStatusIndex` is configured, the downloader polls the consumer status document and waits until the status is `idle` before starting.
@@ -32,12 +32,12 @@ IndexerDownloader  →  UpdateIndexerCursor
 
 | Index | Role |
 |-------|------|
-| `.wazuh-threatintel-vulnerabilities` | CVE documents (source of feed data) |
-| `.wazuh-cti-consumers` | Consumer status document polled before each update |
+| `.guardsarm-threatintel-vulnerabilities` | CVE documents (source of feed data) |
+| `.guardsarm-cti-consumers` | Consumer status document polled before each update |
 
 ## Configuration
 
-The module is configured programmatically by its caller (the Vulnerability Scanner engine), not via `wazuh-manager.conf` directly. Relevant parameters:
+The module is configured programmatically by its caller (the Vulnerability Scanner engine), not via `guardsarm-manager.conf` directly. Relevant parameters:
 
 | Parameter | Description |
 |-----------|-------------|

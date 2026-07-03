@@ -22,10 +22,10 @@
 #include "wrappers/libc/stdio_wrappers.h"
 #include "wrappers/libc/stdlib_wrappers.h"
 #include "wrappers/posix/unistd_wrappers.h"
-#include "wrappers/wazuh/shared/audit_op_wrappers.h"
-#include "wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "wrappers/wazuh/shared/file_op_wrappers.h"
-#include "wrappers/wazuh/syscheckd/audit_parse_wrappers.h"
+#include "wrappers/guardsarm/shared/audit_op_wrappers.h"
+#include "wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "wrappers/guardsarm/shared/file_op_wrappers.h"
+#include "wrappers/guardsarm/syscheckd/audit_parse_wrappers.h"
 
 
 #define PERMS (AUDIT_PERM_WRITE | AUDIT_PERM_ATTR)

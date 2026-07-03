@@ -7,7 +7,7 @@ copyright: Copyright (C) 2015-2024, Wazuh Inc.
 
 type: integration
 
-brief: A Wazuh cluster is a group of Wazuh managers that work together to enhance the availability
+brief: A GuardSarm cluster is a group of GuardSarm managers that work together to enhance the availability
        and scalability of the service. These tests will check the agent enrollment in a multi-server
        environment and how the agent manages the connections to the servers depending on their status.
 
@@ -18,9 +18,9 @@ targets:
     - agent
 
 daemons:
-    - wazuh-agentd
-    - wazuh-manager-authd
-    - wazuh-manager-remoted
+    - guardsarm-agentd
+    - guardsarm-manager-authd
+    - guardsarm-manager-remoted
 
 os_platform:
     - linux
@@ -42,7 +42,7 @@ os_version:
     - Windows Server 2016
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/registering/index.html
+    - https://documentation.guardsarm.com/current/user-manual/registering/index.html
 
 tags:
     - enrollment
@@ -51,16 +51,16 @@ import pytest
 from pathlib import Path
 import sys
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.constants.platforms import WINDOWS
-from wazuh_testing.constants.ports import DEFAULT_SSL_REMOTE_CONNECTION_PORT
-from wazuh_testing.modules.agentd.configuration import AGENTD_DEBUG, AGENTD_WINDOWS_DEBUG, AGENTD_TIMEOUT
-from wazuh_testing.modules.agentd.patterns import *
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.tools.simulators.authd_simulator import AuthdSimulator
-from wazuh_testing.utils import callbacks
-from wazuh_testing.utils.client_keys import add_client_keys_entry
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.constants.platforms import WINDOWS
+from guardsarm_testing.constants.ports import DEFAULT_SSL_REMOTE_CONNECTION_PORT
+from guardsarm_testing.modules.agentd.configuration import AGENTD_DEBUG, AGENTD_WINDOWS_DEBUG, AGENTD_TIMEOUT
+from guardsarm_testing.modules.agentd.patterns import *
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.tools.simulators.authd_simulator import AuthdSimulator
+from guardsarm_testing.utils import callbacks
+from guardsarm_testing.utils.client_keys import add_client_keys_entry
+from guardsarm_testing.utils.configuration import get_test_cases_data, load_configuration_template
 
 from . import CONFIGS_PATH, TEST_CASES_PATH
 
@@ -68,7 +68,7 @@ from . import CONFIGS_PATH, TEST_CASES_PATH
 pytestmark = [pytest.mark.agent, pytest.mark.linux, pytest.mark.win32, pytest.mark.tier(level=0)]
 
 # Configuration and cases data.
-configs_path = Path(CONFIGS_PATH, 'wazuh_conf.yaml')
+configs_path = Path(CONFIGS_PATH, 'guardsarm_conf.yaml')
 cases_path = Path(TEST_CASES_PATH, 'cases_reconnection_protocol.yaml')
 
 # Test configurations.
@@ -94,14 +94,14 @@ How does this test work:
     - LOG_MONITOR_STR: (list of lists) Expected string to be monitored for each simulator
 """
 @pytest.mark.parametrize('test_configuration, test_metadata', zip(test_configuration, test_metadata), ids=test_cases_ids)
-def test_agentd_multi_server(test_configuration, test_metadata, set_wazuh_configuration, configure_local_internal_options, truncate_monitored_files,
+def test_agentd_multi_server(test_configuration, test_metadata, set_guardsarm_configuration, configure_local_internal_options, truncate_monitored_files,
                              remove_keys_file, start_remoted_simulators, daemons_handler):
     '''
     description: Check the agent's enrollment and connection to a manager in a multi-server environment.
                  Initialize an environment with multiple simulated servers in which the agent is forced to enroll
                  under different test conditions, verifying the agent's behavior through its log files.
 
-    wazuh_min_version: 4.2.0
+    guardsarm_min_version: 4.2.0
 
     tier: 0
 
@@ -112,7 +112,7 @@ def test_agentd_multi_server(test_configuration, test_metadata, set_wazuh_config
         - test_metadata:
             type: data
             brief: Configuration cases.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Configure a custom environment for testing.
         - configure_local_internal_options:
@@ -129,13 +129,13 @@ def test_agentd_multi_server(test_configuration, test_metadata, set_wazuh_config
             brief: Starts remoted simulators as requested
         - daemons_handler:
             type: fixture
-            brief: Handler of Wazuh daemons.
+            brief: Handler of GuardSarm daemons.
 
     assertions:
-        - Agent without keys. Verify that all servers will refuse the connection to the 'wazuh-manager-remoted' daemon
+        - Agent without keys. Verify that all servers will refuse the connection to the 'guardsarm-manager-remoted' daemon
           but will accept enrollment. The agent should try to connect and enroll each of them.
         - Agent without keys. Verify that the first server only has enrollment available, and the third server
-          only has the 'wazuh-manager-remoted' daemon available. The agent should enroll in the first server and
+          only has the 'guardsarm-manager-remoted' daemon available. The agent should enroll in the first server and
           connect to the third one.
         - Agent without keys. Verify that the agent should enroll and connect to the first server, and then
           the first server will disconnect. The agent should connect to the second server with the same key.
@@ -147,7 +147,7 @@ def test_agentd_multi_server(test_configuration, test_metadata, set_wazuh_config
           third servers are not responding. The agent on disconnection should try the second and third servers
           and go back finally to the first server.
 
-    input_description: An external YAML file (wazuh_conf.yaml) includes configuration settings for the agent.
+    input_description: An external YAML file (guardsarm_conf.yaml) includes configuration settings for the agent.
                        Different test cases are found in the test module and include parameters for
                        the environment setup, the requests to be made, and the expected result.
 
@@ -178,7 +178,7 @@ def test_agentd_multi_server(test_configuration, test_metadata, set_wazuh_config
                 add_client_keys_entry("001", "ubuntu-agent", "any", "SuperSecretKey")
 
         # Start FileMonitor
-        log_monitor = FileMonitor(WAZUH_LOG_PATH)
+        log_monitor = FileMonitor(GUARDSARM_LOG_PATH)
 
         # Iterate the servers from which we are expecting logs
         for server in range(len(test_metadata['LOG_MONITOR_STR'])):

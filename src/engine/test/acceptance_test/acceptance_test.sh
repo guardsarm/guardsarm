@@ -2,7 +2,7 @@
 # =============================================================================
 # acceptance_test.sh – Engine benchmark harness
 #
-# Runs the wazuh-engine benchmark for each requested thread count.
+# Runs the guardsarm-engine benchmark for each requested thread count.
 # For every iteration it:
 #   1. Stops the manager (if running).
 #   2. Launches analysisd with N orchestrator threads.
@@ -24,7 +24,7 @@ UTILS_DIR="${SCRIPT_DIR}/utils"
 # ---------------------------------------------------------------------------
 # Defaults (all overridable via environment or flags)
 # ---------------------------------------------------------------------------
-: "${WAZUH_HOME:=/var/wazuh-manager}"
+: "${GUARDSARM_HOME:=/var/guardsarm-manager}"
 
 # Comma-separated list of thread counts to test (e.g. "1,2,4,8")
 : "${THREAD_LIST:=1}"
@@ -37,7 +37,7 @@ UTILS_DIR="${SCRIPT_DIR}/utils"
 
 # Output file watched by the benchmark tool.
 # Streamlog output is namespace-dependent; benchmarks default to the standard namespace.
-: "${BT_OUTPUT:=${WAZUH_HOME}/logs/standard-wazuh-events-v5/standard-wazuh-events-v5.json}"
+: "${BT_OUTPUT:=${GUARDSARM_HOME}/logs/standard-guardsarm-events-v5/standard-guardsarm-events-v5.json}"
 
 # Grace period (seconds) before & after benchmark
 : "${GRACE_SECS:=5}"
@@ -55,16 +55,16 @@ UTILS_DIR="${SCRIPT_DIR}/utils"
 : "${RESULTS_DIR:=${SCRIPT_DIR}/results}"
 
 # Analysisd log file
-ANALYSISD_LOG="${WAZUH_HOME}/logs/wazuh-manager.log"
+ANALYSISD_LOG="${GUARDSARM_HOME}/logs/guardsarm-manager.log"
 
 # Analysisd binary
-ANALYSISD_BIN="${WAZUH_HOME}/bin/wazuh-manager-analysisd"
+ANALYSISD_BIN="${GUARDSARM_HOME}/bin/guardsarm-manager-analysisd"
 
 # Manager control
-MANAGER_CTL="${WAZUH_HOME}/bin/wazuh-manager-control"
+MANAGER_CTL="${GUARDSARM_HOME}/bin/guardsarm-manager-control"
 
 # Analysis socket for route check
-ANALYSIS_SOCK="${WAZUH_HOME}/queue/sockets/analysis"
+ANALYSIS_SOCK="${GUARDSARM_HOME}/queue/sockets/analysis"
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -90,15 +90,15 @@ cleanup() {
     rm -f "${MONITOR_PIDFILE:-}" 2>/dev/null || true
 
     # Stop analysisd if running
-    if pgrep -x "wazuh-manager-analysisd" > /dev/null 2>&1; then
+    if pgrep -x "guardsarm-manager-analysisd" > /dev/null 2>&1; then
         log "Cleanup: stopping analysisd..."
         "${MANAGER_CTL}" stop 2>/dev/null || true
         local tries=0
-        while pgrep -x "wazuh-manager-analysisd" > /dev/null 2>&1; do
+        while pgrep -x "guardsarm-manager-analysisd" > /dev/null 2>&1; do
             sleep 1
             tries=$((tries + 1))
             if [[ $tries -ge 15 ]]; then
-                pkill -SIGTERM -f "wazuh-manager-analysisd" 2>/dev/null || true
+                pkill -SIGTERM -f "guardsarm-manager-analysisd" 2>/dev/null || true
                 break
             fi
         done
@@ -111,17 +111,17 @@ cleanup() {
 trap cleanup EXIT
 
 stop_manager() {
-    if pgrep -x "wazuh-manager-analysisd" > /dev/null 2>&1; then
+    if pgrep -x "guardsarm-manager-analysisd" > /dev/null 2>&1; then
         log "Stopping manager..."
         "${MANAGER_CTL}" stop 2>/dev/null || true
         # Wait until analysisd is actually gone
         local tries=0
-        while pgrep -x "wazuh-manager-analysisd" > /dev/null 2>&1; do
+        while pgrep -x "guardsarm-manager-analysisd" > /dev/null 2>&1; do
             sleep 1
             tries=$((tries + 1))
             if [[ $tries -ge 30 ]]; then
                 log "Force-killing analysisd"
-                pkill -9 -x "wazuh-manager-analysisd" || true
+                pkill -9 -x "guardsarm-manager-analysisd" || true
                 sleep 1
                 break
             fi
@@ -132,14 +132,14 @@ stop_manager() {
     fi
 
     # Clean up stale KVDB lock files left by a previous crash
-    if find "${WAZUH_HOME}/engine" -name "LOCK" -type f 2>/dev/null | grep -q .; then
+    if find "${GUARDSARM_HOME}/engine" -name "LOCK" -type f 2>/dev/null | grep -q .; then
         log "Removing stale KVDB lock files from engine..."
-        find "${WAZUH_HOME}/engine" -name "LOCK" -type f -delete 2>/dev/null || true
+        find "${GUARDSARM_HOME}/engine" -name "LOCK" -type f -delete 2>/dev/null || true
     fi
 
-    if find "${WAZUH_HOME}/queue" -name "LOCK" -type f 2>/dev/null | grep -q .; then
+    if find "${GUARDSARM_HOME}/queue" -name "LOCK" -type f 2>/dev/null | grep -q .; then
         log "Removing stale KVDB lock files from queue..."
-        find "${WAZUH_HOME}/queue" -name "LOCK" -type f -delete 2>/dev/null || true
+        find "${GUARDSARM_HOME}/queue" -name "LOCK" -type f -delete 2>/dev/null || true
     fi
 }
 
@@ -150,7 +150,7 @@ start_analysisd() {
     # Truncate the log so we only see fresh messages
     : > "${ANALYSISD_LOG}"
 
-    WAZUH_ORCHESTRATOR_THREADS="${threads}" "${ANALYSISD_BIN}" &
+    GUARDSARM_ORCHESTRATOR_THREADS="${threads}" "${ANALYSISD_BIN}" &
     ANALYSISD_PID=$!
     log "analysisd launched (PID ${ANALYSISD_PID})."
 }
@@ -194,7 +194,7 @@ start_monitor() {
 
     log "Starting monitor -> ${csv_file}"
     python3 "${UTILS_DIR}/monitor.py" \
-        -n wazuh-manager-analysisd \
+        -n guardsarm-manager-analysisd \
         -o "${csv_file}" \
         -s "${MONITOR_INTERVAL}" \
         --pidfile "${pidfile}" &
@@ -249,11 +249,11 @@ stop_analysisd() {
     log "Stopping analysisd..."
     "${MANAGER_CTL}" stop 2>/dev/null || true
     local tries=0
-    while pgrep -x "wazuh-manager-analysisd" > /dev/null 2>&1; do
+    while pgrep -x "guardsarm-manager-analysisd" > /dev/null 2>&1; do
         sleep 1
         tries=$((tries + 1))
         if [[ $tries -ge 30 ]]; then
-            pkill -9 -x "wazuh-manager-analysisd" || true
+            pkill -9 -x "guardsarm-manager-analysisd" || true
             break
         fi
     done

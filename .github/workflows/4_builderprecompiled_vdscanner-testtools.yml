@@ -7,7 +7,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
 env:
-  TOOLS_DIR: ${{github.workspace}}/src/wazuh_modules/vulnerability_scanner/build/testtool/
+  TOOLS_DIR: ${{github.workspace}}/src/guardsarm_modules/vulnerability_scanner/build/testtool/
   TOOLS_FILE_NAME: legacy_vdscanner_testtools
 
 jobs:

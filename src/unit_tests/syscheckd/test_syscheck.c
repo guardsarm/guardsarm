@@ -15,12 +15,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/shared/fs_op_wrappers.h"
-#include "../wrappers/wazuh/shared/validate_op_wrappers.h"
-#include "../wrappers/wazuh/shared/agent_op_wrappers.h"
-#include "../wrappers/wazuh/syscheckd/create_db_wrappers.h"
-#include "../wrappers/wazuh/syscheckd/fim_db_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/fs_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/validate_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/agent_op_wrappers.h"
+#include "../wrappers/guardsarm/syscheckd/create_db_wrappers.h"
+#include "../wrappers/guardsarm/syscheckd/fim_db_wrappers.h"
 
 #include "syscheck.h"
 #include "cJSON.h"

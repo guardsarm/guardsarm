@@ -3,7 +3,7 @@
  * data race.
  *
  * SchemaValidatorFactory is a process-wide singleton initialized from several
- * modules running in the same wazuh-modulesd process (syscollector, sca), each with a check-then-act guard
+ * modules running in the same guardsarm-modulesd process (syscollector, sca), each with a check-then-act guard
  * (if (!isInitialized()) initialize();) living outside the factory. Before the
  * fix the factory had no synchronization, so concurrent initialize() calls
  * mutated the same std::map at the same time (undefined behaviour): a validator
@@ -33,23 +33,23 @@ namespace
     // embedded instead of hard-coding a fixed count.
     const std::vector<std::string> kCandidateIndices =
     {
-        "wazuh-states-inventory-system",
-        "wazuh-states-inventory-hardware",
-        "wazuh-states-inventory-hotfixes",
-        "wazuh-states-inventory-packages",
-        "wazuh-states-inventory-processes",
-        "wazuh-states-inventory-ports",
-        "wazuh-states-inventory-interfaces",
-        "wazuh-states-inventory-protocols",
-        "wazuh-states-inventory-networks",
-        "wazuh-states-inventory-users",
-        "wazuh-states-inventory-groups",
-        "wazuh-states-inventory-services",
-        "wazuh-states-inventory-browser-extensions",
-        "wazuh-states-fim-files",
-        "wazuh-states-fim-registry-keys",
-        "wazuh-states-fim-registry-values",
-        "wazuh-states-sca",
+        "guardsarm-states-inventory-system",
+        "guardsarm-states-inventory-hardware",
+        "guardsarm-states-inventory-hotfixes",
+        "guardsarm-states-inventory-packages",
+        "guardsarm-states-inventory-processes",
+        "guardsarm-states-inventory-ports",
+        "guardsarm-states-inventory-interfaces",
+        "guardsarm-states-inventory-protocols",
+        "guardsarm-states-inventory-networks",
+        "guardsarm-states-inventory-users",
+        "guardsarm-states-inventory-groups",
+        "guardsarm-states-inventory-services",
+        "guardsarm-states-inventory-browser-extensions",
+        "guardsarm-states-fim-files",
+        "guardsarm-states-fim-registry-keys",
+        "guardsarm-states-fim-registry-values",
+        "guardsarm-states-sca",
     };
 
     std::vector<std::string> reachableIndices(SchemaValidatorFactory& factory)

@@ -1990,7 +1990,7 @@ TEST_F(IndexerConnectorSyncTest, ExecuteUpdateByQuerySuccess)
 
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
 
-    std::vector<std::string> indices = {"wazuh-states-fim-files", "wazuh-states-sca"};
+    std::vector<std::string> indices = {"guardsarm-states-fim-files", "guardsarm-states-sca"};
     bool notifyCalled = false;
 
     // Setup expectations
@@ -2002,7 +2002,7 @@ TEST_F(IndexerConnectorSyncTest, ExecuteUpdateByQuerySuccess)
 
     // Build a sample update query (simulating what inventory_sync would build)
     nlohmann::json updateQuery;
-    updateQuery["query"]["bool"]["must"][0]["term"]["wazuh.agent.id"] = "agent-001";
+    updateQuery["query"]["bool"]["must"][0]["term"]["guardsarm.agent.id"] = "agent-001";
     updateQuery["query"]["bool"]["should"][0]["bool"]["must_not"]["exists"]["field"] = "state.document_version";
     updateQuery["query"]["bool"]["should"][1]["range"]["state.document_version"]["lte"] = 12345;
     updateQuery["query"]["bool"]["minimum_should_match"] = 1;
@@ -2020,7 +2020,7 @@ TEST_F(IndexerConnectorSyncTest, ExecuteUpdateByQuerySuccess)
 
     // Verify the request contained the correct data
     auto requestData = nlohmann::json::parse(receivedData[0]);
-    EXPECT_EQ(requestData["query"]["bool"]["must"][0]["term"]["wazuh.agent.id"], "agent-001");
+    EXPECT_EQ(requestData["query"]["bool"]["must"][0]["term"]["guardsarm.agent.id"], "agent-001");
     EXPECT_EQ(requestData["query"]["bool"]["should"][0]["bool"]["must_not"]["exists"]["field"],
               "state.document_version");
     EXPECT_EQ(requestData["query"]["bool"]["should"][1]["range"]["state.document_version"]["lte"], 12345);
@@ -2037,7 +2037,7 @@ TEST_F(IndexerConnectorSyncTest, ExecuteUpdateByQueryError)
 
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
 
-    std::vector<std::string> indices = {"wazuh-states-fim-files"};
+    std::vector<std::string> indices = {"guardsarm-states-fim-files"};
     bool notifyCalled = false;
 
     // Setup error expectation
@@ -2076,7 +2076,7 @@ TEST_F(IndexerConnectorSyncTest, ExecuteUpdateByQueryWithRetry)
 
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
 
-    std::vector<std::string> indices = {"wazuh-states-sca"};
+    std::vector<std::string> indices = {"guardsarm-states-sca"};
     bool notifyCalled = false;
 
     // Call fails with version conflict
@@ -2097,7 +2097,7 @@ TEST_F(IndexerConnectorSyncTest, ExecuteUpdateByQueryWithRetry)
 
     // Build a sample update query
     nlohmann::json updateQuery;
-    updateQuery["query"]["term"]["wazuh.agent.id"] = "agent-003";
+    updateQuery["query"]["term"]["guardsarm.agent.id"] = "agent-003";
     updateQuery["script"]["source"] = "ctx._source.groups = params.groups";
     updateQuery["script"]["params"]["groups"] = std::vector<std::string> {"default"};
 
@@ -2134,14 +2134,14 @@ TEST_F(IndexerConnectorSyncTest, ExecuteSearchQuerySuccess)
                     nlohmann::json hit1;
                     hit1["_id"] = "doc1";
                     hit1["_source"]["checksum"]["hash"]["sha1"] = "abc123";
-                    hit1["_source"]["wazuh"]["agent"]["id"] = "001";
+                    hit1["_source"]["guardsarm"]["agent"]["id"] = "001";
                     hit1["sort"] = nlohmann::json::array({"doc1"});
                     response["hits"]["hits"].push_back(hit1);
 
                     nlohmann::json hit2;
                     hit2["_id"] = "doc2";
                     hit2["_source"]["checksum"]["hash"]["sha1"] = "def456";
-                    hit2["_source"]["wazuh"]["agent"]["id"] = "001";
+                    hit2["_source"]["guardsarm"]["agent"]["id"] = "001";
                     hit2["sort"] = nlohmann::json::array({"doc2"});
                     response["hits"]["hits"].push_back(hit2);
 
@@ -2150,19 +2150,19 @@ TEST_F(IndexerConnectorSyncTest, ExecuteSearchQuerySuccess)
             }));
 
     nlohmann::json searchQuery;
-    searchQuery["query"]["term"]["wazuh.agent.id"] = "001";
+    searchQuery["query"]["term"]["guardsarm.agent.id"] = "001";
     searchQuery["_source"] = nlohmann::json::array({"checksum.hash.sha1"});
     searchQuery["sort"] = nlohmann::json::array({nlohmann::json::object({{"checksum.hash.sha1", "asc"}})});
     searchQuery["size"] = 1000;
 
-    nlohmann::json result = connector.executeSearchQuery("wazuh-states-vulnerabilities", searchQuery);
+    nlohmann::json result = connector.executeSearchQuery("guardsarm-states-vulnerabilities", searchQuery);
 
     // Verify URL is correct
-    EXPECT_EQ(requestUrl, "mockserver:9200/wazuh-states-vulnerabilities/_search");
+    EXPECT_EQ(requestUrl, "mockserver:9200/guardsarm-states-vulnerabilities/_search");
 
     // Verify request data contains the query
     nlohmann::json parsedRequest = nlohmann::json::parse(requestData);
-    EXPECT_EQ(parsedRequest["query"]["term"]["wazuh.agent.id"], "001");
+    EXPECT_EQ(parsedRequest["query"]["term"]["guardsarm.agent.id"], "001");
     EXPECT_EQ(parsedRequest["size"], 1000);
 
     // Verify response structure
@@ -2196,13 +2196,13 @@ TEST_F(IndexerConnectorSyncTest, ExecuteSearchQueryWithSearchAfter)
             }));
 
     nlohmann::json searchQuery;
-    searchQuery["query"]["term"]["wazuh.agent.id"] = "001";
+    searchQuery["query"]["term"]["guardsarm.agent.id"] = "001";
     searchQuery["_source"] = nlohmann::json::array({"checksum.hash.sha1"});
     searchQuery["sort"] = nlohmann::json::array({nlohmann::json::object({{"checksum.hash.sha1", "asc"}})});
     searchQuery["search_after"] = nlohmann::json::array({"previous_doc_id"});
     searchQuery["size"] = 1000;
 
-    nlohmann::json result = connector.executeSearchQuery("wazuh-states-vulnerabilities", searchQuery);
+    nlohmann::json result = connector.executeSearchQuery("guardsarm-states-vulnerabilities", searchQuery);
 
     // Verify request data contains search_after
     nlohmann::json parsedRequest = nlohmann::json::parse(requestData);
@@ -2232,10 +2232,10 @@ TEST_F(IndexerConnectorSyncTest, ExecuteSearchQueryError)
             }));
 
     nlohmann::json searchQuery;
-    searchQuery["query"]["term"]["wazuh.agent.id"] = "001";
+    searchQuery["query"]["term"]["guardsarm.agent.id"] = "001";
 
     // Call should throw exception on error
-    EXPECT_THROW(connector.executeSearchQuery("wazuh-states-vulnerabilities", searchQuery), IndexerConnectorException);
+    EXPECT_THROW(connector.executeSearchQuery("guardsarm-states-vulnerabilities", searchQuery), IndexerConnectorException);
 }
 
 TEST_F(IndexerConnectorSyncTest, ExecuteSearchQueryEmptyResults)
@@ -2260,9 +2260,9 @@ TEST_F(IndexerConnectorSyncTest, ExecuteSearchQueryEmptyResults)
             }));
 
     nlohmann::json searchQuery;
-    searchQuery["query"]["term"]["wazuh.agent.id"] = "999";
+    searchQuery["query"]["term"]["guardsarm.agent.id"] = "999";
 
-    nlohmann::json result = connector.executeSearchQuery("wazuh-states-vulnerabilities", searchQuery);
+    nlohmann::json result = connector.executeSearchQuery("guardsarm-states-vulnerabilities", searchQuery);
 
     // Verify response structure with no results
     EXPECT_TRUE(result.contains("hits"));
@@ -3440,7 +3440,7 @@ TEST_F(IndexerConnectorSyncTest, CreatePointInTimeSuccess)
 
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
 
-    PointInTime pit = connector.createPointInTime({"wazuh-states-*"}, "5m", true);
+    PointInTime pit = connector.createPointInTime({"guardsarm-states-*"}, "5m", true);
     EXPECT_EQ(pit.getPitId(), "abc123pitid");
     EXPECT_EQ(pit.getCreationTime(), 1700000000000ULL);
     EXPECT_EQ(pit.getKeepAlive(), "5m");
@@ -3506,7 +3506,7 @@ TEST_F(IndexerConnectorSyncTest, CreatePointInTimeWithExpandWildcards)
             }));
 
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
-    connector.createPointInTime({"wazuh-*"}, "10m", true);
+    connector.createPointInTime({"guardsarm-*"}, "10m", true);
 
     EXPECT_THAT(capturedUrl, HasSubstr("expand_wildcards=all"));
 }
@@ -3988,7 +3988,7 @@ TEST_F(IndexerConnectorSyncTest, ExecuteSearchQueryWithPaginationSortArray)
 // =============================================================================
 // PTests for the connector-layer `isSafeIndexName` allowlist.
 // The connector refuses any index name that is empty or contains characters
-// outside [a-zA-Z0-9._*-]. Domain rules (e.g. "starts with wazuh-states-")
+// outside [a-zA-Z0-9._*-]. Domain rules (e.g. "starts with guardsarm-states-")
 // are enforced by callers, not here.
 // =============================================================================
 
@@ -3998,7 +3998,7 @@ TEST_F(IndexerConnectorSyncTest, BulkIndex_RejectsIndexWithSlash)
     EXPECT_CALL(*mockSelector, getNext()).WillRepeatedly(Return("mockserver:9200"));
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
 
-    EXPECT_THROW(connector.bulkIndex("id1", "wazuh-states-/secret", R"({"a":1})"), IndexerConnectorException);
+    EXPECT_THROW(connector.bulkIndex("id1", "guardsarm-states-/secret", R"({"a":1})"), IndexerConnectorException);
 }
 
 TEST_F(IndexerConnectorSyncTest, BulkIndex_RejectsIndexWithQuestionMark)
@@ -4007,7 +4007,7 @@ TEST_F(IndexerConnectorSyncTest, BulkIndex_RejectsIndexWithQuestionMark)
     EXPECT_CALL(*mockSelector, getNext()).WillRepeatedly(Return("mockserver:9200"));
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
 
-    EXPECT_THROW(connector.bulkIndex("id1", "wazuh-states-?q=1", R"({"a":1})"), IndexerConnectorException);
+    EXPECT_THROW(connector.bulkIndex("id1", "guardsarm-states-?q=1", R"({"a":1})"), IndexerConnectorException);
 }
 
 TEST_F(IndexerConnectorSyncTest, BulkIndex_RejectsIndexWithComma)
@@ -4016,7 +4016,7 @@ TEST_F(IndexerConnectorSyncTest, BulkIndex_RejectsIndexWithComma)
     EXPECT_CALL(*mockSelector, getNext()).WillRepeatedly(Return("mockserver:9200"));
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
 
-    EXPECT_THROW(connector.bulkIndex("id1", "wazuh-states-a,wazuh-states-b", R"({"a":1})"), IndexerConnectorException);
+    EXPECT_THROW(connector.bulkIndex("id1", "guardsarm-states-a,guardsarm-states-b", R"({"a":1})"), IndexerConnectorException);
 }
 
 TEST_F(IndexerConnectorSyncTest, BulkIndex_RejectsIndexWithNewline)
@@ -4025,19 +4025,19 @@ TEST_F(IndexerConnectorSyncTest, BulkIndex_RejectsIndexWithNewline)
     EXPECT_CALL(*mockSelector, getNext()).WillRepeatedly(Return("mockserver:9200"));
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
 
-    EXPECT_THROW(connector.bulkIndex("id1", "wazuh-states-\nfoo", R"({"a":1})"), IndexerConnectorException);
+    EXPECT_THROW(connector.bulkIndex("id1", "guardsarm-states-\nfoo", R"({"a":1})"), IndexerConnectorException);
 }
 
 TEST_F(IndexerConnectorSyncTest, BulkIndex_AcceptsSystemIndexWithDotPrefix)
 {
-    // Indexes like `.wazuh-cti-consumers` are valid OpenSearch system indices
+    // Indexes like `.guardsarm-cti-consumers` are valid OpenSearch system indices
     // used by other modules (content_manager). They must pass the safety check
     // because they contain only [a-zA-Z0-9._-].
     auto mockSelector = std::make_unique<NiceMock<MockServerSelector>>();
     EXPECT_CALL(*mockSelector, getNext()).WillRepeatedly(Return("mockserver:9200"));
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
 
-    EXPECT_NO_THROW(connector.bulkIndex("id1", ".wazuh-cti-consumers", R"({"a":1})"));
+    EXPECT_NO_THROW(connector.bulkIndex("id1", ".guardsarm-cti-consumers", R"({"a":1})"));
 }
 
 TEST_F(IndexerConnectorSyncTest, BulkDelete_RejectsIndexWithSlash)
@@ -4046,7 +4046,7 @@ TEST_F(IndexerConnectorSyncTest, BulkDelete_RejectsIndexWithSlash)
     EXPECT_CALL(*mockSelector, getNext()).WillRepeatedly(Return("mockserver:9200"));
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
 
-    EXPECT_THROW(connector.bulkDelete("id1", "wazuh-states-/secret"), IndexerConnectorException);
+    EXPECT_THROW(connector.bulkDelete("id1", "guardsarm-states-/secret"), IndexerConnectorException);
 }
 
 TEST_F(IndexerConnectorSyncTest, DeleteByQuery_RejectsUnsafeIndex_Throws)
@@ -4060,7 +4060,7 @@ TEST_F(IndexerConnectorSyncTest, DeleteByQuery_RejectsUnsafeIndex_Throws)
 
     EXPECT_CALL(mockHttpRequest, post(_, _, _)).Times(0);
 
-    EXPECT_THROW(connector.deleteByQuery("wazuh-states-/evil", "001"), IndexerConnectorException);
+    EXPECT_THROW(connector.deleteByQuery("guardsarm-states-/evil", "001"), IndexerConnectorException);
     connector.flush();
 }
 
@@ -4087,9 +4087,9 @@ TEST_F(IndexerConnectorSyncTest, DeleteByQuery_AcceptsSafeIndex_Enqueues)
                 }
             }));
 
-    connector.deleteByQuery("wazuh-states-vulnerabilities", "001");
+    connector.deleteByQuery("guardsarm-states-vulnerabilities", "001");
     connector.flush();
-    EXPECT_THAT(capturedUrl, HasSubstr("/wazuh-states-vulnerabilities/_delete_by_query"));
+    EXPECT_THAT(capturedUrl, HasSubstr("/guardsarm-states-vulnerabilities/_delete_by_query"));
 }
 
 TEST_F(IndexerConnectorSyncTest, ExecuteSearchQuery_RejectsUnsafeIndex_Throws)
@@ -4099,7 +4099,7 @@ TEST_F(IndexerConnectorSyncTest, ExecuteSearchQuery_RejectsUnsafeIndex_Throws)
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
 
     EXPECT_CALL(mockHttpRequest, post(_, _, _)).Times(0);
-    EXPECT_THROW(connector.executeSearchQuery("wazuh-states-/x", nlohmann::json::object()), IndexerConnectorException);
+    EXPECT_THROW(connector.executeSearchQuery("guardsarm-states-/x", nlohmann::json::object()), IndexerConnectorException);
 }
 
 TEST_F(IndexerConnectorSyncTest, ExecuteSearchQueryWithPagination_RejectsUnsafeIndex_Throws)
@@ -4110,7 +4110,7 @@ TEST_F(IndexerConnectorSyncTest, ExecuteSearchQueryWithPagination_RejectsUnsafeI
 
     EXPECT_CALL(mockHttpRequest, post(_, _, _)).Times(0);
     EXPECT_THROW(connector.executeSearchQueryWithPagination(
-                     "wazuh-states-/x", nlohmann::json::object(), [](const nlohmann::json&) {}),
+                     "guardsarm-states-/x", nlohmann::json::object(), [](const nlohmann::json&) {}),
                  IndexerConnectorException);
 }
 
@@ -4142,11 +4142,11 @@ TEST_F(IndexerConnectorSyncTest, ExecuteUpdateByQuery_FiltersUnsafeEntries)
     nlohmann::json q;
     q["query"]["match_all"] = nlohmann::json::object();
 
-    std::vector<std::string> indices = {"wazuh-states-fim-files", "wazuh-states-/evil", "bad name with space"};
+    std::vector<std::string> indices = {"guardsarm-states-fim-files", "guardsarm-states-/evil", "bad name with space"};
     connector.executeUpdateByQuery(indices, q);
 
     // Only the safe entry should appear in the URL path.
-    EXPECT_THAT(capturedUrl, HasSubstr("/wazuh-states-fim-files/_update_by_query"));
+    EXPECT_THAT(capturedUrl, HasSubstr("/guardsarm-states-fim-files/_update_by_query"));
     EXPECT_THAT(capturedUrl, ::testing::Not(HasSubstr("/evil")));
     EXPECT_THAT(capturedUrl, ::testing::Not(HasSubstr("bad name")));
 }
@@ -4168,7 +4168,7 @@ TEST_F(IndexerConnectorSyncTest, ExecuteUpdateByQuery_AllUnsafe_FiresPendingNoti
 
     nlohmann::json q;
     q["query"]["match_all"] = nlohmann::json::object();
-    connector.executeUpdateByQuery({"wazuh-states-/x", ""}, q);
+    connector.executeUpdateByQuery({"guardsarm-states-/x", ""}, q);
     connector.invokePendingCallbacks();
 
     EXPECT_TRUE(called);
@@ -4176,10 +4176,10 @@ TEST_F(IndexerConnectorSyncTest, ExecuteUpdateByQuery_AllUnsafe_FiresPendingNoti
 
 TEST_F(IndexerConnectorSyncTest, ExecuteUpdateByQuery_AcceptsAnyValidNameRegardlessOfPrefix)
 {
-    // The connector no longer enforces the "wazuh-states-" prefix — that domain
+    // The connector no longer enforces the "guardsarm-states-" prefix — that domain
     // rule belongs to the inventory_sync caller. The connector only refuses
     // injection-unsafe characters. Therefore an arbitrary safe name like
-    // "wazuh-other-foo" must be forwarded to the indexer.
+    // "guardsarm-other-foo" must be forwarded to the indexer.
     auto mockSelector = std::make_unique<NiceMock<MockServerSelector>>();
     EXPECT_CALL(*mockSelector, getNext()).WillRepeatedly(Return("mockserver:9200"));
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
@@ -4205,9 +4205,9 @@ TEST_F(IndexerConnectorSyncTest, ExecuteUpdateByQuery_AcceptsAnyValidNameRegardl
 
     nlohmann::json q;
     q["query"]["match_all"] = nlohmann::json::object();
-    connector.executeUpdateByQuery({"wazuh-other-foo"}, q);
+    connector.executeUpdateByQuery({"guardsarm-other-foo"}, q);
 
-    EXPECT_THAT(capturedUrl, HasSubstr("/wazuh-other-foo/_update_by_query"));
+    EXPECT_THAT(capturedUrl, HasSubstr("/guardsarm-other-foo/_update_by_query"));
 }
 
 TEST_F(IndexerConnectorSyncTest, CreatePointInTime_RejectsAnyUnsafeEntry_Throws)
@@ -4217,7 +4217,7 @@ TEST_F(IndexerConnectorSyncTest, CreatePointInTime_RejectsAnyUnsafeEntry_Throws)
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
 
     EXPECT_CALL(mockHttpRequest, post(_, _, _)).Times(0);
-    EXPECT_THROW(connector.createPointInTime({"wazuh-states-x", "wazuh-states-/x"}, "5m"), IndexerConnectorException);
+    EXPECT_THROW(connector.createPointInTime({"guardsarm-states-x", "guardsarm-states-/x"}, "5m"), IndexerConnectorException);
 }
 
 TEST_F(IndexerConnectorSyncTest, CreatePointInTime_AcceptsWildcardIndices)
@@ -4242,7 +4242,7 @@ TEST_F(IndexerConnectorSyncTest, CreatePointInTime_AcceptsWildcardIndices)
                 }
             }));
 
-    EXPECT_NO_THROW(connector.createPointInTime({"wazuh-states-*"}, "5m"));
+    EXPECT_NO_THROW(connector.createPointInTime({"guardsarm-states-*"}, "5m"));
 }
 
 TEST_F(IndexerConnectorSyncTest, Refresh_RejectsUnsafePattern)
@@ -4252,7 +4252,7 @@ TEST_F(IndexerConnectorSyncTest, Refresh_RejectsUnsafePattern)
     IndexerConnectorSyncImplTest connector(config, nullptr, &mockHttpRequest, std::move(mockSelector));
 
     EXPECT_CALL(mockHttpRequest, post(_, _, _)).Times(0);
-    EXPECT_THROW(connector.refresh("wazuh-states-/oh"), IndexerConnectorException);
+    EXPECT_THROW(connector.refresh("guardsarm-states-/oh"), IndexerConnectorException);
 }
 
 TEST_F(IndexerConnectorSyncTest, Refresh_AcceptsWildcard)
@@ -4278,8 +4278,8 @@ TEST_F(IndexerConnectorSyncTest, Refresh_AcceptsWildcard)
                 }
             }));
 
-    EXPECT_NO_THROW(connector.refresh("wazuh-states-*"));
-    EXPECT_THAT(capturedUrl, HasSubstr("/wazuh-states-*/_refresh"));
+    EXPECT_NO_THROW(connector.refresh("guardsarm-states-*"));
+    EXPECT_THAT(capturedUrl, HasSubstr("/guardsarm-states-*/_refresh"));
 }
 
 TEST_F(IndexerConnectorSyncTest, IsSafeIndexName_Allowlist)
@@ -4288,19 +4288,19 @@ TEST_F(IndexerConnectorSyncTest, IsSafeIndexName_Allowlist)
     // the documented allowlist is locked in by a regression test rather than
     // only by indirect API exercising.
     EXPECT_FALSE(isSafeIndexName(""));
-    EXPECT_FALSE(isSafeIndexName("wazuh-states-/x"));
-    EXPECT_FALSE(isSafeIndexName("wazuh-states-?q=1"));
-    EXPECT_FALSE(isSafeIndexName("wazuh-states-#x"));
-    EXPECT_FALSE(isSafeIndexName("wazuh-states-a,b"));
-    EXPECT_FALSE(isSafeIndexName("wazuh-states- "));
-    EXPECT_FALSE(isSafeIndexName("wazuh-states-\nfoo"));
-    EXPECT_FALSE(isSafeIndexName("wazuh-states-\"foo\""));
-    EXPECT_FALSE(isSafeIndexName("wazuh-states-foo\\bar"));
+    EXPECT_FALSE(isSafeIndexName("guardsarm-states-/x"));
+    EXPECT_FALSE(isSafeIndexName("guardsarm-states-?q=1"));
+    EXPECT_FALSE(isSafeIndexName("guardsarm-states-#x"));
+    EXPECT_FALSE(isSafeIndexName("guardsarm-states-a,b"));
+    EXPECT_FALSE(isSafeIndexName("guardsarm-states- "));
+    EXPECT_FALSE(isSafeIndexName("guardsarm-states-\nfoo"));
+    EXPECT_FALSE(isSafeIndexName("guardsarm-states-\"foo\""));
+    EXPECT_FALSE(isSafeIndexName("guardsarm-states-foo\\bar"));
 
-    EXPECT_TRUE(isSafeIndexName("wazuh-states-vulnerabilities"));
-    EXPECT_TRUE(isSafeIndexName("wazuh-states-inventory-system"));
-    EXPECT_TRUE(isSafeIndexName("wazuh-states-fim-files"));
-    EXPECT_TRUE(isSafeIndexName(".wazuh-cti-consumers"));
-    EXPECT_TRUE(isSafeIndexName("wazuh-states-*"));
+    EXPECT_TRUE(isSafeIndexName("guardsarm-states-vulnerabilities"));
+    EXPECT_TRUE(isSafeIndexName("guardsarm-states-inventory-system"));
+    EXPECT_TRUE(isSafeIndexName("guardsarm-states-fim-files"));
+    EXPECT_TRUE(isSafeIndexName(".guardsarm-cti-consumers"));
+    EXPECT_TRUE(isSafeIndexName("guardsarm-states-*"));
     EXPECT_TRUE(isSafeIndexName("Idx_With.MixedCase-1.2.3"));
 }

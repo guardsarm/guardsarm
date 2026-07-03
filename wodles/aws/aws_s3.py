@@ -16,9 +16,9 @@
 #   8 - Failed to decompress file
 #   9 - Failed to parse file
 #   10 - pyarrow module missing
-#   11 - Unable to connect to Wazuh
+#   11 - Unable to connect to GuardSarm
 #   12 - Invalid type of bucket
-#   13 - Unexpected error sending message to Wazuh
+#   13 - Unexpected error sending message to GuardSarm
 #   14 - Empty bucket
 #   15 - Invalid endpoint URL
 #   16 - Throttling error

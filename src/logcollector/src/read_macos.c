@@ -7,13 +7,13 @@
  * Foundation
  */
 
-#if defined(Darwin) || (defined(__linux__) && defined(WAZUH_UNIT_TESTING))
+#if defined(Darwin) || (defined(__linux__) && defined(GUARDSARM_UNIT_TESTING))
 
 #include "shared.h"
 #include "logcollector.h"
 #include "macos_log.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 // Remove STATIC qualifier from tests
 #define STATIC
 #define INLINE

@@ -29,8 +29,8 @@ int main(int argc, char **argv)
         return (0);
     }
 
-    /* Configure Wazuh for automatic startup */
-    system("sc config WazuhSvc start= auto");
+    /* Configure GuardSarm for automatic startup */
+    system("sc config GuardSarmSvc start= auto");
 
     /* Change permissions */
     char cmd[OS_MAXSTR + 1];

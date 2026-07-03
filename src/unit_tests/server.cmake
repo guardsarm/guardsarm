@@ -1,20 +1,20 @@
-# Find the wazuh shared library
+# Find the guardsarm shared library
 find_library(
-  WAZUHLIB
-  NAMES libwazuh_test.a
+  GUARDSARMLIB
+  NAMES libguardsarm_test.a
   HINTS "${SRC_FOLDER}/build/lib")
 find_library(
-  WAZUHEXT
-  NAMES libwazuhext.so
+  GUARDSARMEXT
+  NAMES libguardsarmext.so
   HINTS "${SRC_FOLDER}/build/lib")
 set(uname "Linux")
 
-if(NOT WAZUHLIB)
-  message(FATAL_ERROR "libwazuh_test.a not found in ${SRC_FOLDER}/build/lib! Aborting...")
+if(NOT GUARDSARMLIB)
+  message(FATAL_ERROR "libguardsarm_test.a not found in ${SRC_FOLDER}/build/lib! Aborting...")
 endif()
 
-if(NOT WAZUHEXT)
-  message(FATAL_ERROR "libwazuhext not found in ${SRC_FOLDER}/build/lib! Aborting...")
+if(NOT GUARDSARMEXT)
+  message(FATAL_ERROR "libguardsarmext not found in ${SRC_FOLDER}/build/lib! Aborting...")
 endif()
 
 # Add compiling flags
@@ -34,8 +34,8 @@ link_libraries(-fsanitize=address -fsanitize=undefined)
 link_directories("${SRC_FOLDER}/build/lib/")
 set(TEST_DEPS
     -Wl,--start-group
-    ${WAZUHLIB}
-    ${WAZUHEXT}
+    ${GUARDSARMLIB}
+    ${GUARDSARMEXT}
     -lrouter
     -lschema_validator
     -Wl,--end-group
@@ -46,8 +46,8 @@ set(TEST_DEPS
     -ftest-coverage)
 
 add_subdirectory(remoted)
-add_subdirectory(wazuh_db)
+add_subdirectory(guardsarm_db)
 add_subdirectory(os_auth)
 add_subdirectory(os_crypto)
-add_subdirectory(wazuh_modules)
+add_subdirectory(guardsarm_modules)
 add_subdirectory(monitord)

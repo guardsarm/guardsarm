@@ -1,0 +1,63 @@
+#!/sbin/runscript
+# Gentoo init script for GuardSarm
+# Copyright (C) 2015, Wazuh Inc.
+# by gentuxx <gentuxx@gmail.com>
+
+opts="${opts} status configtest"
+
+GUARDSARM_HOME=GUARDSARM_HOME_TMP
+GUARDSARM_CONTROL="$GUARDSARM_HOME/bin/guardsarm-control"
+
+depend() {
+    need net
+    use logger
+}
+
+configtest() {
+    ebegin "Checking GuardSarm Configuration"
+    checkconfig
+    eend $?
+}
+
+checkconfig() {
+    CONFIGFILE="${CONFIGFILE:-$GUARDSARM_HOME/etc/ossec.conf}"
+    if [ ! -r "${CONFIGFILE}" ]; then
+        eerror "Unable to read configuration file: ${CONFIGFILE}"
+        return 1
+    fi
+
+    # Maybe put some kind of config file syntax checking in here?  XML is a little different
+    # so maybe not.
+    return $ret
+}
+
+start() {
+    checkconfig || return 1
+    ebegin "Starting GuardSarm"
+    ${GUARDSARM_CONTROL} start > /dev/null 2>&1
+    eend $?
+}
+
+stop() {
+    checkconfig || return 1
+    ebegin "Stopping GuardSarm"
+    ${GUARDSARM_CONTROL} stop > /dev/null 2>&1
+    eend $?
+}
+
+restart() {
+    if ! service_started "${myservice}" ; then
+        eerror "GuardSarm is not running! Please start it before trying to reload it."
+    else
+        checkconfig || return 1
+        ebegin "Reloading GuardSarm"
+        svc_stop ${GUARDSARM_CONTROL}
+        svc_start ${GUARDSARM_CONTROL}
+        eend $?
+    fi
+}
+
+status() {
+    checkconfig || return 1
+    ${GUARDSARM_CONTROL} status
+}

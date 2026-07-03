@@ -10,11 +10,11 @@ from os.path import join
 from uuid import uuid4
 
 # qa-integration-framework imports
-from wazuh_testing.utils.configuration import (
+from guardsarm_testing.utils.configuration import (
     get_test_cases_data,
     load_configuration_template,
 )
-from wazuh_testing.logger import logger
+from guardsarm_testing.logger import logger
 
 
 # Local imports

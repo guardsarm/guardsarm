@@ -16,7 +16,7 @@
 
 #include <zlib.h>
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 #ifdef WIN32
 #include "../../unit_tests/wrappers/windows/libc/stdio_wrappers.h"
 #include "../../unit_tests/wrappers/windows/fileapi_wrappers.h"
@@ -1157,6 +1157,11 @@ int mkstemp_ex(char *tmp_path)
 
 
 /* Get uname. Memory must be freed after use */
+/* FROZEN (GuardSarm rebrand): the __guardsarm_name / __guardsarm_version literals used
+ * in the strings below are a backward-compatibility contract. This string is the
+ * agent OS/version metadata that is reported to the manager and parsed back out
+ * (see remoted_op.c strstr(line, __guardsarm_name)) and stored in records. Do NOT
+ * replace with PRODUCT_NAME / PRODUCT_VERSION. See src/shared/include/branding.h. */
 const char *getuname()
 {
     struct utsname uts_buf;
@@ -1174,7 +1179,7 @@ const char *getuname()
                     read_version->os_name,
                     read_version->os_platform,
                     read_version->os_version,
-                    __wazuh_name, __wazuh_version);
+                    __guardsarm_name, __guardsarm_version);
 
             free_osinfo(read_version);
         }
@@ -1185,10 +1190,10 @@ const char *getuname()
                      uts_buf.release,
                      uts_buf.version,
                      uts_buf.machine,
-                     __wazuh_name, __wazuh_version);
+                     __guardsarm_name, __guardsarm_version);
         } else {
             snprintf(muname, 512, "No system info available - %s %s",
-                     __wazuh_name, __wazuh_version);
+                     __guardsarm_name, __guardsarm_version);
         }
     }
 
@@ -1566,6 +1571,9 @@ cleanup:
 }
 
 
+/* FROZEN (GuardSarm rebrand): __guardsarm_name / __guardsarm_version below are a
+ * backward-compatibility contract (Windows agent OS/version metadata reported to
+ * the manager and stored). Do NOT replace with PRODUCT_*. See branding.h. */
 const char *getuname()
 {
     static char ret[OS_SIZE_1024 + 1] = "";
@@ -1581,13 +1589,13 @@ const char *getuname()
                 read_version->os_version ? read_version->os_version : "unknown",
                 read_version->nodename ? read_version->nodename : "unknown",
                 read_version->machine ? read_version->machine : "unknown",
-                __wazuh_name, __wazuh_version);
+                __guardsarm_name, __guardsarm_version);
 
         free_osinfo(read_version);
         return ret;
     }
 
-    snprintf(ret, OS_SIZE_1024, "Microsoft Windows - %s %s", __wazuh_name, __wazuh_version);
+    snprintf(ret, OS_SIZE_1024, "Microsoft Windows - %s %s", __guardsarm_name, __guardsarm_version);
     return ret;
 }
 
@@ -3171,14 +3179,14 @@ int w_uncompress_bz2_gz_file(const char * path, const char * dest) {
 
 #ifndef WIN32
 /**
- * @brief Get the Wazuh installation directory
+ * @brief Get the GuardSarm installation directory
  *
- * The target-specific env var (`WAZUH_MANAGER_HOME` or `WAZUH_AGENT_HOME`,
- * picked at build time via `WAZUH_HOME_ENV`) wins if set. Otherwise the path
+ * The target-specific env var (`GUARDSARM_MANAGER_HOME` or `GUARDSARM_AGENT_HOME`,
+ * picked at build time via `GUARDSARM_HOME_ENV`) wins if set. Otherwise the path
  * is auto-detected from /proc, then argv[0].
  *
  * @param arg ARGV0 - Program name
- * @return Pointer to the Wazuh installation path on success
+ * @return Pointer to the GuardSarm installation path on success
  */
 char *w_homedir(char *arg) {
     char *buff = NULL;
@@ -3187,7 +3195,7 @@ char *w_homedir(char *arg) {
     os_calloc(PATH_MAX, sizeof(char), buff);
 
     // Target-specific home env var wins if set.
-    char * home_env = getenv(WAZUH_HOME_ENV);
+    char * home_env = getenv(GUARDSARM_HOME_ENV);
     if (home_env && *home_env) {
         snprintf(buff, PATH_MAX, "%s", home_env);
     } else {

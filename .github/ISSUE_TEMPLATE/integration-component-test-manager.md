@@ -39,15 +39,15 @@ The scheduled task executes the following workflows every Wednesday:
 
 | Test                                    | Link                                                                                        |
 |-----------------------------------------|---------------------------------------------------------------------------------------------|
-|4_testintegration_analysisd-tier-0-1     |https://github.com/wazuh/wazuh/actions/workflows/4_testintegration_analysisd-tier-0-1.yml    |
-|4_testintegration_analysisd-tier-2       |https://github.com/wazuh/wazuh/actions/workflows/4_testintegration_analysisd-tier-2.yml      |
-|4_testintegration_authd-tier-0-1         |https://github.com/wazuh/wazuh/actions/workflows/4_testintegration_authd-tier-0-1.yml        |
-|4_testintegration_integratord-tier-0-1   |https://github.com/wazuh/wazuh/actions/workflows/4_testintegration_integratord-tier-0-1.yml  |
-|4_testintegration_logtest-tier-0-1       |https://github.com/wazuh/wazuh/actions/workflows/4_testintegration_logtest-tier-0-1.yml      |
-|4_testintegration_remoted-tier-0-1       |https://github.com/wazuh/wazuh/actions/workflows/4_testintegration_remoted-tier-0-1.yml      |
-|4_testintegration_remoted-tier-2         |https://github.com/wazuh/wazuh/actions/workflows/4_testintegration_remoted-tier-2.yml        |
-|4_testintegration_wazuh_db-tier-0-1      |https://github.com/wazuh/wazuh/actions/workflows/4_testintegration_wazuh_db-tier-0-1.yml     |
-|4_testcomponent_vulnerability-scanner    |https://github.com/wazuh/wazuh/actions/workflows/4_testcomponent_vulnerability-scanner.yml    |
+|4_testintegration_analysisd-tier-0-1     |https://github.com/guardsarm/guardsarm/actions/workflows/4_testintegration_analysisd-tier-0-1.yml    |
+|4_testintegration_analysisd-tier-2       |https://github.com/guardsarm/guardsarm/actions/workflows/4_testintegration_analysisd-tier-2.yml      |
+|4_testintegration_authd-tier-0-1         |https://github.com/guardsarm/guardsarm/actions/workflows/4_testintegration_authd-tier-0-1.yml        |
+|4_testintegration_integratord-tier-0-1   |https://github.com/guardsarm/guardsarm/actions/workflows/4_testintegration_integratord-tier-0-1.yml  |
+|4_testintegration_logtest-tier-0-1       |https://github.com/guardsarm/guardsarm/actions/workflows/4_testintegration_logtest-tier-0-1.yml      |
+|4_testintegration_remoted-tier-0-1       |https://github.com/guardsarm/guardsarm/actions/workflows/4_testintegration_remoted-tier-0-1.yml      |
+|4_testintegration_remoted-tier-2         |https://github.com/guardsarm/guardsarm/actions/workflows/4_testintegration_remoted-tier-2.yml        |
+|4_testintegration_guardsarm_db-tier-0-1      |https://github.com/guardsarm/guardsarm/actions/workflows/4_testintegration_guardsarm_db-tier-0-1.yml     |
+|4_testcomponent_vulnerability-scanner    |https://github.com/guardsarm/guardsarm/actions/workflows/4_testcomponent_vulnerability-scanner.yml    |
 
 <!--
 **INSTRUCTIONS:**
@@ -72,7 +72,7 @@ The scheduled task executes the following workflows every Wednesday:
 | :black_circle: | 4_testintegration_logtest-tier-0-1       | | |
 | :black_circle: | 4_testintegration_remoted-tier-0-1       | | |
 | :black_circle: | 4_testintegration_remoted-tier-2         | | |
-| :black_circle: | 4_testintegration_wazuh_db-tier-0-1      | | |
+| :black_circle: | 4_testintegration_guardsarm_db-tier-0-1      | | |
 | :black_circle: | 4_testcomponent_vulnerability-scanner    | | |
 -->
 
@@ -80,24 +80,24 @@ The scheduled task executes the following workflows every Wednesday:
 To launch the tests from the command line, use the following commands:
 
 Old workflows:
-gh workflow run integration-tests-analysisd-tier-0-1.yml --repo=wazuh/wazuh --ref <VERSION>
-gh workflow run integration-tests-analysisd-tier-2.yml --repo=wazuh/wazuh --ref <VERSION>
-gh workflow run integration-tests-authd-tier-0-1.yml --repo=wazuh/wazuh --ref <VERSION>
-gh workflow run integration-tests-integratord-tier-0-1.yml --repo=wazuh/wazuh --ref <VERSION>
-gh workflow run integration-tests-logtest-tier-0-1.yml --repo=wazuh/wazuh --ref <VERSION>
-gh workflow run integration-tests-remoted-tier-0-1.yml --repo=wazuh/wazuh --ref <VERSION> --field base_branch=<VERSION>
-gh workflow run integration-tests-remoted-tier-2.yml --repo=wazuh/wazuh --ref <VERSION>
-gh workflow run integration-tests-wazuh_db-tier-0-1.yml --repo=wazuh/wazuh --ref <VERSION>
-gh workflow run vulnerability-scanner-tests.yml --repo=wazuh/wazuh --ref <VERSION>
+gh workflow run integration-tests-analysisd-tier-0-1.yml --repo=guardsarm/guardsarm --ref <VERSION>
+gh workflow run integration-tests-analysisd-tier-2.yml --repo=guardsarm/guardsarm --ref <VERSION>
+gh workflow run integration-tests-authd-tier-0-1.yml --repo=guardsarm/guardsarm --ref <VERSION>
+gh workflow run integration-tests-integratord-tier-0-1.yml --repo=guardsarm/guardsarm --ref <VERSION>
+gh workflow run integration-tests-logtest-tier-0-1.yml --repo=guardsarm/guardsarm --ref <VERSION>
+gh workflow run integration-tests-remoted-tier-0-1.yml --repo=guardsarm/guardsarm --ref <VERSION> --field base_branch=<VERSION>
+gh workflow run integration-tests-remoted-tier-2.yml --repo=guardsarm/guardsarm --ref <VERSION>
+gh workflow run integration-tests-guardsarm_db-tier-0-1.yml --repo=guardsarm/guardsarm --ref <VERSION>
+gh workflow run vulnerability-scanner-tests.yml --repo=guardsarm/guardsarm --ref <VERSION>
 
 New workflows:
-gh workflow run 4_testintegration_analysisd-tier-0-1.yml --repo=wazuh/wazuh --ref <VERSION>
-gh workflow run 4_testintegration_analysisd-tier-2.yml --repo=wazuh/wazuh --ref <VERSION>
-gh workflow run 4_testintegration_authd-tier-0-1.yml --repo=wazuh/wazuh --ref <VERSION>
-gh workflow run 4_testintegration_integratord-tier-0-1.yml --repo=wazuh/wazuh --ref <VERSION>
-gh workflow run 4_testintegration_logtest-tier-0-1.yml --repo=wazuh/wazuh --ref <VERSION>
-gh workflow run 4_testintegration_remoted-tier-0-1.yml --repo=wazuh/wazuh --ref <VERSION> --field base_branch=<VERSION>
-gh workflow run 4_testintegration_remoted-tier-2.yml --repo=wazuh/wazuh --ref <VERSION>
-gh workflow run 4_testintegration_wazuh_db-tier-0-1.yml --repo=wazuh/wazuh --ref <VERSION>
-gh workflow run 4_testcomponent_vulnerability-scanner.yml --repo=wazuh/wazuh --ref <VERSION>
+gh workflow run 4_testintegration_analysisd-tier-0-1.yml --repo=guardsarm/guardsarm --ref <VERSION>
+gh workflow run 4_testintegration_analysisd-tier-2.yml --repo=guardsarm/guardsarm --ref <VERSION>
+gh workflow run 4_testintegration_authd-tier-0-1.yml --repo=guardsarm/guardsarm --ref <VERSION>
+gh workflow run 4_testintegration_integratord-tier-0-1.yml --repo=guardsarm/guardsarm --ref <VERSION>
+gh workflow run 4_testintegration_logtest-tier-0-1.yml --repo=guardsarm/guardsarm --ref <VERSION>
+gh workflow run 4_testintegration_remoted-tier-0-1.yml --repo=guardsarm/guardsarm --ref <VERSION> --field base_branch=<VERSION>
+gh workflow run 4_testintegration_remoted-tier-2.yml --repo=guardsarm/guardsarm --ref <VERSION>
+gh workflow run 4_testintegration_guardsarm_db-tier-0-1.yml --repo=guardsarm/guardsarm --ref <VERSION>
+gh workflow run 4_testcomponent_vulnerability-scanner.yml --repo=guardsarm/guardsarm --ref <VERSION>
 -->

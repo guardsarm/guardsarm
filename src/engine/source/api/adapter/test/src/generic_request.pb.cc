@@ -21,7 +21,7 @@ namespace _pb = ::PROTOBUF_NAMESPACE_ID;
 namespace _pbi = _pb::internal;
 
 namespace com {
-namespace wazuh {
+namespace guardsarm {
 namespace test {
 namespace generic_request {
 PROTOBUF_CONSTEXPR Generic_Request::Generic_Request(
@@ -40,32 +40,32 @@ struct Generic_RequestDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 Generic_RequestDefaultTypeInternal _Generic_Request_default_instance_;
 }  // namespace generic_request
 }  // namespace test
-}  // namespace wazuh
+}  // namespace guardsarm
 }  // namespace com
 static ::_pb::Metadata file_level_metadata_generic_5frequest_2eproto[1];
 static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_generic_5frequest_2eproto = nullptr;
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_generic_5frequest_2eproto = nullptr;
 
 const uint32_t TableStruct_generic_5frequest_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::test::generic_request::Generic_Request, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::test::generic_request::Generic_Request, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::test::generic_request::Generic_Request, _impl_._has_bits_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::test::generic_request::Generic_Request, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::test::generic_request::Generic_Request, _impl_.content_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::test::generic_request::Generic_Request, _impl_.content_),
   0,
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 7, -1, sizeof(::com::wazuh::test::generic_request::Generic_Request)},
+  { 0, 7, -1, sizeof(::com::guardsarm::test::generic_request::Generic_Request)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
-  &::com::wazuh::test::generic_request::_Generic_Request_default_instance_._instance,
+  &::com::guardsarm::test::generic_request::_Generic_Request_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_generic_5frequest_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\025generic_request.proto\022\036com.wazuh.test."
+  "\n\025generic_request.proto\022\036com.guardsarm.test."
   "generic_request\"3\n\017Generic_Request\022\024\n\007co"
   "ntent\030\001 \001(\tH\000\210\001\001B\n\n\010_contentb\006proto3"
   ;
@@ -85,7 +85,7 @@ PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_generic_
 // Force running AddDescriptors() at dynamic initialization time.
 PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_generic_5frequest_2eproto(&descriptor_table_generic_5frequest_2eproto);
 namespace com {
-namespace wazuh {
+namespace guardsarm {
 namespace test {
 namespace generic_request {
 
@@ -103,7 +103,7 @@ Generic_Request::Generic_Request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
   SharedCtor(arena, is_message_owned);
-  // @@protoc_insertion_point(arena_constructor:com.wazuh.test.generic_request.Generic_Request)
+  // @@protoc_insertion_point(arena_constructor:com.guardsarm.test.generic_request.Generic_Request)
 }
 Generic_Request::Generic_Request(const Generic_Request& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
@@ -122,7 +122,7 @@ Generic_Request::Generic_Request(const Generic_Request& from)
     _this->_impl_.content_.Set(from._internal_content(),
       _this->GetArenaForAllocation());
   }
-  // @@protoc_insertion_point(copy_constructor:com.wazuh.test.generic_request.Generic_Request)
+  // @@protoc_insertion_point(copy_constructor:com.guardsarm.test.generic_request.Generic_Request)
 }
 
 inline void Generic_Request::SharedCtor(
@@ -141,7 +141,7 @@ inline void Generic_Request::SharedCtor(
 }
 
 Generic_Request::~Generic_Request() {
-  // @@protoc_insertion_point(destructor:com.wazuh.test.generic_request.Generic_Request)
+  // @@protoc_insertion_point(destructor:com.guardsarm.test.generic_request.Generic_Request)
   if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
   (void)arena;
     return;
@@ -159,7 +159,7 @@ void Generic_Request::SetCachedSize(int size) const {
 }
 
 void Generic_Request::Clear() {
-// @@protoc_insertion_point(message_clear_start:com.wazuh.test.generic_request.Generic_Request)
+// @@protoc_insertion_point(message_clear_start:com.guardsarm.test.generic_request.Generic_Request)
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -185,7 +185,7 @@ const char* Generic_Request::_InternalParse(const char* ptr, ::_pbi::ParseContex
           auto str = _internal_mutable_content();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "com.wazuh.test.generic_request.Generic_Request.content"));
+          CHK_(::_pbi::VerifyUTF8(str, "com.guardsarm.test.generic_request.Generic_Request.content"));
         } else
           goto handle_unusual;
         continue;
@@ -215,7 +215,7 @@ failure:
 
 uint8_t* Generic_Request::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:com.wazuh.test.generic_request.Generic_Request)
+  // @@protoc_insertion_point(serialize_to_array_start:com.guardsarm.test.generic_request.Generic_Request)
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -224,7 +224,7 @@ uint8_t* Generic_Request::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_content().data(), static_cast<int>(this->_internal_content().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "com.wazuh.test.generic_request.Generic_Request.content");
+      "com.guardsarm.test.generic_request.Generic_Request.content");
     target = stream->WriteStringMaybeAliased(
         1, this->_internal_content(), target);
   }
@@ -233,12 +233,12 @@ uint8_t* Generic_Request::_InternalSerialize(
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:com.wazuh.test.generic_request.Generic_Request)
+  // @@protoc_insertion_point(serialize_to_array_end:com.guardsarm.test.generic_request.Generic_Request)
   return target;
 }
 
 size_t Generic_Request::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:com.wazuh.test.generic_request.Generic_Request)
+// @@protoc_insertion_point(message_byte_size_start:com.guardsarm.test.generic_request.Generic_Request)
   size_t total_size = 0;
 
   uint32_t cached_has_bits = 0;
@@ -266,7 +266,7 @@ const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Generic_Request::GetClassData(
 void Generic_Request::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
   auto* const _this = static_cast<Generic_Request*>(&to_msg);
   auto& from = static_cast<const Generic_Request&>(from_msg);
-  // @@protoc_insertion_point(class_specific_merge_from_start:com.wazuh.test.generic_request.Generic_Request)
+  // @@protoc_insertion_point(class_specific_merge_from_start:com.guardsarm.test.generic_request.Generic_Request)
   GOOGLE_DCHECK_NE(&from, _this);
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
@@ -278,7 +278,7 @@ void Generic_Request::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const 
 }
 
 void Generic_Request::CopyFrom(const Generic_Request& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:com.wazuh.test.generic_request.Generic_Request)
+// @@protoc_insertion_point(class_specific_copy_from_start:com.guardsarm.test.generic_request.Generic_Request)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -309,12 +309,12 @@ void Generic_Request::InternalSwap(Generic_Request* other) {
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace generic_request
 }  // namespace test
-}  // namespace wazuh
+}  // namespace guardsarm
 }  // namespace com
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::com::wazuh::test::generic_request::Generic_Request*
-Arena::CreateMaybeMessage< ::com::wazuh::test::generic_request::Generic_Request >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::com::wazuh::test::generic_request::Generic_Request >(arena);
+template<> PROTOBUF_NOINLINE ::com::guardsarm::test::generic_request::Generic_Request*
+Arena::CreateMaybeMessage< ::com::guardsarm::test::generic_request::Generic_Request >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::com::guardsarm::test::generic_request::Generic_Request >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

@@ -45,7 +45,7 @@ __attribute__((noreturn)) static void helpmsg()
 static void print_banner()
 {
     printf("\n");
-    printf(BANNER, __wazuh_name, __wazuh_version, (int)(21 - strlen(__wazuh_name) - strlen(__wazuh_version)), "                     ");
+    printf(BANNER, PRODUCT_NAME, PRODUCT_VERSION, (int)(21 - strlen(PRODUCT_NAME) - strlen(PRODUCT_VERSION)), "                     ");
 
     printf(BANNER_CLIENT);
     return;
@@ -85,7 +85,7 @@ int main(int argc, char **argv)
     OS_SetName(ARGV0);
 #ifndef WIN32
     char * home_path = w_homedir(argv[0]);
-    mdebug1(WAZUH_HOMEDIR, home_path);
+    mdebug1(GUARDSARM_HOMEDIR, home_path);
 
     /* Change working directory */
     if (chdir(home_path) == -1) {
@@ -157,11 +157,11 @@ int main(int argc, char **argv)
     w_ch_exec_dir();
 
     /* Check permissions */
-    fp = wfopen(WAZUHCONF, "r");
+    fp = wfopen(GUARDSARMCONF, "r");
     if (fp) {
         fclose(fp);
     } else {
-        merror_exit(CONF_ERROR, WAZUHCONF);
+        merror_exit(CONF_ERROR, GUARDSARMCONF);
     }
 #endif
 

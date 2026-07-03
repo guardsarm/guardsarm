@@ -34,7 +34,7 @@ TEST_DATA_PATH = join(dirname(dirname(realpath(__file__))), 'data')
 
 
 @pytest.mark.parametrize('auth_path, offset, query, tag, reparse', [
-    (os.environ.get('INSTALLDIR', '/var/wazuh-manager'), '1d', 'query', 'tag', False)
+    (os.environ.get('INSTALLDIR', '/var/guardsarm-manager'), '1d', 'query', 'tag', False)
 ])
 @patch('azure_services.graph.get_graph_events')
 @patch('azure_services.graph.build_graph_url')

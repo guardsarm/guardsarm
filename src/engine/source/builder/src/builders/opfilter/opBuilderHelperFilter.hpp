@@ -759,11 +759,11 @@ FilterOp opBuilderHelperArrayLength(const Reference& targetField,
  *
  * This helper returns true if:
  * - The policy has indexUnclassifiedEvents flag set to true AND
- * - $wazuh.integration.category equals "unclassified"
+ * - $guardsarm.integration.category equals "unclassified"
  *
  * Otherwise, it returns false.
  *
- * @param targetField Reference to $wazuh.integration.category. Any other field is rejected at build-time.
+ * @param targetField Reference to $guardsarm.integration.category. Any other field is rejected at build-time.
  * @param opArgs Vector of operation arguments (empty for this helper)
  * @param buildCtx Build context containing policy configuration
  * @return FilterOp The filter operation

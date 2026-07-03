@@ -349,17 +349,17 @@ TEST_F(WorkerTest, TesterWorkerSetsTimestampAndEventId)
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     worker.stop();
 
-    // Verify @timestamp and wazuh.event.id were set on the event
+    // Verify @timestamp and guardsarm.event.id were set on the event
     ASSERT_TRUE(eventRef->exists("/@timestamp"));
     ASSERT_TRUE(eventRef->isString("/@timestamp"));
     std::string timestamp;
     ASSERT_EQ(eventRef->getString(timestamp, "/@timestamp"), json::RetGet::Success);
     ASSERT_FALSE(timestamp.empty());
 
-    ASSERT_TRUE(eventRef->exists("/wazuh/event/id"));
-    ASSERT_TRUE(eventRef->isString("/wazuh/event/id"));
+    ASSERT_TRUE(eventRef->exists("/guardsarm/event/id"));
+    ASSERT_TRUE(eventRef->isString("/guardsarm/event/id"));
     std::string eventId;
-    ASSERT_EQ(eventRef->getString(eventId, "/wazuh/event/id"), json::RetGet::Success);
+    ASSERT_EQ(eventRef->getString(eventId, "/guardsarm/event/id"), json::RetGet::Success);
     ASSERT_FALSE(eventId.empty());
 }
 

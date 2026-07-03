@@ -12,7 +12,7 @@
 #define LOGREADER_H
 
 #ifndef ARGV0
-#define ARGV0 "wazuh-logcollector"
+#define ARGV0 "guardsarm-logcollector"
 #endif
 
 #define N_MIN_INPUT_THREADS   1
@@ -78,8 +78,8 @@ void* read_ucs2_be(logreader* lf, int* rc, int drop_it);
 /* Read snort full file */
 void* read_snortfull(logreader* lf, int* rc, int drop_it);
 
-/* Read wazuh alert file */
-void* read_wazuhalert(logreader* lf, int* rc, int drop_it);
+/* Read guardsarm alert file */
+void* read_guardsarmalert(logreader* lf, int* rc, int drop_it);
 
 /* Read nmap grepable format */
 void* read_nmapg(logreader* lf, int* rc, int drop_it);
@@ -116,7 +116,7 @@ int check_ignore_and_restrict(OSList* ignore_exp, OSList* restrict_exp, const ch
  */
 void* read_multiline_regex(logreader* lf, int* rc, int drop_it);
 
-#if defined(Darwin) || (defined(__linux__) && defined(WAZUH_UNIT_TESTING))
+#if defined(Darwin) || (defined(__linux__) && defined(GUARDSARM_UNIT_TESTING))
 /**
  * @brief Read macOS log process output
  *
@@ -337,7 +337,7 @@ extern int OUTPUT_QUEUE_SIZE;
 extern rlim_t nofile;
 #endif
 
-#if defined(Darwin) || (defined(__linux__) && defined(WAZUH_UNIT_TESTING))
+#if defined(Darwin) || (defined(__linux__) && defined(GUARDSARM_UNIT_TESTING))
 /**
  * @brief This function is called to release macOS log's "show" and/or "stream" resources
  */

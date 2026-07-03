@@ -1,5 +1,5 @@
 /*
- * Wazuh - Shared Modules utils
+ * GuardSarm - Shared Modules utils
  * Copyright (C) 2015, Wazuh Inc.
  * October 19, 2023.
  *

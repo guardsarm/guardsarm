@@ -9,18 +9,18 @@ clean() {
     make clean -C src
 }
 
-build_wazuh_test_flags() {
+build_guardsarm_test_flags() {
     local target=$1
-    echo "Building Wazuh for target: $target"
+    echo "Building GuardSarm for target: $target"
     cd "$GITHUB_WORKSPACE"
     make deps -C src TARGET=${target} -j$(nproc)
     make -C src TARGET=${target} TEST=1 -j$(nproc)
 }
 
-build_wazuh_unit_tests() {
+build_guardsarm_unit_tests() {
     local target=$1
     local gcov_path
-    # gcov must match the active gcc. The workflow installs the wazuh-packaged GCC at /opt/gcc-14
+    # gcov must match the active gcc. The workflow installs the guardsarm-packaged GCC at /opt/gcc-14
     # (currently 14.3, version tag B43*); pin to its bundled gcov to avoid being shadowed by the
     # system's /usr/bin/gcov-14 (Ubuntu 24.04 ships GCC 14.2, version tag B42*).
     if [[ -x /opt/gcc-14/bin/gcov ]]; then
@@ -28,7 +28,7 @@ build_wazuh_unit_tests() {
     else
         gcov_path=$(command -v gcov)
     fi
-    echo "Building Wazuh Unit Tests for target: $target"
+    echo "Building GuardSarm Unit Tests for target: $target"
     mkdir -p "$GITHUB_WORKSPACE/src/unit_tests/build"
     cd "$GITHUB_WORKSPACE/src/unit_tests/build"
     if [[ $target == "agent" ]]; then
@@ -67,9 +67,9 @@ EOF
     make -j$(nproc)
 }
 
-run_wazuh_unit_tests() {
+run_guardsarm_unit_tests() {
     local target=$1
-    echo "Running Wazuh Unit Tests for target: $target"
+    echo "Running GuardSarm Unit Tests for target: $target"
     cd "$GITHUB_WORKSPACE/src/unit_tests/build"
     if [[ $target == "agent" ]]; then
         ctest --output-on-failure  > "test_results.txt" || true
@@ -160,9 +160,9 @@ main() {
     echo "Starting process for target: $target"
 
     clean
-    build_wazuh_test_flags $target
-    build_wazuh_unit_tests $target
-    run_wazuh_unit_tests $target
+    build_guardsarm_test_flags $target
+    build_guardsarm_unit_tests $target
+    run_guardsarm_unit_tests $target
     format_display_test_results
     format_display_test_coverage $target
 }

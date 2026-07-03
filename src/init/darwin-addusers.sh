@@ -95,4 +95,4 @@ else
    sudo ${DSCL} localhost -createprop /Local/Default/Users/${USER} Password "*"
 fi
 
-sudo ${DSCL} . create /Users/wazuh IsHidden 1
+sudo ${DSCL} . create /Users/guardsarm IsHidden 1

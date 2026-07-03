@@ -23,7 +23,7 @@ namespace confremote
  *
  * On construction, loads the last persisted settings from store. Modules register
  * per-key callbacks via addTrigger(). On each synchronize() call, fetches the
- * current settings from wazuh-indexer, applies accepted changes through the
+ * current settings from guardsarm-indexer, applies accepted changes through the
  * registered callbacks, and persists successful updates to store.
  */
 class ConfRemoteManager final : public IConfRemote
@@ -33,7 +33,7 @@ public:
      * @brief Runtime remote configuration manager.
      *
      * Loads the last persisted runtime settings from store, registers per-key
-     * callbacks, and synchronizes updated values from wazuh-indexer.
+     * callbacks, and synchronizes updated values from guardsarm-indexer.
      *
      * @param indexerConnector Shared pointer to the indexer connector for fetching remote settings.
      * @param store Shared pointer to the internal store for persisting settings.
@@ -46,7 +46,7 @@ public:
                                const size_t waitSeconds);
 
     /**
-     * @brief Synchronizes runtime settings from wazuh-indexer.
+     * @brief Synchronizes runtime settings from guardsarm-indexer.
      */
     void synchronize() override;
 

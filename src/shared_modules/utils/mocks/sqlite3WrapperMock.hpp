@@ -1,5 +1,5 @@
 /*
- * Wazuh SQLITE3 Wrapper
+ * GuardSarm SQLITE3 Wrapper
  * Copyright (C) 2015, Wazuh Inc.
  * May 5, 2025.
  *

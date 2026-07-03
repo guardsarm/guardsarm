@@ -1,5 +1,5 @@
 /*
- * Wazuh shared modules utils
+ * GuardSarm shared modules utils
  * Copyright (C) 2015, Wazuh Inc.
  * January 30, 2024.
  *
@@ -24,9 +24,9 @@ namespace Utils
         // Target-specific env var wins if set (manager/agent separation
         // for co-hosted installs).
 #ifdef CLIENT
-        const char* envHome = std::getenv("WAZUH_AGENT_HOME");
+        const char* envHome = std::getenv("GUARDSARM_AGENT_HOME");
 #else
-        const char* envHome = std::getenv("WAZUH_MANAGER_HOME");
+        const char* envHome = std::getenv("GUARDSARM_MANAGER_HOME");
 #endif
         if (envHome != nullptr && *envHome != '\0')
         {

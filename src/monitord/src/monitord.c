@@ -16,7 +16,7 @@
 #include "monitord.h"
 #include "config.h"
 #include "string_op.h"
-#include "wazuhdb_queries_op.h"
+#include "guardsarmdb_queries_op.h"
 #include "time.h"
 
 /* Global variables */
@@ -35,9 +35,9 @@ void Monitord()
 
     /* Set internal log path to rotate them */
 
-    /* /var/wazuh-manager/logs/wazuh-manager.log */
+    /* /var/guardsarm-manager/logs/guardsarm-manager.log */
     snprintf(path, PATH_MAX, "%s", LOGFILE);
-    /* /var/wazuh-manager/logs/wazuh-manager.json */
+    /* /var/guardsarm-manager/logs/guardsarm-manager.json */
     snprintf(path_json, PATH_MAX, "%s", LOGJSONFILE);
 
     /* Log monitord startup message to ossec.log */

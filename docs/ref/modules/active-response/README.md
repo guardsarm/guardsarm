@@ -1,8 +1,8 @@
 # Active Response
 
-The **Active Response** module enables automated response actions triggered by security events detected by the Wazuh manager. When specific rules are triggered, the manager can execute scripts on agents to block IPs, disable accounts, or perform other security-relevant actions.
+The **Active Response** module enables automated response actions triggered by security events detected by the GuardSarm manager. When specific rules are triggered, the manager can execute scripts on agents to block IPs, disable accounts, or perform other security-relevant actions.
 
-Active Response is implemented through `wazuh-execd`, which receives commands from the manager, executes response scripts on the agent, and manages response lifecycle including timeouts for stateful responses.
+Active Response is implemented through `guardsarm-execd`, which receives commands from the manager, executes response scripts on the agent, and manages response lifecycle including timeouts for stateful responses.
 
 ## Key Features
 
@@ -20,12 +20,12 @@ Active Response operates in a manager-agent communication model:
 
 1. **Event Detection**: Manager's analysis engine detects events matching specific rules
 2. **Command Generation**: Manager generates an Active Response command with WCS metadata
-3. **Agent Execution**: Agent's `wazuh-execd` receives the command and executes the appropriate script
+3. **Agent Execution**: Agent's `guardsarm-execd` receives the command and executes the appropriate script
 4. **Lifecycle Management**: For stateful responses, execd manages timeouts and automatic reversion
 
 ```
 ┌─────────────┐         ┌──────────────┐         ┌─────────────┐
-│   Manager   │ ──────> │ wazuh-execd  │ ──────> │  AR Script  │
+│   Manager   │ ──────> │ guardsarm-execd  │ ──────> │  AR Script  │
 │  (Analysis) │  JSON   │   (Agent)    │  stdin  │ (block-ip)  │
 └─────────────┘         └──────────────┘         └─────────────┘
                                │                         │
@@ -43,7 +43,7 @@ Activates a response action (e.g., block an IP):
 
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "active_response": {
       "name": "block-ip",
       "executable": "block-ip",
@@ -72,7 +72,7 @@ Reverts a response action (e.g., unblock an IP):
 
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "active_response": {
       "name": "block-ip",
       "executable": "block-ip",
@@ -146,7 +146,7 @@ Active Response uses a **metadata-driven approach** where all execution metadata
 
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "active_response": {
       "name": "block-ip",
       "executable": "block-ip",
@@ -162,8 +162,8 @@ Active Response uses a **metadata-driven approach** where all execution metadata
 ```
 
 **Benefits**:
-- **No ar.conf needed**: Executable name, type, and timeout are embedded in the `wazuh.active_response` object
-- **WCS Compatibility**: Field names aligned with Wazuh Cloud Standards
+- **No ar.conf needed**: Executable name, type, and timeout are embedded in the `guardsarm.active_response` object
+- **WCS Compatibility**: Field names aligned with GuardSarm Cloud Standards
 - **Simplified Configuration**: Reduces agent-side configuration complexity
 - **Centralized Metadata**: All execution parameters controlled by manager
 
@@ -183,11 +183,11 @@ This prevents multiple concurrent blocks of the same IP or account.
 
 ### Configuration
 
-Active Response is configured from the Wazuh dashboard.
+Active Response is configured from the GuardSarm dashboard.
 
 ### Agent Execution
 
-The agent's `wazuh-execd` daemon:
+The agent's `guardsarm-execd` daemon:
 1. Listens for commands from the manager
 2. Validates the JSON structure and command
 3. Executes the appropriate script with JSON input via stdin
@@ -219,7 +219,7 @@ Active Response operations are logged to:
 Log format:
 ```
 2026-03-31 15:30:45 block-ip: Starting
-2026-03-31 15:30:45 block-ip: {"wazuh":{"active_response":{...}},"source":{...},"command":"enable"}
+2026-03-31 15:30:45 block-ip: {"guardsarm":{"active_response":{...}},"source":{...},"command":"enable"}
 2026-03-31 15:30:46 block-ip: INFO - firewalld - success - IP 192.168.1.100 blocked successfully
 2026-03-31 15:30:46 block-ip: Ended
 ```

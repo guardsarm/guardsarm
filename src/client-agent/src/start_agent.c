@@ -16,17 +16,17 @@
 #include "metadata_provider.h"
 #include <ctype.h>
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
     // Remove static qualifier when unit testing
     #define STATIC
     #ifdef WIN32
-            #include "../../unit_tests/wrappers/wazuh/client-agent/start_agent.h"
+            #include "../../unit_tests/wrappers/guardsarm/client-agent/start_agent.h"
             #define recv wrap_recv
     #endif
 
-    // Redefine wazuh_version
-    #undef __wazuh_version
-    #define __wazuh_version "v5.0.0"
+    // Redefine guardsarm_version
+    #undef __guardsarm_version
+    #define __guardsarm_version "v5.0.0"
 #else
     #define STATIC static
 #endif
@@ -468,7 +468,7 @@ void start_agent(int is_startup)
         sleep(agt->server[current_server_id].retry_interval);
 
         /* Wait for server reply */
-        mwarn(AG_WAIT_SERVER, agt->server[current_server_id].rip, __wazuh_version);
+        mwarn(AG_WAIT_SERVER, agt->server[current_server_id].rip, __guardsarm_version);
 
         /* If there is a next server, try it */
         if (agt->server[current_server_id + 1].rip) {
@@ -618,7 +618,7 @@ static void populate_early_metadata(void)
         strncpy(metadata.agent_id, keys.keyentries[0]->id, sizeof(metadata.agent_id) - 1);
         strncpy(metadata.agent_name, keys.keyentries[0]->name, sizeof(metadata.agent_name) - 1);
     }
-    strncpy(metadata.agent_version, __wazuh_version, sizeof(metadata.agent_version) - 1);
+    strncpy(metadata.agent_version, __guardsarm_version, sizeof(metadata.agent_version) - 1);
 
     /* OS info */
     if (os) {
@@ -716,7 +716,7 @@ STATIC bool agent_handshake_to_server(int server_id, bool is_startup) {
     char cleartext[OS_MAXSTR + 1] = { '\0' };
 
     cJSON* agent_info = cJSON_CreateObject();
-    cJSON_AddStringToObject(agent_info, "version", __wazuh_version);
+    cJSON_AddStringToObject(agent_info, "version", __guardsarm_version);
     char *agent_info_string = cJSON_PrintUnformatted(agent_info);
     cJSON_Delete(agent_info);
 
@@ -865,13 +865,13 @@ STATIC void send_msg_on_startup(void) {
     get_iso8601_utc_time(timestamp, sizeof(timestamp));
 
     cJSON *event = cJSON_CreateObject();
-    cJSON_AddStringToObject(event, "event.module", "wazuh-agent");
+    cJSON_AddStringToObject(event, "event.module", "guardsarm-agent");
     cJSON_AddStringToObject(event, "event.action", "agent-start");
     cJSON_AddStringToObject(event, "event.start", timestamp);
     char *json_str = cJSON_PrintUnformatted(event);
     cJSON_Delete(event);
 
-    os_snprintf(fmsg, OS_MAXSTR, "%c:%s:%s", LOCALFILE_MQ, "wazuh-agent", json_str);
+    os_snprintf(fmsg, OS_MAXSTR, "%c:%s:%s", LOCALFILE_MQ, "guardsarm-agent", json_str);
     os_free(json_str);
 
     send_msg(fmsg, -1);

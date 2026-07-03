@@ -1,6 +1,6 @@
 #!/bin/sh
 # Copyright (C) 2015, Wazuh Inc.
-# Installation script for Wazuh
+# Installation script for GuardSarm
 # Author: Daniel B. Cid <daniel.cid@gmail.com>
 
 # Resolve script location and always run from its directory.
@@ -71,7 +71,7 @@ UPGRADE_PRESERVE_RESTORE_CP="cp -R"
 
 PrepareUpgradePreserve()
 {
-    UPGRADE_PRESERVE_DIR=$(mktemp -d "${TMPDIR:-/tmp}/wazuh-${INSTYPE}-upgrade-preserve.XXXXXX" 2>/dev/null) || return 1
+    UPGRADE_PRESERVE_DIR=$(mktemp -d "${TMPDIR:-/tmp}/guardsarm-${INSTYPE}-upgrade-preserve.XXXXXX" 2>/dev/null) || return 1
     [ -n "${UPGRADE_PRESERVE_DIR}" ] && [ -d "${UPGRADE_PRESERVE_DIR}" ] || return 1
 
     if [ -d "${INSTALLDIR}/etc" ]; then
@@ -248,8 +248,8 @@ Install()
 
     # For updates, stop running services before replacing files.
     if [ "X${update_only}" = "Xyes" ]; then
-        echo "Stopping Wazuh..."
-        UpdateStopWAZUH
+        echo "Stopping GuardSarm..."
+        UpdateStopGUARDSARM
     fi
 
     if [ "X${update_only}" = "Xyes" ] && { [ "X${INSTYPE}" = "Xmanager" ]; }; then
@@ -259,7 +259,7 @@ Install()
     fi
 
     # Install selected components.
-    InstallWazuh
+    InstallGuardSarm
     INSTALL_STATUS=$?
 
     if [ "${INSTALL_STATUS}" != "0" ]; then
@@ -283,18 +283,18 @@ Install()
 
     # For updates, run upgrade hooks and start services again.
     if [ "X${update_only}" = "Xyes" ]; then
-        WazuhUpgrade $INSTYPE
+        GuardSarmUpgrade $INSTYPE
         # Compatibility migration for very old versions.
         UpdateOldVersions
-        echo "Starting Wazuh..."
-        UpdateStartWAZUH
+        echo "Starting GuardSarm..."
+        UpdateStartGUARDSARM
     fi
 
     if [ $runinit_value = 1 ]; then
         notmodified="yes"
-    elif [ "X$START_WAZUH" = "Xyes" ]; then
-        echo "Starting Wazuh..."
-        UpdateStartWAZUH
+    elif [ "X$START_GUARDSARM" = "Xyes" ]; then
+        echo "Starting GuardSarm..."
+        UpdateStartGUARDSARM
     fi
 
 }
@@ -363,7 +363,7 @@ ConfigureBoot()
 
         if [ "X${USER_AUTO_START}" = "X" ]; then
             echo ""
-            $ECHO "  $NB- ${startwazuh} ($yes/$no) [$yes]: "
+            $ECHO "  $NB- ${startguardsarm} ($yes/$no) [$yes]: "
             read ANSWER
             PROMPTED="yes"
         fi
@@ -375,13 +375,13 @@ ConfigureBoot()
         case $ANSWER in
             $nomatch)
                 if [ "X${INSTALLER_BRIEF_FLOW}" != "Xyes" ] || [ "X${PROMPTED}" = "Xyes" ]; then
-                    echo "   - ${nowazuhstart}"
+                    echo "   - ${noguardsarmstart}"
                 fi
                 ;;
             *)
-                START_WAZUH="yes"
+                START_GUARDSARM="yes"
                 if [ "X${INSTALLER_BRIEF_FLOW}" != "Xyes" ] || [ "X${PROMPTED}" = "Xyes" ]; then
-                    echo "   - ${yeswazuhstart}"
+                    echo "   - ${yesguardsarmstart}"
                 fi
                 ;;
         esac
@@ -613,8 +613,8 @@ askForDelete()
 
         case $ANSWER in
             $yesmatch)
-                echo "      Stopping Wazuh..."
-                UpdateStopWAZUH
+                echo "      Stopping GuardSarm..."
+                UpdateStopGUARDSARM
                 rm -rf -- "$INSTALLDIR"
                 if [ $? -ne 0 ]; then
                     echo "Error deleting ${INSTALLDIR}"
@@ -631,13 +631,13 @@ askForDelete()
 AddPFTable()
 {
     # Default PF table/rules snippet.
-    TABLE="wazuh_fwtable"
+    TABLE="guardsarm_fwtable"
 
     # Print rules to be added by the user.
     echo ""
     echo "   - ${pfmessage}:"
     echo "     ${moreinfo}"
-    echo "     https://documentation.wazuh.com"
+    echo "     https://documentation.guardsarm.com"
 
     echo ""
     echo ""
@@ -797,14 +797,14 @@ detectPreinstalledDirForInstallType()
         return 0
     fi
 
-    if ! isWazuhInstalled "$PREINSTALLEDDIR"; then
-        PREINSTALL_DETECTION_ERROR="A ${pidir_service_name} service entry points to '${PREINSTALLEDDIR}', but no Wazuh control binary was found there."
+    if ! isGuardSarmInstalled "$PREINSTALLEDDIR"; then
+        PREINSTALL_DETECTION_ERROR="A ${pidir_service_name} service entry points to '${PREINSTALLEDDIR}', but no GuardSarm control binary was found there."
         return 2
     fi
 
     PRE_TYPE=$(getPreinstalledType)
     if [ "X$PRE_TYPE" = "X" ]; then
-        PREINSTALL_DETECTION_ERROR="A Wazuh control binary was found in '${PREINSTALLEDDIR}', but its installation type could not be determined."
+        PREINSTALL_DETECTION_ERROR="A GuardSarm control binary was found in '${PREINSTALLEDDIR}', but its installation type could not be determined."
         return 2
     fi
     PREINSTALL_DETECTED_TYPE="${PRE_TYPE}"
@@ -909,11 +909,11 @@ validateUpgradeCompatibility()
         DETECTED_VERSION=$(echo "${1:-unknown}" | sed 's/^v//')
         cat <<EOF
 ==============================================================
-ERROR: Upgrade from Wazuh manager versions prior to 5.x is not supported.
+ERROR: Upgrade from GuardSarm manager versions prior to 5.x is not supported.
 
 Detected installed version: ${DETECTED_VERSION}
 
-A clean installation of Wazuh manager 5.x is required.
+A clean installation of GuardSarm manager 5.x is required.
 Refer to the 5.x migration guide for more information.
 ==============================================================
 EOF
@@ -927,7 +927,7 @@ EOF
                 ERROR_MESSAGE="Current version: $USER_OLD_VERSION
 Target version:  5.0.0
 
-Upgrade to Wazuh 5.0.0 is only supported from version 4.14.0 or later."
+Upgrade to GuardSarm 5.0.0 is only supported from version 4.14.0 or later."
             fi
         fi
     else
@@ -961,7 +961,7 @@ Upgrade to Wazuh 5.0.0 is only supported from version 4.14.0 or later."
         fi
         echo ""
         echo "For more information, visit:"
-        echo "  https://documentation.wazuh.com/current/upgrade-guide/"
+        echo "  https://documentation.guardsarm.com/current/upgrade-guide/"
         echo "═════════════════════════════════════════════════════════════════"
         echo ""
         exit 1
@@ -1021,7 +1021,7 @@ main()
 
     . ./src/init/language.sh
     . ./src/init/init.sh
-    . ./src/init/wazuh/wazuh.sh
+    . ./src/init/guardsarm/guardsarm.sh
     . "${TEMPLATE}/${LANGUAGE}/messages.txt"
     . ./src/init/inst-functions.sh
     . ./src/init/template-select.sh
@@ -1036,7 +1036,7 @@ main()
     fi
 
     # Installer banner.
-    echo " $NAME $VERSION (Rev. $REVISION) ${installscript} - https://www.wazuh.com"
+    echo " $NAME $VERSION (Rev. $REVISION) ${installscript} - https://guardsarm.com"
     catMsg "0x101-initial"
     echo ""
     echo "  - $system: $UNAME (${DIST_NAME} ${DIST_VER}.${DIST_SUBVER})"
@@ -1086,9 +1086,9 @@ main()
     CLEANINSTALL_ANY=$(normalizeYesNo "${USER_CLEANINSTALL}")
     if [ "X${USER_CLEANINSTALL}" = "X" ] || [ "X${CLEANINSTALL_ANY}" = "Xno" ]; then
         if [ "X$INSTYPE" = "Xagent" ]; then
-            pidir_service_name="wazuh-agent"
+            pidir_service_name="guardsarm-agent"
         else
-            pidir_service_name="wazuh-manager"
+            pidir_service_name="guardsarm-manager"
         fi
 
         detectPreinstalledDirForInstallType
@@ -1121,7 +1121,7 @@ main()
         if [ "X$INSTYPE" = "Xagent" ]; then
             INSTALLDIR="/var/ossec"
         else
-            INSTALLDIR="/var/wazuh-manager"
+            INSTALLDIR="/var/guardsarm-manager"
         fi
     fi
 
@@ -1152,9 +1152,9 @@ main()
     Install
 
     # Post-install usage hints.
-    control_script="wazuh-control"
+    control_script="guardsarm-control"
     if [ "X$INSTYPE" = "Xmanager" ]; then
-        control_script="wazuh-manager-control"
+        control_script="guardsarm-manager-control"
     fi
     echo ""
     echo " - ${configurationdone}."
@@ -1165,7 +1165,7 @@ main()
     echo " - ${tostop}:"
     echo "      $INSTALLDIR/bin/${control_script} stop"
     echo ""
-    echo " - ${configat} $INSTALLDIR/etc/${WAZUH_CONF}"
+    echo " - ${configat} $INSTALLDIR/etc/${GUARDSARM_CONF}"
     echo ""
     if [ "X${INSTALLER_BRIEF_FLOW}" != "Xyes" ]; then
         catMsg "0x103-thanksforusing"
@@ -1180,7 +1180,7 @@ main()
         echo ""
 
         # Compatibility note for very old versions.
-        if [ "X$USER_OLD_NAME" != "XWazuh" ]; then
+        if [ "X$USER_OLD_NAME" != "XGuardSarm" ]; then
             echo " ====================================================================================="
             echo "  ${update_rev_newconf1}"
             echo "  ${update_rev_newconf2}"
@@ -1204,13 +1204,13 @@ main()
         echo " - ${addserveragent}"
         echo ""
         echo "   ${moreinfo}"
-        echo "   https://documentation.wazuh.com/"
+        echo "   https://documentation.guardsarm.com/"
         echo ""
 
     elif [ "X$INSTYPE" = "Xagent" ]; then
         echo ""
         echo " - ${moreinfo}"
-        echo "   https://documentation.wazuh.com/"
+        echo "   https://documentation.guardsarm.com/"
         echo ""
     fi
 

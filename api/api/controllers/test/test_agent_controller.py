@@ -10,10 +10,10 @@ from connexion.lifecycle import ConnexionResponse
 
 from api.controllers.test.utils import CustomAffectedItems
 
-with patch('wazuh.common.wazuh_uid'):
-    with patch('wazuh.common.wazuh_gid'):
-        sys.modules['wazuh.rbac.orm'] = MagicMock()
-        import wazuh.rbac.decorators
+with patch('guardsarm.common.guardsarm_uid'):
+    with patch('guardsarm.common.guardsarm_gid'):
+        sys.modules['guardsarm.rbac.orm'] = MagicMock()
+        import guardsarm.rbac.decorators
         from api.controllers.agent_controller import (
             add_agent, delete_agents, delete_groups,
             delete_multiple_agent_single_group,
@@ -29,12 +29,12 @@ with patch('wazuh.common.wazuh_uid'):
             put_upgrade_custom_agents, reconnect_agents, restart_agent,
             restart_agents, restart_agents_by_group, restart_agents_by_node,
             reload_agent, reload_agents, reload_agents_by_group, reload_agents_by_node)
-        from wazuh import agent, stats
-        from wazuh.core.common import DATABASE_LIMIT
-        from wazuh.tests.util import RBAC_bypasser
+        from guardsarm import agent, stats
+        from guardsarm.core.common import DATABASE_LIMIT
+        from guardsarm.tests.util import RBAC_bypasser
 
-        wazuh.rbac.decorators.expose_resources = RBAC_bypasser
-        del sys.modules['wazuh.rbac.orm']
+        guardsarm.rbac.decorators.expose_resources = RBAC_bypasser
+        del sys.modules['guardsarm.rbac.orm']
 
 
 @pytest.mark.asyncio
@@ -454,9 +454,9 @@ async def test_put_upgrade_agents(mock_exc, mock_dapi, mock_remove, mock_dfunc, 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("mock_request", ["agent_controller"], indirect=True)
 @pytest.mark.parametrize('agents_list, file_path',  [
-    (['all'], '/var/wazuh-manager/valid_file.wpk'),
-    (['001', '002'], '/var/wazuh-manager/var/upgrade/valid_file.wpk'),
-    (['001'], '/var/wazuh-manager/wrong_file.txt')
+    (['all'], '/var/guardsarm-manager/valid_file.wpk'),
+    (['001', '002'], '/var/guardsarm-manager/var/upgrade/valid_file.wpk'),
+    (['001'], '/var/guardsarm-manager/wrong_file.txt')
 ])
 @patch('api.configuration.api_conf')
 @patch('api.controllers.agent_controller.DistributedAPI.distribute_function', return_value=AsyncMock())
@@ -950,7 +950,7 @@ async def test_get_group_file(mock_exc, mock_dapi, mock_remove, mock_dfunc, mock
 @patch('api.controllers.agent_controller.DistributedAPI.distribute_function', return_value=AsyncMock())
 @patch('api.controllers.agent_controller.remove_nones_to_dict')
 @patch('api.controllers.agent_controller.DistributedAPI.__init__', return_value=None)
-@patch('api.controllers.agent_controller.AffectedItemsWazuhResult', return_value={})
+@patch('api.controllers.agent_controller.AffectedItemsGuardSarmResult', return_value={})
 async def test_restart_agents_by_group(mock_aiwr, mock_dapi, mock_remove, mock_dfunc, mock_exp, mock_alist,
                                       mock_request):
     """Verify 'restart_agents_by_group' endpoint is working as expected."""
@@ -1079,7 +1079,7 @@ async def test_reload_agent(mock_exc, mock_dapi, mock_remove, mock_dfunc, mock_e
 @patch('api.controllers.agent_controller.DistributedAPI.distribute_function', return_value=AsyncMock())
 @patch('api.controllers.agent_controller.remove_nones_to_dict')
 @patch('api.controllers.agent_controller.DistributedAPI.__init__', return_value=None)
-@patch('api.controllers.agent_controller.AffectedItemsWazuhResult', return_value={})
+@patch('api.controllers.agent_controller.AffectedItemsGuardSarmResult', return_value={})
 async def test_reload_agents_by_group(mock_aiwr, mock_dapi, mock_remove, mock_dfunc, mock_exp, mock_alist,
                                       mock_request):
     """Verify 'reload_agents_by_group' endpoint is working as expected."""
