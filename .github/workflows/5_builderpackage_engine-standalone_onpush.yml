@@ -1,0 +1,23 @@
+name: 5.X - Engine Standalone (on push)
+
+on:
+  pull_request:
+    types: [synchronize, opened, reopened, ready_for_review]
+    paths:
+      - ".github/workflows/5_builderpackage_engine-standalone.yml"
+      - ".github/workflows/5_builderpackage_engine-standalone_onpush.yml"
+      - "src/engine/**"
+      - "packages/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  call-build-workflow:
+    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    uses: ./.github/workflows/5_builderpackage_engine-standalone.yml
+    secrets: inherit
+    with:
+      wazuh-branch: ${{ github.head_ref }}
+      build-type: "release"

@@ -1,0 +1,61 @@
+name: 5.X - Shared Modules - Utils - Unit tests
+
+on:
+  pull_request:
+    types: [synchronize, opened, reopened, ready_for_review]
+    paths:
+      - ".github/workflows/5_testunit_shared_modules_utils.yml"
+      - ".github/actions/cpp_test_pipeline/**"
+      - "src/shared_modules/utils/**"
+      - ".github/actions/build_external_deps/**"
+      - ".github/actions/build_target_cpp/**"
+      - ".github/actions/coverage_cpp/**"
+      - ".github/actions/test_cpp/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  shared_modules_utils-modules:
+    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    runs-on: codebuild-github-actions-codebuild-runner-server-amd-${{ github.run_id }}-${{ github.run_attempt }}
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install a compatible CMake
+        uses: ./.github/actions/reinstall_cmake
+
+      - name: C++ test pipeline
+        uses: ./.github/actions/cpp_test_pipeline
+        with:
+          target: "utils_utest"
+          asan: "false"
+          with_coverage: "true"
+          coverage_path: src/shared_modules/utils
+          coverage_id: utils_utest
+          validate_function_coverage: "false"
+
+  shared_modules_utils-asan:
+    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    runs-on: codebuild-github-actions-codebuild-runner-server-amd-${{ github.run_id }}-${{ github.run_attempt }}
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install a compatible CMake
+        uses: ./.github/actions/reinstall_cmake
+
+      - name: C++ test pipeline (ASAN)
+        uses: ./.github/actions/cpp_test_pipeline
+        with:
+          target: "utils_utest"
+          asan: "true"

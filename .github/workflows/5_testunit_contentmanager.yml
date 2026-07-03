@@ -1,0 +1,56 @@
+name: 5.X - Content Manager - Unit tests
+
+on:
+  pull_request:
+    types: [synchronize, opened, reopened, ready_for_review]
+    paths:
+      - ".github/workflows/5_testunit_contentmanager.yml"
+      - ".github/actions/cpp_test_pipeline/**"
+      - "src/shared_modules/utils/**"
+      - "src/shared_modules/content_manager/**"
+      - ".github/actions/build_external_deps/**"
+      - ".github/actions/build_target_cpp/**"
+      - ".github/actions/coverage_cpp/**"
+      - ".github/actions/test_cpp/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  contentmanager-modules:
+    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: C++ test pipeline
+        uses: ./.github/actions/cpp_test_pipeline
+        with:
+          target: "content_manager_utest"
+          asan: "false"
+          with_coverage: "true"
+          coverage_path: src/shared_modules/content_manager
+          coverage_id: content_manager
+          coverage_threshold: "65"
+
+  contentmanager-asan:
+    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: C++ test pipeline (ASAN)
+        uses: ./.github/actions/cpp_test_pipeline
+        with:
+          target: "content_manager_utest"
+          asan: "true"

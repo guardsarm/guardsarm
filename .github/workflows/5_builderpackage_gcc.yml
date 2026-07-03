@@ -1,0 +1,48 @@
+name: 5.X - Build GCC Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      gcc_major_version:
+        description: "GCC major version"
+        required: true
+        default: "14"
+      gcc_minor_version:
+        description: "GCC minor version"
+        required: true
+        default: "3"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build-package:
+    runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
+    name: Build ${{ matrix.system }} (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        system: [deb, rpm]
+        arch: [amd64, arm64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Docker build
+        env:
+          GCC_MAJOR_VERSION: ${{ inputs.gcc_major_version }}
+          GCC_MINOR_VERSION: ${{ inputs.gcc_minor_version }}
+        run: |
+          IMAGE_NAME="gcc-${{ matrix.system }}-${{ matrix.arch }}"
+          docker build -t "$IMAGE_NAME" -f "packages/${{ matrix.system }}s/${{ matrix.arch }}/gcc/Dockerfile" \
+            --build-arg "GCC_MAJOR_VERSION=$GCC_MAJOR_VERSION" \
+            --build-arg "GCC_MINOR_VERSION=$GCC_MINOR_VERSION" .
+          docker run -v /tmp:/tmp "$IMAGE_NAME" /bin/bash -c "cp /packages/* /tmp/"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gcc-${{ matrix.system }}-${{ matrix.arch }}
+          path: /tmp/*.${{ matrix.system }}

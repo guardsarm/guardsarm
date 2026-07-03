@@ -1,0 +1,131 @@
+name: 5.X - Package - Build Wazuh manager embedded Python
+
+on:
+  workflow_dispatch:
+    inputs:
+      architecture:
+        description: 'Comma-separated architecture. Example: "amd64,arm64"'
+        type: string
+        default: "amd64,arm64"
+        required: true
+      build_cpython:
+        description: Whether to build embedded Python or not.
+        type: boolean
+        default: true
+        required: false
+      build_deps:
+        description: Whether to build embedded Python dependencies or not. Enabling build_cpython will enable this option automatically.
+        type: boolean
+        default: true
+        required: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  pick-architecture:
+    name: Get architectures
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Generate dynamic matrix
+        id: set-matrix
+        env:
+          INPUT_ARCHITECTURE: ${{ inputs.architecture }}
+        run: |
+          set -euo pipefail
+          JSON_ARRAY=$(
+            echo "$INPUT_ARCHITECTURE" \
+            | tr ',' '\n' \
+            | while read -r raw_arch; do
+                arch=$(echo "$raw_arch" | xargs)
+
+                case "$arch" in
+                  arm64|aarch64)
+                    IMG_ARCH="arm64"
+                    ;;
+                  amd64|x86_64)
+                    IMG_ARCH="amd64"
+                    ;;
+                  "")
+                    continue
+                    ;;
+                  *)
+                    echo "Unsupported architecture: $arch" >&2
+                    exit 1
+                    ;;
+                esac
+
+                jq -c -n --arg arch "$IMG_ARCH" '{architecture: $arch}'
+              done
+          )
+          JSON_ARRAY=$(echo "$JSON_ARRAY" | jq -c -s 'unique | {include: .}')
+          echo "matrix=$JSON_ARRAY" >> "$GITHUB_OUTPUT"
+
+  build-python:
+    name: Build embedded Python (${{ matrix.architecture }})
+    needs: pick-architecture
+    strategy:
+      matrix: ${{ fromJSON(needs.pick-architecture.outputs.matrix) }}
+      fail-fast: false
+    runs-on: ${{ matrix.architecture == 'arm64' && format('codebuild-github-actions-codebuild-runner-agent-arm-{0}-{1}', github.run_id, github.run_attempt) || 'ubuntu-24.04' }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set environment variables
+        run: |
+          arch="${{ matrix.architecture }}"
+          if [ "$arch" = "amd64" ]; then
+            pkg_arch="x86_64"
+          else
+            pkg_arch="arm64"
+          fi
+
+          VERSION=$(jq -r '.version' VERSION.json)
+
+          cat << EOF | sed -e 's/^[[:space:]]*//' -e 's/\r$//' >> $GITHUB_ENV
+          ARCH=$arch
+          PACKAGE_ARCH=$pkg_arch
+          TAG=$VERSION
+          CONTAINER_NAME=pkg_rpm_manager_builder_$arch
+          EOF
+
+      - name: Pull builder container image
+        run: |
+          bash $GITHUB_WORKSPACE/.github/actions/ghcr-pull-and-push/pull_image_from_ghcr.sh "${{ secrets.GITHUB_TOKEN }}" "${{ github.actor }}" "${{ env.CONTAINER_NAME }}" "${{ env.TAG }}"
+
+      - name: Compile embedded Python
+        working-directory: framework/cpython
+        env:
+          INPUT_BUILD_CPYTHON: ${{ inputs.build_cpython }}
+          INPUT_BUILD_DEPS: ${{ inputs.build_deps }}
+        run: |
+          FLAGS=""
+          [ "$INPUT_BUILD_CPYTHON" = "true" ] && FLAGS+="--build-cpython "
+          [ "$INPUT_BUILD_DEPS" = "true" ] && FLAGS+="--build-deps "
+          docker run --env ARCH="$PACKAGE_ARCH" \
+            -v $GITHUB_WORKSPACE:/wazuh_host -v /tmp:/output \
+            --entrypoint=bash "$CONTAINER_NAME:$TAG" \
+            /wazuh_host/framework/cpython/compile.sh $FLAGS
+
+      - name: Upload sources
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARCH }}-sources
+          path: /tmp/cpython_${{ env.PACKAGE_ARCH }}.tar.gz
+          if-no-files-found: error
+
+      - name: Upload compiled Python
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARCH }}-compiled
+          path: /tmp/cpython.tar.gz
+          if-no-files-found: error

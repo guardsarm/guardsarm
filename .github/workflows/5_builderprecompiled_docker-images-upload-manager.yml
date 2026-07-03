@@ -1,0 +1,96 @@
+run-name: 5.X - Package - Upload manager images
+name: 5.X - Package - Upload manager images
+
+on:
+  push:
+    branches:
+      - "5.[0-9]+.[0-9]+"
+      - "main"
+    paths:
+      - "packages/**"
+
+  workflow_dispatch:
+    inputs:
+      docker_image_tag:
+        description: |
+          Tag name of the Docker image to be uploaded.
+          Use 'developer' to set branch name as tag.
+          Use 'auto' to set branch version as tag.
+          If using a custom tag, use only '-', '_', '.' and alphanumeric characters.
+          Default is 'auto'.
+        required: false
+        default: auto
+      architecture:
+        description: "Architecture of the package [amd64, arm64]"
+        type: choice
+        options:
+          - amd64
+          - arm64
+        required: true
+      system:
+        type: choice
+        description: "System image to upload [deb, rpm]."
+        options:
+          - deb
+          - rpm
+        required: true
+      source_reference:
+        description: "Branch from wazuh/wazuh repository to use."
+        required: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  upload-images:
+    permissions:
+      contents: read
+      packages: write
+      actions: write
+    runs-on: ${{ matrix.arch == 'arm64' && format('codebuild-github-actions-codebuild-runner-server-arm-{0}-{1}', github.run_id, github.run_attempt) || 'ubuntu-24.04' }}
+    timeout-minutes: 180
+    name: Upload pkg_${{ matrix.system }}_manager_builder_${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        system: ${{ github.event_name == 'push' && fromJSON('["deb", "rpm"]') || fromJSON(format('["{0}"]', inputs.system)) }}
+        arch: ${{ github.event_name == 'push' && fromJSON('["amd64", "arm64"]') || fromJSON(format('["{0}"]', inputs.architecture)) }}
+
+    steps:
+      - name: Checkout wazuh/wazuh repository
+        uses: actions/checkout@v6
+        with:
+          repository: wazuh/wazuh
+          ref: ${{ inputs.source_reference || github.ref }}
+
+      - name: Set environment variables
+        run: |
+          VERSION=$(jq -r '.version' VERSION.json)
+
+          if [ "${{ inputs.docker_image_tag || 'auto' }}" == "auto" ]; then
+            TAG="$VERSION"
+          elif [ "${{ inputs.docker_image_tag }}" == "developer" ]; then
+            REF_NAME="${{ inputs.source_reference || github.ref_name }}"
+            TAG="$(sed 's|[/\]|--|g' <<< $REF_NAME)"
+          else
+            TAG="${{ inputs.docker_image_tag }}"
+          fi
+
+          DOCKERFILE_PATH="packages/${{ matrix.system }}s/${{ matrix.arch }}/manager"
+
+          cat << EOF | sed -e 's/^[[:space:]]*//' -e 's/\r$//' >> $GITHUB_ENV
+          TAG=$TAG
+          DOCKERFILE_PATH=$DOCKERFILE_PATH
+          CONTAINER_NAME=pkg_${{ matrix.system }}_manager_builder_${{ matrix.arch }}
+          EOF
+
+      - name: Copy build.sh and utils to Dockerfile path
+        run: |
+          cp packages/build.sh ${{ env.DOCKERFILE_PATH }}
+          cp packages/${{ matrix.system }}s/utils/* ${{ env.DOCKERFILE_PATH }}
+          cp .github/scripts/run_with_retry.sh ${{ env.DOCKERFILE_PATH }}/retry.sh
+
+      - name: Build and push image to Github Container Registry
+        timeout-minutes: 165
+        run: bash .github/actions/ghcr-pull-and-push/build_and_push_image_to_ghcr.sh ${{ secrets.GITHUB_TOKEN }} ${{ github.actor }} ${{ env.CONTAINER_NAME }} ${{ env.DOCKERFILE_PATH }} ${{ env.TAG }}
