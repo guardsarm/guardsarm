@@ -14,7 +14,7 @@ from api import configuration
 from api.constants import (SECURITY_PATH)
 from api.authentication import generate_keypair, _private_key_path, _public_key_path
 
-logger = logging.getLogger('wazuh-api')
+logger = logging.getLogger('guardsarm-api')
 
 def cancel_signal_handler(func: Callable) -> Callable:
     """Decorator to handle asyncio.CancelledError for signals coroutines.
@@ -68,4 +68,4 @@ async def lifespan_handler(_: ConnexionMiddleware):
         task.cancel()
         await task
 
-    logger.info('Shutdown wazuh-manager-apid server.')
+    logger.info('Shutdown guardsarm-manager-apid server.')

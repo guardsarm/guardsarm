@@ -1,5 +1,5 @@
-name: 'Test uninstall Wazuh agent package'
-description: 'Test uninstall Wazuh agent package'
+name: 'Test uninstall GuardSarm agent package'
+description: 'Test uninstall GuardSarm agent package'
 
 inputs:
   tested_docker:
@@ -9,7 +9,7 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Run test uninstall Wazuh agent package
+    - name: Run test uninstall GuardSarm agent package
       shell: bash
       env:
         INPUT_TESTED_DOCKER: ${{ inputs.tested_docker }}

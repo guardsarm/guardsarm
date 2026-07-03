@@ -26,13 +26,13 @@ TEST_F(RawEventIndexerUnitTest, ConstructorThrowsIfConnectorIsExpired)
 
 TEST_F(RawEventIndexerUnitTest, ConstructorAlwaysStartsDisabled)
 {
-    raweventindexer::RawEventIndexer indexer(m_connector, "wazuh-events-raw-v5");
+    raweventindexer::RawEventIndexer indexer(m_connector, "guardsarm-events-raw-v5");
     EXPECT_FALSE(indexer.isEnabled());
 }
 
 TEST_F(RawEventIndexerUnitTest, EnableDisableTogglesState)
 {
-    raweventindexer::RawEventIndexer indexer(m_connector, "wazuh-events-raw-v5");
+    raweventindexer::RawEventIndexer indexer(m_connector, "guardsarm-events-raw-v5");
     EXPECT_FALSE(indexer.isEnabled());
 
     indexer.enable();

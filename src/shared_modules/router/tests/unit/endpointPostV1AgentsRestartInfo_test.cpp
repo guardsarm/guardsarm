@@ -1,5 +1,5 @@
 /*
- * Wazuh router
+ * GuardSarm router
  * Copyright (C) 2015, Wazuh Inc.
  * May 5, 2025.
  *
@@ -9,7 +9,7 @@
  * Foundation.
  */
 
-#include "shared_modules/router/src/wazuh-db/endpointPostV1AgentsRestartInfo.hpp"
+#include "shared_modules/router/src/guardsarm-db/endpointPostV1AgentsRestartInfo.hpp"
 #include "shared_modules/utils/mocks/sqlite3WrapperMock.hpp"
 
 #include <gmock/gmock.h>

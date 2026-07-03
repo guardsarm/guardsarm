@@ -20,7 +20,7 @@
 #include "agentd.h"
 #include "sendmsg.h"
 
-static const char AG_IN_RCON[] = "wazuh: Invalid remote configuration";
+static const char AG_IN_RCON[] = "guardsarm: Invalid remote configuration";
 
 bool reloadAgent(void) {
 
@@ -85,22 +85,22 @@ int verifyRemoteConf(){
 	configPath = AGENTCONFIG;
 
 	if (Test_Syscheck(configPath) < 0) {
-		snprintf(msg_output, OS_MAXSTR, "%c:%s:%s: '%s'. ",  LOCALFILE_MQ, "wazuh-agent", AG_IN_RCON, "syscheck");
+		snprintf(msg_output, OS_MAXSTR, "%c:%s:%s: '%s'. ",  LOCALFILE_MQ, "guardsarm-agent", AG_IN_RCON, "syscheck");
 		goto fail;
 	} else if (Test_Rootcheck(configPath) < 0) {
-		snprintf(msg_output, OS_MAXSTR, "%c:%s:%s: '%s'. ",  LOCALFILE_MQ, "wazuh-agent", AG_IN_RCON, "rootcheck");
+		snprintf(msg_output, OS_MAXSTR, "%c:%s:%s: '%s'. ",  LOCALFILE_MQ, "guardsarm-agent", AG_IN_RCON, "rootcheck");
 		goto fail;
     } else if (Test_Localfile(configPath) < 0) {
-		snprintf(msg_output, OS_MAXSTR, "%c:%s:%s: '%s'. ",  LOCALFILE_MQ, "wazuh-agent", AG_IN_RCON, "localfile");
+		snprintf(msg_output, OS_MAXSTR, "%c:%s:%s: '%s'. ",  LOCALFILE_MQ, "guardsarm-agent", AG_IN_RCON, "localfile");
 		goto fail;
     } else if (Test_Client(configPath) < 0) {
-		snprintf(msg_output, OS_MAXSTR, "%c:%s:%s: '%s'. ",  LOCALFILE_MQ, "wazuh-agent", AG_IN_RCON, "client");
+		snprintf(msg_output, OS_MAXSTR, "%c:%s:%s: '%s'. ",  LOCALFILE_MQ, "guardsarm-agent", AG_IN_RCON, "client");
 		goto fail;
 	} else if (Test_ClientBuffer(configPath) < 0) {
-		snprintf(msg_output, OS_MAXSTR, "%c:%s:%s: '%s'. ",  LOCALFILE_MQ, "wazuh-agent", AG_IN_RCON, "client_buffer");
+		snprintf(msg_output, OS_MAXSTR, "%c:%s:%s: '%s'. ",  LOCALFILE_MQ, "guardsarm-agent", AG_IN_RCON, "client_buffer");
 		goto fail;
     } else if (Test_WModule(configPath) < 0) {
-		snprintf(msg_output, OS_MAXSTR, "%c:%s:%s: '%s'. ",  LOCALFILE_MQ, "wazuh-agent", AG_IN_RCON, "wodle");
+		snprintf(msg_output, OS_MAXSTR, "%c:%s:%s: '%s'. ",  LOCALFILE_MQ, "guardsarm-agent", AG_IN_RCON, "wodle");
 		goto fail;
     }
 

@@ -29,7 +29,7 @@ LOGGING_MSG_FORMAT = '%(asctime)s azure: %(levelname)s: %(message)s'
 LOGGING_DATE_FORMAT = '%Y/%m/%d %H:%M:%S'
 LOG_LEVELS = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
 
-CREDENTIALS_URL = 'https://documentation.wazuh.com/current/azure/activity-services/prerequisites/credentials.html'
+CREDENTIALS_URL = 'https://documentation.guardsarm.com/current/azure/activity-services/prerequisites/credentials.html'
 URL_LOGGING = 'https://login.microsoftonline.com'
 
 
@@ -366,14 +366,14 @@ def send_message(message: str):
         s.send(encoded_msg)
     except socket_error as e:
         if e.errno == 111:
-            logging.error('Wazuh must be running.')
+            logging.error('GuardSarm must be running.')
             sys.exit(1)
         elif e.errno == 90:
             logging.error(
-                'Message too long to send to Wazuh.  Skipping message...'
+                'Message too long to send to GuardSarm.  Skipping message...'
             )
         else:
-            logging.error(f'Error sending message to wazuh: {e}')
+            logging.error(f'Error sending message to guardsarm: {e}')
             sys.exit(1)
     finally:
         s.close()

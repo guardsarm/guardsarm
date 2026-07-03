@@ -176,8 +176,8 @@ firewall_result_t try_pf_macos(const char *srcip, int action, int ip_version, co
         return FIREWALL_EXECUTION_FAILED;
     }
 
-    // Check if wazuh_fwtable exists and create if necessary
-    char *exec_cmd_check[] = {pfctl_path, "-t", "wazuh_fwtable", "-T", "show", NULL};
+    // Check if guardsarm_fwtable exists and create if necessary
+    char *exec_cmd_check[] = {pfctl_path, "-t", "guardsarm_fwtable", "-T", "show", NULL};
     wfd = wpopenv(pfctl_path, exec_cmd_check, W_BIND_STDOUT | W_BIND_STDERR);
 
     bool table_exists = false;
@@ -194,13 +194,13 @@ firewall_result_t try_pf_macos(const char *srcip, int action, int ip_version, co
 
         // Check if pf.conf exists
         if (access(pf_conf_path, F_OK) >= 0) {
-            // First check if wazuh_fwtable is already configured in pf.conf
+            // First check if guardsarm_fwtable is already configured in pf.conf
             bool config_exists = false;
             FILE *pf_conf_check = wfopen(pf_conf_path, "r");
             if (pf_conf_check) {
                 char line_buf[OS_MAXSTR];
                 while (fgets(line_buf, OS_MAXSTR, pf_conf_check)) {
-                    if (strstr(line_buf, "wazuh_fwtable") != NULL) {
+                    if (strstr(line_buf, "guardsarm_fwtable") != NULL) {
                         config_exists = true;
                         break;
                     }
@@ -210,16 +210,16 @@ firewall_result_t try_pf_macos(const char *srcip, int action, int ip_version, co
 
             if (!config_exists) {
                 memset(log_msg, '\0', OS_MAXSTR);
-                snprintf(log_msg, OS_MAXSTR - 1, "Table 'wazuh_fwtable' does not exist");
+                snprintf(log_msg, OS_MAXSTR - 1, "Table 'guardsarm_fwtable' does not exist");
                 write_debug_file(argv0, log_msg);
 
                 // Append table configuration to pf.conf
                 FILE *pf_conf = wfopen(pf_conf_path, "a");
                 if (pf_conf) {
-                    fprintf(pf_conf, "\n# Wazuh active response table\n");
-                    fprintf(pf_conf, "table <wazuh_fwtable> persist\n");
-                    fprintf(pf_conf, "block in quick from <wazuh_fwtable> to any\n");
-                    fprintf(pf_conf, "block out quick from any to <wazuh_fwtable>\n");
+                    fprintf(pf_conf, "\n# GuardSarm active response table\n");
+                    fprintf(pf_conf, "table <guardsarm_fwtable> persist\n");
+                    fprintf(pf_conf, "block in quick from <guardsarm_fwtable> to any\n");
+                    fprintf(pf_conf, "block out quick from any to <guardsarm_fwtable>\n");
                     fclose(pf_conf);
                 } else {
                     memset(log_msg, '\0', OS_MAXSTR);
@@ -276,7 +276,7 @@ firewall_result_t try_pf_macos(const char *srcip, int action, int ip_version, co
 
     // Add or delete IP from table
     const char *table_operation = (action == ENABLE_COMMAND) ? "add" : "delete";
-    char *exec_cmd2[] = {pfctl_path, "-t", "wazuh_fwtable", "-T", (char *)table_operation, (char *)srcip, NULL};
+    char *exec_cmd2[] = {pfctl_path, "-t", "guardsarm_fwtable", "-T", (char *)table_operation, (char *)srcip, NULL};
 
     wfd = wpopenv(pfctl_path, exec_cmd2, W_BIND_STDOUT | W_BIND_STDERR);
     if (!wfd) {

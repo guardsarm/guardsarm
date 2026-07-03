@@ -40,70 +40,70 @@
         {
             "label": "Scripts: Mount proc",
             "type": "shell",
-            "command": "${env:WAZUH_DEV_SCRIPTS}/mount_wazuh_proc.sh",
+            "command": "${env:GUARDSARM_DEV_SCRIPTS}/mount_guardsarm_proc.sh",
             "args": [],
             "problemMatcher": []
         },
         {
             "label": "Scripts: Create standalone structure",
             "type": "shell",
-            "command": "${env:WAZUH_DEV_SCRIPTS}/create_struct_standalone.sh",
+            "command": "${env:GUARDSARM_DEV_SCRIPTS}/create_struct_standalone.sh",
             "args": [],
             "problemMatcher": []
         },
         {
-            "label": "Scripts: Purge Wazuh installation",
+            "label": "Scripts: Purge GuardSarm installation",
             "type": "shell",
-            "command": "${env:WAZUH_REPO}/tools/purge_wazuh.sh",
+            "command": "${env:GUARDSARM_REPO}/tools/purge_guardsarm.sh",
             "args": [],
             "problemMatcher": []
         },
         {
             "label": "E2E Scripts: [Manager] Init setup (certs && pkg)",
             "type": "shell",
-            "command": "${env:WAZUH_DEV_SCRIPTS}/../e2e/init.sh",
+            "command": "${env:GUARDSARM_DEV_SCRIPTS}/../e2e/init.sh",
             "args": [],
             "problemMatcher": []
         },
         {
-            "label": "E2E Scripts: [Manager] Copy wazuh-manager certs",
+            "label": "E2E Scripts: [Manager] Copy guardsarm-manager certs",
             "type": "shell",
-            "command": "${env:WAZUH_DEV_SCRIPTS}/../e2e/wazuh_copy_certs.sh",
+            "command": "${env:GUARDSARM_DEV_SCRIPTS}/../e2e/guardsarm_copy_certs.sh",
             "args": [],
             "problemMatcher": []
         },
         {
             "label": "E2E Scripts: [Agent] Init setup (download pkgs)",
             "type": "shell",
-            "command": "${env:WAZUH_DEV_SCRIPTS}/../e2e/agents/init.sh",
+            "command": "${env:GUARDSARM_DEV_SCRIPTS}/../e2e/agents/init.sh",
             "args": [],
             "problemMatcher": []
         },
         {
             "label": "E2E Scripts: [Agent] Up (reset & start containers)",
             "type": "shell",
-            "command": "docker compose -f ${env:WAZUH_DEV_SCRIPTS}/../e2e/agents/docker-compose.yml down -v && docker compose -f ${env:WAZUH_DEV_SCRIPTS}/../e2e/agents/docker-compose.yml up -d",
+            "command": "docker compose -f ${env:GUARDSARM_DEV_SCRIPTS}/../e2e/agents/docker-compose.yml down -v && docker compose -f ${env:GUARDSARM_DEV_SCRIPTS}/../e2e/agents/docker-compose.yml up -d",
             "args": [],
             "problemMatcher": []
         },
         {
             "label": "E2E Scripts: [Manager] Up (reset & start containers)",
             "type": "shell",
-            "command": "docker compose -f ${env:WAZUH_DEV_SCRIPTS}/../e2e/docker-compose.yml down -v && docker compose -f ${env:WAZUH_DEV_SCRIPTS}/../e2e/docker-compose.yml up -d",
+            "command": "docker compose -f ${env:GUARDSARM_DEV_SCRIPTS}/../e2e/docker-compose.yml down -v && docker compose -f ${env:GUARDSARM_DEV_SCRIPTS}/../e2e/docker-compose.yml up -d",
             "args": [],
             "problemMatcher": []
         },
         {
             "label": "PR: clang-format (format)",
             "type": "shell",
-            "command": "${env:WAZUH_DEV_SCRIPTS}/pr-clang.sh",
+            "command": "${env:GUARDSARM_DEV_SCRIPTS}/pr-clang.sh",
             "args": [],
             "problemMatcher": []
         },
         {
             "label": "PR: clang-format (check)",
             "type": "shell",
-            "command": "${env:WAZUH_DEV_SCRIPTS}/pr-clang.sh",
+            "command": "${env:GUARDSARM_DEV_SCRIPTS}/pr-clang.sh",
             "args": [
                 "--check"
             ],
@@ -114,7 +114,7 @@
             "type": "shell",
             "command": "/usr/bin/make",
             "args": [
-                "--directory=${env:WAZUH_REPO}/src",
+                "--directory=${env:GUARDSARM_REPO}/src",
                 "-j27",
                 "TARGET=manager",
                 "DEBUG=yes"
@@ -129,7 +129,7 @@
             "type": "shell",
             "command": "/usr/bin/make",
             "args": [
-                "--directory=${env:WAZUH_REPO}/src",
+                "--directory=${env:GUARDSARM_REPO}/src",
                 "-j27",
                 "TARGET=manager",
                 "DEBUG=yes",
@@ -145,7 +145,7 @@
             "type": "shell",
             "command": "/usr/bin/make",
             "args": [
-                "--directory=${env:WAZUH_REPO}/src",
+                "--directory=${env:GUARDSARM_REPO}/src",
                 "-j",
                 "TARGET=manager",
                 "ENGINE_TEST=y",
@@ -161,7 +161,7 @@
             "type": "shell",
             "command": "/usr/bin/make",
             "args": [
-                "--directory=${env:WAZUH_REPO}/src",
+                "--directory=${env:GUARDSARM_REPO}/src",
                 "-j27",
                 "TARGET=manager",
                 "ENGINE_TEST=y"
@@ -182,7 +182,7 @@
                 }
             },
             "args": [
-                "--directory=${env:WAZUH_REPO}/src",
+                "--directory=${env:GUARDSARM_REPO}/src",
                 "-j27",
                 "TARGET=manager",
                 "DEBUG=yes"
@@ -203,7 +203,7 @@
                 }
             },
             "args": [
-                "--directory=${env:WAZUH_REPO}/src",
+                "--directory=${env:GUARDSARM_REPO}/src",
                 "-j27",
                 "TARGET=manager",
                 "DEBUG=yes"
@@ -218,7 +218,7 @@
             "type": "shell",
             "command": "/usr/bin/make",
             "args": [
-                "--directory=${env:WAZUH_REPO}/src",
+                "--directory=${env:GUARDSARM_REPO}/src",
                 "deps",
                 "TARGET=manager",
                 "-j"
@@ -231,7 +231,7 @@
             "type": "shell",
             "command": "/usr/bin/make",
             "args": [
-                "--directory=${env:WAZUH_REPO}/src",
+                "--directory=${env:GUARDSARM_REPO}/src",
                 "clean-deps"
             ],
             "group": "build"
@@ -241,7 +241,7 @@
             "type": "shell",
             "command": "/usr/bin/make",
             "args": [
-                "--directory=${env:WAZUH_REPO}/src",
+                "--directory=${env:GUARDSARM_REPO}/src",
                 "clean-external"
             ],
             "group": "build"
@@ -251,7 +251,7 @@
             "type": "shell",
             "command": "/usr/bin/make",
             "args": [
-                "--directory=${env:WAZUH_REPO}/src",
+                "--directory=${env:GUARDSARM_REPO}/src",
                 "clean-internals"
             ],
             "group": "build",
@@ -262,7 +262,7 @@
             "type": "shell",
             "command": "/usr/bin/make",
             "args": [
-                "--directory=${env:WAZUH_REPO}/src",
+                "--directory=${env:GUARDSARM_REPO}/src",
                 "clean"
             ],
             "group": "build",
@@ -278,9 +278,9 @@
             "args": [
                 "-DTARGET=manager",
                 "-S",
-                "${env:WAZUH_REPO}/src/unit_tests",
+                "${env:GUARDSARM_REPO}/src/unit_tests",
                 "-B",
-                "${env:WAZUH_REPO}/src/unit_tests/build"
+                "${env:GUARDSARM_REPO}/src/unit_tests/build"
             ],
             "group": "build",
             "problemMatcher": [
@@ -292,7 +292,7 @@
             "type": "shell",
             "command": "/usr/bin/make",
             "args": [
-                "--directory=${env:WAZUH_REPO}/src/unit_tests/build"
+                "--directory=${env:GUARDSARM_REPO}/src/unit_tests/build"
             ],
             "group": "build",
             "problemMatcher": [
@@ -304,7 +304,7 @@
             "type": "shell",
             "command": "/usr/bin/make",
             "args": [
-                "--directory=${env:WAZUH_REPO}/src/unit_tests/build",
+                "--directory=${env:GUARDSARM_REPO}/src/unit_tests/build",
                 "coverage"
             ],
             "group": "build",
@@ -325,7 +325,7 @@
                 "--num-callers=20",
                 "--show-leak-kinds=definite,indirect",
                 "--log-file=ValgrindPRs.log",
-                "/var/wazuh-manager/bin/wazuh-remoted",
+                "/var/guardsarm-manager/bin/guardsarm-remoted",
                 "-f",
                 "-d"
             ],
@@ -335,7 +335,7 @@
         {
             "label": "Clean unused containers (interactive)",
             "type": "shell",
-            "command": "bash ${env:WAZUH_DEV_SCRIPTS}/clean-unused-containers.sh",
+            "command": "bash ${env:GUARDSARM_DEV_SCRIPTS}/clean-unused-containers.sh",
             "problemMatcher": [],
             "presentation": {
                 "echo": true,

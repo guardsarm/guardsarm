@@ -1,6 +1,6 @@
 # Indexer Connector
 
-The Indexer Connector is a shared library (`libindexer_connector`) that handles all data indexing operations between the Wazuh Manager and the Wazuh Indexer (OpenSearch). It is the Filebeat replacement introduced in Wazuh 5.0.
+The Indexer Connector is a shared library (`libindexer_connector`) that handles all data indexing operations between the GuardSarm Manager and the GuardSarm Indexer (OpenSearch). It is the Filebeat replacement introduced in GuardSarm 5.0.
 
 Source: `src/shared_modules/indexer_connector/`
 
@@ -10,8 +10,8 @@ For configuration options see [Indexer Configuration](../../configuration/indexe
 
 The Indexer Connector is not a standalone daemon. It is linked into the processes that need to write to or query the Indexer:
 
-- **Vulnerability Scanner** — indexes CVE detections into `wazuh-states-vulnerabilities`
-- **Inventory Sync** — indexes agent state into `wazuh-states-inventory-*` and `wazuh-states-fim-*`
+- **Vulnerability Scanner** — indexes CVE detections into `guardsarm-states-vulnerabilities`
+- **Inventory Sync** — indexes agent state into `guardsarm-states-inventory-*` and `guardsarm-states-fim-*`
 - **Engine** — indexes SCA results and other engine-generated events
 
 The library provides two classes depending on the use case:
@@ -47,25 +47,25 @@ The library provides two classes depending on the use case:
 
 | Index | Written by |
 |-------|------------|
-| `wazuh-states-vulnerabilities` | Vulnerability Scanner |
-| `wazuh-states-inventory-system` | Inventory Sync |
-| `wazuh-states-inventory-hardware` | Inventory Sync |
-| `wazuh-states-inventory-packages` | Inventory Sync |
-| `wazuh-states-inventory-hotfixes` | Inventory Sync (Windows) |
-| `wazuh-states-inventory-processes` | Inventory Sync |
-| `wazuh-states-inventory-ports` | Inventory Sync |
-| `wazuh-states-inventory-interfaces` | Inventory Sync |
-| `wazuh-states-inventory-protocols` | Inventory Sync |
-| `wazuh-states-inventory-networks` | Inventory Sync |
-| `wazuh-states-inventory-users` | Inventory Sync |
-| `wazuh-states-inventory-groups` | Inventory Sync |
-| `wazuh-states-inventory-services` | Inventory Sync |
-| `wazuh-states-inventory-browser-extensions` | Inventory Sync |
-| `wazuh-states-fim-files` | Inventory Sync (FIM) |
-| `wazuh-states-fim-registry-keys` | Inventory Sync (FIM, Windows) |
-| `wazuh-states-fim-registry-values` | Inventory Sync (FIM, Windows) |
-| `wazuh-states-sca` | Engine (SCA) |
-| `wazuh-threatintel-*` | Read-only (Content Manager) |
+| `guardsarm-states-vulnerabilities` | Vulnerability Scanner |
+| `guardsarm-states-inventory-system` | Inventory Sync |
+| `guardsarm-states-inventory-hardware` | Inventory Sync |
+| `guardsarm-states-inventory-packages` | Inventory Sync |
+| `guardsarm-states-inventory-hotfixes` | Inventory Sync (Windows) |
+| `guardsarm-states-inventory-processes` | Inventory Sync |
+| `guardsarm-states-inventory-ports` | Inventory Sync |
+| `guardsarm-states-inventory-interfaces` | Inventory Sync |
+| `guardsarm-states-inventory-protocols` | Inventory Sync |
+| `guardsarm-states-inventory-networks` | Inventory Sync |
+| `guardsarm-states-inventory-users` | Inventory Sync |
+| `guardsarm-states-inventory-groups` | Inventory Sync |
+| `guardsarm-states-inventory-services` | Inventory Sync |
+| `guardsarm-states-inventory-browser-extensions` | Inventory Sync |
+| `guardsarm-states-fim-files` | Inventory Sync (FIM) |
+| `guardsarm-states-fim-registry-keys` | Inventory Sync (FIM, Windows) |
+| `guardsarm-states-fim-registry-values` | Inventory Sync (FIM, Windows) |
+| `guardsarm-states-sca` | Engine (SCA) |
+| `guardsarm-threatintel-*` | Read-only (Content Manager) |
 
 ## Key source files
 

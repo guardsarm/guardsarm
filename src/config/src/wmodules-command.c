@@ -1,5 +1,5 @@
 /*
- * Wazuh Module Configuration
+ * GuardSarm Module Configuration
  * Copyright (C) 2015, Wazuh Inc.
  * October 26, 2017.
  *

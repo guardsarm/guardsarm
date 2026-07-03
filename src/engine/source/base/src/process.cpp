@@ -23,7 +23,7 @@
 #include <fmt/format.h>
 
 #include <base/error.hpp>
-#include <base/libwazuhshared.hpp>
+#include <base/libguardsarmshared.hpp>
 #include <base/process.hpp>
 
 constexpr auto MAX_RBUFFER_SIZE = 65536;
@@ -175,24 +175,24 @@ void privSepSetGroup(gid_t gid)
     }
 }
 
-std::filesystem::path getWazuhHome()
+std::filesystem::path getGuardSarmHome()
 {
-    // Manager mode: libwazuhshared is loaded before this is called (see main.cpp).
-    // Delegate to w_homedir(), the canonical function used by every other Wazuh daemon.
+    // Manager mode: libguardsarmshared is loaded before this is called (see main.cpp).
+    // Delegate to w_homedir(), the canonical function used by every other GuardSarm daemon.
     // It resolves the home via /proc/self/exe internally.
-    if (base::libwazuhshared::getLibPtr())
+    if (base::libguardsarmshared::getLibPtr())
     {
         // Force if we want to avoid the /proc lookup
-        if (std::getenv("WAZUH_ENGINE_FORCE_HOME"))
+        if (std::getenv("GUARDSARM_ENGINE_FORCE_HOME"))
         {
-            return std::filesystem::path(std::getenv("WAZUH_ENGINE_FORCE_HOME"));
+            return std::filesystem::path(std::getenv("GUARDSARM_ENGINE_FORCE_HOME"));
         }
 
         using WHDir = char* (*)(const char*);
         const char executablePath[] = "/proc/self/exe";
 
         std::unique_ptr<char, decltype(&std::free)> home(
-            base::libwazuhshared::getFunction<WHDir>("w_homedir")(executablePath), &std::free);
+            base::libguardsarmshared::getFunction<WHDir>("w_homedir")(executablePath), &std::free);
 
         if (home)
         {
@@ -200,7 +200,7 @@ std::filesystem::path getWazuhHome()
         }
     }
 
-    // Standalone mode / unit tests: libwazuhshared is not loaded.
+    // Standalone mode / unit tests: libguardsarmshared is not loaded.
     // conf::Conf may still use this value to build default paths when the
     // dedicated environment variables are not set.
     return std::filesystem::current_path();

@@ -7,7 +7,7 @@ copyright: Copyright (C) 2015-2024, Wazuh Inc.
 
 type: integration
 
-brief: These tests will check if the 'wazuh-manager-authd' daemon correctly responds to the enrollment requests
+brief: These tests will check if the 'guardsarm-manager-authd' daemon correctly responds to the enrollment requests
        messages respecting the valid option values used in the force configuration block.
 
 components:
@@ -19,8 +19,8 @@ targets:
     - manager
 
 daemons:
-    - wazuh-manager-authd
-    - wazuh-manager-db
+    - guardsarm-manager-authd
+    - guardsarm-manager-db
 
 os_platform:
     - linux
@@ -45,15 +45,15 @@ import pytest
 import re
 from pathlib import Path
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.constants.ports import DEFAULT_SSL_REMOTE_ENROLLMENT_PORT
-from wazuh_testing.constants.daemons import AUTHD_DAEMON, WAZUH_DB_DAEMON
-from wazuh_testing.utils.configuration import load_configuration_template, get_test_cases_data
-from wazuh_testing.modules.authd.utils import create_authd_request, validate_authd_response
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils import callbacks
-from wazuh_testing.modules.authd import PREFIX
-from wazuh_testing.modules.authd.configuration import AUTHD_DEBUG_CONFIG
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.constants.ports import DEFAULT_SSL_REMOTE_ENROLLMENT_PORT
+from guardsarm_testing.constants.daemons import AUTHD_DAEMON, GUARDSARM_DB_DAEMON
+from guardsarm_testing.utils.configuration import load_configuration_template, get_test_cases_data
+from guardsarm_testing.modules.authd.utils import create_authd_request, validate_authd_response
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.utils import callbacks
+from guardsarm_testing.modules.authd import PREFIX
+from guardsarm_testing.modules.authd.configuration import AUTHD_DEBUG_CONFIG
 
 from . import CONFIGURATIONS_FOLDER_PATH, TEST_CASES_FOLDER_PATH
 
@@ -82,7 +82,7 @@ test_configuration_t1 = load_configuration_template(test_configuration_path_t1, 
 # Variables
 local_internal_options = {AUTHD_DEBUG_CONFIG: '2'}
 receiver_sockets_params = [(('localhost', DEFAULT_SSL_REMOTE_ENROLLMENT_PORT), 'AF_INET', 'SSL_TLSv1_2')]
-monitored_sockets_params = [(WAZUH_DB_DAEMON, None, True), (AUTHD_DAEMON, None, True)]
+monitored_sockets_params = [(GUARDSARM_DB_DAEMON, None, True), (AUTHD_DAEMON, None, True)]
 receiver_sockets, monitored_sockets = None, None  # Set in the fixtures
 
 daemons_handler_configuration = {'daemons': [AUTHD_DAEMON], 'ignore_errors': True}
@@ -90,7 +90,7 @@ daemons_handler_configuration = {'daemons': [AUTHD_DAEMON], 'ignore_errors': Tru
 # Functions
 def check_options(test_metadata):
     authd_sock = receiver_sockets[0]
-    wazuh_log_monitor = FileMonitor(WAZUH_LOG_PATH)
+    guardsarm_log_monitor = FileMonitor(GUARDSARM_LOG_PATH)
     for stage in test_metadata['test_case']:
         # Reopen socket (socket is closed by manager after sending message with client key)
         authd_sock.open()
@@ -106,13 +106,13 @@ def check_options(test_metadata):
 
         for log in stage['log']:
             log = re.escape(log)
-            wazuh_log_monitor.start(callback=callbacks.generate_callback(fr'{PREFIX}{log}'), timeout=10, encoding='utf-8')
-            assert wazuh_log_monitor.callback_result, f'Error event not detected'
+            guardsarm_log_monitor.start(callback=callbacks.generate_callback(fr'{PREFIX}{log}'), timeout=10, encoding='utf-8')
+            assert guardsarm_log_monitor.callback_result, f'Error event not detected'
 
 
 # Tests
 @pytest.mark.parametrize('test_configuration,test_metadata', zip(test_configuration_t1, test_metadata_t1), ids=test_cases_ids_t1)
-def test_authd_force_options(test_configuration, test_metadata, set_wazuh_configuration,
+def test_authd_force_options(test_configuration, test_metadata, set_guardsarm_configuration,
                              configure_local_internal_options, truncate_monitored_files,
                              insert_pre_existent_agents, daemons_handler,
                              wait_for_authd_startup, connect_to_sockets):
@@ -120,7 +120,7 @@ def test_authd_force_options(test_configuration, test_metadata, set_wazuh_config
     description:
         Checks that every input message in authd port generates the adequate output.
 
-    wazuh_min_version:
+    guardsarm_min_version:
         5.0.0
 
     tier: 0
@@ -132,9 +132,9 @@ def test_authd_force_options(test_configuration, test_metadata, set_wazuh_config
         - test_metadata:
             type: dict
             brief: Test case metadata.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
-            brief: Load basic wazuh configuration.
+            brief: Load basic guardsarm configuration.
         - configure_local_internal_options:
             type: fixture
             brief: Configure the local internal options file.
@@ -143,7 +143,7 @@ def test_authd_force_options(test_configuration, test_metadata, set_wazuh_config
             brief: adds the required agents to the client.keys and global.db
         - daemons_handler:
             type: fixture
-            brief: Handler of Wazuh daemons.
+            brief: Handler of GuardSarm daemons.
         - wait_for_authd_startup:
             type: fixture
             brief: Waits until Authd is accepting connections.

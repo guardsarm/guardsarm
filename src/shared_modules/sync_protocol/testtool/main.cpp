@@ -1,5 +1,5 @@
 /*
- * Wazuh Sync Protocol Test tool
+ * GuardSarm Sync Protocol Test tool
  */
 
 #include <iostream>
@@ -23,36 +23,36 @@ static int mq_start_stub(const char*, short, short)
 
 static int mq_send_binary_stub(int, const void* msg, size_t, const char*, char)
 {
-    auto* m = Wazuh::SyncSchema::GetMessage(reinterpret_cast<const uint8_t*>(msg));
+    auto* m = GuardSarm::SyncSchema::GetMessage(reinterpret_cast<const uint8_t*>(msg));
 
     switch (m->content_type())
     {
-        case Wazuh::SyncSchema::MessageType::Start:
+        case GuardSarm::SyncSchema::MessageType::Start:
             {
                 flatbuffers::FlatBufferBuilder builder;
-                Wazuh::SyncSchema::StartAckBuilder startAckBuilder(builder);
-                startAckBuilder.add_status(Wazuh::SyncSchema::Status::Ok);
+                GuardSarm::SyncSchema::StartAckBuilder startAckBuilder(builder);
+                startAckBuilder.add_status(GuardSarm::SyncSchema::Status::Ok);
                 startAckBuilder.add_session(g_session);
                 auto startAckOffset = startAckBuilder.Finish();
-                auto message = Wazuh::SyncSchema::CreateMessage(
+                auto message = GuardSarm::SyncSchema::CreateMessage(
                                    builder,
-                                   Wazuh::SyncSchema::MessageType::StartAck,
+                                   GuardSarm::SyncSchema::MessageType::StartAck,
                                    startAckOffset.Union());
                 builder.Finish(message);
                 g_proto->parseResponseBuffer(builder.GetBufferPointer(), builder.GetSize());
                 break;
             }
 
-        case Wazuh::SyncSchema::MessageType::End:
+        case GuardSarm::SyncSchema::MessageType::End:
             {
                 flatbuffers::FlatBufferBuilder builder;
-                Wazuh::SyncSchema::EndAckBuilder endAckBuilder(builder);
-                endAckBuilder.add_status(Wazuh::SyncSchema::Status::Ok);
+                GuardSarm::SyncSchema::EndAckBuilder endAckBuilder(builder);
+                endAckBuilder.add_status(GuardSarm::SyncSchema::Status::Ok);
                 endAckBuilder.add_session(g_session);
                 auto endAckOffset = endAckBuilder.Finish();
-                auto message = Wazuh::SyncSchema::CreateMessage(
+                auto message = GuardSarm::SyncSchema::CreateMessage(
                                    builder,
-                                   Wazuh::SyncSchema::MessageType::EndAck,
+                                   GuardSarm::SyncSchema::MessageType::EndAck,
                                    endAckOffset.Union());
                 builder.Finish(message);
                 g_proto->parseResponseBuffer(builder.GetBufferPointer(), builder.GetSize());

@@ -38,8 +38,8 @@
  *   E.g.
  *   ```cpp
  *   RotationConfig cfg {
- *     "/var/wazuh-manager/logs",         // basePath
- *     "${YYYY}/${MMM}/wazuh-${name}-${DD}.json",
+ *     "/var/guardsarm-manager/logs",         // basePath
+ *     "${YYYY}/${MMM}/guardsarm-${name}-${DD}.json",
  *     10*1024*1024,              // rotate after 10 MiB
  *     1<<20,                     // 1 MiB write buffer
  *     true,                      // compress rotated files
@@ -50,7 +50,7 @@
  *   ```
  *
  * - **Writer Functor**
- *   `auto writer = logManager.ensureAndGetWriter("standard-wazuh-events-v5", cfg, "json");`
+ *   `auto writer = logManager.ensureAndGetWriter("standard-guardsarm-events-v5", cfg, "json");`
  *   `writer(jsonString);` enqueues one line (JSON string + ‘\n’) to the log.
  *
  * - **Asynchronous I/O**
@@ -69,8 +69,8 @@
  *   Placeholders like `${YYYY}`, `${MMM}`, `${DD}`, and `${name}` are
  *   replaced with the current date and the log channel name.
  *   For example, if the pattern is `"${YYYY}/${MMM}/${name}-${DD}.json"`,
- *   and the channel name is `"standard-wazuh-events-v5"`, the log file might be named
- *   `"2026/Mar/standard-wazuh-events-v5-26.json"` for logs written on March 26, 2026.
+ *   and the channel name is `"standard-guardsarm-events-v5"`, the log file might be named
+ *   `"2026/Mar/standard-guardsarm-events-v5-26.json"` for logs written on March 26, 2026.
  *
  * - **Suported Patterns**
  *  The following placeholders are supported in the `pattern`:

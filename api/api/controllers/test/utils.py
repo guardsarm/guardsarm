@@ -2,10 +2,10 @@
 # Created by Wazuh, Inc. <info@wazuh.com>.
 # This program is a free software; you can redistribute it and/or modify it under the terms of GPLv2
 
-from wazuh.core.results import AffectedItemsWazuhResult
+from guardsarm.core.results import AffectedItemsGuardSarmResult
 
 
-class CustomAffectedItems(AffectedItemsWazuhResult):
+class CustomAffectedItems(AffectedItemsGuardSarmResult):
     """Mock custom values that are needed in controller tests"""
 
     def __init__(self, empty: bool = False):

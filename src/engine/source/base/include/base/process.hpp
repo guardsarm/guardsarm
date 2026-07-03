@@ -15,7 +15,7 @@
 
 namespace base::process
 {
-constexpr auto ENV_ENGINE_STANDALONE = "WAZUH_ENGINE_STANDALONE"; ///< Env var to indicate standalone mode
+constexpr auto ENV_ENGINE_STANDALONE = "GUARDSARM_ENGINE_STANDALONE"; ///< Env var to indicate standalone mode
 
 /**
  * @brief Transforms the current process into a daemon (double fork + detach).
@@ -99,23 +99,23 @@ gid_t privSepGetGroup(const std::string& groupname);
 void privSepSetGroup(gid_t gid);
 
 /**
- * @brief Gets the Wazuh installation home directory path.
+ * @brief Gets the GuardSarm installation home directory path.
  *
  * It delegates the functionality to w_homedir() when manager is not standalone
- * (libwazuhshared already loaded), the canonical Wazuh function used by
+ * (libguardsarmshared already loaded), the canonical GuardSarm function used by
  * every other daemon. It resolves the path via /proc/self/exe
- * (e.g. /var/wazuh-manager/bin/wazuh-engine -> /var/wazuh-manager).
+ * (e.g. /var/guardsarm-manager/bin/guardsarm-engine -> /var/guardsarm-manager).
  *
  * It returns the current working directory when the manager is in standalone
- * mode or during unit tests (libwazuhshared not loaded). In standalone mode,
+ * mode or during unit tests (libguardsarmshared not loaded). In standalone mode,
  * runtime paths are expected to come from dedicated environment variables;
  * this fallback can still be used to build defaults when those variables are
  * not set.
  *
- * @return std::filesystem::path The path to the Wazuh home directory.
+ * @return std::filesystem::path The path to the GuardSarm home directory.
  *
  */
-std::filesystem::path getWazuhHome();
+std::filesystem::path getGuardSarmHome();
 
 /**
  * @brief Sets the name of the current thread.
@@ -129,7 +129,7 @@ std::filesystem::path getWazuhHome();
 void setThreadName(const std::string& name);
 
 /**
- * @brief Checks whether standalone mode is enabled for the Wazuh engine.
+ * @brief Checks whether standalone mode is enabled for the GuardSarm engine.
  *
  * @return true  If standalone mode is enabled.
  * @return false Otherwise.

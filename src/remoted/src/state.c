@@ -14,7 +14,7 @@
 #include "state.h"
 #include <pthread.h>
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 // Remove STATIC qualifier from tests
 #define STATIC
 #else
@@ -35,7 +35,7 @@ STATIC remoted_agent_state_t * get_node(const char *agent_id);
 
 /**
  * @brief Clean non active agents from agents state
- * @param sock Wazuh DB socket
+ * @param sock GuardSarm DB socket
  */
 STATIC void w_remoted_clean_agents_state(int *sock);
 

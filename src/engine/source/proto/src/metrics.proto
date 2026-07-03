@@ -2,15 +2,15 @@ syntax = "proto3";
 
 import "engine.proto";
 
-package com.wazuh.api.engine.metrics;
+package com.guardsarm.api.engine.metrics;
 
 /*
- * Metrics API - Lock-free metrics management for wazuh-engine
+ * Metrics API - Lock-free metrics management for guardsarm-engine
  *
  * Provides operations to enable/disable, query, list, and dump engine metrics.
  * Metrics are organized in two scopes:
  *   - Global metrics: engine-wide counters and rates (e.g., "router.events.processed")
- *   - Per-space metrics: scoped to a policy namespace (e.g., "events.discarded" within space "wazuh")
+ *   - Per-space metrics: scoped to a policy namespace (e.g., "events.discarded" within space "guardsarm")
  *
  * When a request includes the `space` field, the metric name is resolved internally
  * as "space.<space>.<instrumentName>", abstracting the naming convention from the consumer.
@@ -127,7 +127,7 @@ message MetricEntry
 /* Metrics grouped by space (policy/namespace) */
 message SpaceMetrics
 {
-    string name = 1;                  // Space name (e.g., "wazuh", "testing")
+    string name = 1;                  // Space name (e.g., "guardsarm", "testing")
     repeated MetricEntry metrics = 2; // Metrics belonging to this space
 }
 
@@ -135,7 +135,7 @@ message Dump_Response
 {
     ReturnStatus status = 1;          // Status of the query
     optional string error = 2;        // Error message if status is ERROR
-    optional string name = 3;         // Daemon name (e.g., "wazuh-manager-analysisd")
+    optional string name = 3;         // Daemon name (e.g., "guardsarm-manager-analysisd")
     optional string uptime = 4;       // ISO 8601 timestamp of when the daemon started
     optional string timestamp = 5;    // ISO 8601 timestamp of when this dump was collected
     repeated MetricEntry global = 6;  // Global metrics (not space-scoped)

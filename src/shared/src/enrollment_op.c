@@ -14,13 +14,13 @@
 #include "sec.h"
 #include "sha1_op.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
     /* Remove static qualifier when unit testing */
     #define static
 
-    // Redefine wazuh_version
-    #undef __wazuh_version
-    #define __wazuh_version "v5.0.0"
+    // Redefine guardsarm_version
+    #undef __guardsarm_version
+    #define __guardsarm_version "v5.0.0"
 
     /* Replace assert with mock_assert */
     extern void mock_assert(const int result, const char* const expression,
@@ -112,7 +112,7 @@ w_enrollment_ctx * w_enrollment_init(w_enrollment_target *target, w_enrollment_c
     cfg->ssl = NULL;
     cfg->delay_after_enrollment = 20;
     cfg->keys = keys;
-    os_strdup(__wazuh_version, cfg->agent_version);
+    os_strdup(__guardsarm_version, cfg->agent_version);
     return cfg;
 }
 

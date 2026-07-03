@@ -1,5 +1,5 @@
 /*
- * Wazuh utils
+ * GuardSarm utils
  * Copyright (C) 2015, Wazuh Inc.
  * March 25, 2023.
  *

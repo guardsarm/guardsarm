@@ -1,6 +1,6 @@
 # Manager Cluster Security Model
 
-This document describes the security model of the Wazuh Manager Cluster. It is
+This document describes the security model of the GuardSarm Manager Cluster. It is
 intended as a reference for developers, security researchers, and operators
 evaluating the cluster surface.
 
@@ -53,9 +53,9 @@ Independently of the trust model, the DAPI does enforce a small set of
 restrictions on operations between nodes:
 
 - **Local configuration**: a node will not accept remote modifications to its
-  local  `wazuh-manager.conf` (previously `ossec.conf`).
-- **Authority context boundary**: operations outside the scope of the Wazuh
-  product (i.e. outside the Wazuh authority context) are not executed through
+  local  `guardsarm-manager.conf` (previously `ossec.conf`).
+- **Authority context boundary**: operations outside the scope of the GuardSarm
+  product (i.e. outside the GuardSarm authority context) are not executed through
   the DAPI.
 
 These restrictions are explicit limits of the cluster protocol and are part
@@ -176,7 +176,7 @@ cluster surface:
 - Joining the cluster, or executing operations on the cluster protocol,
   without possession of the Fernet key.
 - Bypassing the explicit restrictions listed above (writing local
-  `wazuh-manager.conf` remotely, or executing operations outside the Wazuh authority
+  `guardsarm-manager.conf` remotely, or executing operations outside the GuardSarm authority
   context through the DAPI).
 - Any vector that allows a principal outside the cluster authority context to
   cross into it.

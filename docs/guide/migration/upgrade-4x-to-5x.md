@@ -1,6 +1,6 @@
-# Migration from Wazuh Agent 4.X to 5.0.0
+# Migration from GuardSarm Agent 4.X to 5.0.0
 
-This guide describes how to migrate Wazuh agents from 4.X to 5.0.0, including:
+This guide describes how to migrate GuardSarm agents from 4.X to 5.0.0, including:
 
 - Required upgrade path when the current agent is older than 4.14.X.
 - Invalid and deprecated configuration elements in `ossec.conf`.
@@ -9,7 +9,7 @@ This guide describes how to migrate Wazuh agents from 4.X to 5.0.0, including:
 
 ## Upgrade path requirements
 
-Wazuh Agent 5.0.0 cannot be installed directly on agents running versions earlier than 4.14.0.
+GuardSarm Agent 5.0.0 cannot be installed directly on agents running versions earlier than 4.14.0.
 
 Required path:
 
@@ -34,16 +34,16 @@ UPGRADE BLOCKED: Incompatible version detected
 Current version: v4.13.1
 Target version:  5.0.0
 
-Upgrade to Wazuh 5.0.0 is only supported from version 4.14.0 or later.
+Upgrade to GuardSarm 5.0.0 is only supported from version 4.14.0 or later.
 ```
 
 On a MacOS terminal the message is less intuitive:
 
 ```console
-sh-3.2# installer -pkg /Users/vagrant/Downloads/wazuh-agent-5.0.0-beta2.arm64.pkg -target /
-installer: Package name is wazuh-agent-5.0.0-beta2.arm64
+sh-3.2# installer -pkg /Users/vagrant/Downloads/guardsarm-agent-5.0.0-beta2.arm64.pkg -target /
+installer: Package name is guardsarm-agent-5.0.0-beta2.arm64
 installer: Upgrading at base path /
-installer: The upgrade failed. (The Installer encountered an error that caused the installation to fail. Contact the software manufacturer for assistance. An error occurred while running scripts from the package “wazuh-agent-5.0.0-beta2.arm64.pkg”.)
+installer: The upgrade failed. (The Installer encountered an error that caused the installation to fail. Contact the software manufacturer for assistance. An error occurred while running scripts from the package “guardsarm-agent-5.0.0-beta2.arm64.pkg”.)
 ```
 
 ## Recommended migration workflow
@@ -77,7 +77,7 @@ When invalid rootcheck/syscheck options remain in the configuration, the agent m
 
 ```console
 INFO: (1202): Configuration error at 'etc/ossec.conf'.
-INFO: (1207): wazuh-rootcheck remote configuration in 'etc/ossec.conf' is corrupted.
+INFO: (1207): guardsarm-rootcheck remote configuration in 'etc/ossec.conf' is corrupted.
 ```
 
 These messages are resolved by removing the invalid elements listed above.
@@ -148,16 +148,16 @@ Remove unsupported elements:
 
 `local_internal_options.conf` overrides values defined in the default `internal_options.conf`. Comparing the agent default internal options between `4.14.X` and `5.0.0`, **no agent-side option keys were removed or renamed**. All agent component namespaces remain valid in 5.0:
 
-`agent`, `execd`, `logcollector`, `rootcheck`, `sca`, `syscheck`, `wazuh_command`, `wazuh_modules`, `windows`.
+`agent`, `execd`, `logcollector`, `rootcheck`, `sca`, `syscheck`, `guardsarm_command`, `guardsarm_modules`, `windows`.
 
-The internal options removed in 5.0 belong exclusively to **manager-side** components (for example `analysisd.*`, `remoted.*`, `monitord.*`, `wazuh_db.*`, `vulnerability-detection.*`). These never take effect on an agent, so they do not require any migration action on agent hosts.
+The internal options removed in 5.0 belong exclusively to **manager-side** components (for example `analysisd.*`, `remoted.*`, `monitord.*`, `guardsarm_db.*`, `vulnerability-detection.*`). These never take effect on an agent, so they do not require any migration action on agent hosts.
 
 The agent does not validate `local_internal_options.conf` against a schema. Keys that no module reads are silently ignored: they do not block startup and do not emit warning or error messages. Consequently, there are **no `local_internal_options.conf` entries that prevent a 5.0.0 agent from starting**, and no specific log messages are expected for this file during the upgrade.
 
 Recommended handling:
 
 1. Keep `local_internal_options.conf` as-is during the package upgrade.
-2. Optionally, remove any manager-only keys that may have been copied into the agent file (for example `analysisd.*`, `remoted.*`, `wazuh_db.*`); they have no effect on the agent and are kept only for tidiness.
+2. Optionally, remove any manager-only keys that may have been copied into the agent file (for example `analysisd.*`, `remoted.*`, `guardsarm_db.*`); they have no effect on the agent and are kept only for tidiness.
 
 ## Connectivity and interoperability checks
 

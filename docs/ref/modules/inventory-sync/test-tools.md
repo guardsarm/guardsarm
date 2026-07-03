@@ -10,7 +10,7 @@ Inventory Sync currently has three practical test surfaces in the source tree:
 
 Unit tests live under:
 
-- `src/wazuh_modules/inventory_sync/tests/unit/`
+- `src/guardsarm_modules/inventory_sync/tests/unit/`
 
 They cover components such as:
 
@@ -25,7 +25,7 @@ These tests validate session lifecycle, chunk tracking, checksum handling, retra
 
 Protocol-oriented integration tests live under:
 
-- `src/wazuh_modules/inventory_sync/qa/`
+- `src/guardsarm_modules/inventory_sync/qa/`
 
 This suite uses the real FlatBuffer protocol to simulate agent-manager exchanges and validate the Inventory Sync behavior end to end.
 
@@ -52,7 +52,7 @@ Representative test assets:
 
 The end-to-end test tool lives under:
 
-- `src/wazuh_modules/inventory_sync/testtool/`
+- `src/guardsarm_modules/inventory_sync/testtool/`
 
 The executable is `inventory_sync_testtool`.
 
@@ -66,7 +66,7 @@ Its purpose is to simulate a full Inventory Sync session against a manager-side 
 This tool is especially useful for validating the integration between:
 
 - Inventory Sync,
-- the Wazuh Indexer,
+- the GuardSarm Indexer,
 - and the Vulnerability Scanner.
 
 ## When to use each tool

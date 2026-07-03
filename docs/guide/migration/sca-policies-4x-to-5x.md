@@ -1,6 +1,6 @@
 # SCA policies from 4.x to 5.x
 
-This guide describes the manual changes required to run custom Security Configuration Assessment (SCA) policies created for Wazuh 4.x on Wazuh 5.x.
+This guide describes the manual changes required to run custom Security Configuration Assessment (SCA) policies created for GuardSarm 4.x on GuardSarm 5.x.
 
 There is no automatic migration tool for custom SCA policies. Review each custom policy, migrate it to the 5.x policy format, and validate it on a non-production 5.x agent before rolling it out.
 
@@ -24,13 +24,13 @@ For the current custom policy schema, see [Creating custom SCA policies](../../r
 
    Include policies referenced from `<sca><policies>` and any policy copied into a shared agent group. Check both local agent policies and manager-distributed policies.
 
-   Watch for `<policy>` entries that reference legacy filenames ending in `_rcl.yml`, such as `cis_rhel7_linux_rcl.yml`, `system_audit_rcl.yml`, or `win_audit_rcl.yml`. These are old policy names carried over from earlier Wazuh versions, not 5.x SCA policy files. The SCA configuration reader keeps a built-in list of these filenames and silently skips them, without logging a warning, if they are still referenced in `<sca><policies>`, so remove or replace those references. Note that only the exact filenames in that built-in list are skipped silently; any other missing or unresolved policy path instead logs a `File '...' not found` or `Policy file '...' not found` warning.
+   Watch for `<policy>` entries that reference legacy filenames ending in `_rcl.yml`, such as `cis_rhel7_linux_rcl.yml`, `system_audit_rcl.yml`, or `win_audit_rcl.yml`. These are old policy names carried over from earlier GuardSarm versions, not 5.x SCA policy files. The SCA configuration reader keeps a built-in list of these filenames and silently skips them, without logging a warning, if they are still referenced in `<sca><policies>`, so remove or replace those references. Note that only the exact filenames in that built-in list are skipped silently; any other missing or unresolved policy path instead logs a `File '...' not found` or `Policy file '...' not found` warning.
 
 2. Back up policies and move custom files out of package-managed paths.
 
-   Do not edit or store custom policies in `$WAZUH_HOME/ruleset/sca`. Package upgrades replace stock policy files in that directory. Use an administrator-managed path and point `<policy>` entries to that path.
+   Do not edit or store custom policies in `$GUARDSARM_HOME/ruleset/sca`. Package upgrades replace stock policy files in that directory. Use an administrator-managed path and point `<policy>` entries to that path.
 
-   Policies under `$WAZUH_HOME/etc/shared` are shared policies. The agent treats paths that contain `etc/shared/` as remote policies, so command rules (`c:`) in those policies run only when the `sca.remote_commands` internal option is enabled. External local paths outside `etc/shared`, such as `/opt/wazuh-sca/custom_linux.yml`, are not treated as remote by this check, but the file must exist locally on each agent.
+   Policies under `$GUARDSARM_HOME/etc/shared` are shared policies. The agent treats paths that contain `etc/shared/` as remote policies, so command rules (`c:`) in those policies run only when the `sca.remote_commands` internal option is enabled. External local paths outside `etc/shared`, such as `/opt/guardsarm-sca/custom_linux.yml`, are not treated as remote by this check, but the file must exist locally on each agent.
 
    ```xml
    <sca>
@@ -41,7 +41,7 @@ For the current custom policy schema, see [Creating custom SCA policies](../../r
        <!-- Shared policy: distributed through etc/shared; command rules require sca.remote_commands=1. -->
        <policy>etc/shared/default/sca/custom_linux.yml</policy>
        <!-- External local policy: must exist on each agent. -->
-       <policy>/opt/wazuh-sca/custom_linux_local.yml</policy>
+       <policy>/opt/guardsarm-sca/custom_linux_local.yml</policy>
        <policy enabled="no">ruleset/sca/cis_debian12.yml</policy>
      </policies>
      <synchronization>
@@ -105,9 +105,9 @@ For the current custom policy schema, see [Creating custom SCA policies](../../r
 
    Delete `<skip_nfs>` from the SCA module configuration. If you explicitly configure synchronization, keep it under `<synchronization>` as shown in step 2.
 
-7. Validate the migrated policy on Wazuh 5.x.
+7. Validate the migrated policy on GuardSarm 5.x.
 
-   Install the policy on a non-production 5.x agent or manager, restart the service, and run a scan. Check the Wazuh logs for policy parsing, invalid compliance keys, and PCRE2 errors. Search for messages such as `Failed to parse policy`, `Invalid compliance key`, `Unexpected compliance format`, and `PCRE2 compilation failed`.
+   Install the policy on a non-production 5.x agent or manager, restart the service, and run a scan. Check the GuardSarm logs for policy parsing, invalid compliance keys, and PCRE2 errors. Search for messages such as `Failed to parse policy`, `Invalid compliance key`, `Unexpected compliance format`, and `PCRE2 compilation failed`.
 
 8. Roll out incrementally.
 
@@ -179,7 +179,7 @@ checks:
 
 ## Final checklist
 
-- Custom policies are stored outside `$WAZUH_HOME/ruleset/sca`.
+- Custom policies are stored outside `$GUARDSARM_HOME/ruleset/sca`.
 - SCA configuration references the migrated custom policy paths.
 - `requirements` and checks use `name` (the deprecated `title` still works but should be replaced).
 - The `regex_type` field is removed (it is ignored in 5.x; all patterns are PCRE2).

@@ -1,5 +1,5 @@
 /*
- * Wazuh router - RouterFacade tests
+ * GuardSarm router - RouterFacade tests
  * Copyright (C) 2015, Wazuh Inc.
  * June 25, 2025.
  *

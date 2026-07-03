@@ -32,7 +32,7 @@ configurator.configure_test(configuration_file='bucket_configuration_defaults.ya
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_bucket_defaults(
-        test_configuration, metadata, create_test_bucket, set_wazuh_configuration,
+        test_configuration, metadata, create_test_bucket, set_guardsarm_configuration,
         clean_s3_cloudtrail_db, configure_local_internal_options_function, truncate_monitored_files,
         daemons_handler, file_monitoring
 ):
@@ -40,18 +40,18 @@ def test_bucket_defaults(
     description: The module is invoked with the expected parameters and no error occurs.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has appeared calling the module with correct parameters.
             - Check in the ossec.log that no errors occurs.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -62,7 +62,7 @@ def test_bucket_defaults(
         - create_test_bucket:
             type: fixture
             brief: Create temporal bucket.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - clean_s3_cloudtrail_db:
@@ -73,10 +73,10 @@ def test_bucket_defaults(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
-        - restart_wazuh_daemon_function:
+            brief: Truncate guardsarm logs.
+        - restart_guardsarm_daemon_function:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -131,25 +131,25 @@ configurator.configure_test(configuration_file='cloudwatch_configuration_default
                          ids=configurator.cases_ids)
 def test_service_defaults(
         test_configuration, metadata, create_test_log_group,
-        set_wazuh_configuration, clean_aws_services_db, configure_local_internal_options_function,
+        set_guardsarm_configuration, clean_aws_services_db, configure_local_internal_options_function,
         truncate_monitored_files, daemons_handler, file_monitoring
 ):
     """
     description: The module is invoked with the expected parameters and no error occurs.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has appeared calling the module with correct parameters.
             - Check in the ossec.log that no errors occurs.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -160,7 +160,7 @@ def test_service_defaults(
         - create_test_log_group:
             type: fixture
             brief: Create a log group.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - clean_aws_services_db:
@@ -171,10 +171,10 @@ def test_service_defaults(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
-        - restart_wazuh_daemon_function:
+            brief: Truncate guardsarm logs.
+        - restart_guardsarm_daemon_function:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -232,25 +232,25 @@ configurator.configure_test(configuration_file='inspector_configuration_defaults
                          ids=configurator.cases_ids)
 def test_inspector_defaults(
         test_configuration, metadata, create_test_log_group,
-        set_wazuh_configuration, clean_aws_services_db, configure_local_internal_options_function,
+        set_guardsarm_configuration, clean_aws_services_db, configure_local_internal_options_function,
         truncate_monitored_files, daemons_handler, file_monitoring
 ):
     """
     description: The module is invoked with the expected parameters and no error occurs.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has appeared calling the module with correct parameters.
             - Check in the ossec.log that no errors occurs.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -261,7 +261,7 @@ def test_inspector_defaults(
         - create_test_log_group:
             type: fixture
             brief: Create a log group.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - clean_aws_services_db:
@@ -272,10 +272,10 @@ def test_inspector_defaults(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
-        - restart_wazuh_daemon_function:
+            brief: Truncate guardsarm logs.
+        - restart_guardsarm_daemon_function:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.

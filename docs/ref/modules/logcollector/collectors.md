@@ -58,7 +58,7 @@ Events can be filtered with XPath queries using the `<query>` element. See [Conf
 
 ### Event output format
 
-#### Wazuh 4.x
+#### GuardSarm 4.x
 
 The agent wrapped each event in a JSON object containing a human-readable message and the raw XML:
 
@@ -66,7 +66,7 @@ The agent wrapped each event in a JSON object containing a human-readable messag
 {"Message": "Event description.", "Event": "<Event>...</Event>"}
 ```
 
-#### Wazuh 5.0
+#### GuardSarm 5.0
 
 The agent now forwards the native Windows Event XML exactly as returned by `EvtRender()`, matching the export format of Windows Event Viewer:
 

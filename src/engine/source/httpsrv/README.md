@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **httpsrv** module provides an HTTP server over Unix Domain Sockets (UDS) for the Wazuh engine's internal API. Built on top of [cpp-httplib](https://github.com/yhirose/cpp-httplib), it handles route registration, request dispatching, payload size enforcement, and lifecycle management (start/stop with optional background thread). The engine runs two server instances: one for API services (management, metrics, geo, etc.) and one for event ingestion.
+The **httpsrv** module provides an HTTP server over Unix Domain Sockets (UDS) for the GuardSarm engine's internal API. Built on top of [cpp-httplib](https://github.com/yhirose/cpp-httplib), it handles route registration, request dispatching, payload size enforcement, and lifecycle management (start/stop with optional background thread). The engine runs two server instances: one for API services (management, metrics, geo, etc.) and one for event ingestion.
 
 ## Architecture
 
@@ -154,10 +154,10 @@ Eight API sub-modules register handlers on the API server, plus one direct route
 
 | Key | Env Override | Default | Description |
 |-----|-------------|---------|-------------|
-| `analysisd.server_api_socket` | `WAZUH_SERVER_API_SOCKET` | `$WAZUH_HOME/queue/sockets/analysis` | UDS path for API server |
-| `analysisd.server_api_timeout` | `WAZUH_SERVER_API_TIMEOUT` | `5000` | Server timeout (ms) |
-| `analysisd.server_api_payload_max_bytes` | `WAZUH_SERVER_API_PAYLOAD_MAX_BYTES` | `0` (unlimited) | Max payload size for API server |
-| `analysisd.server_enriched_events_socket` | `WAZUH_SERVER_ENRICHED_EVENTS_SOCKET` | `$WAZUH_HOME/queue/sockets/queue-http.sock` | UDS path for event server |
+| `analysisd.server_api_socket` | `GUARDSARM_SERVER_API_SOCKET` | `$GUARDSARM_HOME/queue/sockets/analysis` | UDS path for API server |
+| `analysisd.server_api_timeout` | `GUARDSARM_SERVER_API_TIMEOUT` | `5000` | Server timeout (ms) |
+| `analysisd.server_api_payload_max_bytes` | `GUARDSARM_SERVER_API_PAYLOAD_MAX_BYTES` | `0` (unlimited) | Max payload size for API server |
+| `analysisd.server_enriched_events_socket` | `GUARDSARM_SERVER_ENRICHED_EVENTS_SOCKET` | `$GUARDSARM_HOME/queue/sockets/queue-http.sock` | UDS path for event server |
 
 ## Integration in `main.cpp`
 
@@ -242,7 +242,7 @@ httpsrv/
 Build and run:
 
 ```bash
-make --directory=$WAZUH_REPO/src -j TARGET=manager ENGINE_TEST=y DEBUG=yes
+make --directory=$GUARDSARM_REPO/src -j TARGET=manager ENGINE_TEST=y DEBUG=yes
 $ENGINE_BUILD/source/httpsrv/httpsrv_utest
 $ENGINE_BUILD/source/httpsrv/httpsrv_ctest
 ```

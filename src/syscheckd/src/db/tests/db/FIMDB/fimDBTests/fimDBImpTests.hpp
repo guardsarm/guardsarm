@@ -1,5 +1,5 @@
 /*
- * Wazuh Syscheck
+ * GuardSarm Syscheck
  * Copyright (C) 2015, Wazuh Inc.
  * November 23, 2021.
  *

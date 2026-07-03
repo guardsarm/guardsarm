@@ -13,11 +13,11 @@ import sys
 from os import path
 from typing import Union
 
-import wazuh.core.cluster.cluster
-import wazuh.core.cluster.utils
-from wazuh.core.cluster import control, local_client
-from wazuh.core.common import DECIMALS_DATE_FORMAT
-from wazuh.core.utils import get_utc_strptime
+import guardsarm.core.cluster.cluster
+import guardsarm.core.cluster.utils
+from guardsarm.core.cluster import control, local_client
+from guardsarm.core.common import DECIMALS_DATE_FORMAT
+from guardsarm.core.utils import get_utc_strptime
 
 
 def __print_table(data: map, headers: dict, show_header: bool = False):
@@ -265,8 +265,8 @@ def main():
 
     logging.basicConfig(level=logging.DEBUG if args.debug else logging.ERROR, format='%(levelname)s: %(message)s')
 
-    cluster_config = wazuh.core.cluster.utils.read_config()
-    wazuh.core.cluster.cluster.check_cluster_config(config=cluster_config)
+    cluster_config = guardsarm.core.cluster.utils.read_config()
+    guardsarm.core.cluster.cluster.check_cluster_config(config=cluster_config)
     try:
         if args.filter_status and not args.list_agents:
             logging.error("Wrong arguments.")

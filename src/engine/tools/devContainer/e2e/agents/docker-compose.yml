@@ -13,8 +13,8 @@ services:
       context: .
       dockerfile: centos/4.x/Dockerfile
       network: host
-    container_name: wazuh-agent-4x-centos
-    hostname: wazuh-agent-4x-centos
+    container_name: guardsarm-agent-4x-centos
+    hostname: guardsarm-agent-4x-centos
     environment:
       MANAGER_HOST: "host.docker.internal"
       MANAGER_PORT: "1514"
@@ -29,8 +29,8 @@ services:
       context: .
       dockerfile: ubuntu/4.x/Dockerfile
       network: host
-    container_name: wazuh-agent-4x-ubuntu
-    hostname: wazuh-agent-4x-ubuntu
+    container_name: guardsarm-agent-4x-ubuntu
+    hostname: guardsarm-agent-4x-ubuntu
     environment:
       MANAGER_HOST: "host.docker.internal"
       MANAGER_PORT: "1514"
@@ -45,8 +45,8 @@ services:
       context: .
       dockerfile: centos/5.x/Dockerfile
       network: host
-    container_name: wazuh-agent-5x-centos
-    hostname: wazuh-agent-5x-centos
+    container_name: guardsarm-agent-5x-centos
+    hostname: guardsarm-agent-5x-centos
     environment:
       MANAGER_HOST: "host.docker.internal"
       MANAGER_PORT: "1514"
@@ -61,8 +61,8 @@ services:
       context: .
       dockerfile: ubuntu/5.x/Dockerfile
       network: host
-    container_name: wazuh-agent-5x-ubuntu
-    hostname: wazuh-agent-5x-ubuntu
+    container_name: guardsarm-agent-5x-ubuntu
+    hostname: guardsarm-agent-5x-ubuntu
     environment:
       MANAGER_HOST: "host.docker.internal"
       MANAGER_PORT: "1514"

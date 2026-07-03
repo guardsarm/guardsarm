@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **kvdbstore** module provides an in-memory, read-only key-value database (KVDB) layer for the Wazuh Engine. It materializes KVDB resources from the Content Manager store into `unordered_map<string, json::Json>` instances and exposes them through lightweight handlers, enabling fast O(1) key lookups during event processing.
+The **kvdbstore** module provides an in-memory, read-only key-value database (KVDB) layer for the GuardSarm Engine. It materializes KVDB resources from the Content Manager store into `unordered_map<string, json::Json>` instances and exposes them through lightweight handlers, enabling fast O(1) key lookups during event processing.
 
 The module implements a **weak-pointer cache** strategy: once a KVDB is loaded, all handlers share the same underlying map. When all handlers are released, the cache entry expires automatically, and the next request will rebuild the map from fresh data. This provides both efficient memory reuse and automatic data refresh without explicit invalidation.
 

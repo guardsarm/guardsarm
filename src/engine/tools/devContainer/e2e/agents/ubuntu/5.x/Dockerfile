@@ -7,10 +7,10 @@ RUN apt-get update \
         ca-certificates curl procps hostname tini \
  && rm -rf /var/lib/apt/lists/*
 
-COPY pkgs/wazuh-agent_5*_amd64.deb /tmp/wazuh-agent.deb
+COPY pkgs/guardsarm-agent_5*_amd64.deb /tmp/guardsarm-agent.deb
 RUN apt-get update \
- && apt-get install -y --no-install-recommends /tmp/wazuh-agent.deb \
- && rm -f /tmp/wazuh-agent.deb \
+ && apt-get install -y --no-install-recommends /tmp/guardsarm-agent.deb \
+ && rm -f /tmp/guardsarm-agent.deb \
  && rm -rf /var/lib/apt/lists/*
 
 COPY entrypoint.sh /entrypoint.sh

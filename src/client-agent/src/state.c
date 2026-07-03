@@ -13,7 +13,7 @@
 #include <pthread.h>
 #include "state.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 // Remove STATIC qualifier from tests
 #define STATIC
 #else

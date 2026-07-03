@@ -22,7 +22,7 @@
 #define CAUTHD        0001000000
 #define CBUFFER       0002000000
 #define CLGCSOCKET    0010000000
-#define WAZUHDB       0040000000
+#define GUARDSARMDB       0040000000
 #define ATAMPERING    0200000000
 
 #define MAX_NEEDED_TAGS 4
@@ -33,12 +33,12 @@
                             (modules & CREMOTE       ) | (modules & CCLIENT       ) |\
                             (modules & CAGENT_CONFIG ) | (modules & CWMODULE      ) |\
                             (modules & CAUTHD        ) | (modules & CBUFFER       ) |\
-                            (modules & CLGCSOCKET    ) | (modules & WAZUHDB       ) )
+                            (modules & CLGCSOCKET    ) | (modules & GUARDSARMDB       ) )
 
 
 
 #include "os_xml.h"
-#include "wazuh_db-config.h"
+#include "guardsarm_db-config.h"
 #include "time.h"
 
 /* Main function to read the config */

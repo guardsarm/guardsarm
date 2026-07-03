@@ -1,5 +1,5 @@
 /*
- * Wazuh Syscheck - Test tool
+ * GuardSarm Syscheck - Test tool
  * Copyright (C) 2015, Wazuh Inc.
  * January 21, 2022.
  *

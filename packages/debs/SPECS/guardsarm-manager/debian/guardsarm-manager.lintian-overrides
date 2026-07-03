@@ -1,0 +1,9 @@
+guardsarm-manager: embedded-library
+guardsarm-manager: embedded-zlib
+guardsarm-manager: possible-gpl-code-linked-with-openssl
+guardsarm-manager: new-package-should-close-itp-bug
+guardsarm-manager: possibly-insecure-handling-of-tmp-files-in-maintainer-script
+guardsarm-manager: non-standard-dir-in-var
+guardsarm-manager: file-in-unusual-dir
+guardsarm-manager: hardening-no-fortify-functions
+guardsarm-manager: hardening-no-relro

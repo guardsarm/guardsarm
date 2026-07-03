@@ -192,7 +192,7 @@ protected:
             ASSERT_FALSE(resStr.isError());
             // TODO: recheck the need of this overloading
             //<< resStr.error();
-            ASSERT_EQ("Wazuh", resStr.value());
+            ASSERT_EQ("GuardSarm", resStr.value());
 
             ASSERT_FALSE(resUint.isError());
             // TODO: recheck the need of this overloading
@@ -207,7 +207,7 @@ protected:
             ASSERT_FALSE(resJson.isError());
             // TODO: recheck the need of this overloading
             //<< resJson.error();
-            ASSERT_EQ(json::Json(R"("Wazuh")"), resJson.value());
+            ASSERT_EQ(json::Json(R"("GuardSarm")"), resJson.value());
         }
         else
         {
@@ -334,7 +334,7 @@ TEST_F(LocatorTest, GetAsJson)
 
     ASSERT_NO_THROW(res = locator->getAsJson(g_ipFullData, "test_map.test_str1"));
     ASSERT_FALSE(res.isError());
-    expected.setString("Wazuh");
+    expected.setString("GuardSarm");
     ASSERT_EQ(expected, res.value());
 
     ASSERT_NO_THROW(res = locator->getAsJson(g_ipFullData, "test_map")); // Complex type
@@ -414,7 +414,7 @@ TEST_F(LocatorTest, GetAllReturnsCompleteJson)
     ASSERT_EQ(jsonData.getBool("/test_boolean").value(), true);
     std::string tmpStr;
     ASSERT_EQ(json::RetGet::Success, jsonData.getString(tmpStr, "/test_map/test_str1"));
-    ASSERT_EQ(tmpStr, "Wazuh");
+    ASSERT_EQ(tmpStr, "GuardSarm");
     ASSERT_EQ(jsonData.getInt("/test_uint32").value(), 94043);
 }
 

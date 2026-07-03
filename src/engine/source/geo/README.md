@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **geo** module provides GeoIP enrichment capabilities for the Wazuh engine using MaxMind MMDB databases. It manages the lifecycle of GeoLite2 databases (City and ASN), including automatic downloading from a remote manifest, hash-based update detection, hot-reloading without restart, and persistent state tracking via the internal store. At query time, it provides `ILocator` instances for resolving IP addresses to geographic and network information.
+The **geo** module provides GeoIP enrichment capabilities for the GuardSarm engine using MaxMind MMDB databases. It manages the lifecycle of GeoLite2 databases (City and ASN), including automatic downloading from a remote manifest, hash-based update detection, hot-reloading without restart, and persistent state tracking via the internal store. At query time, it provides `ILocator` instances for resolving IP addresses to geographic and network information.
 
 ## Architecture
 
@@ -142,10 +142,10 @@ The `path` parameter uses dot notation matching the MMDB internal structure (e.g
 
 | Key | Env Override | Default | Description |
 |-----|-------------|---------|-------------|
-| `analysisd.geo_sync_interval` | `WAZUH_GEO_SYNC_INTERVAL` | `360` | Seconds between sync checks (`0` = disabled) |
-| `analysisd.geo_db_path` | `WAZUH_GEO_DB_PATH` | `{wazuhRoot}/data/mmdb` | Directory for `.mmdb` files |
-| `analysisd.geo_manifest_url` | `WAZUH_GEO_MANIFEST_URL` | S3 URL | Manifest JSON URL |
-| `analysisd.geo_download_timeout` | `WAZUH_GEO_DOWNLOAD_TIMEOUT` | `60000` | HTTP download timeout (ms) |
+| `analysisd.geo_sync_interval` | `GUARDSARM_GEO_SYNC_INTERVAL` | `360` | Seconds between sync checks (`0` = disabled) |
+| `analysisd.geo_db_path` | `GUARDSARM_GEO_DB_PATH` | `{guardsarmRoot}/data/mmdb` | Directory for `.mmdb` files |
+| `analysisd.geo_manifest_url` | `GUARDSARM_GEO_MANIFEST_URL` | S3 URL | Manifest JSON URL |
+| `analysisd.geo_download_timeout` | `GUARDSARM_GEO_DOWNLOAD_TIMEOUT` | `60000` | HTTP download timeout (ms) |
 
 ## Integration in `main.cpp`
 
@@ -197,12 +197,12 @@ Database metadata is stored in a single document at `geo/mmdb/0` in the internal
 ```json
 {
   "city": {
-    "path": "/var/wazuh-manager/data/mmdb/GeoLite2-City.mmdb",
+    "path": "/var/guardsarm-manager/data/mmdb/GeoLite2-City.mmdb",
     "hash": "abc123...",
     "generated_at": 1715270400
   },
   "asn": {
-    "path": "/var/wazuh-manager/data/mmdb/GeoLite2-ASN.mmdb",
+    "path": "/var/guardsarm-manager/data/mmdb/GeoLite2-ASN.mmdb",
     "hash": "def456...",
     "generated_at": 1715270400
   }
@@ -273,7 +273,7 @@ Build and run:
 
 ```bash
 # Tests
-make --directory=$WAZUH_REPO/src -j TARGET=manager ENGINE_TEST=y DEBUG=yes
+make --directory=$GUARDSARM_REPO/src -j TARGET=manager ENGINE_TEST=y DEBUG=yes
 $ENGINE_BUILD/source/geo/geo_utest
 $ENGINE_BUILD/source/geo/geo_ctest
 

@@ -200,7 +200,7 @@ int runPushEvents(const int argc, const char* argv[])
 
                 const std::string idxName = (cfg.contains("index") && cfg["index"].is_string())
                                                 ? cfg["index"].get<std::string>()
-                                                : "wazuh-test";
+                                                : "guardsarm-test";
                 indexNames.push_back(idxName);
 
                 std::cout << "  [" << queueId << "] config=" << cfgPath << ", index=" << idxName
@@ -279,7 +279,7 @@ int runPushEvents(const int argc, const char* argv[])
 
         const std::string indexName = (configuration.contains("index") && configuration["index"].is_string())
                                           ? configuration["index"].get<std::string>()
-                                          : "wazuh-test";
+                                          : "guardsarm-test";
 
         if (!args.getEventsFilePath().empty())
         {
@@ -404,14 +404,14 @@ int runExportPolicy(const int argc, const char* argv[])
         if (!out.is_open())
             throw std::runtime_error("Failed to open output file: " + outputPath);
 
-        // Query wazuh-threatintel-policies for the given space with full pagination
+        // Query guardsarm-threatintel-policies for the given space with full pagination
         nlohmann::json searchQuery = {
             {"query", {{"bool", {{"filter", nlohmann::json::array({{{"term", {{"space.name", space}}}}})}}}}},
             {"sort", nlohmann::json::array({{{"_id", "asc"}}})},
             {"size", 1000}};
 
         nlohmann::json docs = nlohmann::json::array();
-        connector.executeSearchQueryWithPagination("wazuh-threatintel-policies",
+        connector.executeSearchQueryWithPagination("guardsarm-threatintel-policies",
                                                    searchQuery,
                                                    [&docs](const nlohmann::json& response)
                                                    {
@@ -468,11 +468,11 @@ int runGenerateFullPolicy(const int argc, const char* argv[])
             throw std::runtime_error("Failed to open output file: " + outputPath);
 
         // Create a consistent PIT snapshot across all policy aliases
-        const std::vector<std::string> POLICY_ALIASES = {"wazuh-threatintel-kvdbs",
-                                                         "wazuh-threatintel-decoders",
-                                                         "wazuh-threatintel-filters",
-                                                         "wazuh-threatintel-integrations",
-                                                         "wazuh-threatintel-policies"};
+        const std::vector<std::string> POLICY_ALIASES = {"guardsarm-threatintel-kvdbs",
+                                                         "guardsarm-threatintel-decoders",
+                                                         "guardsarm-threatintel-filters",
+                                                         "guardsarm-threatintel-integrations",
+                                                         "guardsarm-threatintel-policies"};
 
         auto pit = connector.createPointInTime(POLICY_ALIASES, "5m", true);
         // RAII guard to always delete the PIT

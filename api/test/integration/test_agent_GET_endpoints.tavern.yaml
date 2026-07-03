@@ -3,7 +3,7 @@ test_name: GET /agents
 
 stages:
 
-  - name: Get wazuh version
+  - name: Get guardsarm version
     request:
       verify: False
       url: "{protocol:s}://{host:s}:{balanced_port:d}/"
@@ -14,7 +14,7 @@ stages:
       status_code: 200
       save:
         json:
-          wazuh_version: data.api_version
+          guardsarm_version: data.api_version
 
   - name: Get all agents
     request: &get_agents
@@ -86,13 +86,13 @@ stages:
         data:
           affected_items:
             - id: '004'
-              version: 'v{wazuh_version:s}'
+              version: 'v{guardsarm_version:s}'
             - id: '003'
-              version: 'v{wazuh_version:s}'
+              version: 'v{guardsarm_version:s}'
             - id: '002'
-              version: 'v{wazuh_version:s}'
+              version: 'v{guardsarm_version:s}'
             - id: '001'
-              version: 'v{wazuh_version:s}'
+              version: 'v{guardsarm_version:s}'
             - id: '008'
               version: 'v4.14.1'
             - id: '007'
@@ -139,13 +139,13 @@ stages:
             - id: '008'
               version: 'v4.14.1'
             - id: '001'
-              version: 'v{wazuh_version:s}'
+              version: 'v{guardsarm_version:s}'
             - id: '002'
-              version: 'v{wazuh_version:s}'
+              version: 'v{guardsarm_version:s}'
             - id: '003'
-              version: 'v{wazuh_version:s}'
+              version: 'v{guardsarm_version:s}'
             - id: '004'
-              version: 'v{wazuh_version:s}'
+              version: 'v{guardsarm_version:s}'
           failed_items: [ ]
           total_affected_items: 12
           total_failed_items: 0
@@ -300,7 +300,7 @@ stages:
       verify: False
       <<: *get_agents
       params:
-        search: 'wazuh-agent6'
+        search: 'guardsarm-agent6'
     response:
       status_code: 200
       json:
@@ -308,7 +308,7 @@ stages:
         data:
           affected_items:
             - id: '006'
-              name: 'wazuh-agent6'
+              name: 'guardsarm-agent6'
           failed_items: []
           total_affected_items: 1
           total_failed_items: 0
@@ -318,7 +318,7 @@ stages:
       verify: False
       <<: *get_agents
       params:
-        search: "wazuh-agent6' or 'wazuh'='wazuh"
+        search: "guardsarm-agent6' or 'guardsarm'='guardsarm"
     response:
       status_code: 200
       json:
@@ -421,13 +421,13 @@ stages:
       json:
         <<: *error_spec
 
-  - name: Filter by agent version following the 'wazuh vX.Y.Z' format
+  - name: Filter by agent version following the 'guardsarm vX.Y.Z' format
     request:
       verify: False
       <<: *get_agents
       params:
         version: 'v4.9.2'
-    response: &old_wazuh_agents_response
+    response: &old_guardsarm_agents_response
       status_code: 200
       json:
         error: 0
@@ -439,14 +439,14 @@ stages:
           total_affected_items: 2
           total_failed_items: 0
 
-  - name: Filter by agent version following the 'wazuh X.Y.Z' format
+  - name: Filter by agent version following the 'guardsarm X.Y.Z' format
     request:
       verify: False
       <<: *get_agents
       params:
-        version: 'Wazuh 4.9.2'
+        version: 'GuardSarm 4.9.2'
     response:
-      <<: *old_wazuh_agents_response
+      <<: *old_guardsarm_agents_response
 
   - name: Filter by agent version following the 'vX.Y.Z' format
     request:
@@ -455,7 +455,7 @@ stages:
       params:
         version: 'v4.9.2'
     response:
-      <<: *old_wazuh_agents_response
+      <<: *old_guardsarm_agents_response
 
   - name: Filter by agent version following the 'X.Y.Z' format
     request:
@@ -464,7 +464,7 @@ stages:
       params:
         version: '4.9.2'
     response:
-      <<: *old_wazuh_agents_response
+      <<: *old_guardsarm_agents_response
 
   - name: Try to show agents using a non existing version
     request:
@@ -1887,13 +1887,13 @@ stages:
         data:
           affected_items:
             - timestamp: !anystr
-              name: wazuh-manager-remoted
+              name: guardsarm-manager-remoted
               agents:
                 - id: 1
                   uptime: !anystr
                   metrics: !anything
           failed_items:
-            - id: [ wazuh-manager-analysisd ]
+            - id: [ guardsarm-manager-analysisd ]
           total_affected_items: 1
           total_failed_items: 1
 
@@ -1919,7 +1919,7 @@ stages:
       url: "{protocol:s}://{host:s}:{balanced_port:d}/agents/001/daemons/stats"
       method: GET
       params:
-        daemons_list: wazuh-manager-remoted
+        daemons_list: guardsarm-manager-remoted
       headers:
         Authorization: "Bearer {test_login_token}"
     response:
@@ -1929,7 +1929,7 @@ stages:
         data:
           affected_items:
             - timestamp: !anystr
-              name: wazuh-manager-remoted
+              name: guardsarm-manager-remoted
               agents:
                 - id: 1
                   uptime: !anystr
@@ -1989,7 +1989,7 @@ stages:
           total_affected_items: 1
           total_failed_items: 0
 
-  - name: Get wazuh-agentd stats from agent 001
+  - name: Get guardsarm-agentd stats from agent 001
     request:
       verify: False
       url: "{protocol:s}://{host:s}:{balanced_port:d}/agents/001/stats/agent"
@@ -2545,7 +2545,7 @@ stages:
       verify: False
       <<: *groups_id_request
       params:
-        search: 'wazuh-agent8'
+        search: 'guardsarm-agent8'
     response:
       status_code: 200
       json:
@@ -2553,7 +2553,7 @@ stages:
         data:
           affected_items:
             - id: '008'
-              name: 'wazuh-agent8'
+              name: 'guardsarm-agent8'
               group:
                 - default
           failed_items: []
@@ -2824,7 +2824,7 @@ test_name: GET /groups/{group_id}/agents {sort,select} version
 
 stages:
 
-  - name: Get wazuh version
+  - name: Get guardsarm version
     request:
       verify: False
       url: "{protocol:s}://{host:s}:{balanced_port:d}/"
@@ -2835,7 +2835,7 @@ stages:
       status_code: 200
       save:
         json:
-          wazuh_version: data.api_version
+          guardsarm_version: data.api_version
 
   - name: Filter groups, sort
     request:
@@ -2852,7 +2852,7 @@ stages:
             - version: 'v4.14.1'
             - version: 'v4.14.1'
             - version: 'v4.14.1'
-            - version: 'v{wazuh_version:s}'
+            - version: 'v{guardsarm_version:s}'
           failed_items: []
           total_affected_items: 4
           total_failed_items: 0
@@ -3419,7 +3419,7 @@ stages:
       headers:
         Authorization: "Bearer {test_login_token}"
       params:
-        name: wazuh-agent1
+        name: guardsarm-agent1
     response:
       status_code: 200
       json:
@@ -3427,7 +3427,7 @@ stages:
         data: &get_agents_by_name_response
           affected_items:
             - id: '001'
-              name: 'wazuh-agent1'
+              name: 'guardsarm-agent1'
           failed_items: []
           total_affected_items: 1
           total_failed_items: 0
@@ -3454,7 +3454,7 @@ stages:
       <<: *get_agents_by_name
       params:
         select: name
-        name: wazuh-agent1
+        name: guardsarm-agent1
     response:
       verify_response_with:
         # Check response item keys are the selected keys
@@ -3473,7 +3473,7 @@ stages:
       <<: *get_agents_by_name
       params:
         select: name,id,status
-        name: wazuh-agent1
+        name: guardsarm-agent1
     response:
       verify_response_with:
         # Check response item keys are the selected keys
@@ -3486,7 +3486,7 @@ stages:
         data:
           affected_items:
             - id: '001'
-              name: 'wazuh-agent1'
+              name: 'guardsarm-agent1'
               status: 'active'
           failed_items: []
           total_affected_items: 1
@@ -3498,7 +3498,7 @@ stages:
       <<: *get_agents_by_name
       params:
         select: wrong_select
-        name: wazuh-agent1
+        name: guardsarm-agent1
     response:
       status_code: 400
       json:
@@ -3640,7 +3640,7 @@ stages:
       verify: False
       <<: *no_group_request
       params:
-        search: wazuh-agent11
+        search: guardsarm-agent11
     response:
       status_code: 200
       json:
@@ -3787,7 +3787,7 @@ stages:
           affected_items:
             - id: '005'
               status: active
-              name: wazuh-agent5
+              name: guardsarm-agent5
               version: 'v4.14.1'
               status_code: 0
               group:
@@ -3815,7 +3815,7 @@ stages:
         error: 0
         data:
           affected_items:
-            - name: wazuh-agent5
+            - name: guardsarm-agent5
           failed_items: []
           total_affected_items: !anyint
           total_failed_items: 0

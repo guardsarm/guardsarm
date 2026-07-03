@@ -27,7 +27,7 @@ typedef struct
 {
     char agent_id[256];           ///< Agent identifier (e.g., "001")
     char agent_name[256];         ///< Agent name
-    char agent_version[256];      ///< Wazuh agent version
+    char agent_version[256];      ///< GuardSarm agent version
     char architecture[256];       ///< System architecture (e.g., "x86_64")
     char hostname[256];           ///< System hostname
     char os_name[256];            ///< Operating system name

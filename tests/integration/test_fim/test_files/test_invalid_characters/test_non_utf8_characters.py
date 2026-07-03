@@ -20,7 +20,7 @@ targets:
     - agent
 
 daemons:
-    - wazuh-syscheckd
+    - guardsarm-syscheckd
 
 os_platform:
     - Linux
@@ -37,8 +37,8 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html
-    - https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syscheck.html
+    - https://documentation.guardsarm.com/current/user-manual/capabilities/file-integrity/index.html
+    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/syscheck.html
 
 pytest_args:
     - fim_mode:
@@ -60,15 +60,15 @@ import pytest
 
 from pathlib import Path
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.modules.agentd.configuration import AGENTD_DEBUG
-from wazuh_testing.modules.fim import configuration
-from wazuh_testing.modules.fim.patterns import FIM_EVENT_JSON
-from wazuh_testing.modules.monitord.configuration import MONITORD_ROTATE_LOG
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils import file
-from wazuh_testing.utils.callbacks import generate_callback
-from wazuh_testing.utils.configuration import (
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.modules.agentd.configuration import AGENTD_DEBUG
+from guardsarm_testing.modules.fim import configuration
+from guardsarm_testing.modules.fim.patterns import FIM_EVENT_JSON
+from guardsarm_testing.modules.monitord.configuration import MONITORD_ROTATE_LOG
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.utils import file
+from guardsarm_testing.utils.callbacks import generate_callback
+from guardsarm_testing.utils.configuration import (
     get_test_cases_data,
     load_configuration_template,
 )
@@ -145,7 +145,7 @@ valid_utf8_sequences = [
 def test_valid_utf8_filenames_do_not_trigger_warning(
     test_configuration,
     test_metadata,
-    set_wazuh_configuration,
+    set_guardsarm_configuration,
     configure_local_internal_options,
     truncate_monitored_files,
     folder_to_monitor,
@@ -153,9 +153,9 @@ def test_valid_utf8_filenames_do_not_trigger_warning(
     start_monitoring,
 ) -> None:
     """
-    description: Check if the 'wazuh-syscheckd' correctly processes valid UTF-8 file names without triggering warnings.
+    description: Check if the 'guardsarm-syscheckd' correctly processes valid UTF-8 file names without triggering warnings.
     """
-    monitor = FileMonitor(WAZUH_LOG_PATH)
+    monitor = FileMonitor(GUARDSARM_LOG_PATH)
 
     # iterate over invalid UTF-8 sequences
     for valid_sequence in valid_utf8_sequences:
@@ -163,7 +163,7 @@ def test_valid_utf8_filenames_do_not_trigger_warning(
         test_path_bytes = os.path.join(
             test_metadata["folder_to_monitor"], valid_sequence
         )
-        file.truncate_file(WAZUH_LOG_PATH)
+        file.truncate_file(GUARDSARM_LOG_PATH)
 
         # Create the file with the invalid byte sequence as part of the file name
         with open(test_path_bytes, "w") as f:

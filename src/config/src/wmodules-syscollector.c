@@ -1,5 +1,5 @@
 /*
- * Wazuh Syscollector Module Configuration
+ * GuardSarm Syscollector Module Configuration
  * Copyright (C) 2015, Wazuh Inc.
  * March 9, 2017.
  *

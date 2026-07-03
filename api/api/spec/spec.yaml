@@ -1,14 +1,14 @@
 openapi: '3.0.0'
 info:
   description: |
-    The Wazuh API is an open-source RESTful API that allows for interaction with the Wazuh manager from a web browser,
-    command line tools like cURL or any script or program that can make web requests. The Wazuh WUI relies on this
-    heavily and Wazuh’s goal is to accommodate complete remote management of the Wazuh infrastructure via the Wazuh WUI.
-    Use the Wazuh API to easily perform everyday actions like adding an agent, restarting the manager(s) or agent(s).
+    The GuardSarm API is an open-source RESTful API that allows for interaction with the GuardSarm manager from a web browser,
+    command line tools like cURL or any script or program that can make web requests. The GuardSarm WUI relies on this
+    heavily and GuardSarm’s goal is to accommodate complete remote management of the GuardSarm infrastructure via the GuardSarm WUI.
+    Use the GuardSarm API to easily perform everyday actions like adding an agent, restarting the manager(s) or agent(s).
 
     # Authentication
 
-    Wazuh API endpoints require authentication to be used. Therefore, all calls must include a JSON Web Token.
+    GuardSarm API endpoints require authentication to be used. Therefore, all calls must include a JSON Web Token.
     JWT is an open standard (RFC 7519) that defines a compact and self-contained way for securely transmitting
     information between parties as a JSON object. Perform a call with `basicAuth` to `POST /security/user/authenticate`
     and obtain a JWT token to run any endpoint.
@@ -41,10 +41,10 @@ info:
 
   version: '5.0.1'
   x-revision: 'alpha0'
-  title: 'Wazuh API REST'
+  title: 'GuardSarm API REST'
   license:
     name: 'GPL 2.0'
-    url: 'https://github.com/wazuh/wazuh/blob/5.0.0/LICENSE'
+    url: 'https://github.com/guardsarm/guardsarm/blob/5.0.0/LICENSE'
 
 servers:
   - url: '{protocol}://{host}:{port}'
@@ -201,7 +201,7 @@ x-rbac-catalog:
         resources: ['group:id:*']
         effect: "allow"
     'cluster:read':
-      description: "Read Wazuh's cluster nodes configuration"
+      description: "Read GuardSarm's cluster nodes configuration"
       resources:
         - $ref: '#/x-rbac-catalog/resources/node:id'
       example:
@@ -209,7 +209,7 @@ x-rbac-catalog:
         resources: ['node:id:worker1', 'node:id:worker3']
         effect: "deny"
     'cluster:update_config':
-      description: "Change the Wazuh's cluster node configuration"
+      description: "Change the GuardSarm's cluster node configuration"
       resources:
         - $ref: '#/x-rbac-catalog/resources/node:id'
       example:
@@ -217,7 +217,7 @@ x-rbac-catalog:
         resources: ['node:id:worker1']
         effect: "allow"
     'cluster:read_api_config':
-      description: "Check Wazuh's cluster nodes API configuration"
+      description: "Check GuardSarm's cluster nodes API configuration"
       resources:
         - $ref: '#/x-rbac-catalog/resources/*:*'
       example:
@@ -225,7 +225,7 @@ x-rbac-catalog:
         resources: ['node:id:worker1', 'node:id:worker3']
         effect: "allow"
     'cluster:restart':
-      description: "Restart Wazuh's cluster nodes"
+      description: "Restart GuardSarm's cluster nodes"
       resources:
         - $ref: '#/x-rbac-catalog/resources/node:id'
       example:
@@ -233,7 +233,7 @@ x-rbac-catalog:
         resources: ['node:id:worker1']
         effect: "allow"
     'cluster:status':
-      description: "Check Wazuh's cluster general status"
+      description: "Check GuardSarm's cluster general status"
       resources:
         - $ref: '#/x-rbac-catalog/resources/*:*'
       example:
@@ -363,7 +363,7 @@ components:
             detail: "Permission denied: Resource type: *:*"
             remediation: "Please, make sure you have permissions to execute the current request. For more information
             on how to set up permissions, please visit
-            https://documentation.wazuh.com/5.0/user-manual/api/rbac/configuration.html"
+            https://documentation.guardsarm.com/5.0/user-manual/api/rbac/configuration.html"
             error: 4000
             dapi_errors:
               unknown-node:
@@ -406,7 +406,7 @@ components:
           schema:
             $ref: '#/components/schemas/RequestError'
           example:
-            title: "Wazuh Error"
+            title: "GuardSarm Error"
             detail: "The body type is not the one specified in the content-type"
             error: 6002
 
@@ -427,10 +427,10 @@ components:
           schema:
             $ref: '#/components/schemas/RequestError'
           example:
-            title: "Wazuh Error"
+            title: "GuardSarm Error"
             detail: "Maximum number of requests per minute reached"
             remediation: "This limit can be changed in api.yaml file. More information here:
-            https://documentation.wazuh.com/5.0/user-manual/api/security/configuration.html"
+            https://documentation.guardsarm.com/5.0/user-manual/api/security/configuration.html"
             code: 6001
 
     ResourceNotFoundResponse:
@@ -443,7 +443,7 @@ components:
             title: "Resource Not Found"
             detail: "The group does not exist"
             remediation: "Please, use `GET /groups` to find all available groups:
-            https://documentation.wazuh.com/5.0/user-manual/api/rbac/configuration.html"
+            https://documentation.guardsarm.com/5.0/user-manual/api/rbac/configuration.html"
             code: 1710
             dapi_errors:
               unknown-node:
@@ -586,7 +586,7 @@ components:
               items:
                 $ref: '#/components/schemas/AgentDistinct'
 
-    AllItemsResponseWazuhDaemonStats:
+    AllItemsResponseGuardSarmDaemonStats:
       allOf:
         - type: object
           required:
@@ -597,12 +597,12 @@ components:
               description: "Items that successfully applied the API call action"
               items:
                 oneOf:
-                  - $ref: '#/components/schemas/WazuhRemotedStatsItem'
-                  - $ref: '#/components/schemas/WazuhAnalysisdStatsItem'
-                  - $ref: '#/components/schemas/WazuhDBStatsItem'
+                  - $ref: '#/components/schemas/GuardSarmRemotedStatsItem'
+                  - $ref: '#/components/schemas/GuardSarmAnalysisdStatsItem'
+                  - $ref: '#/components/schemas/GuardSarmDBStatsItem'
         - $ref: '#/components/schemas/AllItemsResponse'
 
-    AllItemsResponseWazuhDaemonStatsAgents:
+    AllItemsResponseGuardSarmDaemonStatsAgents:
       allOf:
         - type: object
           required:
@@ -613,8 +613,8 @@ components:
               description: "Items that successfully applied the API call action"
               items:
                 oneOf:
-                  - $ref: '#/components/schemas/WazuhRemotedStatsAgentsItem'
-                  - $ref: '#/components/schemas/WazuhAnalysisdStatsAgentsItem'
+                  - $ref: '#/components/schemas/GuardSarmRemotedStatsAgentsItem'
+                  - $ref: '#/components/schemas/GuardSarmAnalysisdStatsAgentsItem'
         - $ref: '#/components/schemas/AllItemsResponse'
 
     AllItemsResponseGroups:
@@ -762,7 +762,7 @@ components:
               items:
                   $ref: '#/components/schemas/ClusterNode'
 
-    AllItemsResponseWazuhLogs:
+    AllItemsResponseGuardSarmLogs:
       allOf:
         - $ref: '#/components/schemas/AllItemsResponse'
         - type: object
@@ -773,7 +773,7 @@ components:
               type: array
               description: "Items that successfully applied the API call action"
               items:
-                  $ref: '#/components/schemas/WazuhLogs'
+                  $ref: '#/components/schemas/GuardSarmLogs'
 
     AllItemsResponseValidationStatus:
       allOf:
@@ -818,7 +818,7 @@ components:
       properties:
         version:
           type: string
-          description: "Wazuh version the agent has installed"
+          description: "GuardSarm version the agent has installed"
         id:
           $ref: '#/components/schemas/AgentID'
         name:
@@ -942,7 +942,7 @@ components:
           type: string
           maxLength: 64
           minLength: 64
-          format: wazuh_key
+          format: guardsarm_key
           description: "Key to use when communicating with the manager. The agent must have the same key on
           its `client.keys` file"
         name:
@@ -966,7 +966,7 @@ components:
       - pending
       - never_connected
       - disconnected
-      description: "Agent status. It is calculated based on the last keepalive and the Wazuh version"
+      description: "Agent status. It is calculated based on the last keepalive and the GuardSarm version"
 
     AgentsSummary:
       type: object
@@ -1083,7 +1083,7 @@ components:
           description: "Time the agent must has been registered to force the insertion. Time in seconds, ‘[n_days]d’, ‘[n_hours]h’, ‘[n_minutes]m’ or ‘[n_seconds]s’. For example, `7d`, `10s` and `10` are valid values. If no time unit is specified, seconds are used"
           format: timeframe
 
-    WazuhRemotedStatsAgentsItem:
+    GuardSarmRemotedStatsAgentsItem:
       type: object
       properties:
         timestamp:
@@ -1094,7 +1094,7 @@ components:
           type: string
           description: "Daemon name"
           enum:
-            - wazuh-manager-remoted
+            - guardsarm-manager-remoted
         agents:
           type: array
           items:
@@ -1168,7 +1168,7 @@ components:
                             format: int32
                             description: "Shared configuration messages (merged.mg) sent to agent"
 
-    WazuhAnalysisdStatsAgentsItem:
+    GuardSarmAnalysisdStatsAgentsItem:
       type: object
       properties:
         timestamp:
@@ -1179,7 +1179,7 @@ components:
           type: string
           description: "Daemon name"
           enum:
-            - wazuh-manager-analysisd
+            - guardsarm-manager-analysisd
         agents:
           type: array
           items:
@@ -1388,7 +1388,7 @@ components:
         version:
           type: string
           format: \d+\.\d+\.\d+
-          description: "Wazuh version installed in the node"
+          description: "GuardSarm version installed in the node"
         ip:
           type: string
           description: "IP the node is using to communicate with other nodes in the cluster"
@@ -1781,7 +1781,7 @@ components:
           description: "User's JWT token"
 
     # Cluster and manager models
-    WazuhRemotedStatsItem:
+    GuardSarmRemotedStatsItem:
       type: object
       properties:
         uptime:
@@ -1796,7 +1796,7 @@ components:
           type: string
           description: "Daemon name"
           enum:
-            - wazuh-manager-remoted
+            - guardsarm-manager-remoted
         metrics:
           type: object
           properties:
@@ -1906,7 +1906,7 @@ components:
               format: int32
               description: "Current active TCP sessions (agents)"
 
-    WazuhAnalysisdStatsItem:
+    GuardSarmAnalysisdStatsItem:
       type: object
       properties:
         uptime:
@@ -1921,7 +1921,7 @@ components:
           type: string
           description: "Daemon name"
           enum:
-            - wazuh-manager-analysisd
+            - guardsarm-manager-analysisd
         metrics:
           type: object
           properties:
@@ -2332,7 +2332,7 @@ components:
                       format: int32
                       description: "Current usage of the upgrade queue (percentage)"
 
-    WazuhDBStatsItem:
+    GuardSarmDBStatsItem:
       type: object
       properties:
         uptime:
@@ -2347,7 +2347,7 @@ components:
           type: string
           description: "Daemon name"
           enum:
-            - wazuh-manager-db
+            - guardsarm-manager-db
         metrics:
           type: object
           properties:
@@ -2357,14 +2357,14 @@ components:
                 received:
                   type: integer
                   format: int32
-                  description: "Total number of queries through WazuhDB socket"
+                  description: "Total number of queries through GuardSarmDB socket"
                 received_breakdown:
                   type: object
                   properties:
                     global:
                       type: integer
                       format: int32
-                      description: "Number of global queries through WazuhDB socket"
+                      description: "Number of global queries through GuardSarmDB socket"
                     global_breakdown:
                       type: object
                       properties:
@@ -2469,7 +2469,7 @@ components:
                     task:
                       type: integer
                       format: int32
-                      description: "Number of task queries through WazuhDB socket"
+                      description: "Number of task queries through GuardSarmDB socket"
                     task_breakdown:
                       type: object
                       properties:
@@ -2672,39 +2672,39 @@ components:
                                   type: integer
                                   format: int32
 
-    WazuhDaemonsStatus:
+    GuardSarmDaemonsStatus:
       type: object
       properties:
-        wazuh-manager-analysisd:
+        guardsarm-manager-analysisd:
           $ref: '#/components/schemas/DaemonStatus'
-        wazuh-manager-authd:
+        guardsarm-manager-authd:
           $ref: '#/components/schemas/DaemonStatus'
-        wazuh-manager-monitord:
+        guardsarm-manager-monitord:
           $ref: '#/components/schemas/DaemonStatus'
-        wazuh-manager-remoted:
+        guardsarm-manager-remoted:
           $ref: '#/components/schemas/DaemonStatus'
-        wazuh-manager-apid:
+        guardsarm-manager-apid:
           $ref: '#/components/schemas/DaemonStatus'
-        wazuh-manager-clusterd:
+        guardsarm-manager-clusterd:
           $ref: '#/components/schemas/DaemonStatus'
-        wazuh-manager-db:
+        guardsarm-manager-db:
           $ref: '#/components/schemas/DaemonStatus'
-        wazuh-manager-modulesd:
+        guardsarm-manager-modulesd:
           $ref: '#/components/schemas/DaemonStatus'
 
-    WazuhInfo:
+    GuardSarmInfo:
       type: object
       properties:
         path:
           type: string
           format: paths
-          description: "Wazuh installation path"
+          description: "GuardSarm installation path"
         version:
           type: string
-          description: "Wazuh version"
+          description: "GuardSarm version"
         type:
           type: string
-          description: "Wazuh installation type"
+          description: "GuardSarm installation type"
           enum:
           - server
         max_agents:
@@ -2716,7 +2716,7 @@ components:
         tz_name:
           type: string
 
-    WazuhManagerConfiguration:
+    GuardSarmManagerConfiguration:
       type: object
       properties:
         alerts:
@@ -2747,11 +2747,11 @@ components:
           type: object
         socket:
           type: object
-        #Wodle sections inside WazuhConfiguration(wazuh configuration file)
+        #Wodle sections inside GuardSarmConfiguration(guardsarm configuration file)
         syscollector:
           type: object
 
-    WazuhLogs:
+    GuardSarmLogs:
       type: object
       properties:
         description:
@@ -2770,7 +2770,7 @@ components:
         tag:
           type: string
           format: alphanumeric
-          description: "Wazuh component that logged the event"
+          description: "GuardSarm component that logged the event"
         timestamp:
           type: string
           format: date-time
@@ -2813,36 +2813,36 @@ components:
           format: int32
           minimum: 0
 
-    WazuhLogsSummary:
+    GuardSarmLogsSummary:
       type: object
       properties:
           indexer-connector:
             $ref: '#/components/schemas/LogSummary'
-          wazuh-manager-analysisd:
+          guardsarm-manager-analysisd:
             $ref: '#/components/schemas/LogSummary'
-          wazuh-manager-authd:
+          guardsarm-manager-authd:
             $ref: '#/components/schemas/LogSummary'
-          wazuh-manager-monitord:
+          guardsarm-manager-monitord:
             $ref: '#/components/schemas/LogSummary'
-          wazuh-manager-remoted:
+          guardsarm-manager-remoted:
             $ref: '#/components/schemas/LogSummary'
-          wazuh-manager-db:
+          guardsarm-manager-db:
             $ref: '#/components/schemas/LogSummary'
-          wazuh-manager-modulesd:
+          guardsarm-manager-modulesd:
             $ref: '#/components/schemas/LogSummary'
-          wazuh-manager-modulesd:agent-upgrade:
+          guardsarm-manager-modulesd:agent-upgrade:
             $ref: '#/components/schemas/LogSummary'
-          wazuh-manager-modulesd:control:
+          guardsarm-manager-modulesd:control:
             $ref: '#/components/schemas/LogSummary'
-          wazuh-manager-modulesd:content_manager:
+          guardsarm-manager-modulesd:content_manager:
             $ref: '#/components/schemas/LogSummary'
-          wazuh-manager-modulesd:database:
+          guardsarm-manager-modulesd:database:
             $ref: '#/components/schemas/LogSummary'
-          wazuh-manager-modulesd:download:
+          guardsarm-manager-modulesd:download:
             $ref: '#/components/schemas/LogSummary'
-          wazuh-manager-modulesd:vulnerability-scanner:
+          guardsarm-manager-modulesd:vulnerability-scanner:
             $ref: '#/components/schemas/LogSummary'
-          wazuh-manager-modulesd:task-manager:
+          guardsarm-manager-modulesd:task-manager:
             $ref: '#/components/schemas/LogSummary'
 
     ConfirmationMessage:
@@ -2893,12 +2893,12 @@ components:
                 format: alphanumeric_symbols
         groups:
           type: array
-          description: "Recount of the number of Wazuh agents group by Wazuh groups"
+          description: "Recount of the number of GuardSarm agents group by GuardSarm groups"
           items:
             $ref: '#/components/schemas/AgentGroup'
         agent_os:
           type: array
-          description: "Recount of the number of Wazuh agents group by OS"
+          description: "Recount of the number of GuardSarm agents group by OS"
           items:
             type: object
             properties:
@@ -2924,7 +2924,7 @@ components:
           $ref: '#/components/schemas/AgentsSummaryStatus'
         agent_version:
           type: array
-          description: "Recount of the number of Wazuh agents group by version"
+          description: "Recount of the number of GuardSarm agents group by version"
           items:
             type: object
             properties:
@@ -2999,7 +2999,7 @@ components:
         - auth
         - monitor
         - request
-        - wazuh-manager-db
+        - guardsarm-manager-db
         - wmodules
     agent_configuration:
       in: path
@@ -3133,12 +3133,12 @@ components:
         <td><code>&lt;remoted&gt;</code></td>
         </tr>
         <tr>
-        <td>wazuh-manager-db</td>
+        <td>guardsarm-manager-db</td>
         <td>internal</td>
-        <td><code>&lt;wazuh_db&gt;</code></td>
+        <td><code>&lt;guardsarm_db&gt;</code></td>
         </tr>
         <tr>
-        <td>wazuh-manager-db</td>
+        <td>guardsarm-manager-db</td>
         <td>wdb</td>
         <td><code>&lt;wdb&gt;</code></td>
         </tr>
@@ -3168,9 +3168,9 @@ components:
         items:
           type: string
           enum:
-            - wazuh-manager-analysisd
-            - wazuh-manager-remoted
-            - wazuh-manager-db
+            - guardsarm-manager-analysisd
+            - guardsarm-manager-remoted
+            - guardsarm-manager-db
     daemons_list_agents:
       in: query
       name: daemons_list
@@ -3180,8 +3180,8 @@ components:
         items:
           type: string
           enum:
-            - wazuh-manager-analysisd
-            - wazuh-manager-remoted
+            - guardsarm-manager-analysisd
+            - guardsarm-manager-remoted
     fields:
       in: query
       name: fields
@@ -3445,7 +3445,7 @@ components:
       in: query
       name: purge
       description: |
-        Permanently delete an agent from the key store. The wazuh-manager-authd `purge` configuration option has
+        Permanently delete an agent from the key store. The guardsarm-manager-authd `purge` configuration option has
         precedence over this parameter, when enabled, agents will be permanently deleted regardless of this value.
       schema:
         type: boolean
@@ -3693,7 +3693,7 @@ components:
     version:
       in: query
       name: version
-      description: "Filter by agents version using one of the following formats: 'X.Y.Z', 'vX.Y.Z', 'wazuh X.Y.Z' or 'wazuh vX.Y.Z'. For example: '4.4.0'"
+      description: "Filter by agents version using one of the following formats: 'X.Y.Z', 'vX.Y.Z', 'guardsarm X.Y.Z' or 'guardsarm vX.Y.Z'. For example: '4.4.0'"
       schema:
         type: string
         format: alphanumeric
@@ -3731,7 +3731,7 @@ components:
     section:
       in: query
       name: section
-      description: "Indicates the wazuh configuration section"
+      description: "Indicates the guardsarm configuration section"
       schema:
         type: string
         enum:
@@ -3768,7 +3768,7 @@ components:
     tag:
       in: query
       name: tag
-      description: "Wazuh component that logged the event"
+      description: "GuardSarm component that logged the event"
       schema:
         type: string
         format: alphanumeric
@@ -3898,10 +3898,10 @@ components:
     upgrade_version:
       in: query
       name: upgrade_version
-      description: "Wazuh version to upgrade to"
+      description: "GuardSarm version to upgrade to"
       schema:
         type: string
-        format: wazuh_version
+        format: guardsarm_version
     force:
       in: query
       name: force
@@ -3921,8 +3921,8 @@ components:
     file_path:
       in: query
       name: file_path
-      description: "Full path to the WPK file. The file must be on a folder on the Wazuh's installation directory
-      (by default, <code>/var/wazuh-manager</code>)"
+      description: "Full path to the WPK file. The file must be on a folder on the GuardSarm's installation directory
+      (by default, <code>/var/guardsarm-manager</code>)"
       required: True
       schema:
         type: string
@@ -3953,19 +3953,19 @@ components:
 
 tags:
   - name: API Info
-    description: "Wazuh API information"
+    description: "GuardSarm API information"
   - name: Agents
     description: "Agents management related operations"
   - name: Cluster
-    description: "Wazuh cluster and nodes management"
+    description: "GuardSarm cluster and nodes management"
   - name: Groups
     description: "Group of agents and centralized configurations"
   - name: Manager
-    description: "Wazuh manager management"
+    description: "GuardSarm manager management"
   - name: MITRE
     description: "Technique information from MITRE database"
   - name: Overview
-    description: "Overview of Wazuh"
+    description: "Overview of GuardSarm"
   - name: Rootcheck
     description: "Rootcheck management"
   - name: SCA
@@ -4003,12 +4003,12 @@ paths:
                   data:
                     $ref: '#/components/schemas/BasicInfo'
               example:
-                title: "Wazuh API"
+                title: "GuardSarm API"
                 api_version: "v4.5.0"
                 revision: 'alpha0'
                 license_name: "GPL 2.0"
-                license_url: "https://github.com/wazuh/wazuh/blob/5.0.0/LICENSE"
-                hostname: "wazuh"
+                license_url: "https://github.com/guardsarm/guardsarm/blob/5.0.0/LICENSE"
+                hostname: "guardsarm"
                 timestamp: "2019-04-02T08:08:11Z"
 
   /agents:
@@ -4588,8 +4588,8 @@ paths:
     get:
       tags:
         - Agents
-      summary: "Get Wazuh daemon stats from an agent"
-      description: "Return Wazuh statistical information from specified daemons in a specified agent"
+      summary: "Get GuardSarm daemon stats from an agent"
+      description: "Return GuardSarm statistical information from specified daemons in a specified agent"
       operationId: api.controllers.agent_controller.get_daemon_stats
       x-rbac-actions:
         - $ref: '#/x-rbac-catalog/actions/agent:read'
@@ -4600,7 +4600,7 @@ paths:
         - $ref: '#/components/parameters/daemons_list_agents'
       responses:
         '200':
-          description: "Wazuh daemon stats"
+          description: "GuardSarm daemon stats"
           content:
             application/json:
               schema:
@@ -4609,12 +4609,12 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/AllItemsResponseWazuhDaemonStatsAgents'
+                        $ref: '#/components/schemas/AllItemsResponseGuardSarmDaemonStatsAgents'
               example:
                 data:
                   affected_items:
                     - timestamp: 2022-07-27T14:09:20+00:00
-                      name: wazuh-manager-remoted
+                      name: guardsarm-manager-remoted
                       agents:
                         - uptime: 2022-07-27T14:09:20+00:00
                           id: 1
@@ -4635,7 +4635,7 @@ paths:
                                 request: 0
                                 shared: 0
                     - timestamp: 2022-07-27T14:09:20+00:00
-                      name: wazuh-manager-analysisd
+                      name: guardsarm-manager-analysisd
                       agents:
                         - uptime: 2022-07-27T14:09:20+00:00
                           id: 1
@@ -4692,7 +4692,7 @@ paths:
       tags:
         - Agents
       summary: "Get agent's component stats"
-      description: "Return Wazuh's {component} statistical information from agent {agent_id}"
+      description: "Return GuardSarm's {component} statistical information from agent {agent_id}"
       operationId: api.controllers.agent_controller.get_component_stats
       x-rbac-actions:
         - $ref: '#/x-rbac-catalog/actions/agent:read'
@@ -5335,7 +5335,7 @@ paths:
                     - node_name: unknown
                       ip: 172.16.16.16
                       id: 009
-                      name: test_agent_wazuh
+                      name: test_agent_guardsarm
                       status: never_connected
                       dateAdd: 2021-05-27T10:06:13Z
                       registerIP: 172.16.16.16
@@ -5344,7 +5344,7 @@ paths:
                     - node_name: unknown
                       ip: 172.16.16.17
                       id: 010
-                      name: test_agent_wazuh2
+                      name: test_agent_guardsarm2
                       status: never_connected
                       dateAdd: 2021-05-27T10:06:27Z
                       registerIP: 172.16.16.17
@@ -5353,7 +5353,7 @@ paths:
                     - node_name: unknown
                       ip: any
                       id: 011
-                      name: test_wazuh_quick
+                      name: test_guardsarm_quick
                       status: never_connected
                       dateAdd: 2021-05-27T10:07:37Z
                       registerIP: any
@@ -5605,8 +5605,8 @@ paths:
                           code: 1707
                           message: "Cannot send request, agent is not active"
                           remediation: "Please, check non-active agents connection and try again.
-                           Visit https://documentation.wazuh.com/5.0/user-manual/registering/index.html
-                           and https://documentation.wazuh.com/5.0/user-manual/agents/agent-connection.html
+                           Visit https://documentation.guardsarm.com/5.0/user-manual/registering/index.html
+                           and https://documentation.guardsarm.com/5.0/user-manual/agents/agent-connection.html
                            to obtain more information on registering and connecting agents"
                         id:
                           - '009'
@@ -5716,8 +5716,8 @@ paths:
                           code: 1707
                           message: "Cannot send request, agent is not active"
                           remediation: "Please, check non-active agents connection and try again.
-                           Visit https://documentation.wazuh.com/5.0/user-manual/registering/index.html
-                           and https://documentation.wazuh.com/5.0/user-manual/agents/agent-connection.html
+                           Visit https://documentation.guardsarm.com/5.0/user-manual/registering/index.html
+                           and https://documentation.guardsarm.com/5.0/user-manual/agents/agent-connection.html
                            to obtain more information on registering and connecting agents"
                         id:
                           - '009'
@@ -6477,7 +6477,7 @@ paths:
                 data:
                   affected_items:
                     - node: "master-node"
-                      cluster: "wazuh"
+                      cluster: "guardsarm"
                       type: "master"
                   total_affected_items: 1
                   total_failed_items: 0
@@ -6519,14 +6519,14 @@ paths:
               example:
                 data:
                   affected_items:
-                    - name: wazuh
+                    - name: guardsarm
                       node_name: master-node
                       node_type: master
                       key: 9d273b53510fef702b54a92e9cffc82e
                       port: 1516
                       bind_addr: 127.0.0.1
                       nodes:
-                        - wazuh-master
+                        - guardsarm-master
                       hidden: "no"
                   total_affected_items: 1
                   total_failed_items: 0
@@ -6583,7 +6583,7 @@ paths:
                     - name: master-node
                       type: master
                       version: 4.4.0
-                      ip: wazuh-master
+                      ip: guardsarm-master
                     - name: worker1
                       type: worker
                       version: 4.4.0
@@ -6641,7 +6641,7 @@ paths:
                         name: master-node
                         type: master
                         version: 4.4.0
-                        ip: wazuh-master
+                        ip: guardsarm-master
                         n_active_agents: 5
                     - info:
                         name: worker1
@@ -6800,10 +6800,10 @@ paths:
                           request_timeout: 10
                         https:
                           enabled: true
-                          key: "/var/wazuh-manager/api/configuration/ssl/manager.key"
-                          cert: "/var/wazuh-manager/api/configuration/ssl/manager.crt"
+                          key: "/var/guardsarm-manager/api/configuration/ssl/manager.key"
+                          cert: "/var/guardsarm-manager/api/configuration/ssl/manager.crt"
                           use_ca: false
-                          ca: "/var/wazuh-manager/api/configuration/ssl/ca.crt"
+                          ca: "/var/guardsarm-manager/api/configuration/ssl/ca.crt"
                           ssl_ciphers: ""
                         logs:
                           level: info
@@ -6838,10 +6838,10 @@ paths:
                           request_timeout: 10
                         https:
                           enabled: true
-                          key: "/var/wazuh-manager/api/configuration/ssl/manager.key"
-                          cert: "/var/wazuh-manager/api/configuration/ssl/manager.crt"
+                          key: "/var/guardsarm-manager/api/configuration/ssl/manager.key"
+                          cert: "/var/guardsarm-manager/api/configuration/ssl/manager.crt"
                           use_ca: false
-                          ca: "/var/wazuh-manager/api/configuration/ssl/ca.crt"
+                          ca: "/var/guardsarm-manager/api/configuration/ssl/ca.crt"
                           ssl_ciphers: ""
                         logs:
                           level: info
@@ -6875,10 +6875,10 @@ paths:
                           request_timeout: 10
                         https:
                           enabled: true
-                          key: "/var/wazuh-manager/api/configuration/ssl/manager.key"
-                          cert: "/var/wazuh-manager/api/configuration/ssl/manager.crt"
+                          key: "/var/guardsarm-manager/api/configuration/ssl/manager.key"
+                          cert: "/var/guardsarm-manager/api/configuration/ssl/manager.crt"
                           use_ca: false
-                          ca: "/var/wazuh-manager/api/configuration/ssl/ca.crt"
+                          ca: "/var/guardsarm-manager/api/configuration/ssl/ca.crt"
                           ssl_ciphers: ""
                         logs:
                           level: info
@@ -6922,7 +6922,7 @@ paths:
       tags:
         - Cluster
       summary: "Get node status"
-      description: "Return the status of all Wazuh daemons in node node_id"
+      description: "Return the status of all GuardSarm daemons in node node_id"
       operationId: api.controllers.cluster_controller.get_status_node
       x-rbac-actions:
         - $ref: '#/x-rbac-catalog/actions/cluster:read'
@@ -6932,7 +6932,7 @@ paths:
         - $ref: '#/components/parameters/node_id'
       responses:
         '200':
-          description: "Node wazuh daemons statuses"
+          description: "Node guardsarm daemons statuses"
           content:
             application/json:
               schema:
@@ -6941,18 +6941,18 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/WazuhDaemonsStatus'
+                        $ref: '#/components/schemas/GuardSarmDaemonsStatus'
               example:
                 data:
                   affected_items:
-                    - wazuh-manager-analysisd: running
-                      wazuh-manager-authd: stopped
-                      wazuh-manager-monitord: running
-                      wazuh-manager-remoted: running
-                      wazuh-manager-apid: running
-                      wazuh-manager-clusterd: running
-                      wazuh-manager-db: running
-                      wazuh-manager-modulesd: running
+                    - guardsarm-manager-analysisd: running
+                      guardsarm-manager-authd: stopped
+                      guardsarm-manager-monitord: running
+                      guardsarm-manager-remoted: running
+                      guardsarm-manager-apid: running
+                      guardsarm-manager-clusterd: running
+                      guardsarm-manager-db: running
+                      guardsarm-manager-modulesd: running
                   total_affected_items: 1
                   total_failed_items: 0
                   failed_items: []
@@ -6994,11 +6994,11 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/WazuhInfo'
+                        $ref: '#/components/schemas/GuardSarmInfo'
               example:
                 data:
                   affected_items:
-                    - path: /var/wazuh-manager
+                    - path: /var/guardsarm-manager
                       version: v4.3.0
                       type: server
                       max_agents: unlimited
@@ -7025,7 +7025,7 @@ paths:
       tags:
         - Cluster
       summary: "Get node config"
-      description: "Return wazuh configuration used in node {node_id}. The 'section' and 'field' parameters will be
+      description: "Return guardsarm configuration used in node {node_id}. The 'section' and 'field' parameters will be
       ignored if 'raw' parameter is provided."
       operationId: api.controllers.cluster_controller.get_configuration_node
       x-rbac-actions:
@@ -7048,7 +7048,7 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/WazuhManagerConfiguration'
+                        $ref: '#/components/schemas/GuardSarmManagerConfiguration'
               example:
                 data:
                   affected_items:
@@ -7086,17 +7086,17 @@ paths:
                         ssl:
                           certificate_authorities:
                             ca:
-                              - /var/wazuh-manager/etc/certs/root-ca.pem
+                              - /var/guardsarm-manager/etc/certs/root-ca.pem
                           certificate:
-                            - /var/wazuh-manager/etc/certs/manager.pem
+                            - /var/guardsarm-manager/etc/certs/manager.pem
                           key:
-                            - /var/wazuh-manager/etc/certs/manager-key.pem
+                            - /var/guardsarm-manager/etc/certs/manager-key.pem
                       command:
                         - name: disable-account
                           executable: disable-account
                           timeout_allowed: yes
-                        - name: restart-wazuh
-                          executable: restart-wazuh
+                        - name: restart-guardsarm
+                          executable: restart-guardsarm
                         - name: firewall-drop
                           executable: firewall-drop
                           timeout_allowed: yes
@@ -7124,14 +7124,14 @@ paths:
                         ssl_manager_key: "etc/sslmanager.key"
                         ssl_auto_negotiate: "no"
                       cluster:
-                        name: "wazuh"
+                        name: "guardsarm"
                         node_name: "master-node"
                         node_type: "master"
                         key: "9d273b53510fef702b54a92e9cffc82e"
                         port: "1516"
                         bind_addr: "127.0.0.1"
                         nodes:
-                          - "wazuh-master"
+                          - "guardsarm-master"
                         hidden: "no"
                   total_affected_items: 1
                   total_failed_items: 0
@@ -7152,7 +7152,7 @@ paths:
       tags:
         - Cluster
       summary: "Update node configuration"
-      description: "Replace wazuh configuration for the given node with the data contained in the API request"
+      description: "Replace guardsarm configuration for the given node with the data contained in the API request"
       operationId: api.controllers.cluster_controller.update_configuration
       x-rbac-actions:
         - $ref: '#/x-rbac-catalog/actions/cluster:update_config'
@@ -7161,7 +7161,7 @@ paths:
         - $ref: '#/components/parameters/wait_for_complete'
         - $ref: '#/components/parameters/node_id'
       requestBody:
-        description: "Content of the wazuh-manager.conf to be uploaded"
+        description: "Content of the guardsarm-manager.conf to be uploaded"
         required: true
         content:
           application/octet-stream:
@@ -7199,8 +7199,8 @@ paths:
     get:
       tags:
         - Cluster
-      summary: "Get Wazuh daemon stats from a cluster node"
-      description: "Return Wazuh statistical information from specified daemons in a specified cluster node"
+      summary: "Get GuardSarm daemon stats from a cluster node"
+      description: "Return GuardSarm statistical information from specified daemons in a specified cluster node"
       operationId: api.controllers.cluster_controller.get_daemon_stats_node
       x-rbac-actions:
         - $ref: '#/x-rbac-catalog/actions/cluster:read'
@@ -7211,7 +7211,7 @@ paths:
         - $ref: '#/components/parameters/daemons_list'
       responses:
         '200':
-          description: "Wazuh daemon stats"
+          description: "GuardSarm daemon stats"
           content:
             application/json:
               schema:
@@ -7220,13 +7220,13 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/AllItemsResponseWazuhDaemonStats'
+                        $ref: '#/components/schemas/AllItemsResponseGuardSarmDaemonStats'
               example:
                 data:
                   affected_items:
                     - uptime: 2022-07-21T10:09:20+00:00
                       timestamp: 2022-07-21T10:48:32+00:00
-                      name: wazuh-manager-remoted
+                      name: guardsarm-manager-remoted
                       metrics:
                         bytes:
                           received: 0
@@ -7276,7 +7276,7 @@ paths:
       tags:
         - Cluster
       summary: "Get node logs"
-      description: "Return the last 2000 wazuh log entries in the specified node"
+      description: "Return the last 2000 guardsarm log entries in the specified node"
       operationId: api.controllers.cluster_controller.get_log_node
       x-rbac-actions:
         - $ref: '#/x-rbac-catalog/actions/cluster:read'
@@ -7295,7 +7295,7 @@ paths:
         - $ref: '#/components/parameters/distinct'
       responses:
         '200':
-          description: "Wazuh node logs"
+          description: "GuardSarm node logs"
           content:
             application/json:
               schema:
@@ -7304,20 +7304,20 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/AllItemsResponseWazuhLogs'
+                        $ref: '#/components/schemas/AllItemsResponseGuardSarmLogs'
               example:
                 data:
                   affected_items:
                     - timestamp: '2021-05-27T12:18:08Z'
-                      tag: wazuh-manager-remoted
+                      tag: guardsarm-manager-remoted
                       level: debug
                       description: " TCP socket 20 already in keystore. Updating..."
                     - timestamp: '2021-05-27T12:18:08Z'
-                      tag: wazuh-manager-remoted
+                      tag: guardsarm-manager-remoted
                       level: debug
                       description: " Agent '003' group is 'default'"
                     - timestamp: '2021-05-27T12:18:08Z'
-                      tag: wazuh-manager-remoted
+                      tag: guardsarm-manager-remoted
                       level: debug
                       description: " Agent '003' with group 'default' file 'merged.mg' MD5
                         '9a016508cea1e997ab8569f5cfab30f5'"
@@ -7342,7 +7342,7 @@ paths:
       tags:
         - Cluster
       summary: "Get node logs summary"
-      description: "Return a summary of the last 2000 wazuh log entries in the specified node"
+      description: "Return a summary of the last 2000 guardsarm log entries in the specified node"
       operationId: api.controllers.cluster_controller.get_log_summary_node
       x-rbac-actions:
         - $ref: '#/x-rbac-catalog/actions/cluster:read'
@@ -7352,7 +7352,7 @@ paths:
         - $ref: '#/components/parameters/node_id'
       responses:
         '200':
-          description: "Wazuh node logs summary"
+          description: "GuardSarm node logs summary"
           content:
             application/json:
               schema:
@@ -7361,7 +7361,7 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/WazuhLogsSummary'
+                        $ref: '#/components/schemas/GuardSarmLogsSummary'
               example:
                 data:
                   affected_items:
@@ -7372,28 +7372,28 @@ paths:
                         critical: 0
                         warning: 24
                         debug: 0
-                    - wazuh-manager-db:
+                    - guardsarm-manager-db:
                         info: 1
                         all: 4
                         critical: 0
                         debug: 0
                         error: 3
                         warning: 0
-                    - wazuh-manager-modulesd:content_manager:
+                    - guardsarm-manager-modulesd:content_manager:
                         info: 1
                         all: 1
                         critical: 0
                         debug: 0
                         error: 0
                         warning: 0
-                    - wazuh-manager-modulesd:router:
+                    - guardsarm-manager-modulesd:router:
                         info: 1
                         all: 1
                         critical: 0
                         debug: 0
                         error: 0
                         warning: 0
-                    - wazuh-manager-remoted:
+                    - guardsarm-manager-remoted:
                         info: 744
                         all: 0
                         critical: 0
@@ -7467,8 +7467,8 @@ paths:
     put:
       tags:
         - Cluster
-      summary: "Reload Wazuh manager"
-      description: "Restart Wazuh manager daemons in all nodes in the cluster or a list of them, keeping active agent connections"
+      summary: "Reload GuardSarm manager"
+      description: "Restart GuardSarm manager daemons in all nodes in the cluster or a list of them, keeping active agent connections"
       operationId: api.controllers.cluster_controller.put_reload
       x-rbac-actions:
         - $ref: '#/x-rbac-catalog/actions/cluster:read'
@@ -7515,7 +7515,7 @@ paths:
       tags:
         - Cluster
       summary: "Check nodes config"
-      description: "Return whether the Wazuh configuration is correct or not in all cluster nodes or a list of them"
+      description: "Return whether the GuardSarm configuration is correct or not in all cluster nodes or a list of them"
       operationId: api.controllers.cluster_controller.get_conf_validation
       x-rbac-actions:
         - $ref: '#/x-rbac-catalog/actions/cluster:read'
@@ -8175,7 +8175,7 @@ paths:
                 $ref: '#/components/schemas/ApiResponse'
               example:
                 data:
-                  message: "User wazuh was successfully logged out"
+                  message: "User guardsarm was successfully logged out"
                   error: 0
         '400':
           $ref: '#/components/responses/ResponseError'
@@ -8209,7 +8209,7 @@ paths:
             example:
               name: "Initial_auth"
               auth:
-                name: "Wazuh"
+                name: "GuardSarm"
                 office:
                   - "20"
                   - "21"
@@ -8267,7 +8267,7 @@ paths:
                   data:
                     affected_items:
                       - id: 1
-                        username: wazuh
+                        username: guardsarm
                         allow_run_as: true
                         roles:
                           - id: 1
@@ -8408,7 +8408,7 @@ paths:
                   data:
                     affected_items:
                       - id: 1
-                        username: wazuh
+                        username: guardsarm
                         allow_run_as: true
                         roles:
                           - 1
@@ -8585,12 +8585,12 @@ paths:
                           - 4
                           - 5
                       - id: 1
-                        username: wazuh
+                        username: guardsarm
                         allow_run_as: true
                         roles:
                           - 1
                       - id: 2
-                        username: wazuh-wui
+                        username: guardsarm-wui
                         allow_run_as: true
                         roles: []
                     total_affected_items: 8
@@ -8653,7 +8653,7 @@ paths:
                   data:
                     affected_items:
                       - id: 100
-                        username: TestWazuh
+                        username: TestGuardSarm
                         allow_run_as: false
                         roles: []
                     total_affected_items: 1
@@ -8764,7 +8764,7 @@ paths:
                   data:
                     affected_items:
                       - id: 100
-                        username: wazuh-test
+                        username: guardsarm-test
                         allow_run_as: false
                         roles:
                           - 2
@@ -8920,7 +8920,7 @@ paths:
                 data:
                   affected_items:
                     - id: 100
-                      name: TestWazuhRole
+                      name: TestGuardSarmRole
                       policies: []
                       users: []
                       rules: []
@@ -9165,7 +9165,7 @@ paths:
                 data:
                   affected_items:
                     - id: 100
-                      name: "TestWazuhRule"
+                      name: "TestGuardSarmRule"
                       rule:
                         MATCH:
                           definition: "test_rule"
@@ -9219,7 +9219,7 @@ paths:
                 data:
                   affected_items:
                     - id: 100
-                      name: "TestWazuhRule"
+                      name: "TestGuardSarmRule"
                       rule:
                         MATCH:
                           definition: "test_rule"
@@ -9279,7 +9279,7 @@ paths:
                   data:
                     affected_items:
                       - id: 100
-                        name: "TestWazuhRule"
+                        name: "TestGuardSarmRule"
                         rule:
                           MATCH:
                             definition: "test_rule_updated"
@@ -9424,7 +9424,7 @@ paths:
                 data:
                   affected_items:
                     - id: 100
-                      name: "TestWazuhPolicy"
+                      name: "TestGuardSarmPolicy"
                       policy:
                         actions:
                           - "security:delete"
@@ -9481,7 +9481,7 @@ paths:
                 data:
                   affected_items:
                     - id: 100
-                      name: "TestWazuhPolicy"
+                      name: "TestGuardSarmPolicy"
                       policy:
                         actions:
                           - "security:delete"
@@ -9524,7 +9524,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PoliciesRequest_no_required'
             example:
-              name: 'wazuhPolicy'
+              name: 'guardsarmPolicy'
               policy:
                 actions:
                   - "agent:delete"
@@ -9549,7 +9549,7 @@ paths:
                 data:
                   affected_items:
                     - id: 100
-                      name: TestWazuhPolicy
+                      name: TestGuardSarmPolicy
                       policy:
                         actions:
                           - "security:delete"
@@ -9609,14 +9609,14 @@ paths:
                 data:
                   affected_items:
                     - id: 100
-                      username: TestWazuhUsername
+                      username: TestGuardSarmUsername
                       allow_run_as: false
                       roles:
                         - 1
                   total_affected_items: 1
                   total_failed_items: 0
                   failed_items: []
-                message: "All roles were linked to TestWazuhUsername"
+                message: "All roles were linked to TestGuardSarmUsername"
                 error: 0
         '400':
           $ref: '#/components/responses/ResponseError'
@@ -9658,13 +9658,13 @@ paths:
                 data:
                   affected_items:
                     - id: 100
-                      username: TestWazuhUsername
+                      username: TestGuardSarmUsername
                       allow_run_as: false
                       roles: []
                   total_affected_items: 1
                   total_failed_items: 0
                   failed_items: []
-                message: "All roles were unlinked from user TestWazuhUsername"
+                message: "All roles were unlinked from user TestGuardSarmUsername"
                 error: 0
         '400':
           $ref: '#/components/responses/ResponseError'
@@ -9704,7 +9704,7 @@ paths:
                 data:
                   affected_items:
                     - id: 100
-                      name: TestWazuhRole
+                      name: TestGuardSarmRole
                       policies:
                         - 100
                       users: []
@@ -9751,7 +9751,7 @@ paths:
                 data:
                   affected_items:
                     - id: 100
-                      name: TestWazuhRole
+                      name: TestGuardSarmRole
                       policies: []
                       users: []
                       rules: []
@@ -9797,7 +9797,7 @@ paths:
                 data:
                   affected_items:
                     - id: 100
-                      name: TestWazuhRole
+                      name: TestGuardSarmRole
                       policies: []
                       users: []
                       rules:
@@ -9844,7 +9844,7 @@ paths:
                 data:
                   affected_items:
                     - id: 100
-                      name: TestWazuhRole
+                      name: TestGuardSarmRole
                       policies: []
                       users: []
                       rules: []
@@ -10107,5 +10107,5 @@ paths:
                 error: 0
 
 externalDocs:
-  description: "Learn more about the Wazuh API"
-  url: 'https://documentation.wazuh.com/5.0/user-manual/api/index.html'
+  description: "Learn more about the GuardSarm API"
+  url: 'https://documentation.guardsarm.com/5.0/user-manual/api/index.html'

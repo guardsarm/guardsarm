@@ -70,7 +70,7 @@ protected:
         tmpDir = getTempDir();
         defaultConfig = {
             .basePath = tmpDir,
-            .pattern = "wazuh-${name}-${YYYY}-${MM}-${DD}",
+            .pattern = "guardsarm-${name}-${YYYY}-${MM}-${DD}",
             .maxSize = 0,                                // No size limit for most tests
             .bufferSize = fastqueue::MIN_QUEUE_CAPACITY, // Use minimum buffer size for testing
         };

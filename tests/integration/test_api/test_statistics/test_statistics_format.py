@@ -8,7 +8,7 @@ copyright: Copyright (C) 2015-2024, Wazuh Inc.
 type: integration
 
 brief: These tests will check if the stats can be obtained from the API and if they follow the expected schema.
-       The Wazuh API is an open source 'RESTful' API that allows for interaction with the Wazuh manager from
+       The GuardSarm API is an open source 'RESTful' API that allows for interaction with the GuardSarm manager from
        a web browser, command line tool like 'cURL' or any script or program that can make web requests.
 
 components:
@@ -20,11 +20,11 @@ targets:
     - manager
 
 daemons:
-    - wazuh-manager-apid
-    - wazuh-manager-modulesd
-    - wazuh-manager-analysisd
-    - wazuh-manager-db
-    - wazuh-manager-remoted
+    - guardsarm-manager-apid
+    - guardsarm-manager-modulesd
+    - guardsarm-manager-analysisd
+    - guardsarm-manager-db
+    - guardsarm-manager-remoted
 
 os_platform:
     - linux
@@ -49,8 +49,8 @@ os_version:
     - Red Hat 6
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/api/reference.html (Get Wazuh daemon stats)
-    - https://documentation.wazuh.com/current/user-manual/api/reference.html (Get Wazuh daemon stats from an agent)
+    - https://documentation.guardsarm.com/current/user-manual/api/reference.html (Get GuardSarm daemon stats)
+    - https://documentation.guardsarm.com/current/user-manual/api/reference.html (Get GuardSarm daemon stats from an agent)
 
 tags:
     - api
@@ -60,9 +60,9 @@ import requests
 from pathlib import Path
 
 from . import CONFIGURATION_FOLDER_PATH, TEST_CASES_FOLDER_PATH
-from wazuh_testing import DATA_PATH
-from wazuh_testing.modules.api.utils import get_base_url, login, validate_statistics
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from guardsarm_testing import DATA_PATH
+from guardsarm_testing.modules.api.utils import get_base_url, login, validate_statistics
+from guardsarm_testing.utils.configuration import get_test_cases_data, load_configuration_template
 
 
 pytestmark = [pytest.mark.server, pytest.mark.tier(level=0)]
@@ -87,32 +87,32 @@ _, test2_metadata, test2_cases_ids = get_test_cases_data(test2_cases_path)
 
 # Tests
 @pytest.mark.parametrize('test_metadata', test1_metadata, ids=test1_cases_ids)
-def test_cluster_statistics_format(test_metadata, load_wazuh_basic_configuration, daemons_handler):
+def test_cluster_statistics_format(test_metadata, load_guardsarm_basic_configuration, daemons_handler):
     """
     description: Check if the statistics returned by the API have the expected format.
 
     test_phases:
         - setup:
-            - Load Wazuh basic configuration
-            - Restart wazuh-manager service
+            - Load GuardSarm basic configuration
+            - Restart guardsarm-manager service
         - test:
             - Request the statistics of a particular daemon from the API
             - Compare the obtained statistics with the json schema
         - teardown:
-            - Stop wazuh-manager
+            - Stop guardsarm-manager
 
-    wazuh_min_version: 4.4.0
+    guardsarm_min_version: 4.4.0
 
     parameters:
         - test_metadata:
             type: dict
             brief: Metadata from the test case.
-        - load_wazuh_basic_configuration:
+        - load_guardsarm_basic_configuration:
             type: fixture
-            brief: Load basic wazuh configuration.
+            brief: Load basic guardsarm configuration.
         - daemons_handler:
             type: fixture
-            brief: Wrapper of a helper function to handle Wazuh daemons.
+            brief: Wrapper of a helper function to handle GuardSarm daemons.
 
     assertions:
         - Check if the statistics returned by the API have the expected format.
@@ -139,16 +139,16 @@ def test_agent_statistics_format(test_metadata, daemons_handler, simulate_agent)
 
     test_phases:
         - setup:
-            - Restart wazuh-manager service to apply configuration changes
+            - Restart guardsarm-manager service to apply configuration changes
         - test:
             - Simulate and connect an agent
             - Request the statistics of a particular daemon and agent from the API
             - Compare the obtained statistics with the json schema
             - Stop and delete the simulated agent
         - teardown:
-            - Stop wazuh-manager
+            - Stop guardsarm-manager
 
-    wazuh_min_version: 4.4.0
+    guardsarm_min_version: 4.4.0
 
     parameters:
         - test_metadata:
@@ -156,7 +156,7 @@ def test_agent_statistics_format(test_metadata, daemons_handler, simulate_agent)
             brief: Get metadata from the module.
         - daemons_handler:
             type: fixture
-            brief: Wrapper of a helper function to handle Wazuh daemons.
+            brief: Wrapper of a helper function to handle GuardSarm daemons.
         - simulate_agent:
             type: fixture
             brief: Simulate an agent

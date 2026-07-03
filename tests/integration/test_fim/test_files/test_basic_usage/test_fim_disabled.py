@@ -10,7 +10,7 @@ type: integration
 brief: File Integrity Monitoring (FIM) system watches selected files and triggering alerts when these
        files are modified. In particular, these tests will check if FIM events are still generated when
        a monitored directory is deleted and created again.
-       The FIM capability is managed by the 'wazuh-syscheckd' daemon, which checks configured files
+       The FIM capability is managed by the 'guardsarm-syscheckd' daemon, which checks configured files
        for changes to the checksums, permissions, and ownership.
 
 components:
@@ -22,7 +22,7 @@ targets:
     - agent
 
 daemons:
-    - wazuh-syscheckd
+    - guardsarm-syscheckd
 
 os_platform:
     - linux
@@ -40,9 +40,9 @@ os_version:
 
 references:
     - https://man7.org/linux/man-pages/man8/auditd.8.html
-    - https://documentation.wazuh.com/current/user-manual/capabilities/auditing-whodata/who-linux.html
-    - https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html
-    - https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syscheck.html
+    - https://documentation.guardsarm.com/current/user-manual/capabilities/auditing-whodata/who-linux.html
+    - https://documentation.guardsarm.com/current/user-manual/capabilities/file-integrity/index.html
+    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/syscheck.html
 
 pytest_args:
     - fim_mode:
@@ -61,15 +61,15 @@ import pytest
 
 from pathlib import Path
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.constants.platforms import WINDOWS
-from wazuh_testing.modules.agentd.configuration import AGENTD_DEBUG, AGENTD_WINDOWS_DEBUG
-from wazuh_testing.modules.fim.patterns import FIM_EVENT_JSON
-from wazuh_testing.modules.monitord.configuration import MONITORD_ROTATE_LOG
-from wazuh_testing.modules.fim.configuration import SYSCHECK_DEBUG
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils.callbacks import generate_callback
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.constants.platforms import WINDOWS
+from guardsarm_testing.modules.agentd.configuration import AGENTD_DEBUG, AGENTD_WINDOWS_DEBUG
+from guardsarm_testing.modules.fim.patterns import FIM_EVENT_JSON
+from guardsarm_testing.modules.monitord.configuration import MONITORD_ROTATE_LOG
+from guardsarm_testing.modules.fim.configuration import SYSCHECK_DEBUG
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.utils.callbacks import generate_callback
+from guardsarm_testing.utils.configuration import get_test_cases_data, load_configuration_template
 
 from . import TEST_CASES_PATH, CONFIGS_PATH
 
@@ -89,15 +89,15 @@ if sys.platform == WINDOWS: local_internal_options.update({AGENTD_WINDOWS_DEBUG:
 
 
 @pytest.mark.parametrize('test_configuration, test_metadata', zip(test_configuration, test_metadata), ids=cases_ids)
-def test_fim_disabled(test_configuration, test_metadata, set_wazuh_configuration, truncate_monitored_files,
+def test_fim_disabled(test_configuration, test_metadata, set_guardsarm_configuration, truncate_monitored_files,
                       configure_local_internal_options, folder_to_monitor, daemons_handler):
 
     '''
-    description: Check if the 'wazuh-syscheckd' daemon generates FIM events when it is disabled
+    description: Check if the 'guardsarm-syscheckd' daemon generates FIM events when it is disabled
                  in the main configuration file. For this purpose, the test will monitor a testing
                  folder and finally verifies that no FIM events have been generated.
 
-    wazuh_min_version: 4.2.0
+    guardsarm_min_version: 4.2.0
 
     tier: 0
 
@@ -108,7 +108,7 @@ def test_fim_disabled(test_configuration, test_metadata, set_wazuh_configuration
         - test_metadata:
             type: dict
             brief: Test case data.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Set ossec.conf configuration.
         - configure_local_internal_options:
@@ -122,13 +122,13 @@ def test_fim_disabled(test_configuration, test_metadata, set_wazuh_configuration
             brief: Folder created for monitoring.
         - daemons_handler:
             type: fixture
-            brief: Handler of Wazuh daemons.
+            brief: Handler of GuardSarm daemons.
 
     assertions:
-        - Verify that when the 'wazuh-syscheckd' daemon is disabled, no FIM events are generated.
+        - Verify that when the 'guardsarm-syscheckd' daemon is disabled, no FIM events are generated.
 
     input_description: The test cases are contained in external YAML file (cases_fim_disabled.yaml)
-                       which includes configuration parameters for the 'wazuh-syscheckd' daemon and testing
+                       which includes configuration parameters for the 'guardsarm-syscheckd' daemon and testing
                        directories to monitor. The configuration template is contained in another external YAML
                        file (configuration_basic.yaml).
 
@@ -139,7 +139,7 @@ def test_fim_disabled(test_configuration, test_metadata, set_wazuh_configuration
         - scheduled
         - realtime
     '''
-    wazuh_log_monitor = FileMonitor(WAZUH_LOG_PATH)
+    guardsarm_log_monitor = FileMonitor(GUARDSARM_LOG_PATH)
 
-    wazuh_log_monitor.start(generate_callback(FIM_EVENT_JSON))
-    assert not wazuh_log_monitor.callback_result
+    guardsarm_log_monitor.start(generate_callback(FIM_EVENT_JSON))
+    assert not guardsarm_log_monitor.callback_result

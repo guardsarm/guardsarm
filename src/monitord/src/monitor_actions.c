@@ -11,7 +11,7 @@
 #include "shared.h"
 #include "monitord.h"
 #include "read-agents.h"
-#include "wazuhdb_queries_op.h"
+#include "guardsarmdb_queries_op.h"
 
 int sock = -1;
 
@@ -87,7 +87,7 @@ void monitor_agents_alert(){
                     }
                 }
         } else {
-            mdebug1("Unable to retrieve agent's '%s' data from Wazuh DB", agent_hash_node->key);
+            mdebug1("Unable to retrieve agent's '%s' data from GuardSarm DB", agent_hash_node->key);
             OSHash_Delete(agents_to_alert_hash, agent_hash_node->key);
         }
         cJSON_Delete(j_agent_info);
@@ -130,7 +130,7 @@ void monitor_agents_deletion(){
                     cJSON_Delete(j_agent_info);
                 }
             } else {
-                mdebug1("Unable to retrieve agent's '%d' data from Wazuh DB", agents_array[i]);
+                mdebug1("Unable to retrieve agent's '%d' data from GuardSarm DB", agents_array[i]);
                 snprintf(str_agent_id, 12, "%d", agents_array[i]);
                 OSHash_Delete(agents_to_alert_hash, str_agent_id);
             }
@@ -145,13 +145,13 @@ void monitor_logs(bool check_logs_size, char path[PATH_MAX], char path_json[PATH
 
     if (check_logs_size == FALSE && mond.rotate_log) {
         sleep(mond.day_wait);
-        /* Daily rotation and compression of wazuh log file/ossec.json */
+        /* Daily rotation and compression of guardsarm log file/ossec.json */
         w_rotate_log(mond.compress, mond.keep_log_days, 1, 0, mond.daily_rotations);
 
     } else if (check_logs_size == TRUE && mond.rotate_log && mond.size_rotate > 0){
         if (w_stat(path, &buf) == 0) {
             size = buf.st_size;
-            /* If log file reachs maximum size, rotate wazuh log file */
+            /* If log file reachs maximum size, rotate guardsarm log file */
             if ( (unsigned long) size >= mond.size_rotate) {
                 w_rotate_log(mond.compress, mond.keep_log_days, 0, 0, mond.daily_rotations);
             }

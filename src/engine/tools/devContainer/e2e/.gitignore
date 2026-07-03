@@ -1,5 +1,5 @@
 certs/*
-wazuh-indexer/*.deb
-wazuh-dashboard/*.deb
+guardsarm-indexer/*.deb
+guardsarm-dashboard/*.deb
 agents/rpm/
 init.log

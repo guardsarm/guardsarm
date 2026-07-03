@@ -1,5 +1,5 @@
 /*
- * Wazuh SYSINFO
+ * GuardSarm SYSINFO
  * Copyright (C) 2015, Wazuh Inc.
  * October 24, 2020.
  *

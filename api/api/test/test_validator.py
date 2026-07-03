@@ -12,14 +12,14 @@ from api.validator import (
     _hashes,
     _names,
     _numbers,
-    _wazuh_key,
+    _guardsarm_key,
     _paths,
     _search_param,
     _sort_param,
     _timeframe_type,
     allowed_fields,
     is_safe_path,
-    _wazuh_version,
+    _guardsarm_version,
     _symbols_alphanumeric_param,
     _base64,
     _group_names,
@@ -30,7 +30,7 @@ from api.validator import (
     check_component_configuration_pair,
     _wpk_path,
 )
-from wazuh import WazuhError
+from guardsarm import GuardSarmError
 
 
 @pytest.mark.parametrize(
@@ -55,7 +55,7 @@ from wazuh import WazuhError
         # IPs
         # hashes
         ("e4d909c290d0fb1ca068ffaddf22cbd0", _hashes),
-        ("449e3b6ffd9b484c5c645321edd4d610", _wazuh_key),
+        ("449e3b6ffd9b484c5c645321edd4d610", _guardsarm_key),
         # date
         ("2021-04-28", _iso8601_date),
         ("2021-11-04T18:14:04Z", _iso8601_date_time),
@@ -68,13 +68,13 @@ from wazuh import WazuhError
         ("sort param-", _sort_param),
         ("search param3", _search_param),
         # paths
-        ("/var/wazuh-manager/etc/internal_options", _paths),
+        ("/var/guardsarm-manager/etc/internal_options", _paths),
         ("correct.wpk", _wpk_path),
         # version
-        ("v4.4.0", _wazuh_version),
-        ("4.4.0", _wazuh_version),
-        ("wazuh 4.4.0", _wazuh_version),
-        ("wazuh v4.4.0", _wazuh_version),
+        ("v4.4.0", _guardsarm_version),
+        ("4.4.0", _guardsarm_version),
+        ("guardsarm 4.4.0", _guardsarm_version),
+        ("guardsarm v4.4.0", _guardsarm_version),
         # miscellaneous
         ("aHR0cHM6Ly9zdGFja2FidXNlLmNvbS90YWcvamF2YS8=", _base64),
     ],
@@ -106,7 +106,7 @@ def test_validation_check_exp_ok(exp, regex_name):
         ("search param;", _search_param),
         # hashes
         ("$$d909c290d0fb1ca068ffaddf22cbd0", _hashes),
-        ("449e3b6ffd9b484c5c645321edd4d61$", _wazuh_key),
+        ("449e3b6ffd9b484c5c645321edd4d61$", _guardsarm_key),
         # date
         ("2021-13-28", _iso8601_date),
         ("2021-10-35", _iso8601_date),
@@ -115,14 +115,14 @@ def test_validation_check_exp_ok(exp, regex_name):
         ("1j", _timeframe_type),
         ("12x", _timeframe_type),
         # paths
-        ("/var/wazuh-manager/etc/internal_options$", _paths),
+        ("/var/guardsarm-manager/etc/internal_options$", _paths),
         ("incorrect.txt", _wpk_path),
         (".wpk", _wpk_path),
         # version
-        ("v4.4", _wazuh_version),
-        ("4.4", _wazuh_version),
-        ("wazuh 4.4", _wazuh_version),
-        ("wazuh v4.4", _wazuh_version),
+        ("v4.4", _guardsarm_version),
+        ("4.4", _guardsarm_version),
+        ("guardsarm 4.4", _guardsarm_version),
+        ("guardsarm v4.4", _guardsarm_version),
         # miscellaneous
         ("aDhjasdh3=", _base64),
     ],
@@ -142,7 +142,7 @@ def test_is_safe_path():
     """Verify that is_safe_path() works as expected"""
     assert is_safe_path("/api/configuration/api.yaml")
     assert is_safe_path("c:\\api\\configuration\\api.yaml")
-    assert is_safe_path("etc/wazuh-manager.conf", relative=True)
+    assert is_safe_path("etc/guardsarm-manager.conf", relative=True)
     assert not is_safe_path("/api/configuration/api.yaml", basedir="non-existent", relative=False)
     assert not is_safe_path("/..")
     assert not is_safe_path("\\..")
@@ -155,14 +155,14 @@ def test_is_safe_path():
         ("AB0264EA00FD9BCDCF1A5B88BC1BDEA4", "hash"),
         ("file_test-33.xml", "names"),
         ("651403650840", "numbers"),
-        ("/var/wazuh/test", "path"),
+        ("/var/guardsarm/test", "path"),
         ("test,.", "search"),
         ("+field", "sort"),
         ("-field,+field.subfield", "sort"),
         ("7d", "timeframe"),
         ("1s", "timeframe"),
         ("7m", "timeframe"),
-        ("asdfASD0101", "wazuh_key"),
+        ("asdfASD0101", "guardsarm_key"),
         ("2019-02-26", "date"),
         ("2020-06-24T17:02:53Z", "date-time"),
         ("group_name.test", "group_names"),
@@ -188,13 +188,13 @@ def test_validation_json_ok(value, format):
         ("AB0264EA00FD9BCDCF1A5B88BC1BDEA4.", "hash"),
         ("../../file_test-33.xml", "names"),
         ("a651403650840", "numbers"),
-        ("!/var/wazuh/test", "path"),
+        ("!/var/guardsarm/test", "path"),
         ("test,.&", "search"),
         ("+field&", "sort"),
         ("-field;+field.subfield", "sort"),
         ("7a", "timeframe"),
         ("s1", "timeframe"),
-        ("asdfASD0101!", "wazuh_key"),
+        ("asdfASD0101!", "guardsarm_key"),
         ("2019-02-26-test", "date"),
         ("2020-06-24 17:02:53.034374", "date-time"),
         ("group_name.test ", "group_names"),
@@ -212,11 +212,11 @@ def test_validation_json_ko(value, format):
 
 @pytest.mark.parametrize(
     "component, configuration, expected_response",
-    [("agent", "client", None), ("agent", "labels", WazuhError(1128)), ("agent", "wmodules", WazuhError(1128))]
+    [("agent", "client", None), ("agent", "labels", GuardSarmError(1128)), ("agent", "wmodules", GuardSarmError(1128))]
 )
 def test_check_component_configuration_pair(component, configuration, expected_response):
     """Verify that `check_component_configuration_pair` function returns an exception when the configuration does
-    not belong to a Wazuh component."""
+    not belong to a GuardSarm component."""
     response = check_component_configuration_pair(component, configuration)
     if isinstance(response, Exception):
         assert isinstance(response, expected_response.__class__)

@@ -1,19 +1,19 @@
-# Makefile for Wazuh API
+# Makefile for GuardSarm API
 # Copyright (C) 2015, Wazuh Inc.
 # May 3, 2017
 #
 # Syntax: make [ all | backup | install | restore | service ]
 
-WAZUH_GROUP       = wazuh
-INSTALLDIR       ?= /var/wazuh-manager
+GUARDSARM_GROUP       = guardsarm
+INSTALLDIR       ?= /var/guardsarm-manager
 
 MV_FILE        = mv -f
 RM_FILE        = rm -f
-INSTALL_DIR    = install -o root -g ${WAZUH_GROUP} -m 0750 -d
-INSTALL_RW_DIR = install -o root -g ${WAZUH_GROUP} -m 0770 -d
-INSTALL_EXEC   = install -o root -g ${WAZUH_GROUP} -m 0750
-INSTALL_FILE   = install -o root -g ${WAZUH_GROUP} -m 0640
-INSTALL_CONFIG_FILE   = install -o root -g ${WAZUH_GROUP} -m 0660
+INSTALL_DIR    = install -o root -g ${GUARDSARM_GROUP} -m 0750 -d
+INSTALL_RW_DIR = install -o root -g ${GUARDSARM_GROUP} -m 0770 -d
+INSTALL_EXEC   = install -o root -g ${GUARDSARM_GROUP} -m 0750
+INSTALL_FILE   = install -o root -g ${GUARDSARM_GROUP} -m 0640
+INSTALL_CONFIG_FILE   = install -o root -g ${GUARDSARM_GROUP} -m 0660
 PYTHON_BIN     = $(INSTALLDIR)/framework/python/bin/python3
 
 
@@ -35,12 +35,12 @@ install:
 	$(INSTALL_CONFIG_FILE) api/configuration/api.yaml ${INSTALLDIR}/api/configuration
 
 	$(INSTALL_DIR) $(INSTALLDIR)/api/scripts
-	$(INSTALL_FILE) scripts/wazuh_manager_apid.py ${INSTALLDIR}/api/scripts
+	$(INSTALL_FILE) scripts/guardsarm_manager_apid.py ${INSTALLDIR}/api/scripts
 
     # Install scripts/%.py on $(INSTALLDIR)/bin/%
 	$(foreach script,$(wildcard scripts/*.py),$(INSTALL_EXEC) wrappers/generic_wrapper.sh $(patsubst scripts/%.py,$(INSTALLDIR)/bin/%,$(script));)
 	
-	$(MV_FILE) $(INSTALLDIR)/bin/wazuh_manager_apid $(INSTALLDIR)/bin/wazuh-manager-apid
+	$(MV_FILE) $(INSTALLDIR)/bin/guardsarm_manager_apid $(INSTALLDIR)/bin/guardsarm-manager-apid
 
 restore:
     # Restore old API config

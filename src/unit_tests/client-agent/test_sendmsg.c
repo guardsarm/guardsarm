@@ -14,9 +14,9 @@
 #include <errno.h>
 
 #include "../wrappers/common.h"
-#include "../wrappers/wazuh/os_crypto/msgs_wrappers.h"
-#include "../wrappers/wazuh/os_net/os_net_wrappers.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/os_crypto/msgs_wrappers.h"
+#include "../wrappers/guardsarm/os_net/os_net_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
 #include "../wrappers/posix/pthread_wrappers.h"
 
 #include "agentd.h"

@@ -5,7 +5,7 @@ on:
   pull_request:
     types: [synchronize, opened, reopened, ready_for_review]
     paths:
-      - "src/wazuh_modules/inventory_sync/**"
+      - "src/guardsarm_modules/inventory_sync/**"
       - "src/shared_modules/utils/flatbuffers/**"
       - ".github/workflows/5_testintegration_inventory-sync.yml"
       - "src/shared_modules/indexer_connector/**"
@@ -47,7 +47,7 @@ jobs:
     name: Run inventory sync integration tests
     runs-on: ubuntu-24.04
     env:
-      INSTALLATION_DIR: /var/wazuh-manager
+      INSTALLATION_DIR: /var/guardsarm-manager
     services:
       opensearch:
         image: opensearchproject/opensearch:latest
@@ -79,24 +79,24 @@ jobs:
           run_id: ${{ inputs.build_run_id }}
           workflow_conclusion: success
           name_is_regexp: true
-          name: wazuh-manager.*amd64.*\.deb
+          name: guardsarm-manager.*amd64.*\.deb
           path: /tmp/packages
           if_no_artifact_found: fail
           check_artifacts: true
           search_artifacts: true
 
-      - name: Install wazuh-manager from artifact
+      - name: Install guardsarm-manager from artifact
         if: inputs.build_run_id != ''
         run: |
-          PACKAGE_PATH=$(find /tmp/packages -maxdepth 2 -type f -name "wazuh-manager*amd64*.deb" \
-            | grep -v "wazuh-manager-dbg" | head -n 1)
+          PACKAGE_PATH=$(find /tmp/packages -maxdepth 2 -type f -name "guardsarm-manager*amd64*.deb" \
+            | grep -v "guardsarm-manager-dbg" | head -n 1)
           if [ -z "$PACKAGE_PATH" ]; then
             echo "No manager package found in /tmp/packages"
             exit 1
           fi
           sudo dpkg -i "${PACKAGE_PATH}" || sudo apt-get install -f -y
-          if ! dpkg -l wazuh-manager | grep -q '^ii'; then
-            echo "wazuh-manager package installation failed"
+          if ! dpkg -l guardsarm-manager | grep -q '^ii'; then
+            echo "guardsarm-manager package installation failed"
             exit 1
           fi
 
@@ -117,19 +117,19 @@ jobs:
         if: inputs.build_run_id == ''
         uses: ./.github/actions/reinstall_cmake
 
-      - name: Build wazuh-manager
+      - name: Build guardsarm-manager
         if: inputs.build_run_id == ''
         run: |
           make deps -C src TARGET=manager -j$(nproc)
           make -C src TARGET=manager -j$(nproc)
 
-      - name: Install wazuh-manager from source
+      - name: Install guardsarm-manager from source
         if: inputs.build_run_id == ''
         run: |
           cat > ./etc/preloaded-vars.conf << 'EOF'
           USER_LANGUAGE="en"
           USER_INSTALL_TYPE="manager"
-          USER_DIR="/var/wazuh-manager"
+          USER_DIR="/var/guardsarm-manager"
           USER_ENABLE_AUTHD="y"
           USER_AUTO_START="n"
           EOF
@@ -140,18 +140,18 @@ jobs:
 
       - name: Configure indexer connector and start manager
         run: |
-          CONF="$INSTALLATION_DIR/etc/wazuh-manager.conf"
-          sudo systemctl stop wazuh-manager 2>/dev/null || true
+          CONF="$INSTALLATION_DIR/etc/guardsarm-manager.conf"
+          sudo systemctl stop guardsarm-manager 2>/dev/null || true
           sudo sed -i 's|https://127\.0\.0\.1:9200|http://127.0.0.1:9200|g' "${CONF}"
           sudo mkdir -p "$INSTALLATION_DIR/etc/certs"
           sudo touch "$INSTALLATION_DIR/etc/certs/root-ca.pem"
           sudo sed -i '/manager\.pem/d' "${CONF}"
           sudo sed -i '/manager-key\.pem/d' "${CONF}"
-          sudo sed -i 's|<ca>etc|<ca>/var/wazuh-manager/etc|' "${CONF}"
-          sudo systemctl start wazuh-manager
+          sudo sed -i 's|<ca>etc|<ca>/var/guardsarm-manager/etc|' "${CONF}"
+          sudo systemctl start guardsarm-manager
           sleep 10
-          if ! systemctl is-active --quiet wazuh-manager; then
-            sudo systemctl status wazuh-manager --no-pager
+          if ! systemctl is-active --quiet guardsarm-manager; then
+            sudo systemctl status guardsarm-manager --no-pager
             exit 1
           fi
 
@@ -161,7 +161,7 @@ jobs:
           sudo apt-get install -y python3-venv flatbuffers-compiler
 
       - name: Set up Python test environment
-        working-directory: src/wazuh_modules/inventory_sync/qa
+        working-directory: src/guardsarm_modules/inventory_sync/qa
         run: |
           python3 -m venv venv
           source venv/bin/activate
@@ -169,7 +169,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Generate FlatBuffers classes
-        working-directory: src/wazuh_modules/inventory_sync/qa
+        working-directory: src/guardsarm_modules/inventory_sync/qa
         run: |
           source venv/bin/activate
           python3 generate_flatbuffers.py
@@ -179,7 +179,7 @@ jobs:
           fi
 
       - name: Run inventory_sync integration tests
-        working-directory: src/wazuh_modules/inventory_sync/qa
+        working-directory: src/guardsarm_modules/inventory_sync/qa
         env:
           TEST_MANAGER: "127.0.0.1"
         run: |
@@ -189,20 +189,20 @@ jobs:
       - name: Cleanup and collect logs
         if: always()
         run: |
-          if systemctl is-active --quiet wazuh-manager 2>/dev/null; then
-            sudo systemctl stop wazuh-manager
+          if systemctl is-active --quiet guardsarm-manager 2>/dev/null; then
+            sudo systemctl stop guardsarm-manager
           fi
-          if sudo test -f "$INSTALLATION_DIR/logs/wazuh-manager.log"; then
-            sudo tail -50 "$INSTALLATION_DIR/logs/wazuh-manager.log"
-            sudo cp "$INSTALLATION_DIR/logs/wazuh-manager.log" ./wazuh-manager.log
-            sudo chown "$(id -un):$(id -gn)" ./wazuh-manager.log
+          if sudo test -f "$INSTALLATION_DIR/logs/guardsarm-manager.log"; then
+            sudo tail -50 "$INSTALLATION_DIR/logs/guardsarm-manager.log"
+            sudo cp "$INSTALLATION_DIR/logs/guardsarm-manager.log" ./guardsarm-manager.log
+            sudo chown "$(id -un):$(id -gn)" ./guardsarm-manager.log
           else
-            echo "wazuh-manager.log not found at $INSTALLATION_DIR/logs/ — searching:"
-            sudo find /var/log -name "*wazuh*" -o -name "*ossec*" 2>/dev/null | head -10 || true
-            for log_path in "/var/log/wazuh" "/var/log/ossec" "/opt/wazuh/logs"; do
+            echo "guardsarm-manager.log not found at $INSTALLATION_DIR/logs/ — searching:"
+            sudo find /var/log -name "*guardsarm*" -o -name "*ossec*" 2>/dev/null | head -10 || true
+            for log_path in "/var/log/guardsarm" "/var/log/ossec" "/opt/guardsarm/logs"; do
               [ -d "$log_path" ] && ls -la "$log_path/" || true
             done
-            sudo journalctl -u wazuh-manager --no-pager -n 50 2>/dev/null || true
+            sudo journalctl -u guardsarm-manager --no-pager -n 50 2>/dev/null || true
           fi
 
       - name: Upload inventory_sync test results
@@ -211,7 +211,7 @@ jobs:
         with:
           name: inventory-sync-test-results-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
-            src/wazuh_modules/inventory_sync/qa/generated/
-            src/wazuh_modules/inventory_sync/qa/wazuh_agents.json
+            src/guardsarm_modules/inventory_sync/qa/generated/
+            src/guardsarm_modules/inventory_sync/qa/guardsarm_agents.json
           retention-days: 7
           if-no-files-found: warn

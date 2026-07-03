@@ -7,14 +7,14 @@
 # This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 
 INSTALLATION_PATH=${1}
-SERVICE=/Library/LaunchDaemons/com.wazuh.agent.plist
-STARTUP=/Library/StartupItems/WAZUH/StartupParameters.plist
-LAUNCHER_SCRIPT=/Library/StartupItems/WAZUH/Wazuh-launcher
-STARTUP_SCRIPT=/Library/StartupItems/WAZUH/WAZUH
+SERVICE=/Library/LaunchDaemons/com.guardsarm.agent.plist
+STARTUP=/Library/StartupItems/GUARDSARM/StartupParameters.plist
+LAUNCHER_SCRIPT=/Library/StartupItems/GUARDSARM/GuardSarm-launcher
+STARTUP_SCRIPT=/Library/StartupItems/GUARDSARM/GUARDSARM
 
-launchctl unload /Library/LaunchDaemons/com.wazuh.agent.plist 2> /dev/null
-mkdir -p /Library/StartupItems/WAZUH
-chown root:wheel /Library/StartupItems/WAZUH
+launchctl unload /Library/LaunchDaemons/com.guardsarm.agent.plist 2> /dev/null
+mkdir -p /Library/StartupItems/GUARDSARM
+chown root:wheel /Library/StartupItems/GUARDSARM
 rm -f $STARTUP $STARTUP_SCRIPT $SERVICE
 echo > $LAUNCHER_SCRIPT
 chown root:wheel $LAUNCHER_SCRIPT
@@ -25,7 +25,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>
  <plist version="1.0">
      <dict>
          <key>Label</key>
-         <string>com.wazuh.agent</string>
+         <string>com.guardsarm.agent</string>
          <key>ProgramArguments</key>
          <array>
              <string>'$LAUNCHER_SCRIPT'</string>
@@ -44,15 +44,15 @@ echo '
 
 StartService ()
 {
-        '${INSTALLATION_PATH}'/bin/wazuh-control start
+        '${INSTALLATION_PATH}'/bin/guardsarm-control start
 }
 StopService ()
 {
-        '${INSTALLATION_PATH}'/bin/wazuh-control stop
+        '${INSTALLATION_PATH}'/bin/guardsarm-control stop
 }
 RestartService ()
 {
-        '${INSTALLATION_PATH}'/bin/wazuh-control restart
+        '${INSTALLATION_PATH}'/bin/guardsarm-control restart
 }
 RunService "$1"
 ' > $STARTUP_SCRIPT
@@ -67,17 +67,17 @@ www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
        <key>Description</key>
-       <string>WAZUH Security agent</string>
+       <string>GUARDSARM Security agent</string>
        <key>Messages</key>
        <dict>
                <key>start</key>
-               <string>Starting Wazuh agent</string>
+               <string>Starting GuardSarm agent</string>
                <key>stop</key>
-               <string>Stopping Wazuh agent</string>
+               <string>Stopping GuardSarm agent</string>
        </dict>
        <key>Provides</key>
        <array>
-               <string>WAZUH</string>
+               <string>GUARDSARM</string>
        </array>
        <key>Requires</key>
        <array>
@@ -92,19 +92,19 @@ chmod u=rw-,go=r-- $STARTUP
 
 echo '#!/bin/sh
 
-# Wazuh-launcher: anchor process of the launchd job (com.wazuh.agent).
+# GuardSarm-launcher: anchor process of the launchd job (com.guardsarm.agent).
 # It starts the agent and then stays alive, polling for control requests
-# dropped by wazuh-modulesd. Running reload/restart from here -- a shell
+# dropped by guardsarm-modulesd. Running reload/restart from here -- a shell
 # launched by launchd -- preserves the same TCC "responsible process" lineage
-# as boot, so wazuh-syscheckd keeps its own Full Disk Access entry instead of
-# inheriting wazuh-modulesd as the responsible process. See
-# src/wazuh_modules/src/wm_control.c (writer of the request flag).
+# as boot, so guardsarm-syscheckd keeps its own Full Disk Access entry instead of
+# inheriting guardsarm-modulesd as the responsible process. See
+# src/guardsarm_modules/src/wm_control.c (writer of the request flag).
 
-CONTROL_REQUEST='${INSTALLATION_PATH}'/var/run/wazuh-control.request
+CONTROL_REQUEST='${INSTALLATION_PATH}'/var/run/guardsarm-control.request
 CONTROL_REQUEST_INFLIGHT="$CONTROL_REQUEST.inflight"
 
 capture_sigterm() {
-    '${INSTALLATION_PATH}'/bin/wazuh-control stop
+    '${INSTALLATION_PATH}'/bin/guardsarm-control stop
     exit $?
 }
 
@@ -113,8 +113,8 @@ capture_sigterm() {
 # spurious reload.
 rm -f "$CONTROL_REQUEST" "$CONTROL_REQUEST_INFLIGHT" "$CONTROL_REQUEST.tmp"
 
-if ! '${INSTALLATION_PATH}'/bin/wazuh-control start; then
-    '${INSTALLATION_PATH}'/bin/wazuh-control stop
+if ! '${INSTALLATION_PATH}'/bin/guardsarm-control start; then
+    '${INSTALLATION_PATH}'/bin/guardsarm-control stop
 fi
 
 while : ; do
@@ -126,7 +126,7 @@ while : ; do
         rm -f "$CONTROL_REQUEST_INFLIGHT"
         case "$action" in
             reload|restart)
-                '${INSTALLATION_PATH}'/bin/wazuh-control "$action"
+                '${INSTALLATION_PATH}'/bin/guardsarm-control "$action"
                 ;;
         esac
     fi

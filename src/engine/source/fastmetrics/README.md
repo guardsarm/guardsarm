@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **fastmetrics** module provides a high-performance, lock-free metrics system for the Wazuh engine. It is designed for ultra-low-overhead instrumentation of hot paths (event processing loops, queue operations) using `std::atomic` with `memory_order_relaxed`. Metrics are registered in a thread-safe registry and accessed globally via a singleton pattern (`SingletonLocator`).
+The **fastmetrics** module provides a high-performance, lock-free metrics system for the GuardSarm engine. It is designed for ultra-low-overhead instrumentation of hot paths (event processing loops, queue operations) using `std::atomic` with `memory_order_relaxed`. Metrics are registered in a thread-safe registry and accessed globally via a singleton pattern (`SingletonLocator`).
 
 The module supports three metric types: **counters** (monotonically increasing), **gauges** (bidirectional integers), and **pull metrics** (on-demand callbacks). All metrics are periodically serialized as JSON lines and written to rotating log files via the `streamlog` subsystem.
 
@@ -254,7 +254,7 @@ fastmetrics/
 Build and run:
 
 ```bash
-make --directory=$WAZUH_REPO/src -j TARGET=manager ENGINE_TEST=y DEBUG=yes
+make --directory=$GUARDSARM_REPO/src -j TARGET=manager ENGINE_TEST=y DEBUG=yes
 $ENGINE_BUILD/source/fastmetrics/fastmetrics_utest
 $ENGINE_BUILD/source/fastmetrics/fastmetrics_ctest
 ```

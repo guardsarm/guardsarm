@@ -36,7 +36,7 @@ def get_script_arguments():
         Namespace with the arguments passed to the script.
     """
     parser = argparse.ArgumentParser(usage="usage: %(prog)s [options]",
-                                     description="Wazuh wodle for monitoring Google Cloud",
+                                     description="GuardSarm wodle for monitoring Google Cloud",
                                      formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-T', '--integration_type', dest='integration_type',

@@ -1,5 +1,5 @@
 /*
- * Wazuh content manager
+ * GuardSarm content manager
  * Copyright (C) 2015, Wazuh Inc.
  * May 12, 2023.
  *
@@ -22,7 +22,7 @@
 /**
  * @class FactoryContentUpdater
  *
- * @brief Creates the orchestration chain for fetching CVE data from the Wazuh Indexer
+ * @brief Creates the orchestration chain for fetching CVE data from the GuardSarm Indexer
  *        and persisting it to the local RocksDB feed database.
  *
  * Pipeline:

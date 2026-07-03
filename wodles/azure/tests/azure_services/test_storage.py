@@ -60,7 +60,7 @@ def create_mocked_blob(blob_name: str, last_modified: datetime = None, content_l
 
 
 @pytest.mark.parametrize('auth_path, name, key, container_name', [
-    (os.environ.get('INSTALLDIR', '/var/wazuh-manager'), 'name', 'key', 'container')
+    (os.environ.get('INSTALLDIR', '/var/guardsarm-manager'), 'name', 'key', 'container')
 ])
 @patch('azure_services.storage.get_blobs')
 @patch('azure_services.storage.create_new_row')

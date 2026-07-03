@@ -50,7 +50,7 @@ struct TableStruct_status_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_status_2eproto;
 namespace com {
-namespace wazuh {
+namespace guardsarm {
 namespace api {
 namespace engine {
 namespace status {
@@ -78,19 +78,19 @@ extern StatusGet_Response_SpacesEntry_DoNotUseDefaultTypeInternal _StatusGet_Res
 }  // namespace status
 }  // namespace engine
 }  // namespace api
-}  // namespace wazuh
+}  // namespace guardsarm
 }  // namespace com
 PROTOBUF_NAMESPACE_OPEN
-template<> ::com::wazuh::api::engine::status::ResourceState* Arena::CreateMaybeMessage<::com::wazuh::api::engine::status::ResourceState>(Arena*);
-template<> ::com::wazuh::api::engine::status::SpaceState* Arena::CreateMaybeMessage<::com::wazuh::api::engine::status::SpaceState>(Arena*);
-template<> ::com::wazuh::api::engine::status::StatusGet_Request* Arena::CreateMaybeMessage<::com::wazuh::api::engine::status::StatusGet_Request>(Arena*);
-template<> ::com::wazuh::api::engine::status::StatusGet_Response* Arena::CreateMaybeMessage<::com::wazuh::api::engine::status::StatusGet_Response>(Arena*);
-template<> ::com::wazuh::api::engine::status::StatusGet_Response_GeoEntry_DoNotUse* Arena::CreateMaybeMessage<::com::wazuh::api::engine::status::StatusGet_Response_GeoEntry_DoNotUse>(Arena*);
-template<> ::com::wazuh::api::engine::status::StatusGet_Response_IocEntry_DoNotUse* Arena::CreateMaybeMessage<::com::wazuh::api::engine::status::StatusGet_Response_IocEntry_DoNotUse>(Arena*);
-template<> ::com::wazuh::api::engine::status::StatusGet_Response_SpacesEntry_DoNotUse* Arena::CreateMaybeMessage<::com::wazuh::api::engine::status::StatusGet_Response_SpacesEntry_DoNotUse>(Arena*);
+template<> ::com::guardsarm::api::engine::status::ResourceState* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::status::ResourceState>(Arena*);
+template<> ::com::guardsarm::api::engine::status::SpaceState* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::status::SpaceState>(Arena*);
+template<> ::com::guardsarm::api::engine::status::StatusGet_Request* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::status::StatusGet_Request>(Arena*);
+template<> ::com::guardsarm::api::engine::status::StatusGet_Response* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::status::StatusGet_Response>(Arena*);
+template<> ::com::guardsarm::api::engine::status::StatusGet_Response_GeoEntry_DoNotUse* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::status::StatusGet_Response_GeoEntry_DoNotUse>(Arena*);
+template<> ::com::guardsarm::api::engine::status::StatusGet_Response_IocEntry_DoNotUse* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::status::StatusGet_Response_IocEntry_DoNotUse>(Arena*);
+template<> ::com::guardsarm::api::engine::status::StatusGet_Response_SpacesEntry_DoNotUse* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::status::StatusGet_Response_SpacesEntry_DoNotUse>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace com {
-namespace wazuh {
+namespace guardsarm {
 namespace api {
 namespace engine {
 namespace status {
@@ -98,7 +98,7 @@ namespace status {
 // ===================================================================
 
 class StatusGet_Request final :
-    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.status.StatusGet_Request) */ {
+    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.status.StatusGet_Request) */ {
  public:
   inline StatusGet_Request() : StatusGet_Request(nullptr) {}
   explicit PROTOBUF_CONSTEXPR StatusGet_Request(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
@@ -186,7 +186,7 @@ class StatusGet_Request final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.status.StatusGet_Request";
+    return "com.guardsarm.api.engine.status.StatusGet_Request";
   }
   protected:
   explicit StatusGet_Request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -202,7 +202,7 @@ class StatusGet_Request final :
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.status.StatusGet_Request)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.status.StatusGet_Request)
  private:
   class _Internal;
 
@@ -216,7 +216,7 @@ class StatusGet_Request final :
 // -------------------------------------------------------------------
 
 class SpaceState final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.status.SpaceState) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.status.SpaceState) */ {
  public:
   inline SpaceState() : SpaceState(nullptr) {}
   ~SpaceState() override;
@@ -319,7 +319,7 @@ class SpaceState final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.status.SpaceState";
+    return "com.guardsarm.api.engine.status.SpaceState";
   }
   protected:
   explicit SpaceState(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -397,7 +397,7 @@ class SpaceState final :
   void _internal_set_last_successful_update(uint32_t value);
   public:
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.status.SpaceState)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.status.SpaceState)
  private:
   class _Internal;
 
@@ -418,7 +418,7 @@ class SpaceState final :
 // -------------------------------------------------------------------
 
 class ResourceState final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.status.ResourceState) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.status.ResourceState) */ {
  public:
   inline ResourceState() : ResourceState(nullptr) {}
   ~ResourceState() override;
@@ -521,7 +521,7 @@ class ResourceState final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.status.ResourceState";
+    return "com.guardsarm.api.engine.status.ResourceState";
   }
   protected:
   explicit ResourceState(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -589,7 +589,7 @@ class ResourceState final :
   void _internal_set_last_successful_update(uint32_t value);
   public:
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.status.ResourceState)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.status.ResourceState)
  private:
   class _Internal;
 
@@ -609,12 +609,12 @@ class ResourceState final :
 // -------------------------------------------------------------------
 
 class StatusGet_Response_SpacesEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<StatusGet_Response_SpacesEntry_DoNotUse, 
-    std::string, ::com::wazuh::api::engine::status::SpaceState,
+    std::string, ::com::guardsarm::api::engine::status::SpaceState,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> {
 public:
   typedef ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<StatusGet_Response_SpacesEntry_DoNotUse, 
-    std::string, ::com::wazuh::api::engine::status::SpaceState,
+    std::string, ::com::guardsarm::api::engine::status::SpaceState,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> SuperType;
   StatusGet_Response_SpacesEntry_DoNotUse();
@@ -624,7 +624,7 @@ public:
   void MergeFrom(const StatusGet_Response_SpacesEntry_DoNotUse& other);
   static const StatusGet_Response_SpacesEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const StatusGet_Response_SpacesEntry_DoNotUse*>(&_StatusGet_Response_SpacesEntry_DoNotUse_default_instance_); }
   static bool ValidateKey(std::string* s) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(s->data(), static_cast<int>(s->size()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::PARSE, "com.wazuh.api.engine.status.StatusGet_Response.SpacesEntry.key");
+    return ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(s->data(), static_cast<int>(s->size()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::PARSE, "com.guardsarm.api.engine.status.StatusGet_Response.SpacesEntry.key");
  }
   static bool ValidateValue(void*) { return true; }
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
@@ -635,12 +635,12 @@ public:
 // -------------------------------------------------------------------
 
 class StatusGet_Response_IocEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<StatusGet_Response_IocEntry_DoNotUse, 
-    std::string, ::com::wazuh::api::engine::status::ResourceState,
+    std::string, ::com::guardsarm::api::engine::status::ResourceState,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> {
 public:
   typedef ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<StatusGet_Response_IocEntry_DoNotUse, 
-    std::string, ::com::wazuh::api::engine::status::ResourceState,
+    std::string, ::com::guardsarm::api::engine::status::ResourceState,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> SuperType;
   StatusGet_Response_IocEntry_DoNotUse();
@@ -650,7 +650,7 @@ public:
   void MergeFrom(const StatusGet_Response_IocEntry_DoNotUse& other);
   static const StatusGet_Response_IocEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const StatusGet_Response_IocEntry_DoNotUse*>(&_StatusGet_Response_IocEntry_DoNotUse_default_instance_); }
   static bool ValidateKey(std::string* s) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(s->data(), static_cast<int>(s->size()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::PARSE, "com.wazuh.api.engine.status.StatusGet_Response.IocEntry.key");
+    return ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(s->data(), static_cast<int>(s->size()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::PARSE, "com.guardsarm.api.engine.status.StatusGet_Response.IocEntry.key");
  }
   static bool ValidateValue(void*) { return true; }
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
@@ -661,12 +661,12 @@ public:
 // -------------------------------------------------------------------
 
 class StatusGet_Response_GeoEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<StatusGet_Response_GeoEntry_DoNotUse, 
-    std::string, ::com::wazuh::api::engine::status::ResourceState,
+    std::string, ::com::guardsarm::api::engine::status::ResourceState,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> {
 public:
   typedef ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<StatusGet_Response_GeoEntry_DoNotUse, 
-    std::string, ::com::wazuh::api::engine::status::ResourceState,
+    std::string, ::com::guardsarm::api::engine::status::ResourceState,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> SuperType;
   StatusGet_Response_GeoEntry_DoNotUse();
@@ -676,7 +676,7 @@ public:
   void MergeFrom(const StatusGet_Response_GeoEntry_DoNotUse& other);
   static const StatusGet_Response_GeoEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const StatusGet_Response_GeoEntry_DoNotUse*>(&_StatusGet_Response_GeoEntry_DoNotUse_default_instance_); }
   static bool ValidateKey(std::string* s) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(s->data(), static_cast<int>(s->size()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::PARSE, "com.wazuh.api.engine.status.StatusGet_Response.GeoEntry.key");
+    return ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(s->data(), static_cast<int>(s->size()), ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::PARSE, "com.guardsarm.api.engine.status.StatusGet_Response.GeoEntry.key");
  }
   static bool ValidateValue(void*) { return true; }
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
@@ -687,7 +687,7 @@ public:
 // -------------------------------------------------------------------
 
 class StatusGet_Response final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.status.StatusGet_Response) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.status.StatusGet_Response) */ {
  public:
   inline StatusGet_Response() : StatusGet_Response(nullptr) {}
   ~StatusGet_Response() override;
@@ -790,7 +790,7 @@ class StatusGet_Response final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.status.StatusGet_Response";
+    return "com.guardsarm.api.engine.status.StatusGet_Response";
   }
   protected:
   explicit StatusGet_Response(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -817,55 +817,55 @@ class StatusGet_Response final :
     kStatusFieldNumber = 1,
     kReadyFieldNumber = 3,
   };
-  // map<string, .com.wazuh.api.engine.status.SpaceState> spaces = 4;
+  // map<string, .com.guardsarm.api.engine.status.SpaceState> spaces = 4;
   int spaces_size() const;
   private:
   int _internal_spaces_size() const;
   public:
   void clear_spaces();
   private:
-  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::SpaceState >&
+  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::SpaceState >&
       _internal_spaces() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::SpaceState >*
+  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::SpaceState >*
       _internal_mutable_spaces();
   public:
-  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::SpaceState >&
+  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::SpaceState >&
       spaces() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::SpaceState >*
+  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::SpaceState >*
       mutable_spaces();
 
-  // map<string, .com.wazuh.api.engine.status.ResourceState> ioc = 5;
+  // map<string, .com.guardsarm.api.engine.status.ResourceState> ioc = 5;
   int ioc_size() const;
   private:
   int _internal_ioc_size() const;
   public:
   void clear_ioc();
   private:
-  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >&
+  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >&
       _internal_ioc() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >*
+  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >*
       _internal_mutable_ioc();
   public:
-  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >&
+  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >&
       ioc() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >*
+  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >*
       mutable_ioc();
 
-  // map<string, .com.wazuh.api.engine.status.ResourceState> geo = 6;
+  // map<string, .com.guardsarm.api.engine.status.ResourceState> geo = 6;
   int geo_size() const;
   private:
   int _internal_geo_size() const;
   public:
   void clear_geo();
   private:
-  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >&
+  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >&
       _internal_geo() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >*
+  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >*
       _internal_mutable_geo();
   public:
-  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >&
+  const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >&
       geo() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >*
+  ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >*
       mutable_geo();
 
   // optional string error = 2;
@@ -886,13 +886,13 @@ class StatusGet_Response final :
   std::string* _internal_mutable_error();
   public:
 
-  // .com.wazuh.api.engine.ReturnStatus status = 1;
+  // .com.guardsarm.api.engine.ReturnStatus status = 1;
   void clear_status();
-  ::com::wazuh::api::engine::ReturnStatus status() const;
-  void set_status(::com::wazuh::api::engine::ReturnStatus value);
+  ::com::guardsarm::api::engine::ReturnStatus status() const;
+  void set_status(::com::guardsarm::api::engine::ReturnStatus value);
   private:
-  ::com::wazuh::api::engine::ReturnStatus _internal_status() const;
-  void _internal_set_status(::com::wazuh::api::engine::ReturnStatus value);
+  ::com::guardsarm::api::engine::ReturnStatus _internal_status() const;
+  void _internal_set_status(::com::guardsarm::api::engine::ReturnStatus value);
   public:
 
   // bool ready = 3;
@@ -904,7 +904,7 @@ class StatusGet_Response final :
   void _internal_set_ready(bool value);
   public:
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.status.StatusGet_Response)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.status.StatusGet_Response)
  private:
   class _Internal;
 
@@ -916,17 +916,17 @@ class StatusGet_Response final :
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
     ::PROTOBUF_NAMESPACE_ID::internal::MapField<
         StatusGet_Response_SpacesEntry_DoNotUse,
-        std::string, ::com::wazuh::api::engine::status::SpaceState,
+        std::string, ::com::guardsarm::api::engine::status::SpaceState,
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> spaces_;
     ::PROTOBUF_NAMESPACE_ID::internal::MapField<
         StatusGet_Response_IocEntry_DoNotUse,
-        std::string, ::com::wazuh::api::engine::status::ResourceState,
+        std::string, ::com::guardsarm::api::engine::status::ResourceState,
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> ioc_;
     ::PROTOBUF_NAMESPACE_ID::internal::MapField<
         StatusGet_Response_GeoEntry_DoNotUse,
-        std::string, ::com::wazuh::api::engine::status::ResourceState,
+        std::string, ::com::guardsarm::api::engine::status::ResourceState,
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> geo_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr error_;
@@ -959,7 +959,7 @@ inline bool SpaceState::_internal_available() const {
   return _impl_.available_;
 }
 inline bool SpaceState::available() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.status.SpaceState.available)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.status.SpaceState.available)
   return _internal_available();
 }
 inline void SpaceState::_internal_set_available(bool value) {
@@ -968,7 +968,7 @@ inline void SpaceState::_internal_set_available(bool value) {
 }
 inline void SpaceState::set_available(bool value) {
   _internal_set_available(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.status.SpaceState.available)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.status.SpaceState.available)
 }
 
 // bool enabled = 2;
@@ -979,7 +979,7 @@ inline bool SpaceState::_internal_enabled() const {
   return _impl_.enabled_;
 }
 inline bool SpaceState::enabled() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.status.SpaceState.enabled)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.status.SpaceState.enabled)
   return _internal_enabled();
 }
 inline void SpaceState::_internal_set_enabled(bool value) {
@@ -988,7 +988,7 @@ inline void SpaceState::_internal_set_enabled(bool value) {
 }
 inline void SpaceState::set_enabled(bool value) {
   _internal_set_enabled(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.status.SpaceState.enabled)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.status.SpaceState.enabled)
 }
 
 // string status = 3;
@@ -996,7 +996,7 @@ inline void SpaceState::clear_status() {
   _impl_.status_.ClearToEmpty();
 }
 inline const std::string& SpaceState::status() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.status.SpaceState.status)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.status.SpaceState.status)
   return _internal_status();
 }
 template <typename ArgT0, typename... ArgT>
@@ -1004,11 +1004,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void SpaceState::set_status(ArgT0&& arg0, ArgT... args) {
  
  _impl_.status_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.status.SpaceState.status)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.status.SpaceState.status)
 }
 inline std::string* SpaceState::mutable_status() {
   std::string* _s = _internal_mutable_status();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.status.SpaceState.status)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.status.SpaceState.status)
   return _s;
 }
 inline const std::string& SpaceState::_internal_status() const {
@@ -1023,7 +1023,7 @@ inline std::string* SpaceState::_internal_mutable_status() {
   return _impl_.status_.Mutable(GetArenaForAllocation());
 }
 inline std::string* SpaceState::release_status() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.status.SpaceState.status)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.status.SpaceState.status)
   return _impl_.status_.Release();
 }
 inline void SpaceState::set_allocated_status(std::string* status) {
@@ -1038,7 +1038,7 @@ inline void SpaceState::set_allocated_status(std::string* status) {
     _impl_.status_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.status.SpaceState.status)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.status.SpaceState.status)
 }
 
 // string hash = 4;
@@ -1046,7 +1046,7 @@ inline void SpaceState::clear_hash() {
   _impl_.hash_.ClearToEmpty();
 }
 inline const std::string& SpaceState::hash() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.status.SpaceState.hash)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.status.SpaceState.hash)
   return _internal_hash();
 }
 template <typename ArgT0, typename... ArgT>
@@ -1054,11 +1054,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void SpaceState::set_hash(ArgT0&& arg0, ArgT... args) {
  
  _impl_.hash_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.status.SpaceState.hash)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.status.SpaceState.hash)
 }
 inline std::string* SpaceState::mutable_hash() {
   std::string* _s = _internal_mutable_hash();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.status.SpaceState.hash)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.status.SpaceState.hash)
   return _s;
 }
 inline const std::string& SpaceState::_internal_hash() const {
@@ -1073,7 +1073,7 @@ inline std::string* SpaceState::_internal_mutable_hash() {
   return _impl_.hash_.Mutable(GetArenaForAllocation());
 }
 inline std::string* SpaceState::release_hash() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.status.SpaceState.hash)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.status.SpaceState.hash)
   return _impl_.hash_.Release();
 }
 inline void SpaceState::set_allocated_hash(std::string* hash) {
@@ -1088,7 +1088,7 @@ inline void SpaceState::set_allocated_hash(std::string* hash) {
     _impl_.hash_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.status.SpaceState.hash)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.status.SpaceState.hash)
 }
 
 // uint32 last_successful_update = 5;
@@ -1099,7 +1099,7 @@ inline uint32_t SpaceState::_internal_last_successful_update() const {
   return _impl_.last_successful_update_;
 }
 inline uint32_t SpaceState::last_successful_update() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.status.SpaceState.last_successful_update)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.status.SpaceState.last_successful_update)
   return _internal_last_successful_update();
 }
 inline void SpaceState::_internal_set_last_successful_update(uint32_t value) {
@@ -1108,7 +1108,7 @@ inline void SpaceState::_internal_set_last_successful_update(uint32_t value) {
 }
 inline void SpaceState::set_last_successful_update(uint32_t value) {
   _internal_set_last_successful_update(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.status.SpaceState.last_successful_update)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.status.SpaceState.last_successful_update)
 }
 
 // -------------------------------------------------------------------
@@ -1123,7 +1123,7 @@ inline bool ResourceState::_internal_available() const {
   return _impl_.available_;
 }
 inline bool ResourceState::available() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.status.ResourceState.available)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.status.ResourceState.available)
   return _internal_available();
 }
 inline void ResourceState::_internal_set_available(bool value) {
@@ -1132,7 +1132,7 @@ inline void ResourceState::_internal_set_available(bool value) {
 }
 inline void ResourceState::set_available(bool value) {
   _internal_set_available(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.status.ResourceState.available)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.status.ResourceState.available)
 }
 
 // string status = 2;
@@ -1140,7 +1140,7 @@ inline void ResourceState::clear_status() {
   _impl_.status_.ClearToEmpty();
 }
 inline const std::string& ResourceState::status() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.status.ResourceState.status)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.status.ResourceState.status)
   return _internal_status();
 }
 template <typename ArgT0, typename... ArgT>
@@ -1148,11 +1148,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void ResourceState::set_status(ArgT0&& arg0, ArgT... args) {
  
  _impl_.status_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.status.ResourceState.status)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.status.ResourceState.status)
 }
 inline std::string* ResourceState::mutable_status() {
   std::string* _s = _internal_mutable_status();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.status.ResourceState.status)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.status.ResourceState.status)
   return _s;
 }
 inline const std::string& ResourceState::_internal_status() const {
@@ -1167,7 +1167,7 @@ inline std::string* ResourceState::_internal_mutable_status() {
   return _impl_.status_.Mutable(GetArenaForAllocation());
 }
 inline std::string* ResourceState::release_status() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.status.ResourceState.status)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.status.ResourceState.status)
   return _impl_.status_.Release();
 }
 inline void ResourceState::set_allocated_status(std::string* status) {
@@ -1182,7 +1182,7 @@ inline void ResourceState::set_allocated_status(std::string* status) {
     _impl_.status_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.status.ResourceState.status)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.status.ResourceState.status)
 }
 
 // string hash = 3;
@@ -1190,7 +1190,7 @@ inline void ResourceState::clear_hash() {
   _impl_.hash_.ClearToEmpty();
 }
 inline const std::string& ResourceState::hash() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.status.ResourceState.hash)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.status.ResourceState.hash)
   return _internal_hash();
 }
 template <typename ArgT0, typename... ArgT>
@@ -1198,11 +1198,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void ResourceState::set_hash(ArgT0&& arg0, ArgT... args) {
  
  _impl_.hash_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.status.ResourceState.hash)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.status.ResourceState.hash)
 }
 inline std::string* ResourceState::mutable_hash() {
   std::string* _s = _internal_mutable_hash();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.status.ResourceState.hash)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.status.ResourceState.hash)
   return _s;
 }
 inline const std::string& ResourceState::_internal_hash() const {
@@ -1217,7 +1217,7 @@ inline std::string* ResourceState::_internal_mutable_hash() {
   return _impl_.hash_.Mutable(GetArenaForAllocation());
 }
 inline std::string* ResourceState::release_hash() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.status.ResourceState.hash)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.status.ResourceState.hash)
   return _impl_.hash_.Release();
 }
 inline void ResourceState::set_allocated_hash(std::string* hash) {
@@ -1232,7 +1232,7 @@ inline void ResourceState::set_allocated_hash(std::string* hash) {
     _impl_.hash_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.status.ResourceState.hash)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.status.ResourceState.hash)
 }
 
 // uint32 last_successful_update = 4;
@@ -1243,7 +1243,7 @@ inline uint32_t ResourceState::_internal_last_successful_update() const {
   return _impl_.last_successful_update_;
 }
 inline uint32_t ResourceState::last_successful_update() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.status.ResourceState.last_successful_update)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.status.ResourceState.last_successful_update)
   return _internal_last_successful_update();
 }
 inline void ResourceState::_internal_set_last_successful_update(uint32_t value) {
@@ -1252,7 +1252,7 @@ inline void ResourceState::_internal_set_last_successful_update(uint32_t value) 
 }
 inline void ResourceState::set_last_successful_update(uint32_t value) {
   _internal_set_last_successful_update(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.status.ResourceState.last_successful_update)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.status.ResourceState.last_successful_update)
 }
 
 // -------------------------------------------------------------------
@@ -1265,24 +1265,24 @@ inline void ResourceState::set_last_successful_update(uint32_t value) {
 
 // StatusGet_Response
 
-// .com.wazuh.api.engine.ReturnStatus status = 1;
+// .com.guardsarm.api.engine.ReturnStatus status = 1;
 inline void StatusGet_Response::clear_status() {
   _impl_.status_ = 0;
 }
-inline ::com::wazuh::api::engine::ReturnStatus StatusGet_Response::_internal_status() const {
-  return static_cast< ::com::wazuh::api::engine::ReturnStatus >(_impl_.status_);
+inline ::com::guardsarm::api::engine::ReturnStatus StatusGet_Response::_internal_status() const {
+  return static_cast< ::com::guardsarm::api::engine::ReturnStatus >(_impl_.status_);
 }
-inline ::com::wazuh::api::engine::ReturnStatus StatusGet_Response::status() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.status.StatusGet_Response.status)
+inline ::com::guardsarm::api::engine::ReturnStatus StatusGet_Response::status() const {
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.status.StatusGet_Response.status)
   return _internal_status();
 }
-inline void StatusGet_Response::_internal_set_status(::com::wazuh::api::engine::ReturnStatus value) {
+inline void StatusGet_Response::_internal_set_status(::com::guardsarm::api::engine::ReturnStatus value) {
   
   _impl_.status_ = value;
 }
-inline void StatusGet_Response::set_status(::com::wazuh::api::engine::ReturnStatus value) {
+inline void StatusGet_Response::set_status(::com::guardsarm::api::engine::ReturnStatus value) {
   _internal_set_status(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.status.StatusGet_Response.status)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.status.StatusGet_Response.status)
 }
 
 // optional string error = 2;
@@ -1298,7 +1298,7 @@ inline void StatusGet_Response::clear_error() {
   _impl_._has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& StatusGet_Response::error() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.status.StatusGet_Response.error)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.status.StatusGet_Response.error)
   return _internal_error();
 }
 template <typename ArgT0, typename... ArgT>
@@ -1306,11 +1306,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void StatusGet_Response::set_error(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000001u;
  _impl_.error_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.status.StatusGet_Response.error)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.status.StatusGet_Response.error)
 }
 inline std::string* StatusGet_Response::mutable_error() {
   std::string* _s = _internal_mutable_error();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.status.StatusGet_Response.error)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.status.StatusGet_Response.error)
   return _s;
 }
 inline const std::string& StatusGet_Response::_internal_error() const {
@@ -1325,7 +1325,7 @@ inline std::string* StatusGet_Response::_internal_mutable_error() {
   return _impl_.error_.Mutable(GetArenaForAllocation());
 }
 inline std::string* StatusGet_Response::release_error() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.status.StatusGet_Response.error)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.status.StatusGet_Response.error)
   if (!_internal_has_error()) {
     return nullptr;
   }
@@ -1350,7 +1350,7 @@ inline void StatusGet_Response::set_allocated_error(std::string* error) {
     _impl_.error_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.status.StatusGet_Response.error)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.status.StatusGet_Response.error)
 }
 
 // bool ready = 3;
@@ -1361,7 +1361,7 @@ inline bool StatusGet_Response::_internal_ready() const {
   return _impl_.ready_;
 }
 inline bool StatusGet_Response::ready() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.status.StatusGet_Response.ready)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.status.StatusGet_Response.ready)
   return _internal_ready();
 }
 inline void StatusGet_Response::_internal_set_ready(bool value) {
@@ -1370,10 +1370,10 @@ inline void StatusGet_Response::_internal_set_ready(bool value) {
 }
 inline void StatusGet_Response::set_ready(bool value) {
   _internal_set_ready(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.status.StatusGet_Response.ready)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.status.StatusGet_Response.ready)
 }
 
-// map<string, .com.wazuh.api.engine.status.SpaceState> spaces = 4;
+// map<string, .com.guardsarm.api.engine.status.SpaceState> spaces = 4;
 inline int StatusGet_Response::_internal_spaces_size() const {
   return _impl_.spaces_.size();
 }
@@ -1383,26 +1383,26 @@ inline int StatusGet_Response::spaces_size() const {
 inline void StatusGet_Response::clear_spaces() {
   _impl_.spaces_.Clear();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::SpaceState >&
+inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::SpaceState >&
 StatusGet_Response::_internal_spaces() const {
   return _impl_.spaces_.GetMap();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::SpaceState >&
+inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::SpaceState >&
 StatusGet_Response::spaces() const {
-  // @@protoc_insertion_point(field_map:com.wazuh.api.engine.status.StatusGet_Response.spaces)
+  // @@protoc_insertion_point(field_map:com.guardsarm.api.engine.status.StatusGet_Response.spaces)
   return _internal_spaces();
 }
-inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::SpaceState >*
+inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::SpaceState >*
 StatusGet_Response::_internal_mutable_spaces() {
   return _impl_.spaces_.MutableMap();
 }
-inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::SpaceState >*
+inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::SpaceState >*
 StatusGet_Response::mutable_spaces() {
-  // @@protoc_insertion_point(field_mutable_map:com.wazuh.api.engine.status.StatusGet_Response.spaces)
+  // @@protoc_insertion_point(field_mutable_map:com.guardsarm.api.engine.status.StatusGet_Response.spaces)
   return _internal_mutable_spaces();
 }
 
-// map<string, .com.wazuh.api.engine.status.ResourceState> ioc = 5;
+// map<string, .com.guardsarm.api.engine.status.ResourceState> ioc = 5;
 inline int StatusGet_Response::_internal_ioc_size() const {
   return _impl_.ioc_.size();
 }
@@ -1412,26 +1412,26 @@ inline int StatusGet_Response::ioc_size() const {
 inline void StatusGet_Response::clear_ioc() {
   _impl_.ioc_.Clear();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >&
+inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >&
 StatusGet_Response::_internal_ioc() const {
   return _impl_.ioc_.GetMap();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >&
+inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >&
 StatusGet_Response::ioc() const {
-  // @@protoc_insertion_point(field_map:com.wazuh.api.engine.status.StatusGet_Response.ioc)
+  // @@protoc_insertion_point(field_map:com.guardsarm.api.engine.status.StatusGet_Response.ioc)
   return _internal_ioc();
 }
-inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >*
+inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >*
 StatusGet_Response::_internal_mutable_ioc() {
   return _impl_.ioc_.MutableMap();
 }
-inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >*
+inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >*
 StatusGet_Response::mutable_ioc() {
-  // @@protoc_insertion_point(field_mutable_map:com.wazuh.api.engine.status.StatusGet_Response.ioc)
+  // @@protoc_insertion_point(field_mutable_map:com.guardsarm.api.engine.status.StatusGet_Response.ioc)
   return _internal_mutable_ioc();
 }
 
-// map<string, .com.wazuh.api.engine.status.ResourceState> geo = 6;
+// map<string, .com.guardsarm.api.engine.status.ResourceState> geo = 6;
 inline int StatusGet_Response::_internal_geo_size() const {
   return _impl_.geo_.size();
 }
@@ -1441,22 +1441,22 @@ inline int StatusGet_Response::geo_size() const {
 inline void StatusGet_Response::clear_geo() {
   _impl_.geo_.Clear();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >&
+inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >&
 StatusGet_Response::_internal_geo() const {
   return _impl_.geo_.GetMap();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >&
+inline const ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >&
 StatusGet_Response::geo() const {
-  // @@protoc_insertion_point(field_map:com.wazuh.api.engine.status.StatusGet_Response.geo)
+  // @@protoc_insertion_point(field_map:com.guardsarm.api.engine.status.StatusGet_Response.geo)
   return _internal_geo();
 }
-inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >*
+inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >*
 StatusGet_Response::_internal_mutable_geo() {
   return _impl_.geo_.MutableMap();
 }
-inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::wazuh::api::engine::status::ResourceState >*
+inline ::PROTOBUF_NAMESPACE_ID::Map< std::string, ::com::guardsarm::api::engine::status::ResourceState >*
 StatusGet_Response::mutable_geo() {
-  // @@protoc_insertion_point(field_mutable_map:com.wazuh.api.engine.status.StatusGet_Response.geo)
+  // @@protoc_insertion_point(field_mutable_map:com.guardsarm.api.engine.status.StatusGet_Response.geo)
   return _internal_mutable_geo();
 }
 
@@ -1481,7 +1481,7 @@ StatusGet_Response::mutable_geo() {
 }  // namespace status
 }  // namespace engine
 }  // namespace api
-}  // namespace wazuh
+}  // namespace guardsarm
 }  // namespace com
 
 // @@protoc_insertion_point(global_scope)

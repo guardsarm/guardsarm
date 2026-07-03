@@ -21,52 +21,52 @@ def test_unknown_error_errcode_value():
     assert exceptions.UNKNOWN_ERROR_ERRCODE == 999
 
 
-class TestWazuhIntegrationException:
+class TestGuardSarmIntegrationException:
     def test_is_exception_subclass(self):
-        assert issubclass(exceptions.WazuhIntegrationException, Exception)
-        logger.info("WazuhIntegrationException is a subclass of Exception")
+        assert issubclass(exceptions.GuardSarmIntegrationException, Exception)
+        logger.info("GuardSarmIntegrationException is a subclass of Exception")
 
     def test_properties_accessible(self):
-        exc = exceptions.WazuhIntegrationInternalError(errcode=1)
+        exc = exceptions.GuardSarmIntegrationInternalError(errcode=1)
         logger.info(f"errcode={exc.errcode}, key={exc.key}, message={exc.message}")
         assert isinstance(exc.errcode, int)
         assert isinstance(exc.key, str)
         assert isinstance(exc.message, str)
 
     def test_str_includes_key_and_message(self):
-        exc = exceptions.WazuhIntegrationInternalError(errcode=1)
+        exc = exceptions.GuardSarmIntegrationInternalError(errcode=1)
         logger.info(f"str(exc) => {str(exc)}")
         assert str(exc) == f'{exc.key}: {exc.message}'
 
 
-class TestWazuhIntegrationInternalError:
-    def test_errcode_1_wazuh_not_running(self):
-        exc = exceptions.WazuhIntegrationInternalError(errcode=1)
+class TestGuardSarmIntegrationInternalError:
+    def test_errcode_1_guardsarm_not_running(self):
+        exc = exceptions.GuardSarmIntegrationInternalError(errcode=1)
         logger.info(f"errcode=1 => key={exc.key}, message={exc.message}")
         assert exc.errcode == 1
-        assert exc.key == 'GCloudWazuhNotRunning'
-        assert exc.message == 'Wazuh must be running'
+        assert exc.key == 'GCloudGuardSarmNotRunning'
+        assert exc.message == 'GuardSarm must be running'
 
     def test_errcode_2_socket_error_with_kwargs(self):
-        exc = exceptions.WazuhIntegrationInternalError(errcode=2, socket_path='/tmp/test.sock')
+        exc = exceptions.GuardSarmIntegrationInternalError(errcode=2, socket_path='/tmp/test.sock')
         logger.info(f"errcode=2 => message={exc.message}")
         assert exc.errcode == 2
         assert exc.key == 'GCloudSocketError'
         assert '/tmp/test.sock' in exc.message
 
     def test_errcode_3_socket_send_error(self):
-        exc = exceptions.WazuhIntegrationInternalError(errcode=3)
+        exc = exceptions.GuardSarmIntegrationInternalError(errcode=3)
         logger.info(f"errcode=3 => key={exc.key}, message={exc.message}")
         assert exc.errcode == 3
         assert exc.key == 'GCloudSocketSendError'
-        assert exc.message == 'Error sending event to Wazuh'
+        assert exc.message == 'Error sending event to GuardSarm'
 
-    def test_is_subclass_of_wazuh_integration_exception(self):
+    def test_is_subclass_of_guardsarm_integration_exception(self):
         assert issubclass(
-            exceptions.WazuhIntegrationInternalError,
-            exceptions.WazuhIntegrationException,
+            exceptions.GuardSarmIntegrationInternalError,
+            exceptions.GuardSarmIntegrationException,
         )
-        logger.info("WazuhIntegrationInternalError is a subclass of WazuhIntegrationException")
+        logger.info("GuardSarmIntegrationInternalError is a subclass of GuardSarmIntegrationException")
 
 
 class TestGCloudError:
@@ -163,6 +163,6 @@ class TestGCloudError:
         assert exc.key == 'GCloudPubSubForbidden'
         assert 'publish' in exc.message
 
-    def test_is_subclass_of_wazuh_integration_exception(self):
-        assert issubclass(exceptions.GCloudError, exceptions.WazuhIntegrationException)
-        logger.info("GCloudError is a subclass of WazuhIntegrationException")
+    def test_is_subclass_of_guardsarm_integration_exception(self):
+        assert issubclass(exceptions.GCloudError, exceptions.GuardSarmIntegrationException)
+        logger.info("GCloudError is a subclass of GuardSarmIntegrationException")

@@ -2,10 +2,10 @@
 
 ## Overview
 
-The **conf** module provides the unified configuration system for the Wazuh engine. It loads, validates, and resolves configuration values from three sources with a strict priority order:
+The **conf** module provides the unified configuration system for the GuardSarm engine. It loads, validates, and resolves configuration values from three sources with a strict priority order:
 
 1. **Environment variables** (highest priority)
-2. **Configuration file** (`wazuh-manager-internal-options.conf`)
+2. **Configuration file** (`guardsarm-manager-internal-options.conf`)
 3. **Default values** (lowest priority — hardcoded in C++)
 
 Each configuration option is declared as a typed **unit** (`UConf<T>`) tied to a key, an environment variable name, and a default value. At runtime, `Conf::get<T>(key)` resolves the final value by checking the three sources in priority order.
@@ -53,7 +53,7 @@ Supported types:
 | `UnitConfType` | C++ Types | Example |
 |---|---|---|
 | `INTEGER` | `int`, `int64_t`, `size_t` | `120` |
-| `STRING` | `std::string` | `"/var/wazuh-manager/data/store"` |
+| `STRING` | `std::string` | `"/var/guardsarm-manager/data/store"` |
 | `STRING_LIST` | `std::vector<std::string>` | `"host1,host2,host3"` |
 | `BOOL` | `bool` | `"true"` / `"false"` |
 
@@ -69,12 +69,12 @@ This means invalid environment variables or file values are gracefully degraded 
 
 ### File Format
 
-The configuration file (`wazuh-manager-internal-options.conf`) uses a simple `section.key=value` format:
+The configuration file (`guardsarm-manager-internal-options.conf`) uses a simple `section.key=value` format:
 
 ```ini
 # Comment
 analysisd.debug=0
-analysisd.store_path=/var/wazuh-manager/data/store
+analysisd.store_path=/var/guardsarm-manager/data/store
 analysisd.indexer_hosts=host1,host2
 analysisd.dumper_enabled=false  # inline comment
 analysisd.note=value\#with-hash   # escaped '#' in value
@@ -136,7 +136,7 @@ conf/
 | Element | Description |
 |---------|-------------|
 | `IFileLoader` | Interface with a protected `load()` method and a public `operator()()` |
-| `FileLoader` | Parses `analysisd.*` keys from a `.conf` file (default: `/var/wazuh-manager/etc/wazuh-manager-internal-options.conf`) |
+| `FileLoader` | Parses `analysisd.*` keys from a `.conf` file (default: `/var/guardsarm-manager/etc/guardsarm-manager-internal-options.conf`) |
 | `OptionMap` | `std::unordered_map<std::string, std::string>` — flat key→value map |
 
 ### Configuration Keys (include/conf/keys.hpp)

@@ -28,7 +28,7 @@ set_target_properties(
     LINKER_LANGUAGE C
 )
 
-target_link_libraries(CLIENT-AGENT ${WAZUHLIB} ${WAZUHEXT} -lpthread)
+target_link_libraries(CLIENT-AGENT ${GUARDSARMLIB} ${GUARDSARMEXT} -lpthread)
 endif()
 
 if(${TARGET} STREQUAL "winagent")
@@ -36,7 +36,7 @@ if(${TARGET} STREQUAL "winagent")
 endif(${TARGET} STREQUAL "winagent")
 
 #include wrappers
-include(${SRC_FOLDER}/unit_tests/wrappers/wazuh/shared/shared.cmake)
+include(${SRC_FOLDER}/unit_tests/wrappers/guardsarm/shared/shared.cmake)
 
 # Generate agentd tests
 list(APPEND client-agent_names "test_start_agent")
@@ -141,16 +141,16 @@ foreach(counter RANGE ${count})
         # On winagent, agentd objects come from DEPENDENCIES_O (in TEST_DEPS)
         target_link_libraries(
             ${client-agent_test_name}
-            ${WAZUHLIB}
-            ${WAZUHEXT}
+            ${GUARDSARMLIB}
+            ${GUARDSARMEXT}
             ${TEST_DEPS}
         )
         target_link_libraries(${client-agent_test_name} fimdb)
     else()
         target_link_libraries(
             ${client-agent_test_name}
-            ${WAZUHLIB}
-            ${WAZUHEXT}
+            ${GUARDSARMLIB}
+            ${GUARDSARMEXT}
             CLIENT-AGENT
             ${TEST_DEPS}
         )

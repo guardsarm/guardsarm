@@ -17,8 +17,8 @@
 
 #include "syscheck.h"
 #include "syscheck-config.h"
-#include "../wrappers/wazuh/os_crypto/md5_op_wrappers.h"
-#include "../wrappers/wazuh/shared/file_op_wrappers.h"
+#include "../wrappers/guardsarm/os_crypto/md5_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/file_op_wrappers.h"
 #include "../wrappers/libc/stdio_wrappers.h"
 #include "../wrappers/libc/stdlib_wrappers.h"
 #include "../wrappers/posix/stat_wrappers.h"

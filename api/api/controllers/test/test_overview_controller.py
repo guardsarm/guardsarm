@@ -9,15 +9,15 @@ import pytest
 from connexion.lifecycle import ConnexionResponse
 from api.controllers.test.utils import CustomAffectedItems
 
-with patch('wazuh.common.wazuh_uid'):
-    with patch('wazuh.common.wazuh_gid'):
-        sys.modules['wazuh.rbac.orm'] = MagicMock()
-        import wazuh.rbac.decorators
+with patch('guardsarm.common.guardsarm_uid'):
+    with patch('guardsarm.common.guardsarm_gid'):
+        sys.modules['guardsarm.rbac.orm'] = MagicMock()
+        import guardsarm.rbac.decorators
         from api.controllers.overview_controller import get_overview_agents
-        from wazuh import agent
-        from wazuh.tests.util import RBAC_bypasser
-        wazuh.rbac.decorators.expose_resources = RBAC_bypasser
-        del sys.modules['wazuh.rbac.orm']
+        from guardsarm import agent
+        from guardsarm.tests.util import RBAC_bypasser
+        guardsarm.rbac.decorators.expose_resources = RBAC_bypasser
+        del sys.modules['guardsarm.rbac.orm']
 
 
 @pytest.mark.asyncio

@@ -7,7 +7,7 @@ copyright: Copyright (C) 2015-2026, Wazuh Inc.
 
 type: integration
 
-brief: Validate startup hash gate behavior in wazuh-agentd.
+brief: Validate startup hash gate behavior in guardsarm-agentd.
        Modules call startup_gate_wait_for_ready() at startup and remain
        blocked until the handshake merged_sum matches the local merged.mg
        hash.
@@ -29,19 +29,19 @@ targets:
     - agent
 
 daemons:
-    - wazuh-agentd
-    - wazuh-execd
-    - wazuh-logcollector
-    - wazuh-syscheckd
-    - wazuh-modulesd
+    - guardsarm-agentd
+    - guardsarm-execd
+    - guardsarm-logcollector
+    - guardsarm-syscheckd
+    - guardsarm-modulesd
 
 os_platform:
     - linux
 
 references:
-    - https://github.com/wazuh/wazuh/issues/34509
-    - https://github.com/wazuh/wazuh/issues/34329
-    - https://github.com/wazuh/wazuh/issues/36239
+    - https://github.com/guardsarm/guardsarm/issues/34509
+    - https://github.com/guardsarm/guardsarm/issues/34329
+    - https://github.com/guardsarm/guardsarm/issues/36239
 '''
 
 import hashlib
@@ -53,24 +53,24 @@ from pathlib import Path
 
 import pytest
 
-from wazuh_testing.constants import platforms
-from wazuh_testing.constants.paths import WAZUH_PATH
-from wazuh_testing.constants.paths.configurations import SHARED_CONFIGURATIONS_PATH
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.modules.agentd.configuration import AGENTD_DEBUG, AGENTD_TIMEOUT
-from wazuh_testing.modules.modulesd.configuration import MODULESD_DEBUG
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.tools.simulators.remoted_simulator import RemotedSimulator
-from wazuh_testing.utils import callbacks
-from wazuh_testing.utils import file as file_utils
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
-from wazuh_testing.utils.services import check_if_process_is_running, control_service
-from wazuh_testing.utils.sockets import send_request_socket
+from guardsarm_testing.constants import platforms
+from guardsarm_testing.constants.paths import GUARDSARM_PATH
+from guardsarm_testing.constants.paths.configurations import SHARED_CONFIGURATIONS_PATH
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.modules.agentd.configuration import AGENTD_DEBUG, AGENTD_TIMEOUT
+from guardsarm_testing.modules.modulesd.configuration import MODULESD_DEBUG
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.tools.simulators.remoted_simulator import RemotedSimulator
+from guardsarm_testing.utils import callbacks
+from guardsarm_testing.utils import file as file_utils
+from guardsarm_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from guardsarm_testing.utils.services import check_if_process_is_running, control_service
+from guardsarm_testing.utils.sockets import send_request_socket
 
 from . import CONFIGS_PATH, TEST_CASES_PATH
 from utils import wait_connect
 
-WAZUH_MERGED_MG_PATH = os.path.join(SHARED_CONFIGURATIONS_PATH, 'merged.mg')
+GUARDSARM_MERGED_MG_PATH = os.path.join(SHARED_CONFIGURATIONS_PATH, 'merged.mg')
 
 
 # Marks
@@ -78,7 +78,7 @@ pytestmark = [pytest.mark.agent, pytest.mark.linux, pytest.mark.tier(level=0)]
 
 
 # Configuration and cases data.
-configs_path = Path(CONFIGS_PATH, 'wazuh_conf.yaml')
+configs_path = Path(CONFIGS_PATH, 'guardsarm_conf.yaml')
 cases_path = Path(TEST_CASES_PATH, 'cases_startup_hash_gate.yaml')
 
 # Test configurations.
@@ -93,20 +93,20 @@ local_internal_options = {
 
 daemons_handler_configuration = {'all_daemons': True}
 
-AGENT_SOCKET_PATH = os.path.join(WAZUH_PATH, 'queue', 'sockets', 'agent')
+AGENT_SOCKET_PATH = os.path.join(GUARDSARM_PATH, 'queue', 'sockets', 'agent')
 
-MODULE_DAEMONS = ('wazuh-modulesd', 'wazuh-syscheckd', 'wazuh-logcollector', 'wazuh-execd')
-ALL_DAEMONS = ('wazuh-agentd',) + MODULE_DAEMONS
+MODULE_DAEMONS = ('guardsarm-modulesd', 'guardsarm-syscheckd', 'guardsarm-logcollector', 'guardsarm-execd')
+ALL_DAEMONS = ('guardsarm-agentd',) + MODULE_DAEMONS
 
 # Log patterns emitted by the startup gate C code.
 GATE_BLOCKING_PATTERN = (
     r".*Startup hash gate is blocking "
-    r"'wazuh-(modulesd|syscheckd|logcollector|execd)' "
+    r"'guardsarm-(modulesd|syscheckd|logcollector|execd)' "
     r"\((waiting_hash_match|waiting for agentd startup gate status)\)\."
 )
 GATE_RELEASED_PATTERN = (
     r".*Startup hash gate released for "
-    r"'wazuh-(modulesd|syscheckd|logcollector|execd)' \(hash_match\)\."
+    r"'guardsarm-(modulesd|syscheckd|logcollector|execd)' \(hash_match\)\."
 )
 
 # YAML template paths for merged.mg and handshake JSON.
@@ -203,13 +203,13 @@ def _wait_startup_gate_status(expected_ready, expected_reason, timeout=90):
 
 
 @pytest.mark.parametrize('test_configuration, test_metadata', zip(test_configuration, test_metadata), ids=test_cases_ids)
-def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazuh_configuration,
+def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_guardsarm_configuration,
                                      configure_local_internal_options, truncate_monitored_files,
                                      clean_keys, add_keys, clean_merged_mg, daemons_handler):
     '''
     description: Validate startup hash gate blocking and unblocking for hash match/mismatch scenarios.
 
-    wazuh_min_version: 4.12.0
+    guardsarm_min_version: 4.12.0
 
     parameters:
         - test_configuration:
@@ -218,7 +218,7 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
         - test_metadata:
             type: data
             brief: Startup gate scenario and expected behavior.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Configure a custom environment for testing.
         - configure_local_internal_options:
@@ -238,7 +238,7 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
             brief: Remove merged.mg so the agent starts with no local file.
         - daemons_handler:
             type: fixture
-            brief: Handler of Wazuh daemons.
+            brief: Handler of GuardSarm daemons.
 
     assertions:
         - Modules unblock and start normally when hashes match.
@@ -257,15 +257,15 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
             # Write merged.mg to disk so the hash matches on handshake.
             # clean_merged_mg removed the file; we recreate it from the YAML
             # template with correct permissions so agentd can read it.
-            os.makedirs(os.path.dirname(WAZUH_MERGED_MG_PATH), exist_ok=True)
-            with open(WAZUH_MERGED_MG_PATH, 'wb') as f:
+            os.makedirs(os.path.dirname(GUARDSARM_MERGED_MG_PATH), exist_ok=True)
+            with open(GUARDSARM_MERGED_MG_PATH, 'wb') as f:
                 f.write(merged_content)
             if sys.platform != platforms.WINDOWS:
-                os.chmod(WAZUH_MERGED_MG_PATH, 0o660)
+                os.chmod(GUARDSARM_MERGED_MG_PATH, 0o660)
                 try:
                     import grp
-                    wazuh_gid = grp.getgrnam('wazuh').gr_gid
-                    os.chown(WAZUH_MERGED_MG_PATH, -1, wazuh_gid)
+                    guardsarm_gid = grp.getgrnam('guardsarm').gr_gid
+                    os.chown(GUARDSARM_MERGED_MG_PATH, -1, guardsarm_gid)
                 except (KeyError, PermissionError):
                     pass
 
@@ -289,7 +289,7 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
                 )
 
             # Verify the released log message was emitted.
-            released_monitor = FileMonitor(WAZUH_LOG_PATH)
+            released_monitor = FileMonitor(GUARDSARM_LOG_PATH)
             released_monitor.start(
                 callback=callbacks.generate_callback(GATE_RELEASED_PATTERN), timeout=60
             )
@@ -319,7 +319,7 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
                 )
 
             # Verify the blocking log message was emitted.
-            blocking_monitor = FileMonitor(WAZUH_LOG_PATH)
+            blocking_monitor = FileMonitor(GUARDSARM_LOG_PATH)
             blocking_monitor.start(
                 callback=callbacks.generate_callback(GATE_BLOCKING_PATTERN), timeout=60
             )
@@ -351,7 +351,7 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
                 )
 
             # Blocking log emitted.
-            blocking_monitor = FileMonitor(WAZUH_LOG_PATH)
+            blocking_monitor = FileMonitor(GUARDSARM_LOG_PATH)
             blocking_monitor.start(
                 callback=callbacks.generate_callback(GATE_BLOCKING_PATTERN), timeout=60
             )
@@ -374,7 +374,7 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
             # reloadAgent() reports failure (i.e. the reload chain definitively
             # cannot run), so modules can still start without a full restart.
             #
-            # We force the failure by stopping wazuh-modulesd between the
+            # We force the failure by stopping guardsarm-modulesd between the
             # handshake and the merged.mg push, so its CONTROL_SOCK is gone
             # by the time reloadAgent() runs.
             push_delay = 10
@@ -393,7 +393,7 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
 
             # Kill modulesd: queue/sockets/control now disappears, so the
             # reloadAgent() call triggered by the upcoming push will fail.
-            control_service('stop', daemon='wazuh-modulesd')
+            control_service('stop', daemon='guardsarm-modulesd')
 
             # The push arrives during the delay. reloadAgent() spends ~30s
             # retrying the now-dead socket, returns false, and the fallback
@@ -406,7 +406,7 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
             # one. Without this assertion a future change that, say, started
             # modulesd back up automatically would silently turn this into a
             # happy-path test.
-            reload_fail_monitor = FileMonitor(WAZUH_LOG_PATH)
+            reload_fail_monitor = FileMonitor(GUARDSARM_LOG_PATH)
             reload_fail_monitor.start(
                 callback=callbacks.generate_callback(
                     r".*Could not auto-reload agent\..*after 30 attempts\."
@@ -430,8 +430,8 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
             # This scenario reproduces the normal-reload path (push delayed,
             # reload chain succeeds) and asserts that modules do NOT start
             # before the reload chain dispatches. Concretely: the first
-            # "wazuh-syscheckd: INFO: Started (pid: ..." log line in the run
-            # must come AFTER modulesd's "Executing 'reload' on wazuh-agent"
+            # "guardsarm-syscheckd: INFO: Started (pid: ..." log line in the run
+            # must come AFTER modulesd's "Executing 'reload' on guardsarm-agent"
             # log line.
             push_delay = 10
 
@@ -451,7 +451,7 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
             _wait_startup_gate_status(True, "hash_match", timeout=push_delay + 60)
 
             # Wait until both events have hit the log: the reload chain
-            # dispatching ("Executing 'reload' on wazuh-agent") and the
+            # dispatching ("Executing 'reload' on guardsarm-agent") and the
             # post-reload syscheckd finishing startup. Polling for both
             # avoids a race where we read the log before syscheckd's
             # startup log line is flushed.
@@ -459,16 +459,16 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
             exec_reload_idx = None
             sys_started_idx = None
             while time.time() < deadline:
-                with open(WAZUH_LOG_PATH, 'r') as log_file:
+                with open(GUARDSARM_LOG_PATH, 'r') as log_file:
                     log_lines = log_file.readlines()
                 exec_reload_idx = next(
                     (i for i, line in enumerate(log_lines)
-                     if "Executing 'reload' on wazuh-agent" in line),
+                     if "Executing 'reload' on guardsarm-agent" in line),
                     None,
                 )
                 sys_started_idx = next(
                     (i for i, line in enumerate(log_lines)
-                     if "wazuh-syscheckd: INFO: Started" in line),
+                     if "guardsarm-syscheckd: INFO: Started" in line),
                     None,
                 )
                 if exec_reload_idx is not None and sys_started_idx is not None:
@@ -476,12 +476,12 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
                 time.sleep(1)
 
             assert exec_reload_idx is not None, (
-                "Reload chain log line 'Executing reload on wazuh-agent' not "
+                "Reload chain log line 'Executing reload on guardsarm-agent' not "
                 "found within timeout; the test did not exercise the reload "
                 "path."
             )
             assert sys_started_idx is not None, (
-                "wazuh-syscheckd never logged 'Started' within timeout; the "
+                "guardsarm-syscheckd never logged 'Started' within timeout; the "
                 "agent did not come up as expected."
             )
 
@@ -489,7 +489,7 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
             # chain dispatch, modules unblocked during the reloadAgent retry
             # window — the regression we're guarding against.
             assert sys_started_idx > exec_reload_idx, (
-                f"REGRESSION: wazuh-syscheckd logged 'Started' (log line "
+                f"REGRESSION: guardsarm-syscheckd logged 'Started' (log line "
                 f"{sys_started_idx + 1}) BEFORE the reload chain dispatched "
                 f"(log line {exec_reload_idx + 1}). Modules started during "
                 f"the reloadAgent retry window, indicating the startup hash "
@@ -505,24 +505,24 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
             # the new merged.mg; the reload chain runs.
             #
             # During the gate-blocking window the agent must hold back
-            # EVERY module — not just wazuh-syscheckd's own startup, but
-            # also wazuh-rootcheck (which is statically linked into
-            # wazuh-syscheckd and historically logged "Started" from
+            # EVERY module — not just guardsarm-syscheckd's own startup, but
+            # also guardsarm-rootcheck (which is statically linked into
+            # guardsarm-syscheckd and historically logged "Started" from
             # rootcheck_init() before the gate was queried). The user's
             # field report showed exactly that:
             #
-            #     wazuh-agentd ... receiver.c: INFO: Agent is reloading...
-            #     wazuh-agentd ... reload_agent.c: ... attempt 1/30
-            #     wazuh-rootcheck: INFO: Started (pid: 32440).   <-- BUG
-            #     wazuh-agentd ... reload_agent.c: ... attempt 2/30
+            #     guardsarm-agentd ... receiver.c: INFO: Agent is reloading...
+            #     guardsarm-agentd ... reload_agent.c: ... attempt 1/30
+            #     guardsarm-rootcheck: INFO: Started (pid: 32440).   <-- BUG
+            #     guardsarm-agentd ... reload_agent.c: ... attempt 2/30
             #     ...
-            #     wazuh-modulesd ... main.c: INFO: Started (pid: 32465).
+            #     guardsarm-modulesd ... main.c: INFO: Started (pid: 32465).
             #
             # This scenario reproduces that flow and asserts that, for
-            # every agent module ("wazuh-rootcheck", "wazuh-syscheckd",
-            # "wazuh-logcollector", "wazuh-execd"), the first
+            # every agent module ("guardsarm-rootcheck", "guardsarm-syscheckd",
+            # "guardsarm-logcollector", "guardsarm-execd"), the first
             # "<module>: INFO: Started" log line appears AFTER the reload
-            # chain dispatches ("Executing 'reload' on wazuh-agent" log
+            # chain dispatches ("Executing 'reload' on guardsarm-agent" log
             # emitted by wm_control).
             push_delay = 15
 
@@ -544,15 +544,15 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
                 "the gate would release immediately and the scenario would "
                 "not exercise the reload chain."
             )
-            os.makedirs(os.path.dirname(WAZUH_MERGED_MG_PATH), exist_ok=True)
-            with open(WAZUH_MERGED_MG_PATH, 'wb') as f:
+            os.makedirs(os.path.dirname(GUARDSARM_MERGED_MG_PATH), exist_ok=True)
+            with open(GUARDSARM_MERGED_MG_PATH, 'wb') as f:
                 f.write(stale_merged_content)
             if sys.platform != platforms.WINDOWS:
-                os.chmod(WAZUH_MERGED_MG_PATH, 0o660)
+                os.chmod(GUARDSARM_MERGED_MG_PATH, 0o660)
                 try:
                     import grp
-                    wazuh_gid = grp.getgrnam('wazuh').gr_gid
-                    os.chown(WAZUH_MERGED_MG_PATH, -1, wazuh_gid)
+                    guardsarm_gid = grp.getgrnam('guardsarm').gr_gid
+                    os.chown(GUARDSARM_MERGED_MG_PATH, -1, guardsarm_gid)
                 except (KeyError, PermissionError):
                     pass
 
@@ -580,20 +580,20 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
             # where we read the log before slower modules' "Started"
             # lines are flushed.
             module_started_patterns = {
-                "wazuh-rootcheck": "wazuh-rootcheck: INFO: Started",
-                "wazuh-syscheckd": "wazuh-syscheckd: INFO: Started",
-                "wazuh-logcollector": "wazuh-logcollector: INFO: Started",
-                "wazuh-execd": "wazuh-execd: INFO: Started",
+                "guardsarm-rootcheck": "guardsarm-rootcheck: INFO: Started",
+                "guardsarm-syscheckd": "guardsarm-syscheckd: INFO: Started",
+                "guardsarm-logcollector": "guardsarm-logcollector: INFO: Started",
+                "guardsarm-execd": "guardsarm-execd: INFO: Started",
             }
             deadline = time.time() + 90
             exec_reload_idx = None
             module_started_indices = {}
             while time.time() < deadline:
-                with open(WAZUH_LOG_PATH, 'r') as log_file:
+                with open(GUARDSARM_LOG_PATH, 'r') as log_file:
                     log_lines = log_file.readlines()
                 exec_reload_idx = next(
                     (i for i, line in enumerate(log_lines)
-                     if "Executing 'reload' on wazuh-agent" in line),
+                     if "Executing 'reload' on guardsarm-agent" in line),
                     None,
                 )
                 module_started_indices = {
@@ -610,7 +610,7 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
                 time.sleep(1)
 
             assert exec_reload_idx is not None, (
-                "Reload chain log line 'Executing reload on wazuh-agent' not "
+                "Reload chain log line 'Executing reload on guardsarm-agent' not "
                 "found within timeout; the test did not exercise the reload "
                 "path."
             )
@@ -637,7 +637,7 @@ def test_startup_hash_gate_scenarios(test_configuration, test_metadata, set_wazu
                 "module(s) logged 'Started' BEFORE the reload chain "
                 "dispatched at log line "
                 f"{exec_reload_idx + 1} ('Executing reload on "
-                "wazuh-agent'):\n  "
+                "guardsarm-agent'):\n  "
                 + "\n  ".join(
                     f"{module} at log line {line_num}"
                     for module, line_num in premature_starts

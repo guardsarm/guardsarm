@@ -121,7 +121,7 @@ stages:
         error: 0
         data:
           affected_items:
-            - cluster: wazuh
+            - cluster: guardsarm
               node: master-node
               type: master
           failed_items: []
@@ -772,10 +772,10 @@ stages:
           total_affected_items: 1
           total_failed_items: 0
 
-  - name: Show the config of wazuh-manager-db/internal on master
+  - name: Show the config of guardsarm-manager-db/internal on master
     request:
       verify: False
-      url: "{protocol:s}://{host:s}:{balanced_port:d}/cluster/master-node/configuration/wazuh-manager-db/internal"
+      url: "{protocol:s}://{host:s}:{balanced_port:d}/cluster/master-node/configuration/guardsarm-manager-db/internal"
       method: GET
       headers:
         Authorization: "Bearer {test_login_token}"
@@ -785,7 +785,7 @@ stages:
         error: !anyint
         data:
           affected_items:
-            - wazuh_db:
+            - guardsarm_db:
                 commit_time_max: !anyint
                 commit_time_min: !anyint
                 open_db_limit: !anyint
@@ -794,10 +794,10 @@ stages:
           total_affected_items: 1
           total_failed_items: 0
 
-  - name: Show the config of wazuh-manager-db/wdb on master
+  - name: Show the config of guardsarm-manager-db/wdb on master
     request:
       verify: False
-      url: "{protocol:s}://{host:s}:{balanced_port:d}/cluster/master-node/configuration/wazuh-manager-db/wdb"
+      url: "{protocol:s}://{host:s}:{balanced_port:d}/cluster/master-node/configuration/guardsarm-manager-db/wdb"
       method: GET
       headers:
         Authorization: "Bearer {test_login_token}"
@@ -1036,12 +1036,12 @@ stages:
           total_affected_items: !anyint
           total_failed_items: 0
 
-  - name: Read logs with filters -> tag=wazuh-manager-analysisd, limit=1 {node_id}
+  - name: Read logs with filters -> tag=guardsarm-manager-analysisd, limit=1 {node_id}
     request:
       verify: False
       <<: *get_cluster_logs
       params:
-        tag: wazuh-manager-analysisd
+        tag: guardsarm-manager-analysisd
         limit: 1
     response:
       status_code: 200
@@ -1054,12 +1054,12 @@ stages:
           total_affected_items: !anyint
           total_failed_items: 0
 
-  - name: Read logs with filters -> tag=wazuh-manager-remoted, limit=1 {node_id}
+  - name: Read logs with filters -> tag=guardsarm-manager-remoted, limit=1 {node_id}
     request:
       verify: False
       <<: *get_cluster_logs
       params:
-        tag: wazuh-manager-remoted
+        tag: guardsarm-manager-remoted
         limit: 1
     response:
       status_code: 200
@@ -1068,7 +1068,7 @@ stages:
         data:
           affected_items:
             - <<: *cluster_log
-              tag: wazuh-manager-remoted
+              tag: guardsarm-manager-remoted
           failed_items: []
           total_affected_items: !anyint
           total_failed_items: 0
@@ -1076,14 +1076,14 @@ stages:
         - function: tavern_utils:test_expected_value
           extra_kwargs:
             key: "tag"
-            expected_values: "wazuh-manager-remoted"
+            expected_values: "guardsarm-manager-remoted"
 
-  - name: Read logs with filters -> tag=wazuh-unknown-daemon {node_id}
+  - name: Read logs with filters -> tag=guardsarm-unknown-daemon {node_id}
     request:
       verify: False
       <<: *get_cluster_logs
       params:
-        tag: wazuh-unknown-daemon
+        tag: guardsarm-unknown-daemon
     response:
       status_code: 200
       json:
@@ -1113,19 +1113,19 @@ stages:
           total_affected_items: !anyint
           total_failed_items: 0
 
-  - name: Read logs with filters by query (tag=wazuh-manager-remoted, level=info) {node_id}
+  - name: Read logs with filters by query (tag=guardsarm-manager-remoted, level=info) {node_id}
     request:
       verify: False
       <<: *get_cluster_logs
       params:
-        q: tag=wazuh-manager-remoted;level=info
+        q: tag=guardsarm-manager-remoted;level=info
     response:
       status_code: 200
       verify_response_with:
         - function: tavern_utils:test_expected_value
           extra_kwargs:
             key: "tag"
-            expected_values: "wazuh-manager-remoted"
+            expected_values: "guardsarm-manager-remoted"
         - function: tavern_utils:test_expected_value
           extra_kwargs:
             key: "level"
@@ -1230,14 +1230,14 @@ stages:
         error: 2
         data:
           affected_items:
-            - name: wazuh-manager-remoted
-            - name: wazuh-manager-db
+            - name: guardsarm-manager-remoted
+            - name: guardsarm-manager-db
           total_affected_items: 2
           failed_items:
-            - id: [ wazuh-manager-analysisd ]
+            - id: [ guardsarm-manager-analysisd ]
           total_failed_items: 1
 
-  # GET /cluster/{node_id}/daemons/stats?daemons_list=wazuh-manager-remoted
+  # GET /cluster/{node_id}/daemons/stats?daemons_list=guardsarm-manager-remoted
   - name: Get statistics from a single daemon from {node_id}
     request:
       verify: False
@@ -1246,19 +1246,19 @@ stages:
       headers:
         Authorization: "Bearer {test_login_token}"
       params:
-        daemons_list: wazuh-manager-remoted
+        daemons_list: guardsarm-manager-remoted
     response:
       status_code: 200
       json:
         error: 0
         data:
           affected_items:
-            - name: wazuh-manager-remoted
+            - name: guardsarm-manager-remoted
           total_affected_items: 1
           failed_items: []
           total_failed_items: 0
 
-  # GET /cluster/{node_id}/daemons/stats?daemons_list=wazuh-manager-remoted,wazuh-manager-db
+  # GET /cluster/{node_id}/daemons/stats?daemons_list=guardsarm-manager-remoted,guardsarm-manager-db
   - name: Get statistics from a list of daemons from {node_id}
     request:
       verify: False
@@ -1267,15 +1267,15 @@ stages:
       headers:
         Authorization: "Bearer {test_login_token}"
       params:
-        daemons_list: wazuh-manager-remoted,wazuh-manager-db
+        daemons_list: guardsarm-manager-remoted,guardsarm-manager-db
     response:
       status_code: 200
       json:
         error: 0
         data:
           affected_items:
-            - name: wazuh-manager-remoted
-            - name: wazuh-manager-db
+            - name: guardsarm-manager-remoted
+            - name: guardsarm-manager-db
           total_affected_items: 2
           failed_items: []
           total_failed_items: 0
@@ -1382,7 +1382,7 @@ stages:
       verify: False
       url: "{protocol:s}://{host:s}:{balanced_port:d}/cluster/worker1/configuration"
       method: PUT
-      data: "{valid_wazuh_conf:s}"
+      data: "{valid_guardsarm_conf:s}"
       headers:
         Authorization: "Bearer {test_login_token}"
         content-type: application/octet-stream
@@ -1427,7 +1427,7 @@ stages:
       verify: False
       url: "{protocol:s}://{host:s}:{balanced_port:d}/cluster/worker1/configuration"
       method: PUT
-      data: "{invalid_wazuh_conf:s}"
+      data: "{invalid_guardsarm_conf:s}"
       headers:
         Authorization: "Bearer {test_login_token}"
         content-type: application/octet-stream

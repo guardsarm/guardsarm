@@ -19,7 +19,7 @@
 #include <windows.h>
 #include "os_regex.h"
 
-#define WAZUHCONF   "ossec.conf"
+#define GUARDSARMCONF   "ossec.conf"
 #define OS_MAXSTR   1024
 
 

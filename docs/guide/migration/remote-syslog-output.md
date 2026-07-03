@@ -1,16 +1,16 @@
 # Migrating Remote Syslog Output to Dashboard Notifications
 
-In previous Wazuh versions (4.x), forwarding alerts to remote log servers via Syslog was managed directly in the Wazuh manager's `ossec.conf` file using `<syslog_output>` configuration blocks handled by the internal `csyslogd` daemon.
+In previous GuardSarm versions (4.x), forwarding alerts to remote log servers via Syslog was managed directly in the GuardSarm manager's `ossec.conf` file using `<syslog_output>` configuration blocks handled by the internal `csyslogd` daemon.
 
-Starting with Wazuh 5.0, these legacy backend Syslog forwarding capabilities have been removed from the manager. Alert forwarding logic must now be configured directly through the Wazuh dashboard using the **Notifications** and **Alerting** dashboard plugins via webhooks.
+Starting with GuardSarm 5.0, these legacy backend Syslog forwarding capabilities have been removed from the manager. Alert forwarding logic must now be configured directly through the GuardSarm dashboard using the **Notifications** and **Alerting** dashboard plugins via webhooks.
 
-> **Note:** There is no automatic upgrade tooling to migrate your existing Wazuh 4.x `<syslog_output>` configurations. You must manually recreate your data filtering and forwarding logic in the Wazuh dashboard. Use the mapping table below to identify which Wazuh 5.x feature corresponds to each element in your `ossec.conf`.
+> **Note:** There is no automatic upgrade tooling to migrate your existing GuardSarm 4.x `<syslog_output>` configurations. You must manually recreate your data filtering and forwarding logic in the GuardSarm dashboard. Use the mapping table below to identify which GuardSarm 5.x feature corresponds to each element in your `ossec.conf`.
 
 ## Configuration mapping (4.x -> 5.x)
 
-The following table maps each `ossec.conf` element from Wazuh 4.x to the corresponding feature in the Wazuh 5.x dashboard. Entries use the form `section.element` - for example, `syslog_output.server` refers to `<syslog_output><server>` in your `ossec.conf`.
+The following table maps each `ossec.conf` element from GuardSarm 4.x to the corresponding feature in the GuardSarm 5.x dashboard. Entries use the form `section.element` - for example, `syslog_output.server` refers to `<syslog_output><server>` in your `ossec.conf`.
 
-> See the [ossec.conf reference](#wazuh-4x-ossecconf-reference) below for the full XML context of this section.
+> See the [ossec.conf reference](#guardsarm-4x-ossecconf-reference) below for the full XML context of this section.
 
 ### Syslog output mapping
 
@@ -21,19 +21,19 @@ The following table maps each `ossec.conf` element from Wazuh 4.x to the corresp
 | `syslog_output.format`   | Alerting > Monitor > Action > Message (Mustache Template)  | [Step 2.2](#22-configuring-triggers-and-actions)                      |
 | `<syslog_output>` filter | Alerting > Monitor > Query (data filter)                | [Step 2.1](#21-creating-a-monitor)                                    |
 | `syslog_output.level`    | Alerting > Monitor > Trigger / data threshold filter    | [Step 2.2](#22-configuring-triggers-and-actions)                      |
-| `syslog_output.group`    | Alerting > Monitor > Query / data filter (`wazuh.rule.tags`) | [Step 2.1](#21-creating-a-monitor)                                |
-| `syslog_output.rule_id`  | Alerting > Monitor > Query / data filter (`wazuh.rule.id`) | [Step 2.1](#21-creating-a-monitor)                                  |
-> **Option scope note:** `protocol` is not a valid `<syslog_output>` option in Wazuh 4.x `ossec.conf` (the documented options are `server`, `port`, `level`, `group`, `rule_id`, `location`, `use_fqdn`, and `format`).
+| `syslog_output.group`    | Alerting > Monitor > Query / data filter (`guardsarm.rule.tags`) | [Step 2.1](#21-creating-a-monitor)                                |
+| `syslog_output.rule_id`  | Alerting > Monitor > Query / data filter (`guardsarm.rule.id`) | [Step 2.1](#21-creating-a-monitor)                                  |
+> **Option scope note:** `protocol` is not a valid `<syslog_output>` option in GuardSarm 4.x `ossec.conf` (the documented options are `server`, `port`, `level`, `group`, `rule_id`, `location`, `use_fqdn`, and `format`).
 
-> **Wazuh 4.x protocol note:** In Wazuh 4.x, `syslog_output` forwarding uses Syslog transport (UDP by default on port `514`). In Wazuh 5.x, Notifications uses HTTP/HTTPS POST webhooks for outbound routing. Target endpoints must support HTTP webhook ingestion, or you must deploy a webhook-to-syslog translation layer on the receiving side.
+> **GuardSarm 4.x protocol note:** In GuardSarm 4.x, `syslog_output` forwarding uses Syslog transport (UDP by default on port `514`). In GuardSarm 5.x, Notifications uses HTTP/HTTPS POST webhooks for outbound routing. Target endpoints must support HTTP webhook ingestion, or you must deploy a webhook-to-syslog translation layer on the receiving side.
 
-> **Note on Output Formats**: In Wazuh 4.x, the <format> tag automatically converted the data layout into predefined profiles (json, cef, or splunk). In Wazuh 5.x, the Notifications plugin does not include these pre-configured encoding profiles. To migrate specific formats (such as ArcSight CEF, Splunk key-value pairs, or custom JSON payloads), the structure must be manually designed inside the Message text block using Mustache syntax variables during the Action configuration phase.
+> **Note on Output Formats**: In GuardSarm 4.x, the <format> tag automatically converted the data layout into predefined profiles (json, cef, or splunk). In GuardSarm 5.x, the Notifications plugin does not include these pre-configured encoding profiles. To migrate specific formats (such as ArcSight CEF, Splunk key-value pairs, or custom JSON payloads), the structure must be manually designed inside the Message text block using Mustache syntax variables during the Action configuration phase.
 
-## Wazuh 4.x ossec.conf reference
+## GuardSarm 4.x ossec.conf reference
 
-Below is a typical Wazuh 4.x configuration block you may have in your `ossec.conf`. Use it as a reference when following the migration steps.
+Below is a typical GuardSarm 4.x configuration block you may have in your `ossec.conf`. Use it as a reference when following the migration steps.
 
-> **Port context:** In this legacy 4.x example, port `514` is the standard Syslog transport port (UDP/TCP). In Wazuh 5.x webhook routing, use the HTTP/HTTPS port exposed by your receiver (for example, `10515`).
+> **Port context:** In this legacy 4.x example, port `514` is the standard Syslog transport port (UDP/TCP). In GuardSarm 5.x webhook routing, use the HTTP/HTTPS port exposed by your receiver (for example, `10515`).
 
 ```xml
 <syslog_output>
@@ -51,15 +51,15 @@ Below is a typical Wazuh 4.x configuration block you may have in your `ossec.con
 
 Before proceeding, make sure you have:
 
-- Wazuh 5.0 or later fully deployed (indexer, manager, dashboard).
-- Access to the Wazuh dashboard as an administrator.
+- GuardSarm 5.0 or later fully deployed (indexer, manager, dashboard).
+- Access to the GuardSarm dashboard as an administrator.
 - The target endpoint URL and port prepared to receive incoming webhook traffic.
 
 ## 1. Setting up a Custom Webhook Notification Channel
 
 Instead of defining raw server endpoints inside XML blocks, destinations are now managed as reusable notification channels in the dashboard UI.
 
-1. Open the Wazuh dashboard and go to the **Notifications** plugin.
+1. Open the GuardSarm dashboard and go to the **Notifications** plugin.
 2. Go to **Channels** and click **Create channel**.
 3. Enter a **Name** for the channel (for example, `remote-syslog-webhook-channel`).
 4. (Optional) Provide a **Description** clarifying the purpose of this channel.
@@ -75,18 +75,18 @@ Instead of defining raw server endpoints inside XML blocks, destinations are now
 
 ## 2. Recreating Data Filters with Alerts and Monitors
 
-In Wazuh 4.x, you used `<syslog_output>` blocks with tags such as `<level>`, `<group>`, and `<rule_id>` to determine which events were forwarded. In Wazuh 5.0, the Alerting plugin executes periodic queries directly against your selected indexes.
+In GuardSarm 4.x, you used `<syslog_output>` blocks with tags such as `<level>`, `<group>`, and `<rule_id>` to determine which events were forwarded. In GuardSarm 5.0, the Alerting plugin executes periodic queries directly against your selected indexes.
 
 ### 2.1. Creating a monitor
 
-1. Navigate to the **Alerting** plugin in the Wazuh dashboard and select **Monitors**.
+1. Navigate to the **Alerting** plugin in the GuardSarm dashboard and select **Monitors**.
 2. Click **Create monitor**.
 3. Configure the monitor:
    - **Monitor name:** Enter a name (for example, `Syslog-Forwarding-Monitor`).
   - **Monitor type:** Select **Per query monitor** or **Per document monitor** depending on your forwarding behavior.
-  - **Indexes:** Use `wazuh-findings-v5*` when your filters depend on `wazuh.rule.*` fields (for example, `wazuh.rule.level`, `wazuh.rule.tags`, or `wazuh.rule.id`).
+  - **Indexes:** Use `guardsarm-findings-v5*` when your filters depend on `guardsarm.rule.*` fields (for example, `guardsarm.rule.level`, `guardsarm.rule.tags`, or `guardsarm.rule.id`).
 4. Under **Query / Data filter**, translate your old XML rules into dashboard filter conditions.
-  For example, to replicate a legacy `<group>` filter, add a condition where `wazuh.rule.tags` contains the expected value.
+  For example, to replicate a legacy `<group>` filter, add a condition where `guardsarm.rule.tags` contains the expected value.
 
 ![Notification Monitor](../../images/remote-syslog-output/create-notification-monitor.png)
 
@@ -96,7 +96,7 @@ In Wazuh 4.x, you used `<syslog_output>` blocks with tags such as `<level>`, `<g
 Triggers act as threshold selectors (similar to legacy `<level>` intent), while actions define the outbound payload format.
 
 1. Add a trigger and set its condition.
-2. Configure the trigger so it activates when your query matches events, and add a severity filter for the desired keywords in `wazuh.rule.level` (for example, `low`, `medium`, `high`, or `critical`). If you use a **Per document monitor**, use a document-level trigger condition.
+2. Configure the trigger so it activates when your query matches events, and add a severity filter for the desired keywords in `guardsarm.rule.level` (for example, `low`, `medium`, `high`, or `critical`). If you use a **Per document monitor**, use a document-level trigger condition.
 3. Under **Actions**, click **Add notification** and configure:
    - **Action name:** Provide a label (for example, `Send-Syslog-Payload`).
    - **Channel:** Select the custom webhook channel created in [Step 1](#1-setting-up-a-custom-webhook-notification-channel).
@@ -105,10 +105,10 @@ Triggers act as threshold selectors (similar to legacy `<level>` intent), while 
 ```json
 {
   "alert_id": "{{ctx.results.0.hits.hits.0._id}}",
-  "rule_id": "{{ctx.results.0.hits.hits.0._source.wazuh.rule.id}}",
-  "rule_title": "{{ctx.results.0.hits.hits.0._source.wazuh.rule.title}}",
-  "severity_level": "{{ctx.results.0.hits.hits.0._source.wazuh.rule.level}}",
-  "agent_name": "{{ctx.results.0.hits.hits.0._source.wazuh.agent.name}}",
+  "rule_id": "{{ctx.results.0.hits.hits.0._source.guardsarm.rule.id}}",
+  "rule_title": "{{ctx.results.0.hits.hits.0._source.guardsarm.rule.title}}",
+  "severity_level": "{{ctx.results.0.hits.hits.0._source.guardsarm.rule.level}}",
+  "agent_name": "{{ctx.results.0.hits.hits.0._source.guardsarm.agent.name}}",
   "event_dataset": "{{ctx.results.0.hits.hits.0._source.event.dataset}}"
 }
 ```
@@ -129,7 +129,7 @@ Triggers act as threshold selectors (similar to legacy `<level>` intent), while 
 <details>
 <summary>Example: recreating a legacy syslog forwarding filter</summary>
 
-If your Wazuh 4.x `ossec.conf` contained:
+If your GuardSarm 4.x `ossec.conf` contained:
 
 ```xml
 <syslog_output>
@@ -145,13 +145,13 @@ You can replicate this behavior with the following dashboard workflow:
 **Monitor setup:**
 
 - **Type:** Per query monitor
-- **Index pattern:** `wazuh-findings-v5*`
-- **Data filter:** `wazuh.rule.tags` contains `authentication_failed`
+- **Index pattern:** `guardsarm-findings-v5*`
+- **Data filter:** `guardsarm.rule.tags` contains `authentication_failed`
 
 **Trigger setup:**
 
 - **Condition:** Trigger when the query returns at least one matching document
-- **Data threshold filter:** `wazuh.rule.level` is one of `informational`, `low`, `medium`, `high`, or `critical` (adjust to the severity values present in your environment)
+- **Data threshold filter:** `guardsarm.rule.level` is one of `informational`, `low`, `medium`, `high`, or `critical` (adjust to the severity values present in your environment)
 
 **Action setup:**
 
@@ -161,9 +161,9 @@ You can replicate this behavior with the following dashboard workflow:
 ```json
 {
   "alert_id": "{{ctx.results.0.hits.hits.0._id}}",
-  "rule_description": "{{ctx.results.0.hits.hits.0._source.wazuh.rule.title}}",
-  "severity_level": "{{ctx.results.0.hits.hits.0._source.wazuh.rule.level}}",
-  "agent_host": "{{ctx.results.0.hits.hits.0._source.wazuh.agent.name}}"
+  "rule_description": "{{ctx.results.0.hits.hits.0._source.guardsarm.rule.title}}",
+  "severity_level": "{{ctx.results.0.hits.hits.0._source.guardsarm.rule.level}}",
+  "agent_host": "{{ctx.results.0.hits.hits.0._source.guardsarm.agent.name}}"
 }
 ```
 

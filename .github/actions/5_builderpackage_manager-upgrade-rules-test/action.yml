@@ -1,11 +1,11 @@
-name: 'Test Wazuh upgrade preservation rules'
-description: 'Prepare and validate file preserve/overwrite rules around Wazuh upgrades'
+name: 'Test GuardSarm upgrade preservation rules'
+description: 'Prepare and validate file preserve/overwrite rules around GuardSarm upgrades'
 inputs:
   mode:
     description: 'Execution mode: prepare, validate, or run'
     required: true
   component:
-    description: 'Wazuh component: manager or agent'
+    description: 'GuardSarm component: manager or agent'
     required: false
     default: manager
   system:
@@ -51,7 +51,7 @@ runs:
             exit 1
           fi
 
-          CONTAINER_NAME="wazuh_${{ inputs.component }}_upgrade_rules_${{ inputs.system }}_${GITHUB_RUN_ID:-local}_${GITHUB_RUN_ATTEMPT:-0}_${RANDOM}"
+          CONTAINER_NAME="guardsarm_${{ inputs.component }}_upgrade_rules_${{ inputs.system }}_${GITHUB_RUN_ID:-local}_${GITHUB_RUN_ATTEMPT:-0}_${RANDOM}"
           cleanup_container() {
             "${DOCKER[@]}" rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
           }

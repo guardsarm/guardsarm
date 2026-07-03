@@ -1,5 +1,5 @@
 name: "Install QA Integration Framework"
-description: "Resolves the correct branch and clones (and optionally pip-installs) the wazuh/qa-integration-framework"
+description: "Resolves the correct branch and clones (and optionally pip-installs) the guardsarm/qa-integration-framework"
 
 inputs:
   branch_name:
@@ -24,16 +24,16 @@ runs:
         INSTALL: ${{ inputs.install }}
       run: |
         VERSION="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' VERSION.json)"
-        if [ "X$(git ls-remote https://github.com/wazuh/qa-integration-framework.git "$BRANCH_NAME")" != "X" ]; then
+        if [ "X$(git ls-remote https://github.com/guardsarm/qa-integration-framework.git "$BRANCH_NAME")" != "X" ]; then
             QA_BRANCH="$BRANCH_NAME"
-        elif [ "X$(git ls-remote https://github.com/wazuh/qa-integration-framework.git "$BRANCH_BASE")" != "X" ]; then
+        elif [ "X$(git ls-remote https://github.com/guardsarm/qa-integration-framework.git "$BRANCH_BASE")" != "X" ]; then
             QA_BRANCH="$BRANCH_BASE"
-        elif [ "X$(git ls-remote https://github.com/wazuh/qa-integration-framework.git "${VERSION}")" != "X" ]; then
+        elif [ "X$(git ls-remote https://github.com/guardsarm/qa-integration-framework.git "${VERSION}")" != "X" ]; then
             QA_BRANCH="${VERSION}"
         else
             QA_BRANCH="main"
         fi
-        git clone -b "${QA_BRANCH}" --single-branch https://github.com/wazuh/qa-integration-framework.git
+        git clone -b "${QA_BRANCH}" --single-branch https://github.com/guardsarm/qa-integration-framework.git
         if [[ "$INSTALL" == "true" ]]; then
           if ! sudo python3 -m pip --version >/dev/null 2>&1; then
             if [ "$RUNNER_OS" = "macOS" ]; then

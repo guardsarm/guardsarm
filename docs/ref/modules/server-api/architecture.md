@@ -1,6 +1,6 @@
 # Architecture
 
-The Wazuh Server API is a layered system where an HTTP server delegates to a Python framework, which in turn communicates with internal daemons and databases through Unix sockets.
+The GuardSarm Server API is a layered system where an HTTP server delegates to a Python framework, which in turn communicates with internal daemons and databases through Unix sockets.
 
 ---
 
@@ -8,12 +8,12 @@ The Wazuh Server API is a layered system where an HTTP server delegates to a Pyt
 
 ```mermaid
 graph TD
-    A["Client (curl / SDK / Dashboard)"] --> B["Wazuh Server API (REST, JWT, RBAC)"]
-    B --> C["Wazuh Python Framework"]
+    A["Client (curl / SDK / Dashboard)"] --> B["GuardSarm Server API (REST, JWT, RBAC)"]
+    B --> C["GuardSarm Python Framework"]
     C --> D["Core Logic Layer"]
     
     D --> E["Unix sockets (daemons)"]
-    D --> F["Wazuh Database (WDB)"]
+    D --> F["GuardSarm Database (WDB)"]
     D --> G["Configuration files"]
     D --> H["Internal queues"]
 
@@ -32,7 +32,7 @@ graph TD
 ## Directory Structure
 
 ### API Interface Layer
-`wazuh/framework/wazuh/`
+`guardsarm/framework/guardsarm/`
 
 This layer:
 - Exposes API-facing functions
@@ -56,7 +56,7 @@ It **must not** contain business logic.
 ---
 
 ### Core Logic Layer
-`wazuh/framework/wazuh/core/`
+`guardsarm/framework/guardsarm/core/`
 
 This layer contains **all real logic**. It is **API-agnostic** and can be reused internally.
 
@@ -64,25 +64,25 @@ This layer contains **all real logic**. It is **API-agnostic** and can be reused
 |-----------|-------------|
 | `agent.py`, `manager.py`, etc. | Business logic implementation |
 | `common.py` | Global constants, paths, context variables, and utility functions |
-| `results.py` | Standardized result model (`WazuhResult`, `AffectedItemsWazuhResult`) |
+| `results.py` | Standardized result model (`GuardSarmResult`, `AffectedItemsGuardSarmResult`) |
 | `InputValidator.py` | Regex-based input validation (names, lengths) |
 | `utils.py` | General utilities (caching, process management, helpers) |
-| `wazuh_socket.py` | IPC with Wazuh daemons via Unix sockets |
-| `wazuh_queue.py` | Internal async messaging |
-| `wdb.py` | Async interface to Wazuh DB (length-prefixed Unix socket protocol) |
+| `guardsarm_socket.py` | IPC with GuardSarm daemons via Unix sockets |
+| `guardsarm_queue.py` | Internal async messaging |
+| `wdb.py` | Async interface to GuardSarm DB (length-prefixed Unix socket protocol) |
 | `wdb_http.py` | HTTP-based alternative WDB client (via `aiohttp`) |
-| `configuration.py` | Parse `wazuh-manager.conf` and related files |
+| `configuration.py` | Parse `guardsarm-manager.conf` and related files |
 | `exception.py` | Custom exception hierarchy and error code catalog |
 | `wlogging.py` | Custom log rotation with gzip compression |
 | `pyDaemonModule.py` | UNIX daemonization (double-fork pattern) |
 | `stats.py` | Statistics processing logic |
 | `cluster/` | Cluster architecture (master, worker, DAPI, HAProxy helper) |
-| `indexer/` | Wazuh Indexer integration (credentials, disconnected agents) |
+| `indexer/` | GuardSarm Indexer integration (credentials, disconnected agents) |
 
 ---
 
 ### API Server Layer
-`wazuh/api/api/`
+`guardsarm/api/api/`
 
 This layer implements the **HTTP server** that exposes the REST API.
 
@@ -120,7 +120,7 @@ Each controller wraps framework calls in the **DAPI (Distributed API)** layer to
 ---
 
 ### RBAC Sub-module
-`wazuh/framework/wazuh/rbac/`
+`guardsarm/framework/guardsarm/rbac/`
 
 | File | Responsibility |
 |------|----------------|
@@ -133,7 +133,7 @@ Each controller wraps framework calls in the **DAPI (Distributed API)** layer to
 ---
 
 ### Cluster Sub-module
-`wazuh/framework/wazuh/core/cluster/`
+`guardsarm/framework/guardsarm/core/cluster/`
 
 | File | Responsibility |
 |------|----------------|
@@ -154,11 +154,11 @@ Each controller wraps framework calls in the **DAPI (Distributed API)** layer to
 ---
 
 ### Indexer Sub-module
-`wazuh/framework/wazuh/core/indexer/`
+`guardsarm/framework/guardsarm/core/indexer/`
 
 | File | Responsibility |
 |------|----------------|
-| `indexer.py` | Main Wazuh Indexer client |
+| `indexer.py` | Main GuardSarm Indexer client |
 | `credential_manager.py` | Indexer credential management |
 | `disconnected_agents.py` | Handling disconnected agents in the indexer |
 | `max_version_components.py` | Version component handling |
@@ -176,14 +176,14 @@ Example: `GET /agents?status=active`
 5. Request is routed to the controller (`agent_controller.py`)
 6. Controller wraps the call in the **DAPI** layer for cluster routing
 7. DAPI determines the target node (`local_master`, `local_any`, etc.)
-8. Framework function (`wazuh/agent.py`) is invoked
+8. Framework function (`guardsarm/agent.py`) is invoked
 9. RBAC permissions are checked via `expose_resources` decorator
 10. Core logic (`core/agent.py`) is executed
 11. Data is fetched from:
     - WDB (via Unix socket or HTTP)
     - Manager daemon (via Unix socket)
     - Filesystem
-12. Result is wrapped in `AffectedItemsWazuhResult` or `WazuhResult`
+12. Result is wrapped in `AffectedItemsGuardSarmResult` or `GuardSarmResult`
 13. Result is serialized to JSON and returned
 
 ---
@@ -217,8 +217,8 @@ All framework functions return standardized result objects defined in `core/resu
 
 | Class | Description |
 |-------|-------------|
-| `WazuhResult` | Base dict-like result wrapper |
-| `AffectedItemsWazuhResult` | Tracks affected/failed items with error details |
+| `GuardSarmResult` | Base dict-like result wrapper |
+| `AffectedItemsGuardSarmResult` | Tracks affected/failed items with error details |
 
 Results support:
 - Merge operations (`|` operator) for combining results across cluster nodes
@@ -229,22 +229,22 @@ Results support:
 
 ## Socket Communication Protocol
 
-The framework communicates with Wazuh daemons via **Unix domain sockets** using a length-prefixed protocol.
+The framework communicates with GuardSarm daemons via **Unix domain sockets** using a length-prefixed protocol.
 
 ### Protocol Details
 - Messages use a **4-byte little-endian header** indicating the payload length
 - The same framing is used for both sending and receiving
-- `WazuhAsyncSocket` (in `core/wdb.py`) handles async socket connections
+- `GuardSarmAsyncSocket` (in `core/wdb.py`) handles async socket connections
 
 ### Key Socket Paths
 
 | Socket | Daemon | Purpose |
 |--------|--------|---------|
-| `queue/db/wdb` | wazuh-manager-db | Database queries (length-prefixed socket protocol) |
-| `queue/sockets/wdb-http.sock` | wazuh-manager-db | HTTP-based database queries (`wdb_http.py`) |
-| `queue/sockets/analysis` | wazuh-manager-analysisd | Engine stats and metrics (HTTP API, `engine_http.py`) |
-| `queue/sockets/auth` | wazuh-manager-authd | Agent registration |
-| `queue/sockets/remote` | wazuh-manager-remoted | Agent communication |
+| `queue/db/wdb` | guardsarm-manager-db | Database queries (length-prefixed socket protocol) |
+| `queue/sockets/wdb-http.sock` | guardsarm-manager-db | HTTP-based database queries (`wdb_http.py`) |
+| `queue/sockets/analysis` | guardsarm-manager-analysisd | Engine stats and metrics (HTTP API, `engine_http.py`) |
+| `queue/sockets/auth` | guardsarm-manager-authd | Agent registration |
+| `queue/sockets/remote` | guardsarm-manager-remoted | Agent communication |
 | `queue/sockets/request` | various | Internal requests |
 
 ---

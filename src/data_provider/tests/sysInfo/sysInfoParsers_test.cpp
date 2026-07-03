@@ -1,5 +1,5 @@
 /*
- * Wazuh SysInfoParsers
+ * GuardSarm SysInfoParsers
  * Copyright (C) 2015, Wazuh Inc.
  * October 19, 2020.
  *

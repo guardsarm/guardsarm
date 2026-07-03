@@ -10,13 +10,13 @@ import re
 import pytest
 from datetime import datetime, timedelta, timedelta
 # qa-integration-framework imports
-from wazuh_testing.constants.paths.aws import S3_CLOUDTRAIL_DB_PATH, AWS_SERVICES_DB_PATH
-from wazuh_testing.constants.aws import ONLY_LOGS_AFTER_PARAM, VPC_FLOW_TYPE, US_EAST_1_REGION
-from wazuh_testing.utils.db_queries.aws_db import get_multiple_s3_db_row, get_service_db_row, get_s3_db_row
-from wazuh_testing.modules.aws.utils import (call_aws_module, upload_log_events, create_log_stream, path_exist,
+from guardsarm_testing.constants.paths.aws import S3_CLOUDTRAIL_DB_PATH, AWS_SERVICES_DB_PATH
+from guardsarm_testing.constants.aws import ONLY_LOGS_AFTER_PARAM, VPC_FLOW_TYPE, US_EAST_1_REGION
+from guardsarm_testing.utils.db_queries.aws_db import get_multiple_s3_db_row, get_service_db_row, get_s3_db_row
+from guardsarm_testing.modules.aws.utils import (call_aws_module, upload_log_events, create_log_stream, path_exist,
                                              get_last_file_key, analyze_command_output,
                                              generate_file, upload_bucket_file)
-from wazuh_testing.modules.aws.patterns import (NO_LOG_PROCESSED, NO_BUCKET_LOG_PROCESSED, MARKER, NO_NEW_EVENTS,
+from guardsarm_testing.modules.aws.patterns import (NO_LOG_PROCESSED, NO_BUCKET_LOG_PROCESSED, MARKER, NO_NEW_EVENTS,
                                                 EVENT_SENT)
 
 # Local module imports
@@ -42,7 +42,7 @@ configurator.configure_test(configuration_file='bucket_configuration_without_onl
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_bucket_without_only_logs_after(
-        test_configuration, metadata, create_test_bucket, manage_bucket_files, set_wazuh_configuration, clean_s3_cloudtrail_db,
+        test_configuration, metadata, create_test_bucket, manage_bucket_files, set_guardsarm_configuration, clean_s3_cloudtrail_db,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler,
         file_monitoring
 ):
@@ -50,21 +50,21 @@ def test_bucket_without_only_logs_after(
     description: Only the log uploaded during execution is processed.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has appeared calling the module with correct parameters.
             - Check the expected number of events were sent to analysisd. Only the logs whose timestamp is greater than
               the date specified in the configuration should be processed.
             - Check the database was created and updated accordingly.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
             - Delete the uploaded file.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -78,7 +78,7 @@ def test_bucket_without_only_logs_after(
         - manage_bucket_files:
             type: fixture
             brief: S3 buckets manager.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - clean_s3_cloudtrail_db:
@@ -89,10 +89,10 @@ def test_bucket_without_only_logs_after(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
-        - restart_wazuh_daemon_function:
+            brief: Truncate guardsarm logs.
+        - restart_guardsarm_daemon_function:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -171,28 +171,28 @@ configurator.configure_test(configuration_file='service_configuration_without_on
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_service_without_only_logs_after(
-        test_configuration, metadata, create_test_log_group, create_test_log_stream, manage_log_group_events, set_wazuh_configuration, clean_aws_services_db,
+        test_configuration, metadata, create_test_log_group, create_test_log_stream, manage_log_group_events, set_guardsarm_configuration, clean_aws_services_db,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler, file_monitoring
 ):
     """
     description: Only the event created during execution is processed.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has appeared calling the module with correct parameters.
             - Check the expected number of events were sent to analysisd. Only the logs whose timestamp is greater than
               the date specified in the configuration should be processed.
             - Check the database was created and updated accordingly.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
             - Delete the uploaded file.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -209,7 +209,7 @@ def test_service_without_only_logs_after(
         - manage_log_group_events:
             type: fixture
             brief: Manage events for the created log stream and log group.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - clean_aws_services_db:
@@ -220,10 +220,10 @@ def test_service_without_only_logs_after(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
-        - restart_wazuh_daemon_function:
+            brief: Truncate guardsarm logs.
+        - restart_guardsarm_daemon_function:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -290,28 +290,28 @@ configurator.configure_test(configuration_file='bucket_configuration_with_only_l
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_bucket_with_only_logs_after(
-        test_configuration, metadata, create_test_bucket, manage_bucket_files, set_wazuh_configuration, clean_s3_cloudtrail_db,
+        test_configuration, metadata, create_test_bucket, manage_bucket_files, set_guardsarm_configuration, clean_s3_cloudtrail_db,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler, file_monitoring
 ):
     """
     description: All logs with a timestamp greater than the only_logs_after value are processed.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has appeared calling the module with correct parameters.
             - Check the expected number of events were sent to analysisd. Only the logs whose timestamp is greater than
               the date specified in the configuration should be processed.
             - Check the database was created and updated accordingly
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
             - Delete the uploaded file.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -325,7 +325,7 @@ def test_bucket_with_only_logs_after(
         - manage_bucket_files:
             type: fixture
             brief: S3 buckets manager.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - clean_s3_cloudtrail_db:
@@ -336,10 +336,10 @@ def test_bucket_with_only_logs_after(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
-        - restart_wazuh_daemon_function:
+            brief: Truncate guardsarm logs.
+        - restart_guardsarm_daemon_function:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -421,28 +421,28 @@ configurator.configure_test(configuration_file='cloudwatch_configuration_with_on
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_cloudwatch_with_only_logs_after(
-        test_configuration, metadata, create_test_log_group, create_test_log_stream, manage_log_group_events, set_wazuh_configuration, clean_aws_services_db,
+        test_configuration, metadata, create_test_log_group, create_test_log_stream, manage_log_group_events, set_guardsarm_configuration, clean_aws_services_db,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler, file_monitoring
 ):
     """
     description: All events with a timestamp greater than the only_logs_after value are processed.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has appeared calling the module with correct parameters.
             - Check the expected number of events were sent to analysisd. Only the logs whose timestamp is greater than
               the date specified in the configuration should be processed.
             - Check the database was created and updated accordingly.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
             - Delete the uploaded file.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -459,7 +459,7 @@ def test_cloudwatch_with_only_logs_after(
         - manage_log_group_events:
             type: fixture
             brief: Manage events for the created log stream and log group.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - clean_aws_services_db:
@@ -470,10 +470,10 @@ def test_cloudwatch_with_only_logs_after(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
-        - restart_wazuh_daemon_function:
+            brief: Truncate guardsarm logs.
+        - restart_guardsarm_daemon_function:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -553,28 +553,28 @@ configurator.configure_test(configuration_file='inspector_configuration_with_onl
                          zip(configurator.test_configuration_template, configurator.metadata),
                          ids=configurator.cases_ids)
 def test_inspector_with_only_logs_after(
-        test_configuration, metadata, set_wazuh_configuration, clean_aws_services_db,
+        test_configuration, metadata, set_guardsarm_configuration, clean_aws_services_db,
         configure_local_internal_options_function, truncate_monitored_files, daemons_handler, file_monitoring
 ):
     """
     description: All events with a timestamp greater than the only_logs_after value are processed.
     test_phases:
         - setup:
-            - Load Wazuh light configuration.
+            - Load GuardSarm light configuration.
             - Apply ossec.conf configuration changes according to the configuration template and use case.
             - Apply custom settings in local_internal_options.conf.
-            - Truncate wazuh logs.
-            - Restart wazuh-manager service to apply configuration changes.
+            - Truncate guardsarm logs.
+            - Restart guardsarm-manager service to apply configuration changes.
         - test:
             - Check in the ossec.log that a line has appeared calling the module with correct parameters.
             - Check the expected number of events were sent to analysisd. Only the logs whose timestamp is greater than
               the date specified in the configuration should be processed.
             - Check the database was created and updated accordingly.
         - teardown:
-            - Truncate wazuh logs.
+            - Truncate guardsarm logs.
             - Restore initial configuration, both ossec.conf and local_internal_options.conf.
             - Delete the uploaded file.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - test_configuration:
             type: dict
@@ -582,7 +582,7 @@ def test_inspector_with_only_logs_after(
         - metadata:
             type: dict
             brief: Get metadata from the module.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
         - clean_aws_services_db:
@@ -593,10 +593,10 @@ def test_inspector_with_only_logs_after(
             brief: Apply changes to the local_internal_options.conf configuration.
         - truncate_monitored_files:
             type: fixture
-            brief: Truncate wazuh logs.
-        - restart_wazuh_daemon_function:
+            brief: Truncate guardsarm logs.
+        - restart_guardsarm_daemon_function:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - file_monitoring:
             type: fixture
             brief: Handle the monitoring of a specified file.
@@ -722,7 +722,7 @@ def test_bucket_multiple_calls(
         - teardown:
             - Delete the `s3_cloudtrail.db`.
             - Delete the uploaded files.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - metadata:
             type: dict
@@ -739,9 +739,9 @@ def test_bucket_multiple_calls(
         - clean_s3_cloudtrail_db:
             type: fixture
             brief: Delete the DB file before and after the test execution.
-        - restart_wazuh_daemon:
+        - restart_guardsarm_daemon:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - delete_file_from_s3:
             type: fixture
             brief: Delete the file after the test execution.
@@ -910,7 +910,7 @@ def test_inspector_multiple_calls(
               were processed, there were no duplicates.
         - teardown:
             - Delete the `aws_services.db`.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - metadata:
             type: dict
@@ -918,9 +918,9 @@ def test_inspector_multiple_calls(
         - clean_aws_services_db:
             type: fixture
             brief: Delete the DB file before and after the test execution.
-        - restart_wazuh_daemon:
+        - restart_guardsarm_daemon:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
     input_description:
         - The `cases_multiple_calls` file provides the test cases.
     """
@@ -1005,7 +1005,7 @@ def test_cloudwatch_multiple_calls(
         - teardown:
             - Delete the `aws_services.db`.
             - Delete the uploaded files.
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
     parameters:
         - metadata:
             type: dict
@@ -1022,9 +1022,9 @@ def test_cloudwatch_multiple_calls(
         - clean_aws_services_db:
             type: fixture
             brief: Delete the DB file before and after the test execution.
-        - restart_wazuh_daemon:
+        - restart_guardsarm_daemon:
             type: fixture
-            brief: Restart the wazuh service.
+            brief: Restart the guardsarm service.
         - delete_log_stream:
             type: fixture
             brief: Delete the log stream after the test execution.

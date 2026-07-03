@@ -23,10 +23,10 @@
 #include "../wrappers/libc/stdlib_wrappers.h"
 #include "../wrappers/posix/stat_wrappers.h"
 #include "../wrappers/posix/unistd_wrappers.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/shared/file_op_wrappers.h"
-#include "../wrappers/wazuh/shared/string_op_wrappers.h"
-#include "../wrappers/wazuh/shared/utf8_winapi_wrapper_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/file_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/string_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/utf8_winapi_wrapper_wrappers.h"
 #include "../wrappers/externals/zlib/zlib_wrappers.h"
 #ifdef WIN32
 #include "../wrappers/windows/fileapi_wrappers.h"
@@ -799,9 +799,9 @@ void test_w_uncompress_gzfile_success(void **state) {
 
 // w_homedir
 //
-// Note: WAZUH_HOME_ENV resolves to "WAZUH_MANAGER_HOME" or "WAZUH_AGENT_HOME"
+// Note: GUARDSARM_HOME_ENV resolves to "GUARDSARM_MANAGER_HOME" or "GUARDSARM_AGENT_HOME"
 // at compile time depending on -DCLIENT. The test binary and the linked
-// libwazuh_test.a may be built under different CLIENT settings, so the env
+// libguardsarm_test.a may be built under different CLIENT settings, so the env
 // var name passed to __wrap_getenv() is not asserted here — expect_any() is
 // used instead of expect_string().
 
@@ -813,20 +813,20 @@ void test_w_homedir_env_var(void **state)
 
     // env var set -> realpath() not called.
     expect_any(__wrap_getenv, name);
-    will_return(__wrap_getenv, "/home/wazuh");
+    will_return(__wrap_getenv, "/home/guardsarm");
 
-    expect_string(__wrap_stat, __file, "/home/wazuh");
+    expect_string(__wrap_stat, __file, "/home/guardsarm");
     will_return(__wrap_stat, &stat_buf);
     will_return(__wrap_stat, 0);
 
     val = w_homedir(argv0);
-    assert_string_equal(val, "/home/wazuh");
+    assert_string_equal(val, "/home/guardsarm");
     free(val);
 }
 
 void test_w_homedir_first_attempt(void **state)
 {
-    char *argv0 = "/usr/share/wazuh/bin/test";
+    char *argv0 = "/usr/share/guardsarm/bin/test";
     struct stat stat_buf = { .st_mode = 0040000 }; // S_IFDIR
     char *val = NULL;
 
@@ -836,18 +836,18 @@ void test_w_homedir_first_attempt(void **state)
     expect_string(__wrap_realpath, path, "/proc/self/exe");
     will_return(__wrap_realpath, argv0);
 
-    expect_string(__wrap_stat, __file, "/usr/share/wazuh");
+    expect_string(__wrap_stat, __file, "/usr/share/guardsarm");
     will_return(__wrap_stat, &stat_buf);
     will_return(__wrap_stat, 0);
 
     val = w_homedir(argv0);
-    assert_string_equal(val, "/usr/share/wazuh");
+    assert_string_equal(val, "/usr/share/guardsarm");
     free(val);
 }
 
 void test_w_homedir_second_attempt(void **state)
 {
-    char *argv0 = "/usr/share/wazuh/bin/test";
+    char *argv0 = "/usr/share/guardsarm/bin/test";
     struct stat stat_buf = { .st_mode = 0040000 }; // S_IFDIR
     char *val = NULL;
 
@@ -860,18 +860,18 @@ void test_w_homedir_second_attempt(void **state)
     expect_string(__wrap_realpath, path, "/proc/curproc/file");
     will_return(__wrap_realpath, argv0);
 
-    expect_string(__wrap_stat, __file, "/usr/share/wazuh");
+    expect_string(__wrap_stat, __file, "/usr/share/guardsarm");
     will_return(__wrap_stat, &stat_buf);
     will_return(__wrap_stat, 0);
 
     val = w_homedir(argv0);
-    assert_string_equal(val, "/usr/share/wazuh");
+    assert_string_equal(val, "/usr/share/guardsarm");
     free(val);
 }
 
 void test_w_homedir_third_attempt(void **state)
 {
-    char *argv0 = "/usr/share/wazuh/bin/test";
+    char *argv0 = "/usr/share/guardsarm/bin/test";
     struct stat stat_buf = { .st_mode = 0040000 }; // S_IFDIR
     char *val = NULL;
 
@@ -887,18 +887,18 @@ void test_w_homedir_third_attempt(void **state)
     expect_string(__wrap_realpath, path, "/proc/self/path/a.out");
     will_return(__wrap_realpath, argv0);
 
-    expect_string(__wrap_stat, __file, "/usr/share/wazuh");
+    expect_string(__wrap_stat, __file, "/usr/share/guardsarm");
     will_return(__wrap_stat, &stat_buf);
     will_return(__wrap_stat, 0);
 
     val = w_homedir(argv0);
-    assert_string_equal(val, "/usr/share/wazuh");
+    assert_string_equal(val, "/usr/share/guardsarm");
     free(val);
 }
 
 void test_w_homedir_check_argv0(void **state)
 {
-    char *argv0 = "/usr/share/wazuh/bin/test";
+    char *argv0 = "/usr/share/guardsarm/bin/test";
     struct stat stat_buf = { .st_mode = 0040000 }; // S_IFDIR
     char *val = NULL;
 
@@ -916,12 +916,12 @@ void test_w_homedir_check_argv0(void **state)
     expect_string(__wrap_realpath, path, argv0);
     will_return(__wrap_realpath, argv0);
 
-    expect_string(__wrap_stat, __file, "/usr/share/wazuh");
+    expect_string(__wrap_stat, __file, "/usr/share/guardsarm");
     will_return(__wrap_stat, &stat_buf);
     will_return(__wrap_stat, 0);
 
     val = w_homedir(argv0);
-    assert_string_equal(val, "/usr/share/wazuh");
+    assert_string_equal(val, "/usr/share/guardsarm");
     free(val);
 }
 
@@ -941,7 +941,7 @@ void test_w_homedir_stat_fail(void **state)
     will_return(__wrap_stat, -1);
 
     // HOME_ERROR resolves to a target-specific string at compile time (see
-    // note above on WAZUH_HOME_ENV); the lib and the test may have been
+    // note above on GUARDSARM_HOME_ENV); the lib and the test may have been
     // built under different CLIENT settings, so the exact message is not
     // asserted — only that merror_exit() is reached.
     expect_any(__wrap__merror_exit, formatted_msg);

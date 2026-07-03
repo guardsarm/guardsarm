@@ -24,17 +24,17 @@ assignees: ''
 ## Considerations
 
 - Testing environment: Deploy the new OS taking into account the following notes:
-  - If the Wazuh central components are supported: 1 VM for each architecture supported.
-  - If the Wazuh agent is supported: 1 VM for each architecture supported.
-  - If the Wazuh central components or the Wazuh agent is not supported, deploy a Debian 12 VM for the non-supported component.
+  - If the GuardSarm central components are supported: 1 VM for each architecture supported.
+  - If the GuardSarm agent is supported: 1 VM for each architecture supported.
+  - If the GuardSarm central components or the GuardSarm agent is not supported, deploy a Debian 12 VM for the non-supported component.
 - All testing tasks must be completed for each OS architecture supported.
 - The following tasks should be completed in order.
 - Use the Provisioner module to deploy needed systems.
 
 ## Tasks
 
-- [ ] Test the Wazuh dashboard one-liner deployment.
-  - [ ] Deploy a Wazuh agent using the Wazuh dashboard one-liner feature provided in the Wazuh user interface with the following cases.
+- [ ] Test the GuardSarm dashboard one-liner deployment.
+  - [ ] Deploy a GuardSarm agent using the GuardSarm dashboard one-liner feature provided in the GuardSarm user interface with the following cases.
     - [ ] Only IP address.
     - [ ] Only FQDN.
     - [ ] IP address, agent name, and group.

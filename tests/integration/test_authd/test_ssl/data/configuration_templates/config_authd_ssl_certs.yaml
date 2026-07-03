@@ -28,10 +28,10 @@
     - ssl_verify_host:
         value: SSL_VERIFY_HOST
     - ssl_manager_cert:
-        value: '/var/wazuh-manager/etc/sslmanager.cert'
+        value: '/var/guardsarm-manager/etc/sslmanager.cert'
     - ssl_manager_key:
-        value: '/var/wazuh-manager/etc/sslmanager.key'
+        value: '/var/guardsarm-manager/etc/sslmanager.key'
     - ssl_auto_negotiate:
         value: 'no'
     - ssl_agent_ca:
-        value: '/var/wazuh-manager/etc/test_rootCA.pem'
+        value: '/var/guardsarm-manager/etc/test_rootCA.pem'

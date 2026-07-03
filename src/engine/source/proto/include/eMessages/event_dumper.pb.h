@@ -47,7 +47,7 @@ struct TableStruct_event_5fdumper_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_event_5fdumper_2eproto;
 namespace com {
-namespace wazuh {
+namespace guardsarm {
 namespace api {
 namespace engine {
 namespace event_dumper {
@@ -66,16 +66,16 @@ extern EventDumperStatus_ResponseDefaultTypeInternal _EventDumperStatus_Response
 }  // namespace event_dumper
 }  // namespace engine
 }  // namespace api
-}  // namespace wazuh
+}  // namespace guardsarm
 }  // namespace com
 PROTOBUF_NAMESPACE_OPEN
-template<> ::com::wazuh::api::engine::event_dumper::EventDumperActivate_Request* Arena::CreateMaybeMessage<::com::wazuh::api::engine::event_dumper::EventDumperActivate_Request>(Arena*);
-template<> ::com::wazuh::api::engine::event_dumper::EventDumperDeactivate_Request* Arena::CreateMaybeMessage<::com::wazuh::api::engine::event_dumper::EventDumperDeactivate_Request>(Arena*);
-template<> ::com::wazuh::api::engine::event_dumper::EventDumperStatus_Request* Arena::CreateMaybeMessage<::com::wazuh::api::engine::event_dumper::EventDumperStatus_Request>(Arena*);
-template<> ::com::wazuh::api::engine::event_dumper::EventDumperStatus_Response* Arena::CreateMaybeMessage<::com::wazuh::api::engine::event_dumper::EventDumperStatus_Response>(Arena*);
+template<> ::com::guardsarm::api::engine::event_dumper::EventDumperActivate_Request* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::event_dumper::EventDumperActivate_Request>(Arena*);
+template<> ::com::guardsarm::api::engine::event_dumper::EventDumperDeactivate_Request* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::event_dumper::EventDumperDeactivate_Request>(Arena*);
+template<> ::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Request* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Request>(Arena*);
+template<> ::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Response* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Response>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace com {
-namespace wazuh {
+namespace guardsarm {
 namespace api {
 namespace engine {
 namespace event_dumper {
@@ -83,7 +83,7 @@ namespace event_dumper {
 // ===================================================================
 
 class EventDumperActivate_Request final :
-    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.event_dumper.EventDumperActivate_Request) */ {
+    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.event_dumper.EventDumperActivate_Request) */ {
  public:
   inline EventDumperActivate_Request() : EventDumperActivate_Request(nullptr) {}
   explicit PROTOBUF_CONSTEXPR EventDumperActivate_Request(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
@@ -171,7 +171,7 @@ class EventDumperActivate_Request final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.event_dumper.EventDumperActivate_Request";
+    return "com.guardsarm.api.engine.event_dumper.EventDumperActivate_Request";
   }
   protected:
   explicit EventDumperActivate_Request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -187,7 +187,7 @@ class EventDumperActivate_Request final :
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.event_dumper.EventDumperActivate_Request)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.event_dumper.EventDumperActivate_Request)
  private:
   class _Internal;
 
@@ -201,7 +201,7 @@ class EventDumperActivate_Request final :
 // -------------------------------------------------------------------
 
 class EventDumperDeactivate_Request final :
-    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.event_dumper.EventDumperDeactivate_Request) */ {
+    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.event_dumper.EventDumperDeactivate_Request) */ {
  public:
   inline EventDumperDeactivate_Request() : EventDumperDeactivate_Request(nullptr) {}
   explicit PROTOBUF_CONSTEXPR EventDumperDeactivate_Request(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
@@ -289,7 +289,7 @@ class EventDumperDeactivate_Request final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.event_dumper.EventDumperDeactivate_Request";
+    return "com.guardsarm.api.engine.event_dumper.EventDumperDeactivate_Request";
   }
   protected:
   explicit EventDumperDeactivate_Request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -305,7 +305,7 @@ class EventDumperDeactivate_Request final :
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.event_dumper.EventDumperDeactivate_Request)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.event_dumper.EventDumperDeactivate_Request)
  private:
   class _Internal;
 
@@ -319,7 +319,7 @@ class EventDumperDeactivate_Request final :
 // -------------------------------------------------------------------
 
 class EventDumperStatus_Request final :
-    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.event_dumper.EventDumperStatus_Request) */ {
+    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Request) */ {
  public:
   inline EventDumperStatus_Request() : EventDumperStatus_Request(nullptr) {}
   explicit PROTOBUF_CONSTEXPR EventDumperStatus_Request(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
@@ -407,7 +407,7 @@ class EventDumperStatus_Request final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.event_dumper.EventDumperStatus_Request";
+    return "com.guardsarm.api.engine.event_dumper.EventDumperStatus_Request";
   }
   protected:
   explicit EventDumperStatus_Request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -423,7 +423,7 @@ class EventDumperStatus_Request final :
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.event_dumper.EventDumperStatus_Request)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Request)
  private:
   class _Internal;
 
@@ -437,7 +437,7 @@ class EventDumperStatus_Request final :
 // -------------------------------------------------------------------
 
 class EventDumperStatus_Response final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response) */ {
  public:
   inline EventDumperStatus_Response() : EventDumperStatus_Response(nullptr) {}
   ~EventDumperStatus_Response() override;
@@ -540,7 +540,7 @@ class EventDumperStatus_Response final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.event_dumper.EventDumperStatus_Response";
+    return "com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response";
   }
   protected:
   explicit EventDumperStatus_Response(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -579,13 +579,13 @@ class EventDumperStatus_Response final :
   std::string* _internal_mutable_error();
   public:
 
-  // .com.wazuh.api.engine.ReturnStatus status = 1;
+  // .com.guardsarm.api.engine.ReturnStatus status = 1;
   void clear_status();
-  ::com::wazuh::api::engine::ReturnStatus status() const;
-  void set_status(::com::wazuh::api::engine::ReturnStatus value);
+  ::com::guardsarm::api::engine::ReturnStatus status() const;
+  void set_status(::com::guardsarm::api::engine::ReturnStatus value);
   private:
-  ::com::wazuh::api::engine::ReturnStatus _internal_status() const;
-  void _internal_set_status(::com::wazuh::api::engine::ReturnStatus value);
+  ::com::guardsarm::api::engine::ReturnStatus _internal_status() const;
+  void _internal_set_status(::com::guardsarm::api::engine::ReturnStatus value);
   public:
 
   // bool active = 3;
@@ -597,7 +597,7 @@ class EventDumperStatus_Response final :
   void _internal_set_active(bool value);
   public:
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response)
  private:
   class _Internal;
 
@@ -637,24 +637,24 @@ class EventDumperStatus_Response final :
 
 // EventDumperStatus_Response
 
-// .com.wazuh.api.engine.ReturnStatus status = 1;
+// .com.guardsarm.api.engine.ReturnStatus status = 1;
 inline void EventDumperStatus_Response::clear_status() {
   _impl_.status_ = 0;
 }
-inline ::com::wazuh::api::engine::ReturnStatus EventDumperStatus_Response::_internal_status() const {
-  return static_cast< ::com::wazuh::api::engine::ReturnStatus >(_impl_.status_);
+inline ::com::guardsarm::api::engine::ReturnStatus EventDumperStatus_Response::_internal_status() const {
+  return static_cast< ::com::guardsarm::api::engine::ReturnStatus >(_impl_.status_);
 }
-inline ::com::wazuh::api::engine::ReturnStatus EventDumperStatus_Response::status() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response.status)
+inline ::com::guardsarm::api::engine::ReturnStatus EventDumperStatus_Response::status() const {
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response.status)
   return _internal_status();
 }
-inline void EventDumperStatus_Response::_internal_set_status(::com::wazuh::api::engine::ReturnStatus value) {
+inline void EventDumperStatus_Response::_internal_set_status(::com::guardsarm::api::engine::ReturnStatus value) {
   
   _impl_.status_ = value;
 }
-inline void EventDumperStatus_Response::set_status(::com::wazuh::api::engine::ReturnStatus value) {
+inline void EventDumperStatus_Response::set_status(::com::guardsarm::api::engine::ReturnStatus value) {
   _internal_set_status(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response.status)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response.status)
 }
 
 // optional string error = 2;
@@ -670,7 +670,7 @@ inline void EventDumperStatus_Response::clear_error() {
   _impl_._has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& EventDumperStatus_Response::error() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response.error)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response.error)
   return _internal_error();
 }
 template <typename ArgT0, typename... ArgT>
@@ -678,11 +678,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void EventDumperStatus_Response::set_error(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000001u;
  _impl_.error_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response.error)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response.error)
 }
 inline std::string* EventDumperStatus_Response::mutable_error() {
   std::string* _s = _internal_mutable_error();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response.error)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response.error)
   return _s;
 }
 inline const std::string& EventDumperStatus_Response::_internal_error() const {
@@ -697,7 +697,7 @@ inline std::string* EventDumperStatus_Response::_internal_mutable_error() {
   return _impl_.error_.Mutable(GetArenaForAllocation());
 }
 inline std::string* EventDumperStatus_Response::release_error() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response.error)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response.error)
   if (!_internal_has_error()) {
     return nullptr;
   }
@@ -722,7 +722,7 @@ inline void EventDumperStatus_Response::set_allocated_error(std::string* error) 
     _impl_.error_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response.error)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response.error)
 }
 
 // bool active = 3;
@@ -733,7 +733,7 @@ inline bool EventDumperStatus_Response::_internal_active() const {
   return _impl_.active_;
 }
 inline bool EventDumperStatus_Response::active() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response.active)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response.active)
   return _internal_active();
 }
 inline void EventDumperStatus_Response::_internal_set_active(bool value) {
@@ -742,7 +742,7 @@ inline void EventDumperStatus_Response::_internal_set_active(bool value) {
 }
 inline void EventDumperStatus_Response::set_active(bool value) {
   _internal_set_active(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response.active)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response.active)
 }
 
 #ifdef __GNUC__
@@ -760,7 +760,7 @@ inline void EventDumperStatus_Response::set_active(bool value) {
 }  // namespace event_dumper
 }  // namespace engine
 }  // namespace api
-}  // namespace wazuh
+}  // namespace guardsarm
 }  // namespace com
 
 // @@protoc_insertion_point(global_scope)

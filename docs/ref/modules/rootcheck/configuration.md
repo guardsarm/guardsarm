@@ -185,7 +185,7 @@ Base directory that will be prefixed to the `/dev` directory scan.
 | **Default (Windows)** | C:\ |
 | **Allowed values** | Any valid directory path |
 
-> **Note:** In Wazuh 5.0, this option only affects `/dev` directory scanning since file check and trojan scan features have been removed.
+> **Note:** In GuardSarm 5.0, this option only affects `/dev` directory scanning since file check and trojan scan features have been removed.
 
 **Example:**
 ```xml
@@ -336,7 +336,7 @@ grep rootcheck /var/ossec/logs/ossec.log
 2. Check scan frequency - wait for next scheduled scan
 3. Force immediate scan:
    ```bash
-   /var/ossec/bin/wazuh-control restart
+   /var/ossec/bin/guardsarm-control restart
    ```
 4. Check agent connection to manager
 

@@ -1,5 +1,5 @@
 /*
- * Wazuh Content Manager - Component Tests
+ * GuardSarm Content Manager - Component Tests
  * Copyright (C) 2015, Wazuh Inc.
  * Dec 18, 2023.
  *

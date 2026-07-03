@@ -13,7 +13,7 @@
 #include "shared.h"
 #include "audit_op.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 #define static
 #endif
 

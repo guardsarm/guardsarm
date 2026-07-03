@@ -37,6 +37,6 @@ test:
     expected:
         number: 1234
         organization:
-          name: " Wazuh Organization"
+          name: " GuardSarm Organization"
 
     description: Get as of public ip

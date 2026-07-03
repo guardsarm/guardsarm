@@ -24,8 +24,8 @@ retag_image(){
     DOCKER_IMAGE_NAME="$1"
     OLD_TAG="$2"
     NEW_TAG="$3"
-    GITHUB_REPOSITORY="wazuh/wazuh"
-    GITHUB_OWNER="wazuh"
+    GITHUB_REPOSITORY="guardsarm/guardsarm"
+    GITHUB_OWNER="guardsarm"
     IMAGE_ID=$(echo "ghcr.io/${GITHUB_OWNER}/${DOCKER_IMAGE_NAME}" | tr '[A-Z]' '[a-z]')
 
     # Bring old tag

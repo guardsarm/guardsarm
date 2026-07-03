@@ -6,8 +6,8 @@ on:
     types: [synchronize, opened, reopened, ready_for_review]
     paths:
       - ".github/workflows/5_codeanalysis_api-rbac-db-version.yml"
-      - "framework/wazuh/rbac/default/**"
-      - "framework/wazuh/rbac/orm.py"
+      - "framework/guardsarm/rbac/default/**"
+      - "framework/guardsarm/rbac/orm.py"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
@@ -38,9 +38,9 @@ jobs:
         with:
           filters: |
             rbac_defaults:
-              - 'framework/wazuh/rbac/default/**'
+              - 'framework/guardsarm/rbac/default/**'
             orm_handler:
-              - 'framework/wazuh/rbac/orm.py'
+              - 'framework/guardsarm/rbac/orm.py'
 
       - name: Validate RBAC DB version bump
         if: steps.check_skip.outputs.skip != 'true' && steps.filter.outputs.rbac_defaults == 'true'
@@ -52,7 +52,7 @@ jobs:
             exit 1
           fi
 
-          if ! git diff "origin/${{ github.base_ref }}" HEAD -- framework/wazuh/rbac/orm.py | grep -q 'CURRENT_ORM_VERSION'; then
+          if ! git diff "origin/${{ github.base_ref }}" HEAD -- framework/guardsarm/rbac/orm.py | grep -q 'CURRENT_ORM_VERSION'; then
             echo "::error::CURRENT_ORM_VERSION was not bumped in orm.py."
             exit 1
           fi

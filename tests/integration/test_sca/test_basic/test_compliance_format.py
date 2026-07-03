@@ -17,7 +17,7 @@ targets:
     - agent
 
 daemons:
-    - wazuh-modulesd
+    - guardsarm-modulesd
 
 os_platform:
     - linux
@@ -30,7 +30,7 @@ os_version:
     - Windows Server 2016
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/capabilities/sec-config-assessment/index.html
+    - https://documentation.guardsarm.com/current/user-manual/capabilities/sec-config-assessment/index.html
 
 tags:
     - sca
@@ -44,13 +44,13 @@ import time
 import pytest
 from pathlib import Path
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.constants.platforms import WINDOWS
-from wazuh_testing.utils import callbacks, configuration, services
-from wazuh_testing.tools.monitors import file_monitor
-from wazuh_testing.modules.agentd.configuration import AGENTD_WINDOWS_DEBUG
-from wazuh_testing.modules.modulesd.sca import patterns
-from wazuh_testing.modules.modulesd.configuration import MODULESD_DEBUG
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.constants.platforms import WINDOWS
+from guardsarm_testing.utils import callbacks, configuration, services
+from guardsarm_testing.tools.monitors import file_monitor
+from guardsarm_testing.modules.agentd.configuration import AGENTD_WINDOWS_DEBUG
+from guardsarm_testing.modules.modulesd.sca import patterns
+from guardsarm_testing.modules.modulesd.configuration import MODULESD_DEBUG
 
 from . import CONFIGURATIONS_FOLDER_PATH, TEST_CASES_FOLDER_PATH
 
@@ -129,7 +129,7 @@ def _callback_event_for_check(check_id: str):
 
 @pytest.mark.parametrize('test_configuration, test_metadata', zip(configurations, configuration_metadata), ids=case_ids)
 def test_sca_compliance_format(test_configuration, test_metadata, prepare_cis_policies_file, truncate_monitored_files,
-                               set_wazuh_configuration, configure_local_internal_options, clean_sca_db,
+                               set_guardsarm_configuration, configure_local_internal_options, clean_sca_db,
                                daemons_handler, wait_for_sca_enabled):
     '''
     description: This test validates the SCA compliance field handling across three scenarios:
@@ -140,37 +140,37 @@ def test_sca_compliance_format(test_configuration, test_metadata, prepare_cis_po
 
     test_phases:
         - Copy SCA policy file into agent.
-        - Restart wazuh.
+        - Restart guardsarm.
         - Wait for SCA scan to complete.
         - Validate WARNING messages in log for invalid/old-format compliance.
         - Validate compliance keys in SCA event JSON.
 
-    wazuh_min_version: 5.0.0
+    guardsarm_min_version: 5.0.0
 
     tier: 0
 
     parameters:
         - test_configuration:
             type: dict
-            brief: Wazuh configuration data. Needed for set_wazuh_configuration fixture.
+            brief: GuardSarm configuration data. Needed for set_guardsarm_configuration fixture.
         - test_metadata:
             type: dict
-            brief: Wazuh configuration metadata.
+            brief: GuardSarm configuration metadata.
         - prepare_cis_policies_file:
             type: fixture
             brief: Copy test SCA policy file. Delete it after test.
         - truncate_monitored_files:
             type: fixture
             brief: Truncate all the log files and json alerts files before and after the test execution.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
-            brief: Set the wazuh configuration according to the configuration data.
+            brief: Set the guardsarm configuration according to the configuration data.
         - configure_local_internal_options:
             type: fixture
             brief: Configure the local_internal_options_file.
         - daemons_handler:
             type: fixture
-            brief: Restart all wazuh daemons.
+            brief: Restart all guardsarm daemons.
         - wait_for_sca_enabled:
             type: fixture
             brief: Wait for the SCA module to start before starting the test.
@@ -197,7 +197,7 @@ def test_sca_compliance_format(test_configuration, test_metadata, prepare_cis_po
     # ------------------------------------------------------------------
     # Phase 1: Wait for scan completion
     # ------------------------------------------------------------------
-    log_monitor = file_monitor.FileMonitor(WAZUH_LOG_PATH)
+    log_monitor = file_monitor.FileMonitor(GUARDSARM_LOG_PATH)
 
     timeout = 180 if sys.platform == WINDOWS else 60
 

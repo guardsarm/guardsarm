@@ -21,9 +21,9 @@
 - [Agent Sync Protocol](utils/sync-protocol/) - Agent-side library for synchronizing data with the manager
 - [Schema Validator](utils/schema-validator/) - JSON schema validation for synchronized data
 - [FlatBuffers](utils/flatbuffers/) - High-performance serialization for synchronization protocol
-- [Cluster](cluster/) - Manages the Wazuh server cluster
+- [Cluster](cluster/) - Manages the GuardSarm server cluster
 - [Indexer Connector](indexer_connector/) - OpenSearch indexing library (Filebeat replacement)
-- [Wazuh DB](wazuh_db/) - Persistent SQLite database daemon for agent and task state
+- [GuardSarm DB](guardsarm_db/) - Persistent SQLite database daemon for agent and task state
 - [Authd](authd/) - Agent enrollment service (TLS, key generation)
 - [Content Manager](content_manager/) - CTI feed fetcher for Vulnerability Detection
 - [Agent Upgrade](agent_upgrade/) - Remote agent upgrade via WPK distribution

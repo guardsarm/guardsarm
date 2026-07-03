@@ -2,9 +2,9 @@
 
 ## Introduction
 
-The Wazuh Office 365 module retrieves audit logs from the Microsoft Office 365 Management Activity API. This enables monitoring of user and administrator activity across Office 365 services, including Exchange Online, SharePoint Online, Azure Active Directory, and Microsoft Teams.
+The GuardSarm Office 365 module retrieves audit logs from the Microsoft Office 365 Management Activity API. This enables monitoring of user and administrator activity across Office 365 services, including Exchange Online, SharePoint Online, Azure Active Directory, and Microsoft Teams.
 
-The module runs on the Wazuh agent and periodically queries the Office 365 API for new audit events. Events are processed by the Wazuh rule engine to generate alerts for suspicious activity such as unauthorized access, mail forwarding rule changes, and privilege escalation.
+The module runs on the GuardSarm agent and periodically queries the Office 365 API for new audit events. Events are processed by the GuardSarm rule engine to generate alerts for suspicious activity such as unauthorized access, mail forwarding rule changes, and privilege escalation.
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ The module runs on the Wazuh agent and periodically queries the Office 365 API f
 
 ## Configuration
 
-Configure the Office 365 module in the Wazuh agent `ossec.conf` file:
+Configure the Office 365 module in the GuardSarm agent `ossec.conf` file:
 
 ```xml
   <office365>
@@ -89,10 +89,10 @@ For US Government Cloud environments, set the `api_type` option:
 
 ## Verify the integration
 
-Restart the Wazuh agent after applying the configuration:
+Restart the GuardSarm agent after applying the configuration:
 
 ```bash
-systemctl restart wazuh-agent
+systemctl restart guardsarm-agent
 ```
 
 Check the module logs:

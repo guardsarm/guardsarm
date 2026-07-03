@@ -1,8 +1,8 @@
 # Migrating Integratord to Dashboard Notifications
 
-In Wazuh 4.x, third-party integrations were configured directly in `ossec.conf` on the manager using `<integration>` blocks, handled by the `integratord` daemon.
+In GuardSarm 4.x, third-party integrations were configured directly in `ossec.conf` on the manager using `<integration>` blocks, handled by the `integratord` daemon.
 
-Wazuh 5.x replaces this approach with two dashboard plugins:
+GuardSarm 5.x replaces this approach with two dashboard plugins:
 
 - **Notifications** — manages shared channels and connection settings for third-party services.
 - **Alerting** — creates monitors that scan data and send messages through those channels.
@@ -13,11 +13,11 @@ All integration configuration is now done from the dashboard, with no changes re
 
 > **⚠️ Warning:** The Notifications plugin does not support bi-directional integrations such as Maltiverse or Virustotal, which were previously supported by `integratord`. See [Security Analytics enrichments](#enrichment-integrations).
 
-> **Note:** This migration must be performed manually. There is no automatic tool to convert `<integration>` blocks from `ossec.conf` to the Wazuh 5.x dashboard configuration.
+> **Note:** This migration must be performed manually. There is no automatic tool to convert `<integration>` blocks from `ossec.conf` to the GuardSarm 5.x dashboard configuration.
 
 ## Configuration mapping 4.x → 5.x
 
-The following table maps each `<integration>` field from Wazuh 4.x to its equivalent in the 5.x dashboard.
+The following table maps each `<integration>` field from GuardSarm 4.x to its equivalent in the 5.x dashboard.
 
 | 4.x field          | 5.x plugin    | 5.x location             | Notes                                                                                                                                    |
 | ------------------ | ------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -25,15 +25,15 @@ The following table maps each `<integration>` field from Wazuh 4.x to its equiva
 | `<hook_url>`       | Notifications | Webhook URL              | Some 4.x built-in scripts (e.g. PagerDuty) had the endpoint hardcoded and did not require this field                                     |
 | `<api_key>`        | Notifications | Webhook URL / Headers    | Depending on the service, credentials may be placed in the URL, request headers, or not be needed at all                                 |
 | `<alert_format>`   | —             | No match                 | This depends on the configurated message in the channel.                                                                                 |
-| `<rule_id>`        | Alerting      | Monitor query            | Monitors use queries on index patterns instead of rule matching. The matching field is `wazuh.rule.id`.                                  |
+| `<rule_id>`        | Alerting      | Monitor query            | Monitors use queries on index patterns instead of rule matching. The matching field is `guardsarm.rule.id`.                                  |
 | `<level>`          | Alerting      | Monitor query            | In 4.x the field was `rule.level`; see the note below.                                                                                   |
-| `<group>`          | Alerting      | Monitor query            | The group tag referred to the internal Wazuh component that generated the data. Now, it's represented by `wazuh.integration.name`.       |
-| `<event_location>` | Alerting      | Monitor query            | The 4.x tag used a sregex expression to match Wazuh modules or log sources/files; In 5.x, there is no direct conversion. See note below. |
+| `<group>`          | Alerting      | Monitor query            | The group tag referred to the internal GuardSarm component that generated the data. Now, it's represented by `guardsarm.integration.name`.       |
+| `<event_location>` | Alerting      | Monitor query            | The 4.x tag used a sregex expression to match GuardSarm modules or log sources/files; In 5.x, there is no direct conversion. See note below. |
 | `<options>`        | Alerting      | Trigger → Action message | See below                                                                                                                                |
 
-> **Note:** In 5.x, `rule.level` is now called `wazuh.rule.level` and uses categorical values (low, medium, high) instead of an integer from 0 to 16. Because there is no direct conversion, you must review your existing alert thresholds and determine how best to map your legacy numeric levels to these new categories based on your organization's specific routing needs.
+> **Note:** In 5.x, `rule.level` is now called `guardsarm.rule.level` and uses categorical values (low, medium, high) instead of an integer from 0 to 16. Because there is no direct conversion, you must review your existing alert thresholds and determine how best to map your legacy numeric levels to these new categories based on your organization's specific routing needs.
 
-> **Note:** The `<event_location>` tag has no direct 1-to-1 replacement in 5.x. Because 5.x parses alerts into highly structured documents, the legacy `location` field is split across multiple independent fields. You should review your current use cases to determine which specific 5.x fields ( e.g: `wazuh.protocol.location`, `file.path`, `wazuh.agent.name`, ... ) align best with your implementation.
+> **Note:** The `<event_location>` tag has no direct 1-to-1 replacement in 5.x. Because 5.x parses alerts into highly structured documents, the legacy `location` field is split across multiple independent fields. You should review your current use cases to determine which specific 5.x fields ( e.g: `guardsarm.protocol.location`, `file.path`, `guardsarm.agent.name`, ... ) align best with your implementation.
 
 ![Configuration mapping index pattern and queries](../../images/integratord-notifications/data_queries.png)
 
@@ -65,14 +65,14 @@ The table below maps some examples on 4.x to their 5.x equivalents:
 
 The 5.x plugins provide a significantly more flexible configuration model. A typical migration results in one channel per external service and one or more monitors combining queries and triggers to cover all the previous `<integration>` blocks.
 
-## Wazuh 4.x example
+## GuardSarm 4.x example
 
-Below there is a set of configurations made in Wazuh 4.x, you can use it as reference to follow the migration steps.
+Below there is a set of configurations made in GuardSarm 4.x, you can use it as reference to follow the migration steps.
 
 > **Note:** Jira is an integration without a default script in 4.x — expand below to see how to create one.
 
 <details>
-<summary>Creating the custom-jira script for Wazuh 4.x</summary>
+<summary>Creating the custom-jira script for GuardSarm 4.x</summary>
 
 1. Create the script file at `/var/ossec/integrations/custom-jira`:
 
@@ -147,7 +147,7 @@ sys.exit(0)
 
 ```bash
 chmod 750 /var/ossec/integrations/custom-jira
-chown root:wazuh /var/ossec/integrations/custom-jira
+chown root:guardsarm /var/ossec/integrations/custom-jira
 ```
 
 3. Add the `<integration>` block to `ossec.conf` referencing the script name (`custom-jira`).
@@ -209,7 +209,7 @@ chown root:wazuh /var/ossec/integrations/custom-jira
 
 ## Migration steps
 
-The steps below show one possible way to migrate the 4.x reference configuration to Wazuh 5.x. Use them as a guide and adapt the configuration to your own needs.
+The steps below show one possible way to migrate the 4.x reference configuration to GuardSarm 5.x. Use them as a guide and adapt the configuration to your own needs.
 
 ### 1. Configure the Notifications channel
 
@@ -217,7 +217,7 @@ Navigate to **Explore > Notifications > Channels**.
 
 #### 1.1 Using default channels
 
-Wazuh ships a set of pre-configured channels that are muted by default. To use one, un-mute it and fill in the required credentials. Each channel includes a brief description with configuration instructions.
+GuardSarm ships a set of pre-configured channels that are muted by default. To use one, un-mute it and fill in the required credentials. Each channel includes a brief description with configuration instructions.
 
 In this example either use the default channel or create a new channel from scratch, see [Custom webhook channel](#122-custom-webhook-channel-type).
 
@@ -245,11 +245,11 @@ For any other custom integration from 4.x, create a new channel using one of the
 
 ##### 1.2.1 Default channel type
 
-Wazuh 5.x provides dedicated channel types for common services such as `Slack`, `Chime`, and `Email`. These simplify setup — for `Chime`, for example, only a webhook URL is required.
+GuardSarm 5.x provides dedicated channel types for common services such as `Slack`, `Chime`, and `Email`. These simplify setup — for `Chime`, for example, only a webhook URL is required.
 
 ##### 1.2.2 Custom webhook channel type
 
-For integrations without a dedicated channel type, use the **Custom webhook** type. This is also the underlying type used by the Wazuh-provided `PagerDuty`, `Jira`, and `Shuffle` channels.
+For integrations without a dedicated channel type, use the **Custom webhook** type. This is also the underlying type used by the GuardSarm-provided `PagerDuty`, `Jira`, and `Shuffle` channels.
 
 The custom webhook channel can be used for services like `Slack` or `Chime`, this can be useful if the user wants to send `Slack` a json payload instead of plain text, see [Trigger Actions](#24-actions).
 
@@ -295,7 +295,7 @@ A monitor defines the indexes, schedule, and query/trigger/action structure. Bec
 | Monitor name  | Security Monitor             |
 | Monitor type  | Per document monitor         |
 | Schedule      | By interval — every 1 minute |
-| Index pattern | `wazuh-findings-v5-security` |
+| Index pattern | `guardsarm-findings-v5-security` |
 
 #### 2.2 Queries
 
@@ -308,18 +308,18 @@ In the PagerDuty example, the original `<level>14</level>` doesn't have a direct
 | Field      | Value                   |
 | ---------- | ----------------------- |
 | Query name | `high_security_finding` |
-| Field      | `wazuh.rule.level`      |
+| Field      | `guardsarm.rule.level`      |
 | Operator   | `is`                    |
 | Value      | `high`                  |
 
 **Example queries for Jira:**
 
-In the Jira example, the original `<group>syscheck</group>` was a group for rules related to FIM (File integrity monitoring), so that maps to the `wazuh.integration.name` is `wazuh-fim` and for the `<level>9</level>` see [Configuration mapping 4x -> 5.x](#configuration-mapping-4x--5x), in this example we will use the value `medium`.
+In the Jira example, the original `<group>syscheck</group>` was a group for rules related to FIM (File integrity monitoring), so that maps to the `guardsarm.integration.name` is `guardsarm-fim` and for the `<level>9</level>` see [Configuration mapping 4x -> 5.x](#configuration-mapping-4x--5x), in this example we will use the value `medium`.
 
 | Field      | Value                     |
 | ---------- | ------------------------- |
 | Query name | `medium_security_finding` |
-| Field      | `wazuh.rule.level`        |
+| Field      | `guardsarm.rule.level`        |
 | Operator   | `is`                      |
 | Value      | `medium`                  |
 
@@ -328,9 +328,9 @@ In the Jira example, the original `<group>syscheck</group>` was a group for rule
 | Field      | Value                    |
 | ---------- | ------------------------ |
 | Query name | `fim_integration`        |
-| Field      | `wazuh.integration.name` |
+| Field      | `guardsarm.integration.name` |
 | Operator   | `is`                     |
-| Value      | `wazuh-fim`              |
+| Value      | `guardsarm-fim`              |
 
 #### 2.3 Triggers
 
@@ -356,7 +356,7 @@ A monitor can have multiple triggers, and each trigger can reference multiple qu
 
 Each trigger can have multiple actions, allowing a single trigger to notify more than one channel.
 
-> **Note:** The examples below show messages for `PagerDuty` and `Jira`, both a json payload, this is not always the case, for example, using `Slack default channel` (created by wazuh using Slack notification type) the message it's parsed in plain text instead of json. This is also defined by the header `Content Type` in custom webhooks.
+> **Note:** The examples below show messages for `PagerDuty` and `Jira`, both a json payload, this is not always the case, for example, using `Slack default channel` (created by guardsarm using Slack notification type) the message it's parsed in plain text instead of json. This is also defined by the header `Content Type` in custom webhooks.
 
 **Example action for PagerDuty:**
 
@@ -374,13 +374,13 @@ The following payload replicates what the default 4.x PagerDuty script sent:
 {
   "event_action": "trigger",
   "payload": {
-    "summary": "Wazuh Alert: {{ctx.alerts.0.sample_documents.0._source.event.original}}",
-    "source": "{{ctx.alerts.0.sample_documents.0._source.wazuh.agent.name}}",
+    "summary": "GuardSarm Alert: {{ctx.alerts.0.sample_documents.0._source.event.original}}",
+    "source": "{{ctx.alerts.0.sample_documents.0._source.guardsarm.agent.name}}",
     "severity": "critical",
     "custom_details": {
-      "Rule ID": "{{ctx.alerts.0.sample_documents.0._source.wazuh.rule.id}}",
-      "Rule Level": "{{ctx.alerts.0.sample_documents.0._source.wazuh.rule.level}}",
-      "Agent OS": "{{ctx.alerts.0.sample_documents.0._source.wazuh.agent.host.os.name}}",
+      "Rule ID": "{{ctx.alerts.0.sample_documents.0._source.guardsarm.rule.id}}",
+      "Rule Level": "{{ctx.alerts.0.sample_documents.0._source.guardsarm.rule.level}}",
+      "Agent OS": "{{ctx.alerts.0.sample_documents.0._source.guardsarm.agent.host.os.name}}",
       "File Path": "{{ctx.alerts.0.sample_documents.0._source.file.path}}",
       "Monitor Name": "{{ctx.monitor.name}}"
     }
@@ -421,7 +421,7 @@ The following payload is an example to create a task:
           "content": [
             {
               "type": "text",
-              "text": "- State: {{ctx.alerts.0.sample_documents.0._source.wazuh.rule.title}}\n- Rule ID: {{ctx.alerts.0.sample_documents.0._source.wazuh.rule.id}}\n- Alert level: {{ctx.alerts.0.sample_documents.0._source.wazuh.rule.level}}\n- Agent: {{ctx.alerts.0.sample_documents.0._source.wazuh.agent.id}} {{ctx.alerts.0.sample_documents.0._source.wazuh.agent.name}}"
+              "text": "- State: {{ctx.alerts.0.sample_documents.0._source.guardsarm.rule.title}}\n- Rule ID: {{ctx.alerts.0.sample_documents.0._source.guardsarm.rule.id}}\n- Alert level: {{ctx.alerts.0.sample_documents.0._source.guardsarm.rule.level}}\n- Agent: {{ctx.alerts.0.sample_documents.0._source.guardsarm.agent.id}} {{ctx.alerts.0.sample_documents.0._source.guardsarm.agent.name}}"
             }
           ]
         }
@@ -442,7 +442,7 @@ For building message payloads with dynamic variables, refer to:
 
 ## Enrichment integrations
 
-In 4.x, `Maltiverse` and `Virustotal` worked as a bi-directional callback loop: the built-in script sent the alert to the external service, received an enriched response, and re-injected it into Wazuh as a new alert. **There is no equivalent mechanism in 5.x — these integrations cannot be migrated.**
+In 4.x, `Maltiverse` and `Virustotal` worked as a bi-directional callback loop: the built-in script sent the alert to the external service, received an enriched response, and re-injected it into GuardSarm as a new alert. **There is no equivalent mechanism in 5.x — these integrations cannot be migrated.**
 
 Enrichment is now handled inline by the [Engine](../../ref/modules/engine/#security-enrichment-process) during event processing, before events reach the indexer. The Engine provides exactly two built-in enrichment plugins (Geo/ASN and IOC), and they cannot be extended with custom third-party services. See [Security enrichment process](../../ref/modules/engine/#security-enrichment-process) for details.
 

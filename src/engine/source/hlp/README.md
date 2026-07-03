@@ -2,7 +2,7 @@
 
 ## Overview
 
-`hlp` is a library of **type-specific parsers** for the Wazuh Engine's log parsing pipeline. Each parser is a self-contained function that can recognize, validate, and extract a particular data type (IP addresses, dates, JSON, CSV, URIs, etc.) from a raw text input, optionally mapping the result into a JSON event.
+`hlp` is a library of **type-specific parsers** for the GuardSarm Engine's log parsing pipeline. Each parser is a self-contained function that can recognize, validate, and extract a particular data type (IP addresses, dates, JSON, CSV, URIs, etc.) from a raw text input, optionally mapping the result into a JSON event.
 
 Parsers are composed from two layers:
 

@@ -14,8 +14,8 @@ foreach(counter RANGE ${count})
 
     target_link_libraries(
         ${active-response_test_name}
-        ${WAZUHLIB}
-        ${WAZUHEXT}
+        ${GUARDSARMLIB}
+        ${GUARDSARMEXT}
         ${TEST_DEPS}
     )
     if(NOT active-response_test_flags STREQUAL " ")

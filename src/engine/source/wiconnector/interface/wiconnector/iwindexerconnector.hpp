@@ -13,18 +13,18 @@
 #include <base/json.hpp>
 
 /**
- * @brief Interface for connecting to and indexing data in a wazuh-indexer.
+ * @brief Interface for connecting to and indexing data in a guardsarm-indexer.
  *
  * The IWIndexerConnector interface provides a contract for implementing
- * indexer connector classes that can send/recive data to wazuh-indexer.
+ * indexer connector classes that can send/recive data to guardsarm-indexer.
  */
 namespace wiconnector
 {
 
-/// @brief Consumer document ID for the standard ruleset in `.wazuh-cti-consumers`
+/// @brief Consumer document ID for the standard ruleset in `.guardsarm-cti-consumers`
 constexpr std::string_view STANDARD_RULESET_CONSUMER_ID = "cti:catalog:consumer:ruleset";
 
-/// @brief Consumer document ID for the IOC enrichment data in `.wazuh-cti-consumers`
+/// @brief Consumer document ID for the IOC enrichment data in `.guardsarm-cti-consumers`
 constexpr std::string_view IOC_ENRICHMENT_CONSUMER_ID = "cti:catalog:consumer:iocs";
 
 /**
@@ -62,8 +62,8 @@ public:
      * @brief Retrieves policy resources associated with the specified space.
      *
      * @param space The name of the space from which to retrieve policy resources
-     * @param consumerIdToValidate Optional consumer document ID in `.wazuh-cti-consumers` to validate.
-     *        When provided, the PIT will include `.wazuh-cti-consumers` and the consumer document
+     * @param consumerIdToValidate Optional consumer document ID in `.guardsarm-cti-consumers` to validate.
+     *        When provided, the PIT will include `.guardsarm-cti-consumers` and the consumer document
      *        will be verified as `ready` within the PIT snapshot to ensure consistency.
      * @return An optional PolicyResources. Returns std::nullopt if the consumer is provided and is not ready.
      * @throws std::invalid_argument if the space name is empty or invalid
@@ -76,13 +76,13 @@ public:
     /**
      * @brief Retrieves the policy hash and enabled status for the specified space.
      *
-     * Queries the wazuh-threatintel-policies index to retrieve the SHA-256 hash stored in
+     * Queries the guardsarm-threatintel-policies index to retrieve the SHA-256 hash stored in
      * the space.hash.sha256 field and the enabled status from document.enabled
      * for the given space name.
      *
      * @param space The name of the space to retrieve the information for
-     * @param consumerIdToValidate Optional consumer document ID in `.wazuh-cti-consumers` to validate.
-     *        When provided, a PIT will include `.wazuh-cti-consumers` and the consumer document
+     * @param consumerIdToValidate Optional consumer document ID in `.guardsarm-cti-consumers` to validate.
+     *        When provided, a PIT will include `.guardsarm-cti-consumers` and the consumer document
      *        will be verified as `ready` within the PIT snapshot to ensure consistency.
      * @return An optional pair containing the SHA-256 hash and enabled status.
      *         Returns std::nullopt if the consumer is provided and is not ready.
@@ -98,7 +98,7 @@ public:
     /**
      * @brief Checks if a policy exists for the specified space.
      *
-     * Queries the wazuh-threatintel-policies index to determine if at least one policy
+     * Queries the guardsarm-threatintel-policies index to determine if at least one policy
      * exists for the given space name.
      *
      * @param space The name of the space to check
@@ -118,11 +118,11 @@ public:
     /**
      * @brief Retrieves per-type IOC hashes from the IOC hashes manifest.
      *
-     * Reads `__ioc_type_hashes__` from `wazuh-threatintel-enrichments` and returns all available
+     * Reads `__ioc_type_hashes__` from `guardsarm-threatintel-enrichments` and returns all available
      * `hash.sha256` values for the supported IOC types.
      *
-     * @param consumerIdToValidate Optional consumer document ID in `.wazuh-cti-consumers` to validate.
-     *        When provided, a PIT will include `.wazuh-cti-consumers` and the consumer document
+     * @param consumerIdToValidate Optional consumer document ID in `.guardsarm-cti-consumers` to validate.
+     *        When provided, a PIT will include `.guardsarm-cti-consumers` and the consumer document
      *        will be verified as `ready` within the PIT snapshot to ensure consistency.
      * @return An optional map(type -> sha256 hash). Returns std::nullopt if the consumer is provided and is not ready.
      * @throws IndexerConnectorException if the manifest is missing or invalid
@@ -140,8 +140,8 @@ public:
      * @param iocType IOC type (e.g. connection, url_domain, url_full, hash_md5, hash_sha1, hash_sha256)
      * @param batchSize Number of documents requested per page
      * @param onIoc Callback invoked for each valid IOC record
-     * @param consumerIdToValidate Optional consumer document ID in `.wazuh-cti-consumers` to validate.
-     *        When provided, the PIT will include `.wazuh-cti-consumers` and the consumer document
+     * @param consumerIdToValidate Optional consumer document ID in `.guardsarm-cti-consumers` to validate.
+     *        When provided, the PIT will include `.guardsarm-cti-consumers` and the consumer document
      *        will be verified as `ready` within the PIT snapshot to ensure consistency.
      * @return An optional number of IOC documents delivered to the callback.
      *         Returns std::nullopt if the consumer is provided and is not ready.
@@ -156,7 +156,7 @@ public:
     /**
      * @brief Pre-flight check: is the consumer ready for synchronization?
      *
-     * Queries `.wazuh-cti-consumers` for the specified consumer document and verifies
+     * Queries `.guardsarm-cti-consumers` for the specified consumer document and verifies
      * two conditions:
      *   1. `status` == `"ready"` — the indexer is not actively updating data.
      *   2. `local_offset` != 0 — the consumer has received at least one CTI update,
@@ -172,9 +172,9 @@ public:
     virtual bool isConsumerReadyForSync(std::string_view consumerId) = 0;
 
     /**
-     * @brief Retrieves remote engine runtime configuration from wazuh-indexer.
+     * @brief Retrieves remote engine runtime configuration from guardsarm-indexer.
      *
-     * Queries `.wazuh-settings` with `size=1`, requests only the `engine` section,
+     * Queries `.guardsarm-settings` with `size=1`, requests only the `engine` section,
      * and returns the normalized engine settings object, for example:
      * { "index_raw_events": false }
      *

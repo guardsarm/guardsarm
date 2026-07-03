@@ -23,7 +23,7 @@ jobs:
     env:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
       BRANCH_BASE: ${{ github.base_ref || inputs.base_branch }}
-      PYTHONPATH: /home/runner/work/wazuh/wazuh/api:/home/runner/work/wazuh/wazuh/framework
+      PYTHONPATH: /home/runner/work/guardsarm/guardsarm/api:/home/runner/work/guardsarm/guardsarm/framework
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -48,5 +48,5 @@ jobs:
           pip install -r qa-integration-framework/requirements.txt --no-build-isolation
       - name: Run tests coverage
         run: |
-          cd qa-integration-framework/src/wazuh_testing/scripts
-          python pytest_coverage.py -p /home/runner/work/wazuh/wazuh
+          cd qa-integration-framework/src/guardsarm_testing/scripts
+          python pytest_coverage.py -p /home/runner/work/guardsarm/guardsarm

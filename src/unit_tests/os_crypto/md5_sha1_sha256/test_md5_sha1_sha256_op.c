@@ -17,7 +17,7 @@
 
 #include "../../wrappers/common.h"
 #include "../../wrappers/libc/stdio_wrappers.h"
-#include "../../wrappers/wazuh/shared/file_op_wrappers.h"
+#include "../../wrappers/guardsarm/shared/file_op_wrappers.h"
 
 static int setup_group(void ** state) {
     test_mode = 1;

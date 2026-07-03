@@ -1,10 +1,10 @@
 # Unit Tests
 
-This document explains how to compile and run the Wazuh unit tests for the supported targets (Linux server/agent, Windows agent, macOS agent). The high-level flow is the same for every target:
+This document explains how to compile and run the GuardSarm unit tests for the supported targets (Linux server/agent, Windows agent, macOS agent). The high-level flow is the same for every target:
 
 1. Install the required toolchain and libraries (GCC 14, CMake, CMocka, and — for the Windows agent — MinGW and wine).
 2. Fetch the external sources with `make TARGET=… deps`.
-3. Compile Wazuh with `TEST=1` so internal symbols and test hooks are exposed.
+3. Compile GuardSarm with `TEST=1` so internal symbols and test hooks are exposed.
 4. Configure and build the unit-test binaries under `src/unit_tests` with CMake.
 5. Run them — either all at once with `ctest`, with coverage via `make coverage`, or one binary at a time.
 
@@ -52,7 +52,7 @@ export CXX=g++-14
 ```
 Add the two `export` lines to your `~/.bashrc` if you want them to persist across sessions.
 
-If you'd rather make GCC 14 the system default (e.g. on a VM dedicated to Wazuh dev) so you can drop the exports entirely, you can swap `gcc`/`g++` system-wide with `update-alternatives`:
+If you'd rather make GCC 14 the system default (e.g. on a VM dedicated to GuardSarm dev) so you can drop the exports entirely, you can swap `gcc`/`g++` system-wide with `update-alternatives`:
 ```
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 \
     --slave /usr/bin/g++ g++ /usr/bin/g++-14
@@ -64,14 +64,14 @@ The repo only checks in `src/external/CMakeLists.txt`; OpenSSL, libcurl, audit-u
 make TARGET=manager|agent deps
 ```
 
-### 2. Compile Wazuh with the test flag
-From `wazuh/src`:
+### 2. Compile GuardSarm with the test flag
+From `guardsarm/src`:
 ```
 make TARGET=manager|agent TEST=1
 ```
 
 ### 3. Build the unit tests
-Navigate into `wazuh/src/unit_tests` and run:
+Navigate into `guardsarm/src/unit_tests` and run:
 ```
 mkdir build
 cd build
@@ -115,7 +115,7 @@ sudo apt-get install -y gcc-mingw-w64 g++-mingw-w64-i686 g++-mingw-w64-x86-64
 Stock Ubuntu 24.04 ships GCC 13.2 in these packages, which is sufficient.
 
 #### 0.2 Build cmocka cross-compiled for MinGW
-Wazuh's `libwazuh_test.a` (built as part of `make TARGET=winagent TEST=1`) `#include <cmocka.h>` from the test wrappers, so the cmocka headers and a static `.a` must live under `/usr/i686-w64-mingw32/` before the compile step. Ubuntu doesn't package a mingw build of cmocka, so build it from source — pinned to the upstream `stable-1.1` branch (Wazuh's wrappers are written against the 1.1 API):
+GuardSarm's `libguardsarm_test.a` (built as part of `make TARGET=winagent TEST=1`) `#include <cmocka.h>` from the test wrappers, so the cmocka headers and a static `.a` must live under `/usr/i686-w64-mingw32/` before the compile step. Ubuntu doesn't package a mingw build of cmocka, so build it from source — pinned to the upstream `stable-1.1` branch (GuardSarm's wrappers are written against the 1.1 API):
 
 ```
 curl -L --retry 3 --retry-delay 2 \
@@ -145,7 +145,7 @@ Wine is needed at **build time** (cmake invokes it as the cross-compile emulator
 The install recipe matches is pinned to wine `10.0.0.0~noble-1`. On Ubuntu 24.04 (noble):
 
 ```
-# Enable 32-bit packages (Wazuh's wine targets win32)
+# Enable 32-bit packages (GuardSarm's wine targets win32)
 sudo dpkg --add-architecture i386
 
 # Register WineHQ's signing key and noble repository
@@ -182,19 +182,19 @@ unset CC CXX
 ```
 
 ### 1. Fetch the external dependencies
-The repo only checks in `src/external/CMakeLists.txt`; OpenSSL, libcurl, audit-userspace, libplist, msgpack, sqlite, etc. are downloaded and extracted on demand. From `wazuh/src` (one-time per checkout — re-run after `make clean-deps` or a fresh clone):
+The repo only checks in `src/external/CMakeLists.txt`; OpenSSL, libcurl, audit-userspace, libplist, msgpack, sqlite, etc. are downloaded and extracted on demand. From `guardsarm/src` (one-time per checkout — re-run after `make clean-deps` or a fresh clone):
 ```
 make TARGET=winagent deps
 ```
 
 ### 2. Compile the Windows agent with the test flag
-From `wazuh/src`:
+From `guardsarm/src`:
 ```
 make TARGET=winagent TEST=1
 ```
 
 ### 3. Build the unit tests
-Navigate into `wazuh/src/unit_tests` and run:
+Navigate into `guardsarm/src/unit_tests` and run:
 ```
 mkdir build
 cd build
@@ -206,22 +206,22 @@ make
 ### 4. Run the tests (via wine)
 Wine needs two env vars before it can run the `.exe` test binaries:
 
-- `WINEPATH` — **semicolon-separated, Windows-style** list of directories wine searches for DLLs at runtime. The test binaries need the mingw runtime (`libstdc++-6.dll`, `libgcc_s_*.dll`, `libwinpthread-1.dll`, etc.) and Wazuh's own built libraries (`libagent_metadata.dll`, `libwazuhext.dll`, etc., emitted under `src/build/bin/`).
+- `WINEPATH` — **semicolon-separated, Windows-style** list of directories wine searches for DLLs at runtime. The test binaries need the mingw runtime (`libstdc++-6.dll`, `libgcc_s_*.dll`, `libwinpthread-1.dll`, etc.) and GuardSarm's own built libraries (`libagent_metadata.dll`, `libguardsarmext.dll`, etc., emitted under `src/build/bin/`).
 - `WINEARCH=win32` — pins the wine prefix to 32-bit. Without it, the first run creates a 64-bit prefix at `~/.wine` and subsequent 32-bit runs fail (see the troubleshooting note at the end of step 0.3).
 
-**Recommended:** scope both env vars to the test invocation so they apply only to the run and don't pollute your shell. From `wazuh/src/unit_tests/build`:
+**Recommended:** scope both env vars to the test invocation so they apply only to the run and don't pollute your shell. From `guardsarm/src/unit_tests/build`:
 ```
-WAZUH_SRC=$(realpath ../..)
+GUARDSARM_SRC=$(realpath ../..)
 WINEARCH=win32 \
-WINEPATH="/usr/i686-w64-mingw32/lib;/usr/lib/gcc/i686-w64-mingw32/13-posix;${WAZUH_SRC};${WAZUH_SRC}/build/bin" \
+WINEPATH="/usr/i686-w64-mingw32/lib;/usr/lib/gcc/i686-w64-mingw32/13-posix;${GUARDSARM_SRC};${GUARDSARM_SRC}/build/bin" \
 ctest --output-on-failure
 ```
-`realpath ../..` derives the absolute path to `wazuh/src` on the fly, so you don't have to hardcode it.
+`realpath ../..` derives the absolute path to `guardsarm/src` on the fly, so you don't have to hardcode it.
 
-**Alternative — persistent shell exports.** Add to `~/.bashrc`, substituting your wazuh checkout's absolute path for `<WAZUH_SRC>`:
+**Alternative — persistent shell exports.** Add to `~/.bashrc`, substituting your guardsarm checkout's absolute path for `<GUARDSARM_SRC>`:
 ```
 export WINEARCH=win32
-export WINEPATH="/usr/i686-w64-mingw32/lib;/usr/lib/gcc/i686-w64-mingw32/13-posix;<WAZUH_SRC>;<WAZUH_SRC>/build/bin"
+export WINEPATH="/usr/i686-w64-mingw32/lib;/usr/lib/gcc/i686-w64-mingw32/13-posix;<GUARDSARM_SRC>;<GUARDSARM_SRC>/build/bin"
 ```
 The `13-posix` path matches the GCC 13.x mingw shipped by Ubuntu 24.04. On other distros run `ls /usr/lib/gcc/i686-w64-mingw32/` to find the right directory.
 
@@ -246,9 +246,9 @@ chmod +x winagent-gcov-wrapper.sh
 
 cmake -DGCOV_PATH=$PWD/winagent-gcov-wrapper.sh ..
 
-WAZUH_SRC=$(realpath ../..)
+GUARDSARM_SRC=$(realpath ../..)
 WINEARCH=win32 \
-WINEPATH="/usr/i686-w64-mingw32/lib;/usr/lib/gcc/i686-w64-mingw32/13-posix;${WAZUH_SRC};${WAZUH_SRC}/build/bin" \
+WINEPATH="/usr/i686-w64-mingw32/lib;/usr/lib/gcc/i686-w64-mingw32/13-posix;${GUARDSARM_SRC};${GUARDSARM_SRC}/build/bin" \
 make coverage
 ```
 The wrapper intercepts `--version` queries from lcov and reports a known-compatible string; every other invocation passes through to the real mingw gcov. `.github/actions/legacy_unit_tests.sh` generates the same wrapper inline in CI. If `make coverage` succeeds, the HTML report lands under `coverage-report/`.
@@ -256,11 +256,11 @@ The wrapper intercepts `--version` queries from lcov and reports a known-compati
 **Note:** To get more accurate coverage mapping on the report, you'll have to add the `DEBUG=1` flag to the `make TARGET=agent` command, so that it compiles without optimizations. Note that this build configuration can take twice as long as the regular test build.
 
 #### Running a specific test
-Useful for iterating on a single failure. From `wazuh/src/unit_tests/build`:
+Useful for iterating on a single failure. From `guardsarm/src/unit_tests/build`:
 ```
-WAZUH_SRC=$(realpath ../..)
+GUARDSARM_SRC=$(realpath ../..)
 WINEARCH=win32 \
-WINEPATH="/usr/i686-w64-mingw32/lib;/usr/lib/gcc/i686-w64-mingw32/13-posix;${WAZUH_SRC};${WAZUH_SRC}/build/bin" \
+WINEPATH="/usr/i686-w64-mingw32/lib;/usr/lib/gcc/i686-w64-mingw32/13-posix;${GUARDSARM_SRC};${GUARDSARM_SRC}/build/bin" \
 wine ./client-agent/test_start_agent.exe
 ```
 
@@ -277,7 +277,7 @@ wine ./client-agent/test_start_agent.exe
 brew install lcov
 ```
 
-**CMocka 1.1.7 from source.** Wazuh's test wrappers are written against the cmocka 1.1 API. Homebrew's current `cmocka` formula is newer and not what CI builds against, so install 1.1.7 directly.
+**CMocka 1.1.7 from source.** GuardSarm's test wrappers are written against the cmocka 1.1 API. Homebrew's current `cmocka` formula is newer and not what CI builds against, so install 1.1.7 directly.
 ```
 curl -LO https://cmocka.org/files/1.1/cmocka-1.1.7.tar.xz
 tar -xf cmocka-1.1.7.tar.xz
@@ -290,13 +290,13 @@ sudo make install
 Headers land at `/usr/local/include/cmocka.h`, the static lib at `/usr/local/lib/libcmocka.a`.
 
 ### 1. Fetch the external dependencies
-The repo only checks in `src/external/CMakeLists.txt`; OpenSSL, libcurl, msgpack, sqlite, etc. are downloaded and extracted on demand. From `wazuh/src` (one-time per checkout — re-run after `make clean-deps` or a fresh clone):
+The repo only checks in `src/external/CMakeLists.txt`; OpenSSL, libcurl, msgpack, sqlite, etc. are downloaded and extracted on demand. From `guardsarm/src` (one-time per checkout — re-run after `make clean-deps` or a fresh clone):
 ```
 make TARGET=agent deps
 ```
 
-### 2. Compile Wazuh with the test flag
-Set the env vars and run from `wazuh/src`. There's no separate "build the unit tests" step — `make TARGET=agent TEST=1` produces the test binaries in `src/build/` alongside the main wazuh build:
+### 2. Compile GuardSarm with the test flag
+Set the env vars and run from `guardsarm/src`. There's no separate "build the unit tests" step — `make TARGET=agent TEST=1` produces the test binaries in `src/build/` alongside the main guardsarm build:
 
 ```
 export CMAKE_POLICY_VERSION_MINIMUM=3.5
@@ -311,7 +311,7 @@ What each env var does:
 - `LIBRARY_PATH=/usr/local/lib:$(brew --prefix)/lib` — `/usr/local/lib` for the cmocka you just installed there; `$(brew --prefix)/lib` for everything else brew installs (on Apple Silicon these are different directories; on Intel they're the same `/usr/local/lib` and the duplicate is harmless).
 
 ### 3. Run the tests
-The test binaries are under `src/build/`. From `wazuh/src`:
+The test binaries are under `src/build/`. From `guardsarm/src`:
 ```
 export DYLD_LIBRARY_PATH="/usr/local/lib:$DYLD_LIBRARY_PATH"
 cd build

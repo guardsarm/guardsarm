@@ -45,7 +45,7 @@ private:
     void updateSpacesStatusSnapshot();
 
     /**
-     * @brief Check if a space exists in the wazuh-indexer
+     * @brief Check if a space exists in the guardsarm-indexer
      *
      * @param space Space name to check
      * @return true if the space exists, false otherwise
@@ -83,13 +83,13 @@ private:
      * @brief Downloads a namespace from the indexer and enriches it with local assets
      *
      * This method performs a two-phase operation to prepare a complete namespace:
-     * 1. Downloads the policy and resources from the wazuh-indexer (KVDB, decoders, integrations, policy)
+     * 1. Downloads the policy and resources from the guardsarm-indexer (KVDB, decoders, integrations, policy)
      * 2. Enriches the namespace with local-only assets (outputs, filters, etc.)
      *
      * The method generates a unique temporary namespace ID to avoid conflicts and performs
      * automatic rollback on failure, ensuring the local store remains consistent.
      *
-     * @param originSpace The source space name in the wazuh-indexer to download from
+     * @param originSpace The source space name in the guardsarm-indexer to download from
      * @param consumerId Optional consumer ID to validate during policy retrieval
      * @return An optional NamespaceId. Returns std::nullopt if consumer is provided and not ready.
      * @throws std::runtime_error if any step of the process fails
@@ -134,7 +134,7 @@ public:
      * @brief Perform synchronization of all configured namespaces
      *
      * This method iterates through all namespaces configured for synchronization,
-     * checking for updates in the wazuh-indexer. If changes are detected, it
+     * checking for updates in the guardsarm-indexer. If changes are detected, it
      * downloads the updated namespace, enriches it with local assets, and updates
      * the router accordingly.
      *

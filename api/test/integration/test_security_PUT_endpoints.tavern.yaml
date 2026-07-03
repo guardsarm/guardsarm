@@ -611,10 +611,10 @@ stages:
         data:
           affected_items:
             - id: 1
-              username: wazuh
+              username: guardsarm
           total_affected_items: 1
 
-  - name: Update wazuh-wui admin user password
+  - name: Update guardsarm-wui admin user password
     request:
       verify: False
       url: "{protocol:s}://{host:s}:{balanced_port:d}/security/users/2"
@@ -622,7 +622,7 @@ stages:
         Authorization: "Bearer {test_login_token}"
       method: PUT
       json:
-        password: "NewWazuhWui1!"
+        password: "NewGuardSarmWui1!"
     response:
       status_code: 200
       json:
@@ -630,7 +630,7 @@ stages:
         data:
           affected_items:
             - id: 2
-              username: wazuh-wui
+              username: guardsarm-wui
           total_affected_items: 1
 
 

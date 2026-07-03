@@ -10,7 +10,7 @@ type: integration
 brief: File Integrity Monitoring (FIM) system watches selected files and triggering alerts when these
        files are modified. In particular, these tests will check if FIM events are still generated when
        a monitored directory is deleted and created again.
-       The FIM capability is managed by the 'wazuh-syscheckd' daemon, which checks configured files
+       The FIM capability is managed by the 'guardsarm-syscheckd' daemon, which checks configured files
        for changes to the checksums, permissions, and ownership.
 
 components:
@@ -22,7 +22,7 @@ targets:
     - agent
 
 daemons:
-    - wazuh-syscheckd
+    - guardsarm-syscheckd
 
 os_platform:
     - linux
@@ -40,9 +40,9 @@ os_version:
 
 references:
     - https://man7.org/linux/man-pages/man8/auditd.8.html
-    - https://documentation.wazuh.com/current/user-manual/capabilities/auditing-whodata/who-linux.html
-    - https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html
-    - https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syscheck.html
+    - https://documentation.guardsarm.com/current/user-manual/capabilities/auditing-whodata/who-linux.html
+    - https://documentation.guardsarm.com/current/user-manual/capabilities/file-integrity/index.html
+    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/syscheck.html
 
 pytest_args:
     - fim_mode:
@@ -62,19 +62,19 @@ import pytest
 
 from pathlib import Path
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.constants.platforms import WINDOWS
-from wazuh_testing.modules.agentd.configuration import (
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.constants.platforms import WINDOWS
+from guardsarm_testing.modules.agentd.configuration import (
     AGENTD_DEBUG,
     AGENTD_WINDOWS_DEBUG,
 )
-from wazuh_testing.modules.fim.patterns import INODE_ENTRIES_PATH_COUNT
-from wazuh_testing.modules.monitord.configuration import MONITORD_ROTATE_LOG
-from wazuh_testing.modules.fim.configuration import SYSCHECK_DEBUG
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils import file
-from wazuh_testing.utils.callbacks import generate_callback
-from wazuh_testing.utils.configuration import (
+from guardsarm_testing.modules.fim.patterns import INODE_ENTRIES_PATH_COUNT
+from guardsarm_testing.modules.monitord.configuration import MONITORD_ROTATE_LOG
+from guardsarm_testing.modules.fim.configuration import SYSCHECK_DEBUG
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.utils import file
+from guardsarm_testing.utils.callbacks import generate_callback
+from guardsarm_testing.utils.configuration import (
     get_test_cases_data,
     load_configuration_template,
 )
@@ -107,7 +107,7 @@ if sys.platform == WINDOWS:
 def test_delete_hardlink_symlink(
     test_configuration,
     test_metadata,
-    set_wazuh_configuration,
+    set_guardsarm_configuration,
     truncate_monitored_files,
     configure_local_internal_options,
     folder_to_monitor,
@@ -122,7 +122,7 @@ def test_delete_hardlink_symlink(
                  before the scan starts. Finally, it verifies in the generated FIM event
                  that the correct inodes and file paths are detected.
 
-    wazuh_min_version: 4.2.0
+    guardsarm_min_version: 4.2.0
 
     tier: 0
 
@@ -133,7 +133,7 @@ def test_delete_hardlink_symlink(
         - test_metadata:
             type: dict
             brief: Test case data.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Set ossec.conf configuration.
         - configure_local_internal_options:
@@ -150,7 +150,7 @@ def test_delete_hardlink_symlink(
             brief: Create the required hardlinks and symlinks.
         - daemons_handler:
             type: fixture
-            brief: Handler of Wazuh daemons.
+            brief: Handler of GuardSarm daemons.
         - start_monitoring:
             type: fixture
             brief: Wait FIM to start.
@@ -160,7 +160,7 @@ def test_delete_hardlink_symlink(
           the number of inodes and paths to files consistent.
 
     input_description: The test cases are contained in external YAML file (cases_delete_hardlink_symlink.yaml)
-                       which includes configuration parameters for the 'wazuh-syscheckd' daemon and testing
+                       which includes configuration parameters for the 'guardsarm-syscheckd' daemon and testing
                        directories to monitor. The configuration template is contained in another external YAML
                        file (configuration_basic.yaml).
 
@@ -171,12 +171,12 @@ def test_delete_hardlink_symlink(
         - scheduled
         - realtime
     """
-    wazuh_log_monitor = FileMonitor(WAZUH_LOG_PATH)
+    guardsarm_log_monitor = FileMonitor(GUARDSARM_LOG_PATH)
     hardlink_amount = test_metadata.get("hardlink_amount")
     symlink_amount = test_metadata.get("symlink_amount")
 
-    wazuh_log_monitor.start(generate_callback(INODE_ENTRIES_PATH_COUNT))
-    inode_entries, path_count = wazuh_log_monitor.callback_result
+    guardsarm_log_monitor.start(generate_callback(INODE_ENTRIES_PATH_COUNT))
+    inode_entries, path_count = guardsarm_log_monitor.callback_result
 
     assert int(inode_entries) == 1 + symlink_amount
     assert int(path_count) == 1 + hardlink_amount + symlink_amount

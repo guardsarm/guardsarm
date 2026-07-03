@@ -2,7 +2,7 @@
 
 ## Overview
 
-`cmstore` is the **primary content repository** for the Wazuh Engine. It manages all the resources that define the event processing pipeline: **decoders**, **filters**, **outputs**, **integrations**, **KVDBs**, and **policies**. These resources are organized into **namespaces**, each backed by a filesystem directory with a bidirectional UUID↔name cache for O(1) lookups.
+`cmstore` is the **primary content repository** for the GuardSarm Engine. It manages all the resources that define the event processing pipeline: **decoders**, **filters**, **outputs**, **integrations**, **KVDBs**, and **policies**. These resources are organized into **namespaces**, each backed by a filesystem directory with a bidirectional UUID↔name cache for O(1) lookups.
 
 CMStore is the single source of truth that the **builder** reads to compile the processing pipeline and that the **backend** ultimately executes. It also provides the CRUD layer used by the management API (`cmcrud`), the test API (`api/tester`), and the KVDB store (`kvdbstore`).
 
@@ -19,7 +19,7 @@ CMStore is the single source of truth that the **builder** reads to compile the 
               ▼                      ▼                      ▼
      ┌────────────────┐    ┌────────────────┐    ┌────────────────┐
      │  CMStoreNS     │    │  CMStoreNS     │    │  CMStoreNS     │
-     │  ns: "wazuh"   │    │  ns: "custom"  │    │  ns: "..."     │
+     │  ns: "guardsarm"   │    │  ns: "custom"  │    │  ns: "..."     │
      │                │    │                │    │                │
      │  ┌──────────┐  │    │  ┌──────────┐  │    │                │
      │  │ CacheNS  │  │    │  │ CacheNS  │  │    │                │

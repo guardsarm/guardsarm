@@ -1,6 +1,6 @@
 #! /bin/bash
 # By Spransy, Derek" <DSPRANS () emory ! edu> and Charlie Scott
-# Modified by Santiago Bassett (http://www.wazuh.com) - Feb 2016
+# Modified by Santiago Bassett (http://www.guardsarm.com) - Feb 2016
 # alterations by bil hays 2013
 # -Switched to bash
 # -Added some sanity checks
@@ -8,17 +8,17 @@
 #  starting at 600 puts this in user space
 # -Added lines to append the ossec users to the group ossec
 #  so the the list GroupMembership works properly
-GROUP="wazuh"
-USER="wazuh"
+GROUP="guardsarm"
+USER="guardsarm"
 DIR="/Library/Ossec"
 INSTALLATION_SCRIPTS_DIR="${DIR}/packages_files/agent_installation_scripts"
 SCA_BASE_DIR="${INSTALLATION_SCRIPTS_DIR}/sca"
-UPGRADE_FILE_FLAG="${DIR}/WAZUH_PKG_UPGRADE"
+UPGRADE_FILE_FLAG="${DIR}/GUARDSARM_PKG_UPGRADE"
 
 
-if [ -f "${DIR}/WAZUH_RESTART" ]; then
+if [ -f "${DIR}/GUARDSARM_RESTART" ]; then
     restart="true"
-    rm -f ${DIR}/WAZUH_RESTART
+    rm -f ${DIR}/GUARDSARM_RESTART
 fi
 
 if [ -f "${UPGRADE_FILE_FLAG}" ]; then
@@ -87,14 +87,14 @@ else
 fi
 
 if [ -z "${upgrade}" ]; then
-    echo "Generating Wazuh configuration for a fresh installation."
+    echo "Generating GuardSarm configuration for a fresh installation."
 
-    if [ -f "${INSTALLATION_SCRIPTS_DIR}/src/init/gen_wazuh.sh" ]; then
-        ${INSTALLATION_SCRIPTS_DIR}/src/init/gen_wazuh.sh conf agent ${DIST_NAME} ${DIST_VER}.${DIST_SUBVER} ${DIR} > ${DIR}/etc/ossec.conf
-        chown root:wazuh ${DIR}/etc/ossec.conf
+    if [ -f "${INSTALLATION_SCRIPTS_DIR}/src/init/gen_guardsarm.sh" ]; then
+        ${INSTALLATION_SCRIPTS_DIR}/src/init/gen_guardsarm.sh conf agent ${DIST_NAME} ${DIST_VER}.${DIST_SUBVER} ${DIR} > ${DIR}/etc/ossec.conf
+        chown root:guardsarm ${DIR}/etc/ossec.conf
         chmod 0640 ${DIR}/etc/ossec.conf
     else
-        echo "Error: ${INSTALLATION_SCRIPTS_DIR}/src/init/gen_wazuh.sh script not found."
+        echo "Error: ${INSTALLATION_SCRIPTS_DIR}/src/init/gen_guardsarm.sh script not found."
     fi
 fi
 
@@ -126,7 +126,7 @@ if [ -r ${SCA_TMP_FILE} ]; then
     done
 fi
 
-# Register and configure agent if Wazuh environment variables are defined
+# Register and configure agent if GuardSarm environment variables are defined
 if [ -z "${upgrade}" ]; then
     echo "Running the register_configure_agent.sh script..."
     if [ -f "${INSTALLATION_SCRIPTS_DIR}/src/init/register_configure_agent.sh" ]; then
@@ -155,11 +155,11 @@ rm -rf ${DIR}/packages_files
 
 # Remove old ossec user and group if exists and change ownwership of files
 if [[ $(dscl . -read /Groups/ossec) ]]; then
-    echo "Changing group from Ossec to Wazuh"
-    find ${DIR}/ -group ossec -user root -exec chown root:wazuh {} \ > /dev/null 2>&1 || true
+    echo "Changing group from Ossec to GuardSarm"
+    find ${DIR}/ -group ossec -user root -exec chown root:guardsarm {} \ > /dev/null 2>&1 || true
     if [[ $(dscl . -read /Users/ossec) ]]; then
-        echo "Changing user from Ossec to Wazuh"
-        find ${DIR}/ -group ossec -user ossec -exec chown wazuh:wazuh {} \ > /dev/null 2>&1 || true
+        echo "Changing user from Ossec to GuardSarm"
+        find ${DIR}/ -group ossec -user ossec -exec chown guardsarm:guardsarm {} \ > /dev/null 2>&1 || true
         echo "Removing Ossec user"
         sudo /usr/bin/dscl . -delete "/Users/ossec"
     fi
@@ -188,6 +188,6 @@ if [ -f ${DIR}/bin/agent-auth ]; then
 fi
 
 if [ -n "${upgrade}" ] && [ -n "${restart}" ]; then
-    echo "Restarting Wazuh..."
-    launchctl bootstrap system /Library/LaunchDaemons/com.wazuh.agent.plist
+    echo "Restarting GuardSarm..."
+    launchctl bootstrap system /Library/LaunchDaemons/com.guardsarm.agent.plist
 fi

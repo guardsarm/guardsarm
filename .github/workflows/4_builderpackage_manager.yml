@@ -1,5 +1,5 @@
-run-name: Package - Build ${{ inputs.system }} wazuh-manager on ${{ inputs.architecture }} ${{ inputs.is_stage && '- is stage' || '' }} ${{ inputs.checksum && '- checksum' || '' }} ${{ inputs.debug && '- debug' || '' }} ${{ inputs.id }}
-name: 4.X - Package - Build Wazuh manager
+run-name: Package - Build ${{ inputs.system }} guardsarm-manager on ${{ inputs.architecture }} ${{ inputs.is_stage && '- is stage' || '' }} ${{ inputs.checksum && '- checksum' || '' }} ${{ inputs.debug && '- debug' || '' }} ${{ inputs.id }}
+name: 4.X - Package - Build GuardSarm manager
 
 on:
   workflow_dispatch:

@@ -20,9 +20,9 @@
 #endif
 #include "../wrappers/libc/stdio_wrappers.h"
 #include "../wrappers/posix/select_wrappers.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/shared/exec_op_wrappers.h"
-#include "../wrappers/wazuh/shared/binaries_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/exec_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/binaries_op_wrappers.h"
 #include "../wrappers/common.h"
 #include "audit_op.h"
 #include "defs.h"

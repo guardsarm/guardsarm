@@ -42,7 +42,7 @@ foreach(TEST_FILE ${TEST_FILES})
             gmock_main
             pthread
             fimebpf
-            wazuh)
+            guardsarm)
 
   # Link gcov for coverage when UNIT_TEST is enabled
   if(UNIT_TEST)

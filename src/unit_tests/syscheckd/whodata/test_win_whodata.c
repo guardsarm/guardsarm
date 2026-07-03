@@ -22,17 +22,17 @@
 #include "wrappers/common.h"
 #include "wrappers/libc/stdio_wrappers.h"
 #include "wrappers/libc/stdlib_wrappers.h"
-#include "wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "wrappers/wazuh/shared/file_op_wrappers.h"
-#include "wrappers/wazuh/shared/fs_op_wrappers.h"
-#include "wrappers/wazuh/shared/hash_op_wrappers.h"
-#include "wrappers/wazuh/shared/mq_op_wrappers.h"
-#include "wrappers/wazuh/shared/string_op_wrappers.h"
-#include "wrappers/wazuh/shared/randombytes_wrappers.h"
-#include "wrappers/wazuh/syscheckd/config_wrappers.h"
-#include "wrappers/wazuh/syscheckd/create_db_wrappers.h"
-#include "wrappers/wazuh/wazuh_modules/wm_exec_wrappers.h"
-#include "wrappers/wazuh/shared/validate_op_wrappers.h"
+#include "wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "wrappers/guardsarm/shared/file_op_wrappers.h"
+#include "wrappers/guardsarm/shared/fs_op_wrappers.h"
+#include "wrappers/guardsarm/shared/hash_op_wrappers.h"
+#include "wrappers/guardsarm/shared/mq_op_wrappers.h"
+#include "wrappers/guardsarm/shared/string_op_wrappers.h"
+#include "wrappers/guardsarm/shared/randombytes_wrappers.h"
+#include "wrappers/guardsarm/syscheckd/config_wrappers.h"
+#include "wrappers/guardsarm/syscheckd/create_db_wrappers.h"
+#include "wrappers/guardsarm/guardsarm_modules/wm_exec_wrappers.h"
+#include "wrappers/guardsarm/shared/validate_op_wrappers.h"
 #include "wrappers/windows/winevt_wrappers.h"
 #include "wrappers/windows/ntsecapi_wrappers.h"
 
@@ -3505,7 +3505,7 @@ void test_get_volume_names_no_more_files(void **state) {
 
 void test_notify_SACL_change(void **state) {
     expect_string(__wrap_SendMSG, message,
-        "wazuh: Audit: The SACL of 'C:\\a\\path' has been modified and can no longer be scanned in whodata mode.");
+        "guardsarm: Audit: The SACL of 'C:\\a\\path' has been modified and can no longer be scanned in whodata mode.");
     expect_string(__wrap_SendMSG, locmsg, "syscheck");
     expect_value(__wrap_SendMSG, loc, LOCALFILE_MQ);
     will_return(__wrap_SendMSG, 0); // Return value is discarded
@@ -7076,7 +7076,7 @@ void test_state_checker_file_with_invalid_sacl(void **state) {
     // Inside notify_SACL_change
     {
         expect_string(__wrap_SendMSG, message,
-            "wazuh: Audit: The SACL of 'c:\\a\\path' has been modified and can no longer be scanned in whodata mode.");
+            "guardsarm: Audit: The SACL of 'c:\\a\\path' has been modified and can no longer be scanned in whodata mode.");
         expect_string(__wrap_SendMSG, locmsg, "syscheck");
         expect_value(__wrap_SendMSG, loc, LOCALFILE_MQ);
         will_return(__wrap_SendMSG, 0); // Return value is discarded

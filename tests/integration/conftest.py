@@ -9,36 +9,36 @@ import subprocess
 import pytest
 import sys
 
-from wazuh_testing.constants.platforms import WINDOWS, MACOS
+from guardsarm_testing.constants.platforms import WINDOWS, MACOS
 from py.xml import html
-from wazuh_testing import session_parameters
-from wazuh_testing.constants import platforms
-from wazuh_testing.constants.daemons import WAZUH_MANAGER, API_DAEMONS_REQUIREMENTS
-from wazuh_testing.constants.paths import ROOT_PREFIX
-from wazuh_testing.constants.paths.variables import VAR_RUN_PATH
-from wazuh_testing.constants.paths.api import RBAC_DATABASE_PATH
-from wazuh_testing.constants.paths.logs import (
-    WAZUH_LOG_PATH,
+from guardsarm_testing import session_parameters
+from guardsarm_testing.constants import platforms
+from guardsarm_testing.constants.daemons import GUARDSARM_MANAGER, API_DAEMONS_REQUIREMENTS
+from guardsarm_testing.constants.paths import ROOT_PREFIX
+from guardsarm_testing.constants.paths.variables import VAR_RUN_PATH
+from guardsarm_testing.constants.paths.api import RBAC_DATABASE_PATH
+from guardsarm_testing.constants.paths.logs import (
+    GUARDSARM_LOG_PATH,
     ALERTS_JSON_PATH,
     ARCHIVES_LOG_PATH,
-    WAZUH_API_LOG_FILE_PATH,
-    WAZUH_API_JSON_LOG_FILE_PATH,
+    GUARDSARM_API_LOG_FILE_PATH,
+    GUARDSARM_API_JSON_LOG_FILE_PATH,
 )
-from wazuh_testing.constants.paths.configurations import WAZUH_CLIENT_KEYS_PATH, SHARED_CONFIGURATIONS_PATH, WAZUH_CONF_PATH
-from wazuh_testing.logger import logger
-from wazuh_testing.tools import socket_controller
-from wazuh_testing.tools.monitors import queue_monitor
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.tools.simulators.agent_simulator import create_agents, connect
-from wazuh_testing.tools.simulators.authd_simulator import AuthdSimulator
-from wazuh_testing.tools.simulators.remoted_simulator import RemotedSimulator
-from wazuh_testing.utils import configuration, database, file, mocking, services
-from wazuh_testing.utils.file import remove_file, truncate_file
-from wazuh_testing.utils.manage_agents import remove_agents
-import wazuh_testing.utils.configuration as wazuh_configuration
-from wazuh_testing.utils.services import control_service
+from guardsarm_testing.constants.paths.configurations import GUARDSARM_CLIENT_KEYS_PATH, SHARED_CONFIGURATIONS_PATH, GUARDSARM_CONF_PATH
+from guardsarm_testing.logger import logger
+from guardsarm_testing.tools import socket_controller
+from guardsarm_testing.tools.monitors import queue_monitor
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.tools.simulators.agent_simulator import create_agents, connect
+from guardsarm_testing.tools.simulators.authd_simulator import AuthdSimulator
+from guardsarm_testing.tools.simulators.remoted_simulator import RemotedSimulator
+from guardsarm_testing.utils import configuration, database, file, mocking, services
+from guardsarm_testing.utils.file import remove_file, truncate_file
+from guardsarm_testing.utils.manage_agents import remove_agents
+import guardsarm_testing.utils.configuration as guardsarm_configuration
+from guardsarm_testing.utils.services import control_service
 
-WAZUH_MERGED_MG_PATH = os.path.join(SHARED_CONFIGURATIONS_PATH, 'merged.mg')
+GUARDSARM_MERGED_MG_PATH = os.path.join(SHARED_CONFIGURATIONS_PATH, 'merged.mg')
 
 # - - - - - - - - - - - - - - - - - - - - - - - - -Pytest configuration - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -148,49 +148,49 @@ def pytest_html_results_summary(prefix, summary, postfix):
 
 
 @pytest.fixture(scope="session")
-def load_wazuh_basic_configuration():
+def load_guardsarm_basic_configuration():
     """Load a new basic configuration to the manager"""
-    # Load wazuh configuration file with all disabled settings
+    # Load guardsarm configuration file with all disabled settings
     minimal_configuration = configuration.get_minimal_configuration()
 
     # Make a backup from current configuration
-    backup_ossec_configuration = configuration.get_wazuh_conf()
+    backup_ossec_configuration = configuration.get_guardsarm_conf()
 
     # Write new configuration
-    configuration.write_wazuh_conf(minimal_configuration)
+    configuration.write_guardsarm_conf(minimal_configuration)
 
     yield
 
-    # Restore the wazuh configuration file backup
-    configuration.write_wazuh_conf(backup_ossec_configuration)
+    # Restore the guardsarm configuration file backup
+    configuration.write_guardsarm_conf(backup_ossec_configuration)
 
 
 @pytest.fixture()
-def backup_wazuh_configuration() -> None:
-    """Backup wazuh configuration. Saves the initial configuration and restores it after the test."""
+def backup_guardsarm_configuration() -> None:
+    """Backup guardsarm configuration. Saves the initial configuration and restores it after the test."""
     # Save configuration
-    backup_config = configuration.get_wazuh_conf()
+    backup_config = configuration.get_guardsarm_conf()
 
     yield
 
     # Restore configuration
-    configuration.write_wazuh_conf(backup_config)
+    configuration.write_guardsarm_conf(backup_config)
 
 
 @pytest.fixture()
-def set_wazuh_configuration(request: pytest.FixtureRequest, test_configuration: dict) -> None:
-    """Set wazuh configuration
+def set_guardsarm_configuration(request: pytest.FixtureRequest, test_configuration: dict) -> None:
+    """Set guardsarm configuration
 
     Args:
         test_configuration (dict): Configuration template data to write in the ossec.conf
     """
     # Save current configuration
-    backup_config = configuration.get_wazuh_conf()
+    backup_config = configuration.get_guardsarm_conf()
 
     # Configuration for testing
     template = None
-    template_spec = getattr(request.module, "wazuh_configuration_template", None)
-    use_minimal_template = getattr(request.module, "use_minimal_wazuh_configuration", False)
+    template_spec = getattr(request.module, "guardsarm_configuration_template", None)
+    use_minimal_template = getattr(request.module, "use_minimal_guardsarm_configuration", False)
 
     if use_minimal_template:
         template = configuration.get_minimal_configuration()
@@ -202,12 +202,12 @@ def set_wazuh_configuration(request: pytest.FixtureRequest, test_configuration: 
         else:
             template = file.read_file_lines(os.fspath(template_spec))
 
-    test_config = configuration.set_section_wazuh_conf(
+    test_config = configuration.set_section_guardsarm_conf(
         test_configuration.get("sections"), template=template
     )
 
     # Set new configuration
-    configuration.write_wazuh_conf(test_config)
+    configuration.write_guardsarm_conf(test_config)
 
     # Set current configuration
     session_parameters.current_configuration = test_config
@@ -215,7 +215,7 @@ def set_wazuh_configuration(request: pytest.FixtureRequest, test_configuration: 
     yield
 
     # Restore previous configuration
-    configuration.write_wazuh_conf(backup_config)
+    configuration.write_guardsarm_conf(backup_config)
 
 
 @pytest.fixture()
@@ -244,22 +244,22 @@ def configure_local_internal_options_function(request):
             ) from AttributeError
 
     backup_local_internal_options = (
-        wazuh_configuration.get_local_internal_options_dict()
+        guardsarm_configuration.get_local_internal_options_dict()
     )
 
     logger.debug(f"Set local_internal_option to {str(local_internal_options)}")
-    wazuh_configuration.set_local_internal_options_dict(local_internal_options)
+    guardsarm_configuration.set_local_internal_options_dict(local_internal_options)
 
     yield
 
     logger.debug(
         f"Restore local_internal_option to {str(backup_local_internal_options)}"
     )
-    wazuh_configuration.set_local_internal_options_dict(backup_local_internal_options)
+    guardsarm_configuration.set_local_internal_options_dict(backup_local_internal_options)
 
 
 @pytest.fixture()
-def restart_wazuh_function(request):
+def restart_guardsarm_function(request):
     """Restart before starting a test, and stop it after finishing.
 
     Args:
@@ -287,7 +287,7 @@ def restart_wazuh_function(request):
         logger.debug("Stopping all daemons")
         control_service("stop")
     else:
-        # Stop a list daemons in order (as Wazuh does)
+        # Stop a list daemons in order (as GuardSarm does)
         daemons.reverse()
         for daemon in daemons:
             logger.debug(f"Stopping {daemon}")
@@ -306,7 +306,7 @@ def file_monitoring(request):
     if hasattr(request.module, "file_to_monitor"):
         file_to_monitor = getattr(request.module, "file_to_monitor")
     else:
-        file_to_monitor = WAZUH_LOG_PATH
+        file_to_monitor = GUARDSARM_LOG_PATH
 
     logger.debug(f"Initializing file to monitor to {file_to_monitor}")
 
@@ -321,17 +321,17 @@ def file_monitoring(request):
 
 def truncate_monitored_files_implementation() -> None:
     """Truncate all the log files and json alerts files before and after the test execution"""
-    if services.get_service() == WAZUH_MANAGER:
+    if services.get_service() == GUARDSARM_MANAGER:
         log_files = [
-            WAZUH_LOG_PATH,
+            GUARDSARM_LOG_PATH,
             ALERTS_JSON_PATH,
             ARCHIVES_LOG_PATH,
-            WAZUH_API_LOG_FILE_PATH,
-            WAZUH_API_JSON_LOG_FILE_PATH,
-            WAZUH_CLIENT_KEYS_PATH,
+            GUARDSARM_API_LOG_FILE_PATH,
+            GUARDSARM_API_JSON_LOG_FILE_PATH,
+            GUARDSARM_CLIENT_KEYS_PATH,
         ]
     else:
-        log_files = [WAZUH_LOG_PATH]
+        log_files = [GUARDSARM_LOG_PATH]
 
     for log_file in log_files:
         if os.path.isfile(os.path.join(ROOT_PREFIX, log_file)):
@@ -357,14 +357,14 @@ def truncate_monitored_files_module() -> None:
 
 
 def daemons_handler_implementation(request: pytest.FixtureRequest) -> None:
-    """Helper function to handle Wazuh daemons.
+    """Helper function to handle GuardSarm daemons.
 
     It uses `daemons_handler_configuration` of each module in order to configure the behavior of the fixture.
 
     The  `daemons_handler_configuration` should be a dictionary with the following keys:
         daemons (list, optional): List with every daemon to be used by the module. In case of empty a ValueError
             will be raised
-        all_daemons (boolean): Configure to restart all wazuh services. Default `False`.
+        all_daemons (boolean): Configure to restart all guardsarm services. Default `False`.
         ignore_errors (boolean): Configure if errors in daemon handling should be ignored. This option is available
         in order to use this fixture along with invalid configuration. Default `False`
 
@@ -383,19 +383,19 @@ def daemons_handler_implementation(request: pytest.FixtureRequest) -> None:
                 raise ValueError
 
         if "all_daemons" in config:
-            logger.debug(f"Wazuh control set to {config['all_daemons']}")
+            logger.debug(f"GuardSarm control set to {config['all_daemons']}")
             all_daemons = config["all_daemons"]
 
         if "ignore_errors" in config:
             logger.debug(f"Ignore error set to {config['ignore_errors']}")
             ignore_errors = config["ignore_errors"]
     else:
-        logger.debug("Wazuh control set to 'all_daemons'")
+        logger.debug("GuardSarm control set to 'all_daemons'")
         all_daemons = True
 
     try:
         if all_daemons:
-            logger.debug("Restarting wazuh using wazuh-control")
+            logger.debug("Restarting guardsarm using guardsarm-control")
             services.control_service("restart")
         else:
             for daemon in daemons:
@@ -416,7 +416,7 @@ def daemons_handler_implementation(request: pytest.FixtureRequest) -> None:
     yield
 
     if all_daemons:
-        logger.debug("Stopping wazuh using wazuh-control")
+        logger.debug("Stopping guardsarm using guardsarm-control")
         services.control_service("stop")
     else:
         if daemons == API_DAEMONS_REQUIREMENTS:
@@ -448,13 +448,13 @@ def daemons_handler_module(request: pytest.FixtureRequest) -> None:
 
 
 @pytest.fixture(scope="module")
-def restart_wazuh_daemon_after_finishing_module(daemon: str = None) -> None:
-    """Restart a Wazuh daemons and clears the wazuh log after the test module finishes execution.
+def restart_guardsarm_daemon_after_finishing_module(daemon: str = None) -> None:
+    """Restart a GuardSarm daemons and clears the guardsarm log after the test module finishes execution.
     Args:
         daemon (str): provide which daemon to restart. If None, all daemons will be restarted.
     """
     yield
-    file.truncate_file(WAZUH_LOG_PATH)
+    file.truncate_file(GUARDSARM_LOG_PATH)
     services.control_service("restart", daemon=daemon)
 
 
@@ -464,7 +464,7 @@ def configure_local_internal_options_handler(
     """Configure the local internal options file.
 
     Takes the `local_internal_options` variable from the request.
-    The `local_internal_options` is a dict with keys and values as the Wazuh `local_internal_options` format.
+    The `local_internal_options` is a dict with keys and values as the GuardSarm `local_internal_options` format.
     E.g.: local_internal_options = {'monitord.rotate_log': '0', 'syscheck.debug': '0' }
 
     Args:
@@ -503,7 +503,7 @@ def configure_local_internal_options(
     """Configure the local internal options file.
 
     Takes the `local_internal_options` variable from the request.
-    The `local_internal_options` is a dict with keys and values as the Wazuh `local_internal_options` format.
+    The `local_internal_options` is a dict with keys and values as the GuardSarm `local_internal_options` format.
     E.g.: local_internal_options = {'monitord.rotate_log': '0', 'syscheck.debug': '0' }
 
     Args:
@@ -542,7 +542,7 @@ def configure_sockets_environment_implementation(
     started_daemons = list()
 
     try:
-        # Stop wazuh-service and ensure all daemons are stopped
+        # Stop guardsarm-service and ensure all daemons are stopped
         try:
             services.control_service("stop")
         except Exception as e:
@@ -593,11 +593,11 @@ def configure_sockets_environment_implementation(
 
             # Use a 60s timeout (vs the framework default of 10s) because
             # test_authd_key_request_worker has been observed to need >30s for
-            # wazuh-authd to publish its pid file when started right after the
-            # previous module killed wazuh-authd (likely TIME_WAIT on port 1515
+            # guardsarm-authd to publish its pid file when started right after the
+            # previous module killed guardsarm-authd (likely TIME_WAIT on port 1515
             # or post-fork init taking longer than expected). If the timeout
             # still hits, the next step is to capture /var/ossec/logs/ossec.log
-            # to see what wazuh-authd is doing after goDaemon().
+            # to see what guardsarm-authd is doing after goDaemon().
             services.wait_expected_daemon_status(
                 target_daemon=daemon,
                 running_condition=True,
@@ -738,7 +738,7 @@ def connect_to_sockets_module(request: pytest.FixtureRequest) -> None:
 
 @pytest.fixture(scope="module")
 def mock_agent_module():
-    """Fixture to create a mocked agent in wazuh databases"""
+    """Fixture to create a mocked agent in guardsarm databases"""
     agent_id = mocking.create_mocked_agent(name="mocked_agent")
 
     yield agent_id
@@ -788,18 +788,18 @@ def ensure_merged_mg() -> None:
     """Write the default dummy merged.mg whose MD5 matches RemotedSimulator.DEFAULT_MERGED_SUM.
 
     On Linux the file is created with group-writable permissions (0o660) and
-    owned by root:wazuh so that wazuh-agentd can overwrite it when receiving
+    owned by root:guardsarm so that guardsarm-agentd can overwrite it when receiving
     a new merged.mg from the manager (or simulator).
     """
-    os.makedirs(os.path.dirname(WAZUH_MERGED_MG_PATH), exist_ok=True)
-    with open(WAZUH_MERGED_MG_PATH, 'wb') as f:
+    os.makedirs(os.path.dirname(GUARDSARM_MERGED_MG_PATH), exist_ok=True)
+    with open(GUARDSARM_MERGED_MG_PATH, 'wb') as f:
         f.write(RemotedSimulator.DEFAULT_MERGED_MG_CONTENT)
     if sys.platform != platforms.WINDOWS:
         import grp
-        os.chmod(WAZUH_MERGED_MG_PATH, 0o660)
+        os.chmod(GUARDSARM_MERGED_MG_PATH, 0o660)
         try:
-            wazuh_gid = grp.getgrnam('wazuh').gr_gid
-            os.chown(WAZUH_MERGED_MG_PATH, -1, wazuh_gid)
+            guardsarm_gid = grp.getgrnam('guardsarm').gr_gid
+            os.chown(GUARDSARM_MERGED_MG_PATH, -1, guardsarm_gid)
         except (KeyError, PermissionError):
             pass
 
@@ -811,11 +811,11 @@ def clean_merged_mg():
     After the test, any merged.mg left by the simulator push is also removed
     to avoid leaking state between tests.
     """
-    if os.path.exists(WAZUH_MERGED_MG_PATH):
-        os.remove(WAZUH_MERGED_MG_PATH)
+    if os.path.exists(GUARDSARM_MERGED_MG_PATH):
+        os.remove(GUARDSARM_MERGED_MG_PATH)
     yield
-    if os.path.exists(WAZUH_MERGED_MG_PATH):
-        os.remove(WAZUH_MERGED_MG_PATH)
+    if os.path.exists(GUARDSARM_MERGED_MG_PATH):
+        os.remove(GUARDSARM_MERGED_MG_PATH)
 
 
 @pytest.fixture()
@@ -916,19 +916,19 @@ def add_user_in_rbac(request):
 @pytest.fixture(autouse=True)
 def autostart_simulators(request: pytest.FixtureRequest) -> None:
     """
-    Fixture for starting simulators in wazuh-agent executions.
+    Fixture for starting simulators in guardsarm-agent executions.
 
     This fixture starts both Authd and Remoted simulators only in the cases where the service is not
-    WAZUH_MANAGER, and when the test function is not already using the simulator fixture, if it does
+    GUARDSARM_MANAGER, and when the test function is not already using the simulator fixture, if it does
     use one of them, only start the remaining simulator.
 
-    This is required so all wazuh-agent instances are being tested with the wazuh-manager connection
+    This is required so all guardsarm-agent instances are being tested with the guardsarm-manager connection
     being mocked.
     """
     create_authd = "authd_simulator" not in request.fixturenames
     create_remoted = "remoted_simulator" not in request.fixturenames
 
-    if services.get_service() is not WAZUH_MANAGER:
+    if services.get_service() is not GUARDSARM_MANAGER:
         authd = AuthdSimulator() if create_authd else None
         remoted = RemotedSimulator() if create_remoted else None
 
@@ -937,7 +937,7 @@ def autostart_simulators(request: pytest.FixtureRequest) -> None:
 
     yield
 
-    if services.get_service() is not WAZUH_MANAGER:
+    if services.get_service() is not GUARDSARM_MANAGER:
         authd.shutdown() if create_authd else None
         remoted.shutdown() if create_remoted else None
 
@@ -966,7 +966,7 @@ def fix_ossec_conf_multiple_roots():
         return
 
     try:
-        with open(WAZUH_CONF_PATH, 'r') as f:
+        with open(GUARDSARM_CONF_PATH, 'r') as f:
             content = f.read()
 
         # Only act when two root blocks are present
@@ -977,7 +977,7 @@ def fix_ossec_conf_multiple_roots():
         import re
         fixed = re.sub(r'</ossec_config>\s*<ossec_config>', '', content, count=1)
 
-        with open(WAZUH_CONF_PATH, 'w') as f:
+        with open(GUARDSARM_CONF_PATH, 'w') as f:
             f.write(fixed)
     except OSError:
         # Not installed or no permission — tests will fail on their own if needed

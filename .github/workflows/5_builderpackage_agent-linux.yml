@@ -1,5 +1,5 @@
-run-name: Build Wazuh agent Linux - ${{ github.event.pull_request.head.ref || github.ref_name }} - ${{ inputs.system || 'deb,rpm' }} - ${{ inputs.architecture || 'amd64' }}
-name: 5.X - Build Wazuh agent Linux (DEB/RPM)
+run-name: Build GuardSarm agent Linux - ${{ github.event.pull_request.head.ref || github.ref_name }} - ${{ inputs.system || 'deb,rpm' }} - ${{ inputs.architecture || 'amd64' }}
+name: 5.X - Build GuardSarm agent Linux (DEB/RPM)
 
 on:
   pull_request:
@@ -122,12 +122,12 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.CI_WAZUHCI_DOCKERHUB_USER }}
-          password: ${{ secrets.CI_WAZUHCI_DOCKERHUB_TOKEN }}
+          username: ${{ secrets.CI_GUARDSARMCI_DOCKERHUB_USER }}
+          password: ${{ secrets.CI_GUARDSARMCI_DOCKERHUB_TOKEN }}
 
       - name: Download docker image for package building
         run: |
-          bash .github/actions/ghcr-pull-and-push/pull_image_from_ghcr.sh "${{ secrets.CI_WAZUH_AGENT_PACKAGES_CLASSIC }}" "${{ github.actor }}" "$CONTAINER_NAME" "$TAG"
+          bash .github/actions/ghcr-pull-and-push/pull_image_from_ghcr.sh "${{ secrets.CI_GUARDSARM_AGENT_PACKAGES_CLASSIC }}" "${{ github.actor }}" "$CONTAINER_NAME" "$TAG"
 
       - name: Append short commit to VERSION file
         run: |
@@ -151,11 +151,11 @@ jobs:
           bash packages/generate_package.sh -a "${{ env.ARCH }}" --tag "${{ env.TAG }}" --system "${{ env.SYSTEM }}" $FLAGS
 
           if [ "${{ matrix.system }}" == "deb" ]; then
-            PACKAGE_NAME=$(find /tmp -maxdepth 1 -type f -name "*agent*.deb" -exec basename {} 2>/dev/null \; | grep -v -E "^wazuh-agent-dbg")
-            PACKAGE_SYMBOLS_NAME=$(find /tmp -maxdepth 1 -type f -name "*agent*.deb" -exec basename {} 2>/dev/null \; | grep -E "^wazuh-agent-dbg")
+            PACKAGE_NAME=$(find /tmp -maxdepth 1 -type f -name "*agent*.deb" -exec basename {} 2>/dev/null \; | grep -v -E "^guardsarm-agent-dbg")
+            PACKAGE_SYMBOLS_NAME=$(find /tmp -maxdepth 1 -type f -name "*agent*.deb" -exec basename {} 2>/dev/null \; | grep -E "^guardsarm-agent-dbg")
           else
-            PACKAGE_NAME=$(find /tmp -maxdepth 1 -type f -name "*agent*.rpm" -exec basename {} 2>/dev/null \; | grep -v -E "^wazuh-agent-debuginfo")
-            PACKAGE_SYMBOLS_NAME=$(find /tmp -maxdepth 1 -type f -name "*agent*.rpm" -exec basename {} 2>/dev/null \; | grep -E "^wazuh-agent-debuginfo")
+            PACKAGE_NAME=$(find /tmp -maxdepth 1 -type f -name "*agent*.rpm" -exec basename {} 2>/dev/null \; | grep -v -E "^guardsarm-agent-debuginfo")
+            PACKAGE_SYMBOLS_NAME=$(find /tmp -maxdepth 1 -type f -name "*agent*.rpm" -exec basename {} 2>/dev/null \; | grep -E "^guardsarm-agent-debuginfo")
           fi
 
           cat <<EOF | sed -e 's/^[[:space:]]*//' > /tmp/metadata.env
@@ -268,12 +268,12 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.CI_WAZUHCI_DOCKERHUB_USER }}
-          password: ${{ secrets.CI_WAZUHCI_DOCKERHUB_TOKEN }}
+          username: ${{ secrets.CI_GUARDSARMCI_DOCKERHUB_USER }}
+          password: ${{ secrets.CI_GUARDSARMCI_DOCKERHUB_TOKEN }}
 
       - name: Download docker image for testing
         run: |
-          bash .github/actions/ghcr-pull-and-push/pull_image_from_ghcr.sh "${{ secrets.CI_WAZUH_AGENT_PACKAGES_CLASSIC }}" "${{ github.actor }}" "${{ env.CONTAINER_NAME }}" "${{ env.TAG }}"
+          bash .github/actions/ghcr-pull-and-push/pull_image_from_ghcr.sh "${{ secrets.CI_GUARDSARM_AGENT_PACKAGES_CLASSIC }}" "${{ github.actor }}" "${{ env.CONTAINER_NAME }}" "${{ env.TAG }}"
 
       - name: Test install package
         run: |
@@ -291,14 +291,14 @@ jobs:
             --entrypoint '/tests/install_component.sh' \
             "$CONTAINER_NAME:$TAG" \
             "$PACKAGE_NAME" agent
-          if grep -iq " installed.*wazuh-agent" /tmp/status.log ; then
+          if grep -iq " installed.*guardsarm-agent" /tmp/status.log ; then
             echo "Installation successfully."
           else
             exit 1
           fi
           cat << EOF | sed -e 's/^[[:space:]]*//' -e 's/\r$//' >> $GITHUB_ENV
-          WAZUH_UID=$(cat $TESTS_PATH/wazuh_uid)
-          WAZUH_GID=$(cat $TESTS_PATH/wazuh_gid)
+          GUARDSARM_UID=$(cat $TESTS_PATH/guardsarm_uid)
+          GUARDSARM_GID=$(cat $TESTS_PATH/guardsarm_gid)
           EOF
 
       - name: CSV filename Formation
@@ -310,8 +310,8 @@ jobs:
         with:
           expected_files: ${{ env.CSV_FILENAME }}
           installation_directory: /var/ossec
-          wazuh_uid: ${{ env.WAZUH_UID }}
-          wazuh_gid: ${{ env.WAZUH_GID }}
+          guardsarm_uid: ${{ env.GUARDSARM_UID }}
+          guardsarm_gid: ${{ env.GUARDSARM_GID }}
 
       - name: Test uninstall package
         uses: ./.github/actions/5_builderpackage_linux-smoke-uninstall-test
@@ -322,8 +322,8 @@ jobs:
         id: last-stable-version
         uses: ./.github/actions/5_builderpackage_get-last-stable-version
         with:
-          repo_owner: wazuh
-          repo_name: wazuh
+          repo_owner: guardsarm
+          repo_name: guardsarm
           testing_version: ${{ env.VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -413,7 +413,7 @@ jobs:
 
       - name: Upload package to S3
         run: |
-          S3_URI="s3://xdrsiem-packages-dev-internal/development/wazuh/5.x/main/packages"
+          S3_URI="s3://xdrsiem-packages-dev-internal/development/guardsarm/5.x/main/packages"
           if [ -s "/tmp/${{ env.PACKAGE_NAME }}" ]; then
             aws s3 cp /tmp/${{ env.PACKAGE_NAME }} $S3_URI/
             echo "S3 URI: $S3_URI/${{ env.PACKAGE_NAME }}"
@@ -425,7 +425,7 @@ jobs:
       - name: Upload checksum to S3
         if: inputs.checksum == true
         run: |
-          S3_URI="s3://xdrsiem-packages-dev-internal/development/wazuh/5.x/main/packages"
+          S3_URI="s3://xdrsiem-packages-dev-internal/development/guardsarm/5.x/main/packages"
           if [ -s "/tmp/${{ env.PACKAGE_NAME }}.sha512" ]; then
             aws s3 cp /tmp/${{ env.PACKAGE_NAME }}.sha512 $S3_URI/
           else
@@ -435,7 +435,7 @@ jobs:
       - name: Upload debug symbols to S3
         if: env.PACKAGE_SYMBOLS_NAME != ''
         run: |
-          S3_URI="s3://xdrsiem-packages-dev-internal/development/wazuh/5.x/main/packages"
+          S3_URI="s3://xdrsiem-packages-dev-internal/development/guardsarm/5.x/main/packages"
           if [ -s "/tmp/${{ env.PACKAGE_SYMBOLS_NAME }}" ]; then
             aws s3 cp /tmp/${{ env.PACKAGE_SYMBOLS_NAME }} $S3_URI/
           else
@@ -445,7 +445,7 @@ jobs:
       - name: Upload debug symbols checksum to S3
         if: inputs.checksum == true && env.PACKAGE_SYMBOLS_NAME != ''
         run: |
-          S3_URI="s3://xdrsiem-packages-dev-internal/development/wazuh/5.x/main/packages"
+          S3_URI="s3://xdrsiem-packages-dev-internal/development/guardsarm/5.x/main/packages"
           if [ -s "/tmp/${{ env.PACKAGE_SYMBOLS_NAME }}.sha512" ]; then
             aws s3 cp /tmp/${{ env.PACKAGE_SYMBOLS_NAME }}.sha512 $S3_URI/
           else

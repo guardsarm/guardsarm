@@ -1,13 +1,14 @@
-WAZUH
+GUARDSARM
 Copyright (C) 2015, Wazuh Inc.
+GuardSarm branding (C) 2026 GuardSarm, Inc.
 
 Based on OSSEC
 Copyright (C) 2014 Trend Micro Inc.
 
 
-= Information about OSSEC =
+= Information about GuardSarm =
 
-Visit https://www.wazuh.com
+Visit https://guardsarm.com
 
 
 = Recommended Installation =
@@ -29,7 +30,7 @@ Fast way steps:
    or /etc/rc.d/init.d/ossec). If the init script is not created,
    make sure to follow the instructions from the install.sh to make
    OSSEC HIDS start during the boot. To start it by hand, just run
-   /var/ossec/bin/wazuh-control start
+   /var/ossec/bin/guardsarm-control start
 
 3- If you are running it on multiple clients, make sure to install
    the server first. Use the manage_agents tool
@@ -72,14 +73,14 @@ To compile everything by yourself the following dependencies need to be installe
 
 The following step is common to all OSes:
 - CMake 3.18 installation
-   $> curl -OL http://packages.wazuh.com/utils/cmake/cmake-3.18.3.tar.gz && tar -zxf cmake-3.18.3.tar.gz
+   $> curl -OL http://packages.guardsarm.com/utils/cmake/cmake-3.18.3.tar.gz && tar -zxf cmake-3.18.3.tar.gz
    $> cd cmake-3.18.3 && ./bootstrap --no-system-curl
    $> make -j$(nproc) && make install
    $> cd .. && rm -rf cmake-*
 
 Note: `gcc/g++ 5.5` and `CMake 3.12.4` are the minimun required versions to be installed.
 
-Under wazuh/src folder:
+Under guardsarm/src folder:
 1- make deps
 2- make TARGET=<agent|server> (Optional: DEBUG=1 TEST=1)
 

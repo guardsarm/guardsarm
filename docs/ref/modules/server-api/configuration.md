@@ -1,6 +1,6 @@
 # Configuration
 
-The Server API and Framework read configuration from multiple sources: YAML files for the API layer, `wazuh-manager.conf` for the manager, and internal constants for runtime limits.
+The Server API and Framework read configuration from multiple sources: YAML files for the API layer, `guardsarm-manager.conf` for the manager, and internal constants for runtime limits.
 
 ---
 
@@ -24,7 +24,7 @@ The API reads its configuration from files defined in `api/constants.py`:
 
 ## Manager Configuration
 
-- `etc/wazuh-manager.conf` is parsed by `core/configuration.py`
+- `etc/guardsarm-manager.conf` is parsed by `core/configuration.py`
 - Configuration sections are validated per component
 - XML validation uses `lxml` and `defusedxml`
 
@@ -32,14 +32,14 @@ The API reads its configuration from files defined in `api/constants.py`:
 
 ## Global Constants & Context (`core/common.py`)
 
-This module centralizes all Wazuh paths, limits, and runtime context.
+This module centralizes all GuardSarm paths, limits, and runtime context.
 
 ### Key Functions
 
 | Function | Description |
 |----------|-------------|
-| `find_wazuh_path()` | Auto-discovers the Wazuh installation root |
-| `wazuh_uid()` / `wazuh_gid()` | Gets the wazuh-manager system user/group IDs |
+| `find_guardsarm_path()` | Auto-discovers the GuardSarm installation root |
+| `guardsarm_uid()` / `guardsarm_gid()` | Gets the guardsarm-manager system user/group IDs |
 | `reset_context_cache()` | Decorator for request-scoped caching |
 
 ### Important Limits

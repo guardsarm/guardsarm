@@ -24,7 +24,7 @@ else
   /var/ossec/bin/agent-auth -A "${AGENT_NAME}" -m "${MANAGER_HOST}" -p "${AUTHD_PORT}" || true
 fi
 
-/var/ossec/bin/wazuh-control start
+/var/ossec/bin/guardsarm-control start
 
 touch "$LOG_FILE"
 tail -F "$LOG_FILE"

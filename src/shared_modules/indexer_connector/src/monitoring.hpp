@@ -1,5 +1,5 @@
 /*
- * Wazuh content manager
+ * GuardSarm content manager
  * Copyright (C) 2015, Wazuh Inc.
  * June 21, 2023.
  *
@@ -84,7 +84,7 @@ class TMonitoring final
             //     {
             //         "epoch": "1726271464",
             //         "timestamp": "23:51:04",
-            //         "cluster": "wazuh-cluster",
+            //         "cluster": "guardsarm-cluster",
             //         "status": "green",
             //         "node.total": "1",
             //         "node.data": "1",

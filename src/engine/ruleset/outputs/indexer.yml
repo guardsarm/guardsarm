@@ -2,18 +2,18 @@ name: output/indexer/0
 enabled: true
 
 metadata:
-  module: wazuh
+  module: guardsarm
   title: Indexer data stream outputs
-  description: Output integrations events to wazuh-indexer
+  description: Output integrations events to guardsarm-indexer
 
 outputs:
   - first_of:
-    - check: index_unclassified_events($wazuh.integration.category)
+    - check: index_unclassified_events($guardsarm.integration.category)
       then:
-        - wazuh-indexer:
-            index: "wazuh-events-v5-unclassified"
+        - guardsarm-indexer:
+            index: "guardsarm-events-v5-unclassified"
 
-    - check: string_not_equal($wazuh.integration.category, "unclassified")
+    - check: string_not_equal($guardsarm.integration.category, "unclassified")
       then:
-        - wazuh-indexer:
-            index: "wazuh-events-v5-${wazuh.integration.category}"
+        - guardsarm-indexer:
+            index: "guardsarm-events-v5-${guardsarm.integration.category}"

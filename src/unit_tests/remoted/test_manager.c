@@ -15,18 +15,18 @@
 #include <sys/stat.h>
 
 #include "../wrappers/common.h"
-#include "../wrappers/wazuh/os_crypto/sha256_op_wrappers.h"
-#include "../wrappers/wazuh/shared/hash_op_wrappers.h"
-#include "../wrappers/wazuh/shared/agent_op_wrappers.h"
+#include "../wrappers/guardsarm/os_crypto/sha256_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/hash_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/agent_op_wrappers.h"
 #include "../wrappers/posix/dirent_wrappers.h"
 #include "../wrappers/posix/unistd_wrappers.h"
-#include "../wrappers/wazuh/remoted/request_wrappers.h"
-#include "../wrappers/wazuh/remoted/remoted_op_wrappers.h"
-#include "../wrappers/wazuh/shared/wazuhdb_queries_op_wrappers.h"
-#include "../wrappers/wazuh/shared/hash_op_wrappers.h"
+#include "../wrappers/guardsarm/remoted/request_wrappers.h"
+#include "../wrappers/guardsarm/remoted/remoted_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/guardsarmdb_queries_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/hash_op_wrappers.h"
 
 #ifdef TEST_SERVER
-#define ARGV0 "wazuh-manager-remoted"
+#define ARGV0 "guardsarm-manager-remoted"
 #endif
 
 #include "wdb.h"
@@ -585,7 +585,7 @@ void test_lookfor_agent_group_with_group()
 {
     const int agent_id = 1;
     const char agent_id_str[] = "001";
-    char *msg = "Linux |localhost.localdomain |4.18.0-240.22.1.el8_3.x86_64 |#1 SMP Thu Apr 8 19:01:30 UTC 2021 |x86_64 [CentOS Linux|centos: 8.3] - Wazuh v4.2.0 / ab73af41699f13fdd81903b5f23d8d00\nc2305e0ac17e7176e924294c69cc7a24 merged.mg\n#\"_agent_ip\":10.0.2.4";
+    char *msg = "Linux |localhost.localdomain |4.18.0-240.22.1.el8_3.x86_64 |#1 SMP Thu Apr 8 19:01:30 UTC 2021 |x86_64 [CentOS Linux|centos: 8.3] - GuardSarm v4.2.0 / ab73af41699f13fdd81903b5f23d8d00\nc2305e0ac17e7176e924294c69cc7a24 merged.mg\n#\"_agent_ip\":10.0.2.4";
     char *r_group = NULL;
     char *test_group = strdup("TESTGROUP");
 
@@ -605,7 +605,7 @@ void test_lookfor_agent_group_set_default_group()
 {
     const int agent_id = 1;
     const char agent_id_str[] = "001";
-    char *msg = "Linux |localhost.localdomain |4.18.0-240.22.1.el8_3.x86_64 |#1 SMP Thu Apr 8 19:01:30 UTC 2021 |x86_64 [CentOS Linux|centos: 8.3] - Wazuh v4.2.0 / ab73af41699f13fdd81903b5f23d8d00\nc2305e0ac17e7176e924294c69cc7a24 merged.mg\n#\"_agent_ip\":10.0.2.4";
+    char *msg = "Linux |localhost.localdomain |4.18.0-240.22.1.el8_3.x86_64 |#1 SMP Thu Apr 8 19:01:30 UTC 2021 |x86_64 [CentOS Linux|centos: 8.3] - GuardSarm v4.2.0 / ab73af41699f13fdd81903b5f23d8d00\nc2305e0ac17e7176e924294c69cc7a24 merged.mg\n#\"_agent_ip\":10.0.2.4";
     char *r_group = NULL;
 
     expect_value(__wrap_wdb_get_agent_group, id, agent_id);
@@ -631,7 +631,7 @@ void test_lookfor_agent_group_set_group_worker()
 {
     const int agent_id = 1;
     const char agent_id_str[] = "001";
-    char *msg = "Linux |localhost.localdomain |4.18.0-240.22.1.el8_3.x86_64 |#1 SMP Thu Apr 8 19:01:30 UTC 2021 |x86_64 [CentOS Linux|centos: 8.3] - Wazuh v4.2.0 / ab73af41699f13fdd81903b5f23d8d00\nc2305e0ac17e7176e924294c69cc7a24 merged.mg\n#\"_agent_ip\":10.0.2.4";
+    char *msg = "Linux |localhost.localdomain |4.18.0-240.22.1.el8_3.x86_64 |#1 SMP Thu Apr 8 19:01:30 UTC 2021 |x86_64 [CentOS Linux|centos: 8.3] - GuardSarm v4.2.0 / ab73af41699f13fdd81903b5f23d8d00\nc2305e0ac17e7176e924294c69cc7a24 merged.mg\n#\"_agent_ip\":10.0.2.4";
     char *r_group = NULL;
 
     cJSON *input = cJSON_CreateObject();
@@ -689,7 +689,7 @@ void test_lookfor_agent_group_set_group_worker_error()
 {
     const int agent_id = 1;
     const char agent_id_str[] = "001";
-    char *msg = "Linux |localhost.localdomain |4.18.0-240.22.1.el8_3.x86_64 |#1 SMP Thu Apr 8 19:01:30 UTC 2021 |x86_64 [CentOS Linux|centos: 8.3] - Wazuh v4.2.0 / ab73af41699f13fdd81903b5f23d8d00\nc2305e0ac17e7176e924294c69cc7a24 merged.mg\n#\"_agent_ip\":10.0.2.4";
+    char *msg = "Linux |localhost.localdomain |4.18.0-240.22.1.el8_3.x86_64 |#1 SMP Thu Apr 8 19:01:30 UTC 2021 |x86_64 [CentOS Linux|centos: 8.3] - GuardSarm v4.2.0 / ab73af41699f13fdd81903b5f23d8d00\nc2305e0ac17e7176e924294c69cc7a24 merged.mg\n#\"_agent_ip\":10.0.2.4";
     char *r_group = NULL;
 
     cJSON *input = cJSON_CreateObject();
@@ -747,7 +747,7 @@ void test_lookfor_agent_group_msg_without_enter()
 {
     const int agent_id = 2;
     const char agent_id_str[] = "002";
-    char *msg = "Linux |localhost.localdomain |4.18.0-240.22.1.el8_3.x86_64 |#1 SMP Thu Apr 8 19:01:30 UTC 2021 |x86_64 [CentOS Linux|centos: 8.3] - Wazuh v4.2.0 / ab73af41699f13fdd81903b5f23d8d00c2305e0ac17e7176e924294c69cc7a24 merged.mg";
+    char *msg = "Linux |localhost.localdomain |4.18.0-240.22.1.el8_3.x86_64 |#1 SMP Thu Apr 8 19:01:30 UTC 2021 |x86_64 [CentOS Linux|centos: 8.3] - GuardSarm v4.2.0 / ab73af41699f13fdd81903b5f23d8d00c2305e0ac17e7176e924294c69cc7a24 merged.mg";
     char *r_group = NULL;
 
     expect_value(__wrap_wdb_get_agent_group, id, agent_id);
@@ -4099,7 +4099,7 @@ void test_validate_control_msg_shutdown_success(void** state)
     expect_value(__wrap_OSHash_Delete_ex, self, agent_data_hash);
 
     // Expect minfo to be called with OS_AG_STOPPED format
-    expect_string(__wrap__minfo, formatted_msg, "wazuh: Agent stopped: [001] (agent1).");
+    expect_string(__wrap__minfo, formatted_msg, "GuardSarm: Agent stopped: [001] (agent1).");
 
     int result = validate_control_msg(&key, r_msg, msg_length, &cleaned_msg, &is_startup, &is_shutdown);
 
@@ -4131,10 +4131,10 @@ void test_validate_control_msg_startup_success(void** state)
 
     expect_string(__wrap__mdebug1, formatted_msg, "Agent agent1 sent HC_STARTUP from '192.168.1.1'");
 
-    expect_string(__wrap_compare_wazuh_versions, version1, __wazuh_version);
-    expect_string(__wrap_compare_wazuh_versions, version2, "v4.6.0");
-    expect_value(__wrap_compare_wazuh_versions, compare_patch, false);
-    will_return(__wrap_compare_wazuh_versions, -1);
+    expect_string(__wrap_compare_guardsarm_versions, version1, __guardsarm_version);
+    expect_string(__wrap_compare_guardsarm_versions, version2, "v4.6.0");
+    expect_value(__wrap_compare_guardsarm_versions, compare_patch, false);
+    will_return(__wrap_compare_guardsarm_versions, -1);
 
     expect_string(__wrap_rem_inc_recv_ctrl_startup, agent_id, "001");
 
@@ -4237,10 +4237,10 @@ void test_validate_control_msg_invalid_agent_version(void** state)
 
     expect_string(__wrap__mdebug1, formatted_msg, "Agent agent1 sent HC_STARTUP from ''");
 
-    expect_string(__wrap_compare_wazuh_versions, version1, __wazuh_version);
-    expect_string(__wrap_compare_wazuh_versions, version2, "v4.6.0");
-    expect_value(__wrap_compare_wazuh_versions, compare_patch, false);
-    will_return(__wrap_compare_wazuh_versions, -1);
+    expect_string(__wrap_compare_guardsarm_versions, version1, __guardsarm_version);
+    expect_string(__wrap_compare_guardsarm_versions, version2, "v4.6.0");
+    expect_value(__wrap_compare_guardsarm_versions, compare_patch, false);
+    will_return(__wrap_compare_guardsarm_versions, -1);
 
     expect_string(__wrap_rem_inc_recv_ctrl_startup, agent_id, "001");
 
@@ -4273,7 +4273,7 @@ void test_validate_control_msg_get_agent_version_fail(void** state)
     int result = validate_control_msg(&key, r_msg, msg_length, &cleaned_msg, &is_startup, &is_shutdown);
 
     // We store the message for later processing, if the version cannot be retrieved
-    // but we need to queue it for wazuh-manager-db processing
+    // but we need to queue it for guardsarm-manager-db processing
     assert_int_equal(result, 1);
     assert_int_equal(is_startup, 1);
     assert_int_equal(is_shutdown, 0);
@@ -4311,10 +4311,10 @@ void test_save_controlmsg_agent_invalid_version(void** state)
     keyentry_init(&key, "NEW_AGENT", "001", "192.168.1.1", "test_key");
     memset(&key.peer_info, 0, sizeof(struct sockaddr_storage));
 
-    expect_string(__wrap_compare_wazuh_versions, version1, __wazuh_version);
-    expect_string(__wrap_compare_wazuh_versions, version2, "v4.6.0");
-    expect_value(__wrap_compare_wazuh_versions, compare_patch, false);
-    will_return(__wrap_compare_wazuh_versions, -1);
+    expect_string(__wrap_compare_guardsarm_versions, version1, __guardsarm_version);
+    expect_string(__wrap_compare_guardsarm_versions, version2, "v4.6.0");
+    expect_value(__wrap_compare_guardsarm_versions, compare_patch, false);
+    will_return(__wrap_compare_guardsarm_versions, -1);
 
     expect_string(__wrap__mdebug2, formatted_msg, "Unable to connect agent: '001': 'Incompatible version'");
 
@@ -4704,10 +4704,10 @@ void test_save_controlmsg_startup(void **state)
     keyentry key;
     keyentry_init(&key, "NEW_AGENT", "001", "192.168.1.1", "test_key");
 
-    expect_string(__wrap_compare_wazuh_versions, version1, "v5.0.0");
-    expect_string(__wrap_compare_wazuh_versions, version2, "v5.0.0");
-    expect_value(__wrap_compare_wazuh_versions, compare_patch, false);
-    will_return(__wrap_compare_wazuh_versions, 0);
+    expect_string(__wrap_compare_guardsarm_versions, version1, "v5.0.0");
+    expect_string(__wrap_compare_guardsarm_versions, version2, "v5.0.0");
+    expect_value(__wrap_compare_guardsarm_versions, compare_patch, false);
+    will_return(__wrap_compare_guardsarm_versions, 0);
 
     expect_function_call(__wrap_OSHash_Create);
     will_return(__wrap_OSHash_Create, 1);
@@ -4930,7 +4930,7 @@ void test_save_controlmsg_json_keepalive_complete(void **state)
     // Complete JSON keepalive with host metadata
     char r_msg[OS_SIZE_1024] = {0};
     strcpy(r_msg, "{\"version\":\"1.0\",\"agent\":{\"version\":\"v5.0.0\",\"merged_sum\":\"abc123\"},"
-                  "\"host\":{\"hostname\":\"wazuh-agent3\",\"os\":{\"name\":\"Ubuntu\"}}}");
+                  "\"host\":{\"hostname\":\"guardsarm-agent3\",\"os\":{\"name\":\"Ubuntu\"}}}");
 
     bool is_startup = false;
     bool is_shutdown = false;
@@ -4960,7 +4960,7 @@ void test_save_controlmsg_json_keepalive_complete(void **state)
     will_return(__wrap_OSHash_Get, data);
 
     expect_string(__wrap__mdebug2, formatted_msg, "Processing JSON keepalive from agent '003'");
-    expect_string(__wrap__mdebug2, formatted_msg, "save_controlmsg(): inserting '{\"version\":\"1.0\",\"agent\":{\"version\":\"v5.0.0\",\"merged_sum\":\"abc123\"},\"host\":{\"hostname\":\"wazuh-agent3\",\"os\":{\"name\":\"Ubuntu\"}}}'");
+    expect_string(__wrap__mdebug2, formatted_msg, "save_controlmsg(): inserting '{\"version\":\"1.0\",\"agent\":{\"version\":\"v5.0.0\",\"merged_sum\":\"abc123\"},\"host\":{\"hostname\":\"guardsarm-agent3\",\"os\":{\"name\":\"Ubuntu\"}}}'");
 
     char* group_name = NULL;
     w_strdup("default", group_name);
@@ -4987,7 +4987,7 @@ void test_save_controlmsg_json_keepalive_complete(void **state)
     os_strdup("v5.0.0", agent_data->version);
     os_strdup("abc123", agent_data->merged_sum);
 
-    expect_string(__wrap_parse_json_keepalive, json_str, "{\"version\":\"1.0\",\"agent\":{\"version\":\"v5.0.0\",\"merged_sum\":\"abc123\"},\"host\":{\"hostname\":\"wazuh-agent3\",\"os\":{\"name\":\"Ubuntu\"}}}");
+    expect_string(__wrap_parse_json_keepalive, json_str, "{\"version\":\"1.0\",\"agent\":{\"version\":\"v5.0.0\",\"merged_sum\":\"abc123\"},\"host\":{\"hostname\":\"guardsarm-agent3\",\"os\":{\"name\":\"Ubuntu\"}}}");
     will_return(__wrap_parse_json_keepalive, agent_data);
     will_return(__wrap_parse_json_keepalive, OS_SUCCESS);
 

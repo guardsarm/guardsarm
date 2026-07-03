@@ -7,9 +7,9 @@ copyright: Copyright (C) 2015-2024, Wazuh Inc.
 
 type: integration
 
-brief: These tests will check if the 'wazuh-manager-authd' daemon correctly handles the enrollment requests
-       from agents with pre-existing IP addresses or names. The 'wazuh-manager-authd' daemon can automatically
-       add a Wazuh agent to a Wazuh manager and provide the key to the agent.
+brief: These tests will check if the 'guardsarm-manager-authd' daemon correctly handles the enrollment requests
+       from agents with pre-existing IP addresses or names. The 'guardsarm-manager-authd' daemon can automatically
+       add a GuardSarm agent to a GuardSarm manager and provide the key to the agent.
 
 components:
     - authd
@@ -18,9 +18,9 @@ targets:
     - manager
 
 daemons:
-    - wazuh-manager-authd
-    - wazuh-manager-db
-    - wazuh-manager-modulesd
+    - guardsarm-manager-authd
+    - guardsarm-manager-db
+    - guardsarm-manager-modulesd
 
 os_platform:
     - linux
@@ -37,8 +37,8 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/reference/daemons/wazuh-manager-authd.html
-    - https://documentation.wazuh.com/current/user-manual/reference/tools/agent_groups.html
+    - https://documentation.guardsarm.com/current/user-manual/reference/daemons/guardsarm-manager-authd.html
+    - https://documentation.guardsarm.com/current/user-manual/reference/tools/agent_groups.html
 
 tags:
     - enrollment
@@ -47,15 +47,15 @@ from pathlib import Path
 
 import pytest
 import time
-from wazuh_testing.constants.paths.sockets import AUTHD_SOCKET_PATH
-from wazuh_testing.constants.ports import DEFAULT_SSL_REMOTE_ENROLLMENT_PORT
-from wazuh_testing.utils.agent_groups import check_agent_groups
-from wazuh_testing.utils.db_queries.global_db import delete_agent
-from wazuh_testing.utils.client_keys import check_client_keys
+from guardsarm_testing.constants.paths.sockets import AUTHD_SOCKET_PATH
+from guardsarm_testing.constants.ports import DEFAULT_SSL_REMOTE_ENROLLMENT_PORT
+from guardsarm_testing.utils.agent_groups import check_agent_groups
+from guardsarm_testing.utils.db_queries.global_db import delete_agent
+from guardsarm_testing.utils.client_keys import check_client_keys
 
 from . import CONFIGURATIONS_FOLDER_PATH, TEST_CASES_FOLDER_PATH, utils
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
-from wazuh_testing.modules.authd.configuration import AUTHD_DEBUG_CONFIG
+from guardsarm_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from guardsarm_testing.modules.authd.configuration import AUTHD_DEBUG_CONFIG
 
 # Marks
 pytestmark = [pytest.mark.server, pytest.mark.tier(level=0)]
@@ -124,17 +124,17 @@ def register_agent_local_server(receiver_sockets, Name, Group=None, IP=None):
 
 # Tests
 @pytest.mark.parametrize('test_configuration,test_metadata', zip(test_configuration, test_metadata), ids=test_cases_ids)
-def test_ossec_authd_agents_ctx(test_configuration, test_metadata, set_wazuh_configuration, truncate_monitored_files,
+def test_ossec_authd_agents_ctx(test_configuration, test_metadata, set_guardsarm_configuration, truncate_monitored_files,
                                 clean_agents_ctx, configure_local_internal_options, daemons_handler,
                                 wait_for_authd_startup, connect_to_sockets, set_up_groups):
     '''
     description:
-        Check if when the 'wazuh-manager-authd' daemon receives an enrollment request from an agent
+        Check if when the 'guardsarm-manager-authd' daemon receives an enrollment request from an agent
         that has an IP address or name that is already registered, 'authd' creates a record
         for the new agent and deletes the old one. In this case, the enrollment requests
         are sent to an IP v4 network socket.
 
-    wazuh_min_version:
+    guardsarm_min_version:
         5.0.0
 
     tier: 0
@@ -146,9 +146,9 @@ def test_ossec_authd_agents_ctx(test_configuration, test_metadata, set_wazuh_con
         - test_metadata:
             type: dict
             brief: Test case metadata.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
-            brief: Load basic wazuh configuration.
+            brief: Load basic guardsarm configuration.
         - truncate_monitored_files:
             type: fixture
             brief: Truncate all the log files and json alerts files before and after the test execution.
@@ -160,7 +160,7 @@ def test_ossec_authd_agents_ctx(test_configuration, test_metadata, set_wazuh_con
             brief: Handle the monitoring of a specified file.
         - daemons_handler:
             type: fixture
-            brief: Handler of Wazuh daemons.
+            brief: Handler of GuardSarm daemons.
         - connect_to_sockets:
             type: fixture
             brief: Module scope version of 'connect_to_sockets' fixture.
@@ -176,11 +176,11 @@ def test_ossec_authd_agents_ctx(test_configuration, test_metadata, set_wazuh_con
         - Verify that agents using an already registered name can successfully enroll.
 
     input_description:
-        Different test cases are contained in an external YAML file (wazuh_conf.yaml)
-        which includes configuration settings for the 'wazuh-manager-authd' daemon.
+        Different test cases are contained in an external YAML file (guardsarm_conf.yaml)
+        which includes configuration settings for the 'guardsarm-manager-authd' daemon.
 
     expected_output:
-        - r'Accepting connections on port 1515' (When the 'wazuh-manager-authd' daemon is ready to accept enrollments)
+        - r'Accepting connections on port 1515' (When the 'guardsarm-manager-authd' daemon is ready to accept enrollments)
         - r'OSSEC K:' (When the agent has enrolled in the manager)
     tags:
         - keys

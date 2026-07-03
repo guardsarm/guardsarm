@@ -22,9 +22,9 @@
 
 #include "../wrappers/common.h"
 #include "../wrappers/libc/stdio_wrappers.h"
-#include "../wrappers/wazuh/shared/file_op_wrappers.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/shared/exec_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/file_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/exec_op_wrappers.h"
 #include "../wrappers/windows/libc/stdio_wrappers.h"
 
 extern int test_mode;
@@ -85,7 +85,7 @@ static void test_WinExecdRun_ok(void **state) {
     int queue = 1;
     int now = 123456789;
     char *message = "{"
-                        "\"wazuh\":{"
+                        "\"guardsarm\":{"
                             "\"active_response\":{"
                                 "\"name\":\"block-ip\","
                                 "\"executable\":\"block-ip\","
@@ -110,7 +110,7 @@ static void test_WinExecdRun_ok(void **state) {
     expect_fclose((FILE *)1, 0);
 
     expect_string(__wrap__mdebug1, formatted_msg, "Executing command '" AR_BINDIR "/block-ip {"
-                                                                                        "\"wazuh\":{"
+                                                                                        "\"guardsarm\":{"
                                                                                             "\"active_response\":{"
                                                                                                 "\"name\":\"block-ip\","
                                                                                                 "\"executable\":\"block-ip\","
@@ -136,7 +136,7 @@ static void test_WinExecdRun_ok(void **state) {
 
     expect_value(wrap_fprintf, __stream, wfd->file_in);
     expect_string(wrap_fprintf, formatted_msg, "{"
-                                                    "\"wazuh\":{"
+                                                    "\"guardsarm\":{"
                                                         "\"active_response\":{"
                                                             "\"name\":\"block-ip\","
                                                             "\"executable\":\"block-ip\","
@@ -174,7 +174,7 @@ static void test_WinExecdRun_ok(void **state) {
 
     expect_value(wrap_fprintf, __stream, wfd->file_in);
     expect_string(wrap_fprintf, formatted_msg, "{"
-                                                    "\"wazuh\":{"
+                                                    "\"guardsarm\":{"
                                                         "\"active_response\":{"
                                                             "\"name\":\"block-ip\","
                                                             "\"executable\":\"block-ip\","
@@ -207,7 +207,7 @@ static void test_WinExecdRun_timeout_not_repeated(void **state) {
     int queue = 1;
     int now = 123456789;
     char *message = "{"
-                        "\"wazuh\":{"
+                        "\"guardsarm\":{"
                             "\"active_response\":{"
                                 "\"name\":\"block-ip\","
                                 "\"executable\":\"block-ip\","
@@ -233,7 +233,7 @@ static void test_WinExecdRun_timeout_not_repeated(void **state) {
     expect_fclose((FILE *)1, 0);
 
     expect_string(__wrap__mdebug1, formatted_msg, "Executing command '" AR_BINDIR "/block-ip {"
-                                                                                        "\"wazuh\":{"
+                                                                                        "\"guardsarm\":{"
                                                                                             "\"active_response\":{"
                                                                                                 "\"name\":\"block-ip\","
                                                                                                 "\"executable\":\"block-ip\","
@@ -260,7 +260,7 @@ static void test_WinExecdRun_timeout_not_repeated(void **state) {
 
     expect_value(wrap_fprintf, __stream, wfd->file_in);
     expect_string(wrap_fprintf, formatted_msg, "{"
-                                                    "\"wazuh\":{"
+                                                    "\"guardsarm\":{"
                                                                     "\"active_response\":{"
                                                             "\"name\":\"block-ip\","
                                                             "\"executable\":\"block-ip\","
@@ -299,7 +299,7 @@ static void test_WinExecdRun_timeout_not_repeated(void **state) {
 
     expect_value(wrap_fprintf, __stream, wfd->file_in);
     expect_string(wrap_fprintf, formatted_msg, "{"
-                                                    "\"wazuh\":{"
+                                                    "\"guardsarm\":{"
                                                         "\"active_response\":{"
                                                             "\"name\":\"block-ip\","
                                                             "\"executable\":\"block-ip\","
@@ -326,7 +326,7 @@ static void test_WinExecdRun_timeout_not_repeated(void **state) {
     will_return(__wrap_wpclose, 0);
 
     expect_string(__wrap__mdebug1, formatted_msg, "Adding command '" AR_BINDIR "/block-ip {"
-                                                                                        "\"wazuh\":{"
+                                                                                        "\"guardsarm\":{"
                                                                                             "\"active_response\":{"
                                                                                                 "\"name\":\"block-ip\","
                                                                                                 "\"executable\":\"block-ip\","
@@ -357,7 +357,7 @@ static void test_WinExecdRun_timeout_repeated(void **state) {
     int queue = 1;
     int now = 123456789;
     char *message = "{"
-                        "\"wazuh\":{"
+                        "\"guardsarm\":{"
                             "\"active_response\":{"
                                 "\"name\":\"block-ip\","
                                 "\"executable\":\"block-ip\","
@@ -383,7 +383,7 @@ static void test_WinExecdRun_timeout_repeated(void **state) {
     expect_fclose((FILE *)1, 0);
 
     expect_string(__wrap__mdebug1, formatted_msg, "Executing command '" AR_BINDIR "/block-ip {"
-                                                                                        "\"wazuh\":{"
+                                                                                        "\"guardsarm\":{"
                                                                                             "\"active_response\":{"
                                                                                                 "\"name\":\"block-ip\","
                                                                                                 "\"executable\":\"block-ip\","
@@ -410,7 +410,7 @@ static void test_WinExecdRun_timeout_repeated(void **state) {
 
     expect_value(wrap_fprintf, __stream, wfd->file_in);
     expect_string(wrap_fprintf, formatted_msg, "{"
-                                                    "\"wazuh\":{"
+                                                    "\"guardsarm\":{"
                                                         "\"active_response\":{"
                                                             "\"name\":\"block-ip\","
                                                             "\"executable\":\"block-ip\","
@@ -449,7 +449,7 @@ static void test_WinExecdRun_timeout_repeated(void **state) {
 
     expect_value(wrap_fprintf, __stream, wfd->file_in);
     expect_string(wrap_fprintf, formatted_msg, "{"
-                                                    "\"wazuh\":{"
+                                                    "\"guardsarm\":{"
                                                         "\"active_response\":{"
                                                             "\"name\":\"block-ip\","
                                                             "\"executable\":\"block-ip\","
@@ -485,7 +485,7 @@ static void test_WinExecdRun_wpopenv_err(void **state) {
     int queue = 1;
     int now = 123456789;
     char *message = "{"
-                        "\"wazuh\":{"
+                        "\"guardsarm\":{"
                             "\"active_response\":{"
                                 "\"name\":\"block-ip\","
                                 "\"executable\":\"block-ip\","
@@ -510,7 +510,7 @@ static void test_WinExecdRun_wpopenv_err(void **state) {
     expect_fclose((FILE *)1, 0);
 
     expect_string(__wrap__mdebug1, formatted_msg, "Executing command '" AR_BINDIR "/block-ip {"
-                                                                                            "\"wazuh\":{"
+                                                                                            "\"guardsarm\":{"
                                                                                                 "\"active_response\":{"
                                                                                                     "\"name\":\"block-ip\","
                                                                                                     "\"executable\":\"block-ip\","
@@ -544,7 +544,7 @@ static void test_WinExecdRun_fgets_err(void **state) {
     int queue = 1;
     int now = 123456789;
     char *message = "{"
-                        "\"wazuh\":{"
+                        "\"guardsarm\":{"
                             "\"active_response\":{"
                                 "\"name\":\"block-ip\","
                                 "\"executable\":\"block-ip\","
@@ -569,7 +569,7 @@ static void test_WinExecdRun_fgets_err(void **state) {
     expect_fclose((FILE *)1, 0);
 
     expect_string(__wrap__mdebug1, formatted_msg, "Executing command '" AR_BINDIR "/block-ip {"
-                                                                                        "\"wazuh\":{"
+                                                                                        "\"guardsarm\":{"
                                                                                             "\"active_response\":{"
                                                                                                 "\"name\":\"block-ip\","
                                                                                                 "\"executable\":\"block-ip\","
@@ -595,7 +595,7 @@ static void test_WinExecdRun_fgets_err(void **state) {
 
     expect_value(wrap_fprintf, __stream, wfd->file_in);
     expect_string(wrap_fprintf, formatted_msg, "{"
-                                                    "\"wazuh\":{"
+                                                    "\"guardsarm\":{"
                                                         "\"active_response\":{"
                                                             "\"name\":\"block-ip\","
                                                             "\"executable\":\"block-ip\","
@@ -633,7 +633,7 @@ static void test_WinExecdRun_get_command_err(void **state) {
     int queue = 1;
     int now = 123456789;
     char *message = "{"
-                        "\"wazuh\":{"
+                        "\"guardsarm\":{"
                             "\"active_response\":{"
                                 "\"name\":\"block-ip\","
                                 "\"executable\":\"block-ip\","

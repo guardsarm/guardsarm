@@ -29,10 +29,10 @@ access:
   max_login_attempts: 10000
   max_request_per_minute: 10000
 
-# Drop privileges (Run as wazuh-manager user)
+# Drop privileges (Run as guardsarm-manager user)
 drop_privileges: yes
 
-# Uploadable Wazuh configuration sections (allow all for testing)
+# Uploadable GuardSarm configuration sections (allow all for testing)
 upload_configuration:
   agents:
     allow_higher_versions:

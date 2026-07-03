@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.12.4)
 
-project(wazuh C)
+project(guardsarm C)
 
-if(NOT DEFINED WAZUH_MAIN_PROJECT)
+if(NOT DEFINED GUARDSARM_MAIN_PROJECT)
   get_filename_component(SRC_FOLDER ${CMAKE_SOURCE_DIR}/../ ABSOLUTE)
 endif()
 
@@ -24,13 +24,13 @@ include_directories(
   ${SRC_FOLDER}/shared_modules/dbsync/include
   ${SRC_FOLDER}/syscheckd/include
   ${SRC_FOLDER}/data_provider/include
-  ${SRC_FOLDER}/wazuh_modules/include
-  ${SRC_FOLDER}/wazuh_modules/src
-  ${SRC_FOLDER}/wazuh_modules/src/agent_upgrade
-  ${SRC_FOLDER}/wazuh_modules/src/agent_upgrade/agent
-  ${SRC_FOLDER}/wazuh_modules/src/agent_upgrade/manager
-  ${SRC_FOLDER}/wazuh_modules/src/task_manager
-  ${SRC_FOLDER}/wazuh_db/include
+  ${SRC_FOLDER}/guardsarm_modules/include
+  ${SRC_FOLDER}/guardsarm_modules/src
+  ${SRC_FOLDER}/guardsarm_modules/src/agent_upgrade
+  ${SRC_FOLDER}/guardsarm_modules/src/agent_upgrade/agent
+  ${SRC_FOLDER}/guardsarm_modules/src/agent_upgrade/manager
+  ${SRC_FOLDER}/guardsarm_modules/src/task_manager
+  ${SRC_FOLDER}/guardsarm_db/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include/error_messages
   ${CMAKE_CURRENT_SOURCE_DIR}/os_crypto/md5
@@ -91,7 +91,7 @@ file(GLOB OS_ZLIB_SRC "${CMAKE_CURRENT_SOURCE_DIR}/os_zlib/*.c")
 set(ACTIVE_RESPONSE_SRC "${SRC_FOLDER}/active-response/src/active_responses.c")
 
 # Combine all sources
-set(LIBWAZUH_SRC
+set(LIBGUARDSARM_SRC
     ${SHARED_CORE_SRC}
     ${OS_CRYPTO_BLOWFISH_SRC}
     ${OS_CRYPTO_MD5_SRC}
@@ -129,50 +129,50 @@ if(UNIT_TEST)
        "${SRC_FOLDER}/unit_tests/wrappers/externals/pcre2/*.c")
   file(GLOB WRAPPERS_LIBC_SRC "${SRC_FOLDER}/unit_tests/wrappers/libc/*.c")
   file(GLOB WRAPPERS_POSIX_SRC "${SRC_FOLDER}/unit_tests/wrappers/posix/*.c")
-  file(GLOB WRAPPERS_WAZUH_SRC "${SRC_FOLDER}/unit_tests/wrappers/wazuh/*.c")
-  file(GLOB WRAPPERS_WAZUH_OS_CRYPTO_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/os_crypto/*.c")
-  file(GLOB WRAPPERS_WAZUH_OS_EXECD_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/os_execd/*.c")
-  file(GLOB WRAPPERS_WAZUH_OS_NET_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/os_net/*.c")
-  file(GLOB WRAPPERS_WAZUH_OS_REGEX_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/os_regex/*.c")
-  file(GLOB WRAPPERS_WAZUH_OS_XML_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/os_xml/*.c")
-  file(GLOB WRAPPERS_WAZUH_SHARED_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/shared/*.c")
-  file(GLOB WRAPPERS_WAZUH_SYSCHECKD_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/syscheckd/*.c")
-  file(GLOB WRAPPERS_WAZUH_WAZUH_DB_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/wazuh_db/*.c")
-  file(GLOB WRAPPERS_WAZUH_WAZUH_MODULES_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/wazuh_modules/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_SRC "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_OS_CRYPTO_SRC
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/os_crypto/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_OS_EXECD_SRC
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/os_execd/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_OS_NET_SRC
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/os_net/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_OS_REGEX_SRC
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/os_regex/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_OS_XML_SRC
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/os_xml/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_SHARED_SRC
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/shared/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_SYSCHECKD_SRC
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/syscheckd/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_GUARDSARM_DB_SRC
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/guardsarm_db/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_GUARDSARM_MODULES_SRC
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/guardsarm_modules/*.c")
   if(IS_AGENT)
     list(
       REMOVE_ITEM
-      WRAPPERS_WAZUH_WAZUH_MODULES_SRC
-      "${SRC_FOLDER}/unit_tests/wrappers/wazuh/wazuh_modules/wm_task_manager_wrappers.c"
+      WRAPPERS_GUARDSARM_GUARDSARM_MODULES_SRC
+      "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/guardsarm_modules/wm_task_manager_wrappers.c"
     )
   endif()
-  file(GLOB WRAPPERS_WAZUH_MONITORD_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/monitord/*.c")
-  file(GLOB WRAPPERS_WAZUH_OS_AUTH_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/os_auth/*.c")
-  file(GLOB WRAPPERS_WAZUH_ADDAGENT_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/addagent/*.c")
-  file(GLOB WRAPPERS_WAZUH_CONFIG_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/config/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_MONITORD_SRC
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/monitord/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_OS_AUTH_SRC
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/os_auth/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_ADDAGENT_SRC
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/addagent/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_CONFIG_SRC
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/config/*.c")
   file(GLOB WRAPPERS_CLIENT_AGENT_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/client-agent/*.c")
-  file(GLOB WRAPPERS_WAZUH_REMOTED_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/remoted/*.c")
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/client-agent/*.c")
+  file(GLOB WRAPPERS_GUARDSARM_REMOTED_SRC
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/remoted/*.c")
   file(GLOB WRAPPERS_DATA_PROVIDER_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/data_provider/*.c")
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/data_provider/*.c")
   file(GLOB WRAPPERS_LOGCOLLECTOR_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/logcollector/*.c")
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/logcollector/*.c")
   file(GLOB WRAPPERS_SHARED_MODULES_SRC
-       "${SRC_FOLDER}/unit_tests/wrappers/wazuh/shared_modules/*.c")
+       "${SRC_FOLDER}/unit_tests/wrappers/guardsarm/shared_modules/*.c")
 
   # Platform-specific wrappers configuration
   if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -195,22 +195,22 @@ if(UNIT_TEST)
         ${WRAPPERS_EXTERNALS_PCRE2_SRC}
         ${WRAPPERS_LIBC_SRC}
         ${WRAPPERS_POSIX_SRC}
-        ${WRAPPERS_WAZUH_SRC}
-        ${WRAPPERS_WAZUH_OS_CRYPTO_SRC}
-        ${WRAPPERS_WAZUH_OS_EXECD_SRC}
-        ${WRAPPERS_WAZUH_OS_NET_SRC}
-        ${WRAPPERS_WAZUH_OS_REGEX_SRC}
-        ${WRAPPERS_WAZUH_OS_XML_SRC}
-        ${WRAPPERS_WAZUH_SHARED_SRC}
-        ${WRAPPERS_WAZUH_SYSCHECKD_SRC}
-        ${WRAPPERS_WAZUH_WAZUH_DB_SRC}
-        ${WRAPPERS_WAZUH_WAZUH_MODULES_SRC}
-        ${WRAPPERS_WAZUH_MONITORD_SRC}
-        ${WRAPPERS_WAZUH_OS_AUTH_SRC}
-        ${WRAPPERS_WAZUH_ADDAGENT_SRC}
-        ${WRAPPERS_WAZUH_CONFIG_SRC}
+        ${WRAPPERS_GUARDSARM_SRC}
+        ${WRAPPERS_GUARDSARM_OS_CRYPTO_SRC}
+        ${WRAPPERS_GUARDSARM_OS_EXECD_SRC}
+        ${WRAPPERS_GUARDSARM_OS_NET_SRC}
+        ${WRAPPERS_GUARDSARM_OS_REGEX_SRC}
+        ${WRAPPERS_GUARDSARM_OS_XML_SRC}
+        ${WRAPPERS_GUARDSARM_SHARED_SRC}
+        ${WRAPPERS_GUARDSARM_SYSCHECKD_SRC}
+        ${WRAPPERS_GUARDSARM_GUARDSARM_DB_SRC}
+        ${WRAPPERS_GUARDSARM_GUARDSARM_MODULES_SRC}
+        ${WRAPPERS_GUARDSARM_MONITORD_SRC}
+        ${WRAPPERS_GUARDSARM_OS_AUTH_SRC}
+        ${WRAPPERS_GUARDSARM_ADDAGENT_SRC}
+        ${WRAPPERS_GUARDSARM_CONFIG_SRC}
         ${WRAPPERS_CLIENT_AGENT_SRC}
-        ${WRAPPERS_WAZUH_REMOTED_SRC}
+        ${WRAPPERS_GUARDSARM_REMOTED_SRC}
         ${WRAPPERS_DATA_PROVIDER_SRC}
         ${WRAPPERS_LOGCOLLECTOR_SRC}
         ${WRAPPERS_SHARED_MODULES_SRC}
@@ -237,22 +237,22 @@ if(UNIT_TEST)
         ${WRAPPERS_EXTERNALS_PCRE2_SRC}
         ${WRAPPERS_LIBC_SRC}
         ${WRAPPERS_POSIX_SRC}
-        ${WRAPPERS_WAZUH_SRC}
-        ${WRAPPERS_WAZUH_OS_CRYPTO_SRC}
-        ${WRAPPERS_WAZUH_OS_EXECD_SRC}
-        ${WRAPPERS_WAZUH_OS_NET_SRC}
-        ${WRAPPERS_WAZUH_OS_REGEX_SRC}
-        ${WRAPPERS_WAZUH_OS_XML_SRC}
-        ${WRAPPERS_WAZUH_SHARED_SRC}
-        ${WRAPPERS_WAZUH_SYSCHECKD_SRC}
-        ${WRAPPERS_WAZUH_WAZUH_DB_SRC}
-        ${WRAPPERS_WAZUH_WAZUH_MODULES_SRC}
-        ${WRAPPERS_WAZUH_MONITORD_SRC}
-        ${WRAPPERS_WAZUH_OS_AUTH_SRC}
-        ${WRAPPERS_WAZUH_ADDAGENT_SRC}
-        ${WRAPPERS_WAZUH_CONFIG_SRC}
+        ${WRAPPERS_GUARDSARM_SRC}
+        ${WRAPPERS_GUARDSARM_OS_CRYPTO_SRC}
+        ${WRAPPERS_GUARDSARM_OS_EXECD_SRC}
+        ${WRAPPERS_GUARDSARM_OS_NET_SRC}
+        ${WRAPPERS_GUARDSARM_OS_REGEX_SRC}
+        ${WRAPPERS_GUARDSARM_OS_XML_SRC}
+        ${WRAPPERS_GUARDSARM_SHARED_SRC}
+        ${WRAPPERS_GUARDSARM_SYSCHECKD_SRC}
+        ${WRAPPERS_GUARDSARM_GUARDSARM_DB_SRC}
+        ${WRAPPERS_GUARDSARM_GUARDSARM_MODULES_SRC}
+        ${WRAPPERS_GUARDSARM_MONITORD_SRC}
+        ${WRAPPERS_GUARDSARM_OS_AUTH_SRC}
+        ${WRAPPERS_GUARDSARM_ADDAGENT_SRC}
+        ${WRAPPERS_GUARDSARM_CONFIG_SRC}
         ${WRAPPERS_CLIENT_AGENT_SRC}
-        ${WRAPPERS_WAZUH_REMOTED_SRC}
+        ${WRAPPERS_GUARDSARM_REMOTED_SRC}
         ${WRAPPERS_DATA_PROVIDER_SRC}
         ${WRAPPERS_LOGCOLLECTOR_SRC}
         ${WRAPPERS_SHARED_MODULES_SRC}
@@ -279,22 +279,22 @@ if(UNIT_TEST)
         ${WRAPPERS_EXTERNALS_PCRE2_SRC}
         ${WRAPPERS_LIBC_SRC}
         ${WRAPPERS_POSIX_SRC}
-        ${WRAPPERS_WAZUH_SRC}
-        ${WRAPPERS_WAZUH_OS_CRYPTO_SRC}
-        ${WRAPPERS_WAZUH_OS_EXECD_SRC}
-        ${WRAPPERS_WAZUH_OS_NET_SRC}
-        ${WRAPPERS_WAZUH_OS_REGEX_SRC}
-        ${WRAPPERS_WAZUH_OS_XML_SRC}
-        ${WRAPPERS_WAZUH_SHARED_SRC}
-        ${WRAPPERS_WAZUH_SYSCHECKD_SRC}
-        ${WRAPPERS_WAZUH_WAZUH_DB_SRC}
-        ${WRAPPERS_WAZUH_WAZUH_MODULES_SRC}
-        ${WRAPPERS_WAZUH_MONITORD_SRC}
-        ${WRAPPERS_WAZUH_OS_AUTH_SRC}
-        ${WRAPPERS_WAZUH_ADDAGENT_SRC}
-        ${WRAPPERS_WAZUH_CONFIG_SRC}
+        ${WRAPPERS_GUARDSARM_SRC}
+        ${WRAPPERS_GUARDSARM_OS_CRYPTO_SRC}
+        ${WRAPPERS_GUARDSARM_OS_EXECD_SRC}
+        ${WRAPPERS_GUARDSARM_OS_NET_SRC}
+        ${WRAPPERS_GUARDSARM_OS_REGEX_SRC}
+        ${WRAPPERS_GUARDSARM_OS_XML_SRC}
+        ${WRAPPERS_GUARDSARM_SHARED_SRC}
+        ${WRAPPERS_GUARDSARM_SYSCHECKD_SRC}
+        ${WRAPPERS_GUARDSARM_GUARDSARM_DB_SRC}
+        ${WRAPPERS_GUARDSARM_GUARDSARM_MODULES_SRC}
+        ${WRAPPERS_GUARDSARM_MONITORD_SRC}
+        ${WRAPPERS_GUARDSARM_OS_AUTH_SRC}
+        ${WRAPPERS_GUARDSARM_ADDAGENT_SRC}
+        ${WRAPPERS_GUARDSARM_CONFIG_SRC}
         ${WRAPPERS_CLIENT_AGENT_SRC}
-        ${WRAPPERS_WAZUH_REMOTED_SRC}
+        ${WRAPPERS_GUARDSARM_REMOTED_SRC}
         ${WRAPPERS_DATA_PROVIDER_SRC}
         ${WRAPPERS_LOGCOLLECTOR_SRC}
         ${WRAPPERS_SHARED_MODULES_SRC}
@@ -305,112 +305,112 @@ if(UNIT_TEST)
 
 endif()
 
-# Create the production wazuh library (without test wrappers)
-add_library(wazuh STATIC ${LIBWAZUH_SRC})
+# Create the production guardsarm library (without test wrappers)
+add_library(guardsarm STATIC ${LIBGUARDSARM_SRC})
 
 # Create a separate test library with wrappers for unit tests only
 if(UNIT_TEST)
-  add_library(wazuh_test STATIC ${LIBWAZUH_SRC} ${UNIT_TEST_WRAPPERS_SRC})
+  add_library(guardsarm_test STATIC ${LIBGUARDSARM_SRC} ${UNIT_TEST_WRAPPERS_SRC})
 endif()
 
 # Set properties: library name, output directory
 set_target_properties(
-  wazuh
-  PROPERTIES OUTPUT_NAME "wazuh"
+  guardsarm
+  PROPERTIES OUTPUT_NAME "guardsarm"
              LINKER_LANGUAGE C
              ARCHIVE_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/lib
              LIBRARY_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/lib
              POSITION_INDEPENDENT_CODE ON)
 
 # Add compile definitions
-target_compile_definitions(wazuh PRIVATE ARGV0="wazuh")
+target_compile_definitions(guardsarm PRIVATE ARGV0="guardsarm")
 
 if(OS_BIG_ENDIAN)
   add_definitions(-DOS_BIG_ENDIAN)
 endif(OS_BIG_ENDIAN)
 
 if(CA_NAME)
-  target_compile_definitions(wazuh PRIVATE CA_NAME="${CA_NAME}")
+  target_compile_definitions(guardsarm PRIVATE CA_NAME="${CA_NAME}")
 endif()
 
 if(IMAGE_TRUST_CHECKS)
-  target_compile_definitions(wazuh
+  target_compile_definitions(guardsarm
                              PRIVATE IMAGE_TRUST_CHECKS=${IMAGE_TRUST_CHECKS})
 endif()
 
 if(ENABLE_AUDIT)
-  target_compile_definitions(wazuh PRIVATE ENABLE_AUDIT)
+  target_compile_definitions(guardsarm PRIVATE ENABLE_AUDIT)
 endif()
 
-target_link_libraries(wazuh PUBLIC wazuhext)
+target_link_libraries(guardsarm PUBLIC guardsarmext)
 
-# Configure wazuh_test library for unit tests
+# Configure guardsarm_test library for unit tests
 if(UNIT_TEST)
   # Set properties for test library
   set_target_properties(
-    wazuh_test
-    PROPERTIES OUTPUT_NAME "wazuh_test"
+    guardsarm_test
+    PROPERTIES OUTPUT_NAME "guardsarm_test"
                LINKER_LANGUAGE C
                ARCHIVE_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/lib
                LIBRARY_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/lib
                POSITION_INDEPENDENT_CODE ON)
 
   # Add same compile definitions as production library
-  target_compile_definitions(wazuh_test PRIVATE ARGV0="wazuh")
-  target_compile_definitions(wazuh_test PRIVATE WAZUH_UNIT_TESTING)
+  target_compile_definitions(guardsarm_test PRIVATE ARGV0="guardsarm")
+  target_compile_definitions(guardsarm_test PRIVATE GUARDSARM_UNIT_TESTING)
 
   if(CA_NAME)
-    target_compile_definitions(wazuh_test PRIVATE CA_NAME="${CA_NAME}")
+    target_compile_definitions(guardsarm_test PRIVATE CA_NAME="${CA_NAME}")
   endif()
 
   if(IMAGE_TRUST_CHECKS)
-    target_compile_definitions(wazuh_test
+    target_compile_definitions(guardsarm_test
                                PRIVATE IMAGE_TRUST_CHECKS=${IMAGE_TRUST_CHECKS})
   endif()
 
   if(ENABLE_AUDIT)
-    target_compile_definitions(wazuh_test PRIVATE ENABLE_AUDIT)
+    target_compile_definitions(guardsarm_test PRIVATE ENABLE_AUDIT)
   endif()
 
   # Debug flags for unit tests: -g -O0
-  target_compile_options(wazuh_test PUBLIC -g -O0)
+  target_compile_options(guardsarm_test PUBLIC -g -O0)
 
   # Add coverage libraries and flags for unit tests
-  add_coverage_libraries(wazuh_test)
+  add_coverage_libraries(guardsarm_test)
 
-  # Link with wazuhext
-  target_link_libraries(wazuh_test PUBLIC wazuhext)
+  # Link with guardsarmext
+  target_link_libraries(guardsarm_test PUBLIC guardsarmext)
 endif()
 
 # Create shared library (Linux/server only — used by the engine)
 if(NOT IS_AGENT AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  # Linux: libwazuhshared.so
-  add_library(wazuhshared SHARED ${LIBWAZUH_SRC})
+  # Linux: libguardsarmshared.so
+  add_library(guardsarmshared SHARED ${LIBGUARDSARM_SRC})
 
   set_target_properties(
-    wazuhshared
-    PROPERTIES OUTPUT_NAME "wazuhshared"
+    guardsarmshared
+    PROPERTIES OUTPUT_NAME "guardsarmshared"
                LIBRARY_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/lib
                BUILD_WITH_INSTALL_RPATH TRUE
                INSTALL_RPATH "$ORIGIN"
                POSITION_INDEPENDENT_CODE ON)
 
-  target_compile_definitions(wazuhshared PRIVATE ARGV0="wazuh")
-  # Link with wazuhext using -Wl,--whole-archive (Linux linker flag)
-  target_link_libraries(wazuhshared PUBLIC -Wl,--whole-archive wazuhext
+  target_compile_definitions(guardsarmshared PRIVATE ARGV0="guardsarm")
+  # Link with guardsarmext using -Wl,--whole-archive (Linux linker flag)
+  target_link_libraries(guardsarmshared PUBLIC -Wl,--whole-archive guardsarmext
                                            -Wl,--no-whole-archive)
 
   # Apply common compile definitions to shared library
   if(CA_NAME)
-    target_compile_definitions(wazuhshared PRIVATE CA_NAME="${CA_NAME}")
+    target_compile_definitions(guardsarmshared PRIVATE CA_NAME="${CA_NAME}")
   endif()
 
   if(IMAGE_TRUST_CHECKS)
-    target_compile_definitions(wazuhshared
+    target_compile_definitions(guardsarmshared
                                PRIVATE IMAGE_TRUST_CHECKS=${IMAGE_TRUST_CHECKS})
   endif()
 
   if(ENABLE_AUDIT)
-    target_compile_definitions(wazuhshared PRIVATE ENABLE_AUDIT)
+    target_compile_definitions(guardsarmshared PRIVATE ENABLE_AUDIT)
   endif()
 endif()

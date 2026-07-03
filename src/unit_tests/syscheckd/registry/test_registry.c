@@ -22,12 +22,12 @@
 #include "../../wrappers/windows/winreg_wrappers.h"
 #include "../../wrappers/windows/winbase_wrappers.h"
 #include "../../wrappers/windows/securitybaseapi_wrappers.h"
-#include "../../wrappers/wazuh/syscheckd/fim_db_wrappers.h"
-#include "../../wrappers/wazuh/shared/syscheck_op_wrappers.h"
-#include "../../wrappers/wazuh/syscheckd/fim_diff_changes_wrappers.h"
-#include "../../wrappers/wazuh/shared/utf8_winapi_wrapper_wrappers.h"
-#include "../../wrappers/wazuh/shared_modules/schema_validator_wrappers.h"
-#include "../../wrappers/wazuh/shared_modules/agent_sync_protocol_wrappers.h"
+#include "../../wrappers/guardsarm/syscheckd/fim_db_wrappers.h"
+#include "../../wrappers/guardsarm/shared/syscheck_op_wrappers.h"
+#include "../../wrappers/guardsarm/syscheckd/fim_diff_changes_wrappers.h"
+#include "../../wrappers/guardsarm/shared/utf8_winapi_wrapper_wrappers.h"
+#include "../../wrappers/guardsarm/shared_modules/schema_validator_wrappers.h"
+#include "../../wrappers/guardsarm/shared_modules/agent_sync_protocol_wrappers.h"
 
 #include "test_fim.h"
 

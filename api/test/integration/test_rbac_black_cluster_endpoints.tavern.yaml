@@ -533,7 +533,7 @@ stages:
       verify: False
       url: "{protocol:s}://{host:s}:{balanced_port:d}/cluster/worker1/configuration"
       method: PUT
-      data: "{valid_wazuh_conf:s}"
+      data: "{valid_guardsarm_conf:s}"
       headers:
         Authorization: "Bearer {test_login_token}"
         content-type: application/octet-stream
@@ -553,7 +553,7 @@ stages:
       verify: False
       url: "{protocol:s}://{host:s}:{balanced_port:d}/cluster/master-node/configuration"
       method: PUT
-      data: "{valid_wazuh_conf:s}"
+      data: "{valid_guardsarm_conf:s}"
       headers:
         Authorization: "Bearer {test_login_token}"
         content-type: application/octet-stream

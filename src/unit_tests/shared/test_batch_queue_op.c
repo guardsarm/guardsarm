@@ -17,7 +17,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "../wrappers/posix/pthread_wrappers.h"  // <- mocks estrictos de Wazuh
+#include "../wrappers/posix/pthread_wrappers.h"  // <- mocks estrictos de GuardSarm
 
 #include "shared.h"
 #include "batch_queue_op.h"

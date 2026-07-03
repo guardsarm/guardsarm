@@ -5577,1480 +5577,1480 @@
     "vulnerability.under_evaluation": {
       "type": "boolean"
     },
-    "wazuh.agent.build.original": {
+    "guardsarm.agent.build.original": {
       "type": "keyword"
     },
-    "wazuh.agent.ephemeral_id": {
+    "guardsarm.agent.ephemeral_id": {
       "type": "keyword"
     },
-    "wazuh.agent.groups": {
+    "guardsarm.agent.groups": {
       "type": "keyword"
     },
-    "wazuh.agent.host.architecture": {
+    "guardsarm.agent.host.architecture": {
       "type": "keyword"
     },
-    "wazuh.agent.host.boot.id": {
+    "guardsarm.agent.host.boot.id": {
       "type": "keyword"
     },
-    "wazuh.agent.host.cpu": {
+    "guardsarm.agent.host.cpu": {
       "type": "object"
     },
-    "wazuh.agent.host.cpu.cores": {
+    "guardsarm.agent.host.cpu.cores": {
       "type": "long"
     },
-    "wazuh.agent.host.cpu.name": {
+    "guardsarm.agent.host.cpu.name": {
       "type": "keyword"
     },
-    "wazuh.agent.host.cpu.speed": {
+    "guardsarm.agent.host.cpu.speed": {
       "type": "long"
     },
-    "wazuh.agent.host.cpu.usage": {
+    "guardsarm.agent.host.cpu.usage": {
       "type": "scaled_float"
     },
-    "wazuh.agent.host.disk.read.bytes": {
+    "guardsarm.agent.host.disk.read.bytes": {
       "type": "long"
     },
-    "wazuh.agent.host.disk.write.bytes": {
+    "guardsarm.agent.host.disk.write.bytes": {
       "type": "long"
     },
-    "wazuh.agent.host.domain": {
+    "guardsarm.agent.host.domain": {
       "type": "keyword"
     },
-    "wazuh.agent.host.geo.city_name": {
+    "guardsarm.agent.host.geo.city_name": {
       "type": "keyword"
     },
-    "wazuh.agent.host.geo.continent_code": {
+    "guardsarm.agent.host.geo.continent_code": {
       "type": "keyword"
     },
-    "wazuh.agent.host.geo.continent_name": {
+    "guardsarm.agent.host.geo.continent_name": {
       "type": "keyword"
     },
-    "wazuh.agent.host.geo.country_iso_code": {
+    "guardsarm.agent.host.geo.country_iso_code": {
       "type": "keyword"
     },
-    "wazuh.agent.host.geo.country_name": {
+    "guardsarm.agent.host.geo.country_name": {
       "type": "keyword"
     },
-    "wazuh.agent.host.geo.location": {
+    "guardsarm.agent.host.geo.location": {
       "type": "geo_point"
     },
-    "wazuh.agent.host.geo.name": {
+    "guardsarm.agent.host.geo.name": {
       "type": "keyword"
     },
-    "wazuh.agent.host.geo.postal_code": {
+    "guardsarm.agent.host.geo.postal_code": {
       "type": "keyword"
     },
-    "wazuh.agent.host.geo.region_iso_code": {
+    "guardsarm.agent.host.geo.region_iso_code": {
       "type": "keyword"
     },
-    "wazuh.agent.host.geo.region_name": {
+    "guardsarm.agent.host.geo.region_name": {
       "type": "keyword"
     },
-    "wazuh.agent.host.geo.timezone": {
+    "guardsarm.agent.host.geo.timezone": {
       "type": "keyword"
     },
-    "wazuh.agent.host.hostname": {
+    "guardsarm.agent.host.hostname": {
       "type": "keyword"
     },
-    "wazuh.agent.host.id": {
+    "guardsarm.agent.host.id": {
       "type": "keyword"
     },
-    "wazuh.agent.host.ip": {
+    "guardsarm.agent.host.ip": {
       "type": "ip"
     },
-    "wazuh.agent.host.mac": {
+    "guardsarm.agent.host.mac": {
       "type": "keyword"
     },
-    "wazuh.agent.host.memory": {
+    "guardsarm.agent.host.memory": {
       "type": "object"
     },
-    "wazuh.agent.host.memory.free": {
+    "guardsarm.agent.host.memory.free": {
       "type": "long"
     },
-    "wazuh.agent.host.memory.total": {
+    "guardsarm.agent.host.memory.total": {
       "type": "long"
     },
-    "wazuh.agent.host.memory.used": {
+    "guardsarm.agent.host.memory.used": {
       "type": "object"
     },
-    "wazuh.agent.host.memory.used.percentage": {
+    "guardsarm.agent.host.memory.used.percentage": {
       "type": "long"
     },
-    "wazuh.agent.host.name": {
+    "guardsarm.agent.host.name": {
       "type": "keyword"
     },
-    "wazuh.agent.host.network.egress.bytes": {
+    "guardsarm.agent.host.network.egress.bytes": {
       "type": "long"
     },
-    "wazuh.agent.host.network.egress.drops": {
+    "guardsarm.agent.host.network.egress.drops": {
       "type": "long"
     },
-    "wazuh.agent.host.network.egress.errors": {
+    "guardsarm.agent.host.network.egress.errors": {
       "type": "long"
     },
-    "wazuh.agent.host.network.egress.packets": {
+    "guardsarm.agent.host.network.egress.packets": {
       "type": "long"
     },
-    "wazuh.agent.host.network.egress.queue": {
+    "guardsarm.agent.host.network.egress.queue": {
       "type": "long"
     },
-    "wazuh.agent.host.network.ingress.bytes": {
+    "guardsarm.agent.host.network.ingress.bytes": {
       "type": "long"
     },
-    "wazuh.agent.host.network.ingress.drops": {
+    "guardsarm.agent.host.network.ingress.drops": {
       "type": "long"
     },
-    "wazuh.agent.host.network.ingress.errors": {
+    "guardsarm.agent.host.network.ingress.errors": {
       "type": "long"
     },
-    "wazuh.agent.host.network.ingress.packets": {
+    "guardsarm.agent.host.network.ingress.packets": {
       "type": "long"
     },
-    "wazuh.agent.host.network.ingress.queue": {
+    "guardsarm.agent.host.network.ingress.queue": {
       "type": "long"
     },
-    "wazuh.agent.host.os.family": {
+    "guardsarm.agent.host.os.family": {
       "type": "keyword"
     },
-    "wazuh.agent.host.os.full": {
+    "guardsarm.agent.host.os.full": {
       "type": "keyword"
     },
-    "wazuh.agent.host.os.kernel": {
+    "guardsarm.agent.host.os.kernel": {
       "type": "keyword"
     },
-    "wazuh.agent.host.os.name": {
+    "guardsarm.agent.host.os.name": {
       "type": "keyword"
     },
-    "wazuh.agent.host.os.platform": {
+    "guardsarm.agent.host.os.platform": {
       "type": "keyword"
     },
-    "wazuh.agent.host.os.type": {
+    "guardsarm.agent.host.os.type": {
       "type": "keyword"
     },
-    "wazuh.agent.host.os.version": {
+    "guardsarm.agent.host.os.version": {
       "type": "keyword"
     },
-    "wazuh.agent.host.pid_ns_ino": {
+    "guardsarm.agent.host.pid_ns_ino": {
       "type": "keyword"
     },
-    "wazuh.agent.host.risk.calculated_level": {
+    "guardsarm.agent.host.risk.calculated_level": {
       "type": "keyword"
     },
-    "wazuh.agent.host.risk.calculated_score": {
+    "guardsarm.agent.host.risk.calculated_score": {
       "type": "float"
     },
-    "wazuh.agent.host.risk.calculated_score_norm": {
+    "guardsarm.agent.host.risk.calculated_score_norm": {
       "type": "float"
     },
-    "wazuh.agent.host.risk.static_level": {
+    "guardsarm.agent.host.risk.static_level": {
       "type": "keyword"
     },
-    "wazuh.agent.host.risk.static_score": {
+    "guardsarm.agent.host.risk.static_score": {
       "type": "float"
     },
-    "wazuh.agent.host.risk.static_score_norm": {
+    "guardsarm.agent.host.risk.static_score_norm": {
       "type": "float"
     },
-    "wazuh.agent.host.type": {
+    "guardsarm.agent.host.type": {
       "type": "keyword"
     },
-    "wazuh.agent.host.uptime": {
+    "guardsarm.agent.host.uptime": {
       "type": "long"
     },
-    "wazuh.agent.id": {
+    "guardsarm.agent.id": {
       "type": "keyword"
     },
-    "wazuh.agent.name": {
+    "guardsarm.agent.name": {
       "type": "keyword"
     },
-    "wazuh.agent.type": {
+    "guardsarm.agent.type": {
       "type": "keyword"
     },
-    "wazuh.agent.version": {
+    "guardsarm.agent.version": {
       "type": "keyword"
     },
-    "wazuh.cluster.name": {
+    "guardsarm.cluster.name": {
       "type": "keyword"
     },
-    "wazuh.cluster.node": {
+    "guardsarm.cluster.node": {
       "type": "keyword"
     },
-    "wazuh.event.id": {
+    "guardsarm.event.id": {
       "type": "keyword"
     },
-    "wazuh.integration.category": {
+    "guardsarm.integration.category": {
       "type": "keyword"
     },
-    "wazuh.integration.decoders": {
+    "guardsarm.integration.decoders": {
       "type": "keyword"
     },
-    "wazuh.integration.name": {
+    "guardsarm.integration.name": {
       "type": "keyword"
     },
-    "wazuh.integration.rules": {
+    "guardsarm.integration.rules": {
       "type": "keyword"
     },
-    "wazuh.protocol.location": {
+    "guardsarm.protocol.location": {
       "type": "keyword"
     },
-    "wazuh.protocol.queue": {
+    "guardsarm.protocol.queue": {
       "type": "byte"
     },
-    "wazuh.schema.version": {
+    "guardsarm.schema.version": {
       "type": "keyword"
     },
-    "wazuh.space.event_discarded": {
+    "guardsarm.space.event_discarded": {
       "type": "boolean"
     },
-    "wazuh.space.name": {
+    "guardsarm.space.name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments": {
+    "guardsarm.threat.enrichments": {
       "type": "object"
     },
-    "wazuh.threat.enrichments.indicator": {
+    "guardsarm.threat.enrichments.indicator": {
       "type": "object"
     },
-    "wazuh.threat.enrichments.indicator.as.number": {
+    "guardsarm.threat.enrichments.indicator.as.number": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.as.organization.name": {
+    "guardsarm.threat.enrichments.indicator.as.organization.name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.confidence": {
+    "guardsarm.threat.enrichments.indicator.confidence": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.description": {
+    "guardsarm.threat.enrichments.indicator.description": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.email.address": {
+    "guardsarm.threat.enrichments.indicator.email.address": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.feed.name": {
+    "guardsarm.threat.enrichments.indicator.feed.name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.accessed": {
+    "guardsarm.threat.enrichments.indicator.file.accessed": {
       "type": "date"
     },
-    "wazuh.threat.enrichments.indicator.file.attributes": {
+    "guardsarm.threat.enrichments.indicator.file.attributes": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.code_signature.digest_algorithm": {
+    "guardsarm.threat.enrichments.indicator.file.code_signature.digest_algorithm": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.code_signature.exists": {
+    "guardsarm.threat.enrichments.indicator.file.code_signature.exists": {
       "type": "boolean"
     },
-    "wazuh.threat.enrichments.indicator.file.code_signature.flags": {
+    "guardsarm.threat.enrichments.indicator.file.code_signature.flags": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.code_signature.signing_id": {
+    "guardsarm.threat.enrichments.indicator.file.code_signature.signing_id": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.code_signature.status": {
+    "guardsarm.threat.enrichments.indicator.file.code_signature.status": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.code_signature.subject_name": {
+    "guardsarm.threat.enrichments.indicator.file.code_signature.subject_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.code_signature.team_id": {
+    "guardsarm.threat.enrichments.indicator.file.code_signature.team_id": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.code_signature.thumbprint_sha256": {
+    "guardsarm.threat.enrichments.indicator.file.code_signature.thumbprint_sha256": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.code_signature.timestamp": {
+    "guardsarm.threat.enrichments.indicator.file.code_signature.timestamp": {
       "type": "date"
     },
-    "wazuh.threat.enrichments.indicator.file.code_signature.trusted": {
+    "guardsarm.threat.enrichments.indicator.file.code_signature.trusted": {
       "type": "boolean"
     },
-    "wazuh.threat.enrichments.indicator.file.code_signature.valid": {
+    "guardsarm.threat.enrichments.indicator.file.code_signature.valid": {
       "type": "boolean"
     },
-    "wazuh.threat.enrichments.indicator.file.created": {
+    "guardsarm.threat.enrichments.indicator.file.created": {
       "type": "date"
     },
-    "wazuh.threat.enrichments.indicator.file.ctime": {
+    "guardsarm.threat.enrichments.indicator.file.ctime": {
       "type": "date"
     },
-    "wazuh.threat.enrichments.indicator.file.device": {
+    "guardsarm.threat.enrichments.indicator.file.device": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.directory": {
+    "guardsarm.threat.enrichments.indicator.file.directory": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.drive_letter": {
+    "guardsarm.threat.enrichments.indicator.file.drive_letter": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.architecture": {
+    "guardsarm.threat.enrichments.indicator.file.elf.architecture": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.byte_order": {
+    "guardsarm.threat.enrichments.indicator.file.elf.byte_order": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.cpu_type": {
+    "guardsarm.threat.enrichments.indicator.file.elf.cpu_type": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.creation_date": {
+    "guardsarm.threat.enrichments.indicator.file.elf.creation_date": {
       "type": "date"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.exports": {
+    "guardsarm.threat.enrichments.indicator.file.elf.exports": {
       "type": "flat_object"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.go_import_hash": {
+    "guardsarm.threat.enrichments.indicator.file.elf.go_import_hash": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.go_imports": {
+    "guardsarm.threat.enrichments.indicator.file.elf.go_imports": {
       "type": "flat_object"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.go_imports_names_entropy": {
+    "guardsarm.threat.enrichments.indicator.file.elf.go_imports_names_entropy": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.go_imports_names_var_entropy": {
+    "guardsarm.threat.enrichments.indicator.file.elf.go_imports_names_var_entropy": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.go_stripped": {
+    "guardsarm.threat.enrichments.indicator.file.elf.go_stripped": {
       "type": "boolean"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.header.abi_version": {
+    "guardsarm.threat.enrichments.indicator.file.elf.header.abi_version": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.header.class": {
+    "guardsarm.threat.enrichments.indicator.file.elf.header.class": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.header.data": {
+    "guardsarm.threat.enrichments.indicator.file.elf.header.data": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.header.entrypoint": {
+    "guardsarm.threat.enrichments.indicator.file.elf.header.entrypoint": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.header.object_version": {
+    "guardsarm.threat.enrichments.indicator.file.elf.header.object_version": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.header.os_abi": {
+    "guardsarm.threat.enrichments.indicator.file.elf.header.os_abi": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.header.type": {
+    "guardsarm.threat.enrichments.indicator.file.elf.header.type": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.header.version": {
+    "guardsarm.threat.enrichments.indicator.file.elf.header.version": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.import_hash": {
+    "guardsarm.threat.enrichments.indicator.file.elf.import_hash": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.imports": {
+    "guardsarm.threat.enrichments.indicator.file.elf.imports": {
       "type": "flat_object"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.imports_names_entropy": {
+    "guardsarm.threat.enrichments.indicator.file.elf.imports_names_entropy": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.imports_names_var_entropy": {
+    "guardsarm.threat.enrichments.indicator.file.elf.imports_names_var_entropy": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.sections": {
+    "guardsarm.threat.enrichments.indicator.file.elf.sections": {
       "type": "nested"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.sections.chi2": {
+    "guardsarm.threat.enrichments.indicator.file.elf.sections.chi2": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.sections.entropy": {
+    "guardsarm.threat.enrichments.indicator.file.elf.sections.entropy": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.sections.flags": {
+    "guardsarm.threat.enrichments.indicator.file.elf.sections.flags": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.sections.name": {
+    "guardsarm.threat.enrichments.indicator.file.elf.sections.name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.sections.physical_offset": {
+    "guardsarm.threat.enrichments.indicator.file.elf.sections.physical_offset": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.sections.physical_size": {
+    "guardsarm.threat.enrichments.indicator.file.elf.sections.physical_size": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.sections.type": {
+    "guardsarm.threat.enrichments.indicator.file.elf.sections.type": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.sections.var_entropy": {
+    "guardsarm.threat.enrichments.indicator.file.elf.sections.var_entropy": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.sections.virtual_address": {
+    "guardsarm.threat.enrichments.indicator.file.elf.sections.virtual_address": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.sections.virtual_size": {
+    "guardsarm.threat.enrichments.indicator.file.elf.sections.virtual_size": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.segments": {
+    "guardsarm.threat.enrichments.indicator.file.elf.segments": {
       "type": "nested"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.segments.sections": {
+    "guardsarm.threat.enrichments.indicator.file.elf.segments.sections": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.segments.type": {
+    "guardsarm.threat.enrichments.indicator.file.elf.segments.type": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.shared_libraries": {
+    "guardsarm.threat.enrichments.indicator.file.elf.shared_libraries": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.elf.telfhash": {
+    "guardsarm.threat.enrichments.indicator.file.elf.telfhash": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.extension": {
+    "guardsarm.threat.enrichments.indicator.file.extension": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.fork_name": {
+    "guardsarm.threat.enrichments.indicator.file.fork_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.gid": {
+    "guardsarm.threat.enrichments.indicator.file.gid": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.group": {
+    "guardsarm.threat.enrichments.indicator.file.group": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.hash.cdhash": {
+    "guardsarm.threat.enrichments.indicator.file.hash.cdhash": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.hash.md5": {
+    "guardsarm.threat.enrichments.indicator.file.hash.md5": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.hash.sha1": {
+    "guardsarm.threat.enrichments.indicator.file.hash.sha1": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.hash.sha256": {
+    "guardsarm.threat.enrichments.indicator.file.hash.sha256": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.hash.sha384": {
+    "guardsarm.threat.enrichments.indicator.file.hash.sha384": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.hash.sha512": {
+    "guardsarm.threat.enrichments.indicator.file.hash.sha512": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.hash.ssdeep": {
+    "guardsarm.threat.enrichments.indicator.file.hash.ssdeep": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.hash.tlsh": {
+    "guardsarm.threat.enrichments.indicator.file.hash.tlsh": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.inode": {
+    "guardsarm.threat.enrichments.indicator.file.inode": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.mime_type": {
+    "guardsarm.threat.enrichments.indicator.file.mime_type": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.mode": {
+    "guardsarm.threat.enrichments.indicator.file.mode": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.mtime": {
+    "guardsarm.threat.enrichments.indicator.file.mtime": {
       "type": "date"
     },
-    "wazuh.threat.enrichments.indicator.file.name": {
+    "guardsarm.threat.enrichments.indicator.file.name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.origin_referrer_url": {
+    "guardsarm.threat.enrichments.indicator.file.origin_referrer_url": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.origin_url": {
+    "guardsarm.threat.enrichments.indicator.file.origin_url": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.owner": {
+    "guardsarm.threat.enrichments.indicator.file.owner": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.path": {
+    "guardsarm.threat.enrichments.indicator.file.path": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.architecture": {
+    "guardsarm.threat.enrichments.indicator.file.pe.architecture": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.company": {
+    "guardsarm.threat.enrichments.indicator.file.pe.company": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.description": {
+    "guardsarm.threat.enrichments.indicator.file.pe.description": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.file_version": {
+    "guardsarm.threat.enrichments.indicator.file.pe.file_version": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.go_import_hash": {
+    "guardsarm.threat.enrichments.indicator.file.pe.go_import_hash": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.go_imports": {
+    "guardsarm.threat.enrichments.indicator.file.pe.go_imports": {
       "type": "flat_object"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.go_imports_names_entropy": {
+    "guardsarm.threat.enrichments.indicator.file.pe.go_imports_names_entropy": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.go_imports_names_var_entropy": {
+    "guardsarm.threat.enrichments.indicator.file.pe.go_imports_names_var_entropy": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.go_stripped": {
+    "guardsarm.threat.enrichments.indicator.file.pe.go_stripped": {
       "type": "boolean"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.imphash": {
+    "guardsarm.threat.enrichments.indicator.file.pe.imphash": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.import_hash": {
+    "guardsarm.threat.enrichments.indicator.file.pe.import_hash": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.imports": {
+    "guardsarm.threat.enrichments.indicator.file.pe.imports": {
       "type": "flat_object"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.imports_names_entropy": {
+    "guardsarm.threat.enrichments.indicator.file.pe.imports_names_entropy": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.imports_names_var_entropy": {
+    "guardsarm.threat.enrichments.indicator.file.pe.imports_names_var_entropy": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.original_file_name": {
+    "guardsarm.threat.enrichments.indicator.file.pe.original_file_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.pehash": {
+    "guardsarm.threat.enrichments.indicator.file.pe.pehash": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.product": {
+    "guardsarm.threat.enrichments.indicator.file.pe.product": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.sections": {
+    "guardsarm.threat.enrichments.indicator.file.pe.sections": {
       "type": "nested"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.sections.entropy": {
+    "guardsarm.threat.enrichments.indicator.file.pe.sections.entropy": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.sections.name": {
+    "guardsarm.threat.enrichments.indicator.file.pe.sections.name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.sections.physical_size": {
+    "guardsarm.threat.enrichments.indicator.file.pe.sections.physical_size": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.sections.var_entropy": {
+    "guardsarm.threat.enrichments.indicator.file.pe.sections.var_entropy": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.pe.sections.virtual_size": {
+    "guardsarm.threat.enrichments.indicator.file.pe.sections.virtual_size": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.size": {
+    "guardsarm.threat.enrichments.indicator.file.size": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.target_path": {
+    "guardsarm.threat.enrichments.indicator.file.target_path": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.type": {
+    "guardsarm.threat.enrichments.indicator.file.type": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.uid": {
+    "guardsarm.threat.enrichments.indicator.file.uid": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.alternative_names": {
+    "guardsarm.threat.enrichments.indicator.file.x509.alternative_names": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.issuer.common_name": {
+    "guardsarm.threat.enrichments.indicator.file.x509.issuer.common_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.issuer.country": {
+    "guardsarm.threat.enrichments.indicator.file.x509.issuer.country": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.issuer.distinguished_name": {
+    "guardsarm.threat.enrichments.indicator.file.x509.issuer.distinguished_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.issuer.locality": {
+    "guardsarm.threat.enrichments.indicator.file.x509.issuer.locality": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.issuer.organization": {
+    "guardsarm.threat.enrichments.indicator.file.x509.issuer.organization": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.issuer.organizational_unit": {
+    "guardsarm.threat.enrichments.indicator.file.x509.issuer.organizational_unit": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.issuer.state_or_province": {
+    "guardsarm.threat.enrichments.indicator.file.x509.issuer.state_or_province": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.not_after": {
+    "guardsarm.threat.enrichments.indicator.file.x509.not_after": {
       "type": "date"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.not_before": {
+    "guardsarm.threat.enrichments.indicator.file.x509.not_before": {
       "type": "date"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.public_key_algorithm": {
+    "guardsarm.threat.enrichments.indicator.file.x509.public_key_algorithm": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.public_key_curve": {
+    "guardsarm.threat.enrichments.indicator.file.x509.public_key_curve": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.public_key_exponent": {
+    "guardsarm.threat.enrichments.indicator.file.x509.public_key_exponent": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.public_key_size": {
+    "guardsarm.threat.enrichments.indicator.file.x509.public_key_size": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.serial_number": {
+    "guardsarm.threat.enrichments.indicator.file.x509.serial_number": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.signature_algorithm": {
+    "guardsarm.threat.enrichments.indicator.file.x509.signature_algorithm": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.subject.common_name": {
+    "guardsarm.threat.enrichments.indicator.file.x509.subject.common_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.subject.country": {
+    "guardsarm.threat.enrichments.indicator.file.x509.subject.country": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.subject.distinguished_name": {
+    "guardsarm.threat.enrichments.indicator.file.x509.subject.distinguished_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.subject.locality": {
+    "guardsarm.threat.enrichments.indicator.file.x509.subject.locality": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.subject.organization": {
+    "guardsarm.threat.enrichments.indicator.file.x509.subject.organization": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.subject.organizational_unit": {
+    "guardsarm.threat.enrichments.indicator.file.x509.subject.organizational_unit": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.subject.state_or_province": {
+    "guardsarm.threat.enrichments.indicator.file.x509.subject.state_or_province": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.file.x509.version_number": {
+    "guardsarm.threat.enrichments.indicator.file.x509.version_number": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.first_seen": {
+    "guardsarm.threat.enrichments.indicator.first_seen": {
       "type": "date"
     },
-    "wazuh.threat.enrichments.indicator.geo.city_name": {
+    "guardsarm.threat.enrichments.indicator.geo.city_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.geo.continent_code": {
+    "guardsarm.threat.enrichments.indicator.geo.continent_code": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.geo.continent_name": {
+    "guardsarm.threat.enrichments.indicator.geo.continent_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.geo.country_iso_code": {
+    "guardsarm.threat.enrichments.indicator.geo.country_iso_code": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.geo.country_name": {
+    "guardsarm.threat.enrichments.indicator.geo.country_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.geo.location": {
+    "guardsarm.threat.enrichments.indicator.geo.location": {
       "type": "geo_point"
     },
-    "wazuh.threat.enrichments.indicator.geo.name": {
+    "guardsarm.threat.enrichments.indicator.geo.name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.geo.postal_code": {
+    "guardsarm.threat.enrichments.indicator.geo.postal_code": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.geo.region_iso_code": {
+    "guardsarm.threat.enrichments.indicator.geo.region_iso_code": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.geo.region_name": {
+    "guardsarm.threat.enrichments.indicator.geo.region_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.geo.timezone": {
+    "guardsarm.threat.enrichments.indicator.geo.timezone": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.id": {
+    "guardsarm.threat.enrichments.indicator.id": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.ip": {
+    "guardsarm.threat.enrichments.indicator.ip": {
       "type": "ip"
     },
-    "wazuh.threat.enrichments.indicator.last_seen": {
+    "guardsarm.threat.enrichments.indicator.last_seen": {
       "type": "date"
     },
-    "wazuh.threat.enrichments.indicator.marking.tlp": {
+    "guardsarm.threat.enrichments.indicator.marking.tlp": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.marking.tlp_version": {
+    "guardsarm.threat.enrichments.indicator.marking.tlp_version": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.modified_at": {
+    "guardsarm.threat.enrichments.indicator.modified_at": {
       "type": "date"
     },
-    "wazuh.threat.enrichments.indicator.name": {
+    "guardsarm.threat.enrichments.indicator.name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.port": {
+    "guardsarm.threat.enrichments.indicator.port": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.provider": {
+    "guardsarm.threat.enrichments.indicator.provider": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.reference": {
+    "guardsarm.threat.enrichments.indicator.reference": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.registry.data.bytes": {
+    "guardsarm.threat.enrichments.indicator.registry.data.bytes": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.registry.data.strings": {
+    "guardsarm.threat.enrichments.indicator.registry.data.strings": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.registry.data.type": {
+    "guardsarm.threat.enrichments.indicator.registry.data.type": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.registry.hive": {
+    "guardsarm.threat.enrichments.indicator.registry.hive": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.registry.key": {
+    "guardsarm.threat.enrichments.indicator.registry.key": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.registry.path": {
+    "guardsarm.threat.enrichments.indicator.registry.path": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.registry.value": {
+    "guardsarm.threat.enrichments.indicator.registry.value": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.scanner_stats": {
+    "guardsarm.threat.enrichments.indicator.scanner_stats": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.sightings": {
+    "guardsarm.threat.enrichments.indicator.sightings": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.software": {
+    "guardsarm.threat.enrichments.indicator.software": {
       "type": "object"
     },
-    "wazuh.threat.enrichments.indicator.software.alias": {
+    "guardsarm.threat.enrichments.indicator.software.alias": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.software.name": {
+    "guardsarm.threat.enrichments.indicator.software.name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.software.type": {
+    "guardsarm.threat.enrichments.indicator.software.type": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.tags": {
+    "guardsarm.threat.enrichments.indicator.tags": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.type": {
+    "guardsarm.threat.enrichments.indicator.type": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.alternative_names": {
+    "guardsarm.threat.enrichments.indicator.x509.alternative_names": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.issuer.common_name": {
+    "guardsarm.threat.enrichments.indicator.x509.issuer.common_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.issuer.country": {
+    "guardsarm.threat.enrichments.indicator.x509.issuer.country": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.issuer.distinguished_name": {
+    "guardsarm.threat.enrichments.indicator.x509.issuer.distinguished_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.issuer.locality": {
+    "guardsarm.threat.enrichments.indicator.x509.issuer.locality": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.issuer.organization": {
+    "guardsarm.threat.enrichments.indicator.x509.issuer.organization": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.issuer.organizational_unit": {
+    "guardsarm.threat.enrichments.indicator.x509.issuer.organizational_unit": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.issuer.state_or_province": {
+    "guardsarm.threat.enrichments.indicator.x509.issuer.state_or_province": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.not_after": {
+    "guardsarm.threat.enrichments.indicator.x509.not_after": {
       "type": "date"
     },
-    "wazuh.threat.enrichments.indicator.x509.not_before": {
+    "guardsarm.threat.enrichments.indicator.x509.not_before": {
       "type": "date"
     },
-    "wazuh.threat.enrichments.indicator.x509.public_key_algorithm": {
+    "guardsarm.threat.enrichments.indicator.x509.public_key_algorithm": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.public_key_curve": {
+    "guardsarm.threat.enrichments.indicator.x509.public_key_curve": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.public_key_exponent": {
+    "guardsarm.threat.enrichments.indicator.x509.public_key_exponent": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.x509.public_key_size": {
+    "guardsarm.threat.enrichments.indicator.x509.public_key_size": {
       "type": "long"
     },
-    "wazuh.threat.enrichments.indicator.x509.serial_number": {
+    "guardsarm.threat.enrichments.indicator.x509.serial_number": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.signature_algorithm": {
+    "guardsarm.threat.enrichments.indicator.x509.signature_algorithm": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.subject.common_name": {
+    "guardsarm.threat.enrichments.indicator.x509.subject.common_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.subject.country": {
+    "guardsarm.threat.enrichments.indicator.x509.subject.country": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.subject.distinguished_name": {
+    "guardsarm.threat.enrichments.indicator.x509.subject.distinguished_name": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.subject.locality": {
+    "guardsarm.threat.enrichments.indicator.x509.subject.locality": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.subject.organization": {
+    "guardsarm.threat.enrichments.indicator.x509.subject.organization": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.subject.organizational_unit": {
+    "guardsarm.threat.enrichments.indicator.x509.subject.organizational_unit": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.subject.state_or_province": {
+    "guardsarm.threat.enrichments.indicator.x509.subject.state_or_province": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.indicator.x509.version_number": {
+    "guardsarm.threat.enrichments.indicator.x509.version_number": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.matched.atomic": {
+    "guardsarm.threat.enrichments.matched.atomic": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.matched.field": {
+    "guardsarm.threat.enrichments.matched.field": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.matched.id": {
+    "guardsarm.threat.enrichments.matched.id": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.matched.index": {
+    "guardsarm.threat.enrichments.matched.index": {
       "type": "keyword"
     },
-    "wazuh.threat.enrichments.matched.occurred": {
+    "guardsarm.threat.enrichments.matched.occurred": {
       "type": "date"
     },
-    "wazuh.threat.enrichments.matched.type": {
+    "guardsarm.threat.enrichments.matched.type": {
       "type": "keyword"
     },
-    "wazuh.threat.feed.dashboard_id": {
+    "guardsarm.threat.feed.dashboard_id": {
       "type": "keyword"
     },
-    "wazuh.threat.feed.description": {
+    "guardsarm.threat.feed.description": {
       "type": "keyword"
     },
-    "wazuh.threat.feed.name": {
+    "guardsarm.threat.feed.name": {
       "type": "keyword"
     },
-    "wazuh.threat.feed.reference": {
+    "guardsarm.threat.feed.reference": {
       "type": "keyword"
     },
-    "wazuh.threat.framework": {
+    "guardsarm.threat.framework": {
       "type": "keyword"
     },
-    "wazuh.threat.group.alias": {
+    "guardsarm.threat.group.alias": {
       "type": "keyword"
     },
-    "wazuh.threat.group.id": {
+    "guardsarm.threat.group.id": {
       "type": "keyword"
     },
-    "wazuh.threat.group.name": {
+    "guardsarm.threat.group.name": {
       "type": "keyword"
     },
-    "wazuh.threat.group.reference": {
+    "guardsarm.threat.group.reference": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.as.number": {
+    "guardsarm.threat.indicator.as.number": {
       "type": "long"
     },
-    "wazuh.threat.indicator.as.organization.name": {
+    "guardsarm.threat.indicator.as.organization.name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.confidence": {
+    "guardsarm.threat.indicator.confidence": {
       "type": "short"
     },
-    "wazuh.threat.indicator.description": {
+    "guardsarm.threat.indicator.description": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.email.address": {
+    "guardsarm.threat.indicator.email.address": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.accessed": {
+    "guardsarm.threat.indicator.file.accessed": {
       "type": "date"
     },
-    "wazuh.threat.indicator.file.attributes": {
+    "guardsarm.threat.indicator.file.attributes": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.code_signature.digest_algorithm": {
+    "guardsarm.threat.indicator.file.code_signature.digest_algorithm": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.code_signature.exists": {
+    "guardsarm.threat.indicator.file.code_signature.exists": {
       "type": "boolean"
     },
-    "wazuh.threat.indicator.file.code_signature.flags": {
+    "guardsarm.threat.indicator.file.code_signature.flags": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.code_signature.signing_id": {
+    "guardsarm.threat.indicator.file.code_signature.signing_id": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.code_signature.status": {
+    "guardsarm.threat.indicator.file.code_signature.status": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.code_signature.subject_name": {
+    "guardsarm.threat.indicator.file.code_signature.subject_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.code_signature.team_id": {
+    "guardsarm.threat.indicator.file.code_signature.team_id": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.code_signature.thumbprint_sha256": {
+    "guardsarm.threat.indicator.file.code_signature.thumbprint_sha256": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.code_signature.timestamp": {
+    "guardsarm.threat.indicator.file.code_signature.timestamp": {
       "type": "date"
     },
-    "wazuh.threat.indicator.file.code_signature.trusted": {
+    "guardsarm.threat.indicator.file.code_signature.trusted": {
       "type": "boolean"
     },
-    "wazuh.threat.indicator.file.code_signature.valid": {
+    "guardsarm.threat.indicator.file.code_signature.valid": {
       "type": "boolean"
     },
-    "wazuh.threat.indicator.file.created": {
+    "guardsarm.threat.indicator.file.created": {
       "type": "date"
     },
-    "wazuh.threat.indicator.file.ctime": {
+    "guardsarm.threat.indicator.file.ctime": {
       "type": "date"
     },
-    "wazuh.threat.indicator.file.device": {
+    "guardsarm.threat.indicator.file.device": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.directory": {
+    "guardsarm.threat.indicator.file.directory": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.drive_letter": {
+    "guardsarm.threat.indicator.file.drive_letter": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.architecture": {
+    "guardsarm.threat.indicator.file.elf.architecture": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.byte_order": {
+    "guardsarm.threat.indicator.file.elf.byte_order": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.cpu_type": {
+    "guardsarm.threat.indicator.file.elf.cpu_type": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.creation_date": {
+    "guardsarm.threat.indicator.file.elf.creation_date": {
       "type": "date"
     },
-    "wazuh.threat.indicator.file.elf.exports": {
+    "guardsarm.threat.indicator.file.elf.exports": {
       "type": "flat_object"
     },
-    "wazuh.threat.indicator.file.elf.go_import_hash": {
+    "guardsarm.threat.indicator.file.elf.go_import_hash": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.go_imports": {
+    "guardsarm.threat.indicator.file.elf.go_imports": {
       "type": "flat_object"
     },
-    "wazuh.threat.indicator.file.elf.go_imports_names_entropy": {
+    "guardsarm.threat.indicator.file.elf.go_imports_names_entropy": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.elf.go_imports_names_var_entropy": {
+    "guardsarm.threat.indicator.file.elf.go_imports_names_var_entropy": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.elf.go_stripped": {
+    "guardsarm.threat.indicator.file.elf.go_stripped": {
       "type": "boolean"
     },
-    "wazuh.threat.indicator.file.elf.header.abi_version": {
+    "guardsarm.threat.indicator.file.elf.header.abi_version": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.header.class": {
+    "guardsarm.threat.indicator.file.elf.header.class": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.header.data": {
+    "guardsarm.threat.indicator.file.elf.header.data": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.header.entrypoint": {
+    "guardsarm.threat.indicator.file.elf.header.entrypoint": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.elf.header.object_version": {
+    "guardsarm.threat.indicator.file.elf.header.object_version": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.header.os_abi": {
+    "guardsarm.threat.indicator.file.elf.header.os_abi": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.header.type": {
+    "guardsarm.threat.indicator.file.elf.header.type": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.header.version": {
+    "guardsarm.threat.indicator.file.elf.header.version": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.import_hash": {
+    "guardsarm.threat.indicator.file.elf.import_hash": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.imports": {
+    "guardsarm.threat.indicator.file.elf.imports": {
       "type": "flat_object"
     },
-    "wazuh.threat.indicator.file.elf.imports_names_entropy": {
+    "guardsarm.threat.indicator.file.elf.imports_names_entropy": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.elf.imports_names_var_entropy": {
+    "guardsarm.threat.indicator.file.elf.imports_names_var_entropy": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.elf.sections": {
+    "guardsarm.threat.indicator.file.elf.sections": {
       "type": "nested"
     },
-    "wazuh.threat.indicator.file.elf.sections.chi2": {
+    "guardsarm.threat.indicator.file.elf.sections.chi2": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.elf.sections.entropy": {
+    "guardsarm.threat.indicator.file.elf.sections.entropy": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.elf.sections.flags": {
+    "guardsarm.threat.indicator.file.elf.sections.flags": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.sections.name": {
+    "guardsarm.threat.indicator.file.elf.sections.name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.sections.physical_offset": {
+    "guardsarm.threat.indicator.file.elf.sections.physical_offset": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.sections.physical_size": {
+    "guardsarm.threat.indicator.file.elf.sections.physical_size": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.elf.sections.type": {
+    "guardsarm.threat.indicator.file.elf.sections.type": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.sections.var_entropy": {
+    "guardsarm.threat.indicator.file.elf.sections.var_entropy": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.elf.sections.virtual_address": {
+    "guardsarm.threat.indicator.file.elf.sections.virtual_address": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.elf.sections.virtual_size": {
+    "guardsarm.threat.indicator.file.elf.sections.virtual_size": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.elf.segments": {
+    "guardsarm.threat.indicator.file.elf.segments": {
       "type": "nested"
     },
-    "wazuh.threat.indicator.file.elf.segments.sections": {
+    "guardsarm.threat.indicator.file.elf.segments.sections": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.segments.type": {
+    "guardsarm.threat.indicator.file.elf.segments.type": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.shared_libraries": {
+    "guardsarm.threat.indicator.file.elf.shared_libraries": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.elf.telfhash": {
+    "guardsarm.threat.indicator.file.elf.telfhash": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.extension": {
+    "guardsarm.threat.indicator.file.extension": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.fork_name": {
+    "guardsarm.threat.indicator.file.fork_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.gid": {
+    "guardsarm.threat.indicator.file.gid": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.group": {
+    "guardsarm.threat.indicator.file.group": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.hash.cdhash": {
+    "guardsarm.threat.indicator.file.hash.cdhash": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.hash.md5": {
+    "guardsarm.threat.indicator.file.hash.md5": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.hash.sha1": {
+    "guardsarm.threat.indicator.file.hash.sha1": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.hash.sha256": {
+    "guardsarm.threat.indicator.file.hash.sha256": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.hash.sha384": {
+    "guardsarm.threat.indicator.file.hash.sha384": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.hash.sha512": {
+    "guardsarm.threat.indicator.file.hash.sha512": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.hash.ssdeep": {
+    "guardsarm.threat.indicator.file.hash.ssdeep": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.hash.tlsh": {
+    "guardsarm.threat.indicator.file.hash.tlsh": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.inode": {
+    "guardsarm.threat.indicator.file.inode": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.mime_type": {
+    "guardsarm.threat.indicator.file.mime_type": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.mode": {
+    "guardsarm.threat.indicator.file.mode": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.mtime": {
+    "guardsarm.threat.indicator.file.mtime": {
       "type": "date"
     },
-    "wazuh.threat.indicator.file.name": {
+    "guardsarm.threat.indicator.file.name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.origin_referrer_url": {
+    "guardsarm.threat.indicator.file.origin_referrer_url": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.origin_url": {
+    "guardsarm.threat.indicator.file.origin_url": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.owner": {
+    "guardsarm.threat.indicator.file.owner": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.path": {
+    "guardsarm.threat.indicator.file.path": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.pe.architecture": {
+    "guardsarm.threat.indicator.file.pe.architecture": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.pe.company": {
+    "guardsarm.threat.indicator.file.pe.company": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.pe.description": {
+    "guardsarm.threat.indicator.file.pe.description": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.pe.file_version": {
+    "guardsarm.threat.indicator.file.pe.file_version": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.pe.go_import_hash": {
+    "guardsarm.threat.indicator.file.pe.go_import_hash": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.pe.go_imports": {
+    "guardsarm.threat.indicator.file.pe.go_imports": {
       "type": "flat_object"
     },
-    "wazuh.threat.indicator.file.pe.go_imports_names_entropy": {
+    "guardsarm.threat.indicator.file.pe.go_imports_names_entropy": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.pe.go_imports_names_var_entropy": {
+    "guardsarm.threat.indicator.file.pe.go_imports_names_var_entropy": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.pe.go_stripped": {
+    "guardsarm.threat.indicator.file.pe.go_stripped": {
       "type": "boolean"
     },
-    "wazuh.threat.indicator.file.pe.imphash": {
+    "guardsarm.threat.indicator.file.pe.imphash": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.pe.import_hash": {
+    "guardsarm.threat.indicator.file.pe.import_hash": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.pe.imports": {
+    "guardsarm.threat.indicator.file.pe.imports": {
       "type": "flat_object"
     },
-    "wazuh.threat.indicator.file.pe.imports_names_entropy": {
+    "guardsarm.threat.indicator.file.pe.imports_names_entropy": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.pe.imports_names_var_entropy": {
+    "guardsarm.threat.indicator.file.pe.imports_names_var_entropy": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.pe.original_file_name": {
+    "guardsarm.threat.indicator.file.pe.original_file_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.pe.pehash": {
+    "guardsarm.threat.indicator.file.pe.pehash": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.pe.product": {
+    "guardsarm.threat.indicator.file.pe.product": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.pe.sections": {
+    "guardsarm.threat.indicator.file.pe.sections": {
       "type": "nested"
     },
-    "wazuh.threat.indicator.file.pe.sections.entropy": {
+    "guardsarm.threat.indicator.file.pe.sections.entropy": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.pe.sections.name": {
+    "guardsarm.threat.indicator.file.pe.sections.name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.pe.sections.physical_size": {
+    "guardsarm.threat.indicator.file.pe.sections.physical_size": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.pe.sections.var_entropy": {
+    "guardsarm.threat.indicator.file.pe.sections.var_entropy": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.pe.sections.virtual_size": {
+    "guardsarm.threat.indicator.file.pe.sections.virtual_size": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.size": {
+    "guardsarm.threat.indicator.file.size": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.target_path": {
+    "guardsarm.threat.indicator.file.target_path": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.type": {
+    "guardsarm.threat.indicator.file.type": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.uid": {
+    "guardsarm.threat.indicator.file.uid": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.alternative_names": {
+    "guardsarm.threat.indicator.file.x509.alternative_names": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.issuer.common_name": {
+    "guardsarm.threat.indicator.file.x509.issuer.common_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.issuer.country": {
+    "guardsarm.threat.indicator.file.x509.issuer.country": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.issuer.distinguished_name": {
+    "guardsarm.threat.indicator.file.x509.issuer.distinguished_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.issuer.locality": {
+    "guardsarm.threat.indicator.file.x509.issuer.locality": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.issuer.organization": {
+    "guardsarm.threat.indicator.file.x509.issuer.organization": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.issuer.organizational_unit": {
+    "guardsarm.threat.indicator.file.x509.issuer.organizational_unit": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.issuer.state_or_province": {
+    "guardsarm.threat.indicator.file.x509.issuer.state_or_province": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.not_after": {
+    "guardsarm.threat.indicator.file.x509.not_after": {
       "type": "date"
     },
-    "wazuh.threat.indicator.file.x509.not_before": {
+    "guardsarm.threat.indicator.file.x509.not_before": {
       "type": "date"
     },
-    "wazuh.threat.indicator.file.x509.public_key_algorithm": {
+    "guardsarm.threat.indicator.file.x509.public_key_algorithm": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.public_key_curve": {
+    "guardsarm.threat.indicator.file.x509.public_key_curve": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.public_key_exponent": {
+    "guardsarm.threat.indicator.file.x509.public_key_exponent": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.x509.public_key_size": {
+    "guardsarm.threat.indicator.file.x509.public_key_size": {
       "type": "long"
     },
-    "wazuh.threat.indicator.file.x509.serial_number": {
+    "guardsarm.threat.indicator.file.x509.serial_number": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.signature_algorithm": {
+    "guardsarm.threat.indicator.file.x509.signature_algorithm": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.subject.common_name": {
+    "guardsarm.threat.indicator.file.x509.subject.common_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.subject.country": {
+    "guardsarm.threat.indicator.file.x509.subject.country": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.subject.distinguished_name": {
+    "guardsarm.threat.indicator.file.x509.subject.distinguished_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.subject.locality": {
+    "guardsarm.threat.indicator.file.x509.subject.locality": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.subject.organization": {
+    "guardsarm.threat.indicator.file.x509.subject.organization": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.subject.organizational_unit": {
+    "guardsarm.threat.indicator.file.x509.subject.organizational_unit": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.subject.state_or_province": {
+    "guardsarm.threat.indicator.file.x509.subject.state_or_province": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.file.x509.version_number": {
+    "guardsarm.threat.indicator.file.x509.version_number": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.first_seen": {
+    "guardsarm.threat.indicator.first_seen": {
       "type": "date"
     },
-    "wazuh.threat.indicator.geo.city_name": {
+    "guardsarm.threat.indicator.geo.city_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.geo.continent_code": {
+    "guardsarm.threat.indicator.geo.continent_code": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.geo.continent_name": {
+    "guardsarm.threat.indicator.geo.continent_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.geo.country_iso_code": {
+    "guardsarm.threat.indicator.geo.country_iso_code": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.geo.country_name": {
+    "guardsarm.threat.indicator.geo.country_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.geo.location": {
+    "guardsarm.threat.indicator.geo.location": {
       "type": "geo_point"
     },
-    "wazuh.threat.indicator.geo.name": {
+    "guardsarm.threat.indicator.geo.name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.geo.postal_code": {
+    "guardsarm.threat.indicator.geo.postal_code": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.geo.region_iso_code": {
+    "guardsarm.threat.indicator.geo.region_iso_code": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.geo.region_name": {
+    "guardsarm.threat.indicator.geo.region_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.geo.timezone": {
+    "guardsarm.threat.indicator.geo.timezone": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.id": {
+    "guardsarm.threat.indicator.id": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.ip": {
+    "guardsarm.threat.indicator.ip": {
       "type": "ip"
     },
-    "wazuh.threat.indicator.last_seen": {
+    "guardsarm.threat.indicator.last_seen": {
       "type": "date"
     },
-    "wazuh.threat.indicator.marking.tlp": {
+    "guardsarm.threat.indicator.marking.tlp": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.marking.tlp_version": {
+    "guardsarm.threat.indicator.marking.tlp_version": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.modified_at": {
+    "guardsarm.threat.indicator.modified_at": {
       "type": "date"
     },
-    "wazuh.threat.indicator.name": {
+    "guardsarm.threat.indicator.name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.port": {
+    "guardsarm.threat.indicator.port": {
       "type": "long"
     },
-    "wazuh.threat.indicator.provider": {
+    "guardsarm.threat.indicator.provider": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.reference": {
+    "guardsarm.threat.indicator.reference": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.registry.data.bytes": {
+    "guardsarm.threat.indicator.registry.data.bytes": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.registry.data.strings": {
+    "guardsarm.threat.indicator.registry.data.strings": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.registry.data.type": {
+    "guardsarm.threat.indicator.registry.data.type": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.registry.hive": {
+    "guardsarm.threat.indicator.registry.hive": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.registry.key": {
+    "guardsarm.threat.indicator.registry.key": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.registry.path": {
+    "guardsarm.threat.indicator.registry.path": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.registry.value": {
+    "guardsarm.threat.indicator.registry.value": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.scanner_stats": {
+    "guardsarm.threat.indicator.scanner_stats": {
       "type": "long"
     },
-    "wazuh.threat.indicator.sightings": {
+    "guardsarm.threat.indicator.sightings": {
       "type": "long"
     },
-    "wazuh.threat.indicator.type": {
+    "guardsarm.threat.indicator.type": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.alternative_names": {
+    "guardsarm.threat.indicator.x509.alternative_names": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.issuer.common_name": {
+    "guardsarm.threat.indicator.x509.issuer.common_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.issuer.country": {
+    "guardsarm.threat.indicator.x509.issuer.country": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.issuer.distinguished_name": {
+    "guardsarm.threat.indicator.x509.issuer.distinguished_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.issuer.locality": {
+    "guardsarm.threat.indicator.x509.issuer.locality": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.issuer.organization": {
+    "guardsarm.threat.indicator.x509.issuer.organization": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.issuer.organizational_unit": {
+    "guardsarm.threat.indicator.x509.issuer.organizational_unit": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.issuer.state_or_province": {
+    "guardsarm.threat.indicator.x509.issuer.state_or_province": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.not_after": {
+    "guardsarm.threat.indicator.x509.not_after": {
       "type": "date"
     },
-    "wazuh.threat.indicator.x509.not_before": {
+    "guardsarm.threat.indicator.x509.not_before": {
       "type": "date"
     },
-    "wazuh.threat.indicator.x509.public_key_algorithm": {
+    "guardsarm.threat.indicator.x509.public_key_algorithm": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.public_key_curve": {
+    "guardsarm.threat.indicator.x509.public_key_curve": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.public_key_exponent": {
+    "guardsarm.threat.indicator.x509.public_key_exponent": {
       "type": "long"
     },
-    "wazuh.threat.indicator.x509.public_key_size": {
+    "guardsarm.threat.indicator.x509.public_key_size": {
       "type": "long"
     },
-    "wazuh.threat.indicator.x509.serial_number": {
+    "guardsarm.threat.indicator.x509.serial_number": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.signature_algorithm": {
+    "guardsarm.threat.indicator.x509.signature_algorithm": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.subject.common_name": {
+    "guardsarm.threat.indicator.x509.subject.common_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.subject.country": {
+    "guardsarm.threat.indicator.x509.subject.country": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.subject.distinguished_name": {
+    "guardsarm.threat.indicator.x509.subject.distinguished_name": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.subject.locality": {
+    "guardsarm.threat.indicator.x509.subject.locality": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.subject.organization": {
+    "guardsarm.threat.indicator.x509.subject.organization": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.subject.organizational_unit": {
+    "guardsarm.threat.indicator.x509.subject.organizational_unit": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.subject.state_or_province": {
+    "guardsarm.threat.indicator.x509.subject.state_or_province": {
       "type": "keyword"
     },
-    "wazuh.threat.indicator.x509.version_number": {
+    "guardsarm.threat.indicator.x509.version_number": {
       "type": "keyword"
     },
-    "wazuh.threat.software.alias": {
+    "guardsarm.threat.software.alias": {
       "type": "keyword"
     },
-    "wazuh.threat.software.id": {
+    "guardsarm.threat.software.id": {
       "type": "keyword"
     },
-    "wazuh.threat.software.name": {
+    "guardsarm.threat.software.name": {
       "type": "keyword"
     },
-    "wazuh.threat.software.platforms": {
+    "guardsarm.threat.software.platforms": {
       "type": "keyword"
     },
-    "wazuh.threat.software.reference": {
+    "guardsarm.threat.software.reference": {
       "type": "keyword"
     },
-    "wazuh.threat.software.type": {
+    "guardsarm.threat.software.type": {
       "type": "keyword"
     },
-    "wazuh.threat.tactic.id": {
+    "guardsarm.threat.tactic.id": {
       "type": "keyword"
     },
-    "wazuh.threat.tactic.name": {
+    "guardsarm.threat.tactic.name": {
       "type": "keyword"
     },
-    "wazuh.threat.tactic.reference": {
+    "guardsarm.threat.tactic.reference": {
       "type": "keyword"
     },
-    "wazuh.threat.technique.id": {
+    "guardsarm.threat.technique.id": {
       "type": "keyword"
     },
-    "wazuh.threat.technique.name": {
+    "guardsarm.threat.technique.name": {
       "type": "keyword"
     },
-    "wazuh.threat.technique.reference": {
+    "guardsarm.threat.technique.reference": {
       "type": "keyword"
     },
-    "wazuh.threat.technique.subtechnique.id": {
+    "guardsarm.threat.technique.subtechnique.id": {
       "type": "keyword"
     },
-    "wazuh.threat.technique.subtechnique.name": {
+    "guardsarm.threat.technique.subtechnique.name": {
       "type": "keyword"
     },
-    "wazuh.threat.technique.subtechnique.reference": {
+    "guardsarm.threat.technique.subtechnique.reference": {
       "type": "keyword"
     }
   },

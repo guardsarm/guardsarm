@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **store** module provides a document-oriented key-value storage abstraction for the Wazuh engine. It manages JSON documents organized hierarchically by name (using `base::Name` as a multi-part key) and supports full CRUD operations plus collection listing.
+The **store** module provides a document-oriented key-value storage abstraction for the GuardSarm engine. It manages JSON documents organized hierarchically by name (using `base::Name` as a multi-part key) and supports full CRUD operations plus collection listing.
 
 The module follows a **driver-based architecture**: a thin `Store` facade implements the `IStore` interface and delegates all persistence operations to a pluggable `IDriver` backend. The only shipped driver is `FileDriver`, which maps document names to filesystem paths.
 
@@ -223,7 +223,7 @@ The store is instantiated once in `main.cpp` using `FileDriver` pointed at the c
 |------|-------|-------------|
 | `schema/engine-schema/0` | builder | Engine schema definition |
 | `schema/allowed-fields/0` | builder | Allowed fields restrictions |
-| `schema/wazuh-logpar-overrides/0` | builder | Log parser overrides |
+| `schema/guardsarm-logpar-overrides/0` | builder | Log parser overrides |
 | `router/router/0` | router | Router configuration snapshot |
 | `router/tester/0` | router | Tester configuration snapshot |
 | `geo/mmdb-hash/internal` | geo | GeoIP database hashes |

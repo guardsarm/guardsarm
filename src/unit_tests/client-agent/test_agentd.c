@@ -13,8 +13,8 @@
 #include <cmocka.h>
 
 #include "agentd.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/shared/url_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/url_wrappers.h"
 
 #ifdef TEST_AGENT
 

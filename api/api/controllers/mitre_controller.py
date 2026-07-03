@@ -9,10 +9,10 @@ from connexion.lifecycle import ConnexionResponse
 
 from api.controllers.util import json_response
 from api.util import raise_if_exc, parse_api_param, remove_nones_to_dict
-from wazuh import mitre
-from wazuh.core.cluster.dapi.dapi import DistributedAPI
+from guardsarm import mitre
+from guardsarm.core.cluster.dapi.dapi import DistributedAPI
 
-logger = logging.getLogger('wazuh-api')
+logger = logging.getLogger('guardsarm-api')
 
 
 async def get_metadata(pretty: bool = False, wait_for_complete: bool = False) -> ConnexionResponse:

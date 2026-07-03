@@ -1,0 +1,50 @@
+# GuardSarm manager image: build the C core from source + full install (root) → API on 55000
+FROM ubuntu:24.04
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      gcc g++ make cmake automake autoconf libtool pkg-config \
+      python3 python3-dev curl gawk perl libssl-dev procps \
+      brotli patch m4 file ca-certificates coreutils \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY . /build/guardsarm
+WORKDIR /build/guardsarm/src
+
+# A fork uses upstream build artifacts until it hosts its own mirrors.
+RUN sed -i \
+      -e 's#https://packages.guardsarm.com/deps/#https://packages.wazuh.com/deps/#g' \
+      -e 's#github.com/guardsarm/guardsarm-http-request#github.com/wazuh/wazuh-http-request#g' \
+      -e 's#guardsarm/guardsarm-indexer-plugins#wazuh/wazuh-indexer-plugins#g' \
+      Makefile
+
+RUN make deps TARGET=server INDEXER_PLUGINS_REFS=main -j"$(nproc)"
+RUN make TARGET=server INDEXER_PLUGINS_REFS=main -j"$(nproc)"
+
+# Compat shim (the GuardSarm dependency-mirror workaround): the full Wazuh->GuardSarm
+# rename produced libguardsarmext.so, but the upstream precompiled CPython that
+# `make deps` fetches still links the old soname libwazuhext.so. The ABI is identical
+# (renamed source), so alias it, and drop the bundled libpython beside it, so that
+# install-time schema generation can load the interpreter. (Proper fix = host our own
+# dependency mirror that ships a CPython linked against libguardsarmext.so.)
+RUN cp /build/guardsarm/src/build/lib/libguardsarmext.so /build/guardsarm/src/build/lib/libwazuhext.so \
+ && tar xzf /build/guardsarm/src/external/cpython.tar.gz -C /tmp \
+ && cp /tmp/*/lib/libpython3.12.so.1.0 /build/guardsarm/src/build/lib/ 2>/dev/null || true
+
+WORKDIR /build/guardsarm
+ENV LD_LIBRARY_PATH=/build/guardsarm/src/build/lib:/var/ossec/lib:/var/ossec/framework/python/lib
+# Unattended manager install (uses the freshly built binaries)
+RUN USER_LANGUAGE=en USER_NO_STOP=y USER_INSTALL_TYPE=server USER_DIR=/var/ossec \
+    USER_ENABLE_EMAIL=n USER_ENABLE_SYSCHECK=y USER_ENABLE_ROOTCHECK=y \
+    USER_ENABLE_ACTIVE_RESPONSE=y USER_ENABLE_SYSLOG=n USER_ENABLE_AUTHD=y \
+    USER_AUTO_START=n USER_BINARYINSTALL=yes \
+    bash install.sh || (echo '=== install.sh failed ===' && tail -60 /var/ossec/logs/ossec.log 2>/dev/null; exit 1)
+
+EXPOSE 1514 1515 1516 55000
+
+# Start the manager (its DAEMONS list includes the API daemon) and keep the container alive.
+CMD bash -lc '\
+  ( /var/ossec/bin/guardsarm-manager-control start || /var/ossec/bin/guardsarm-control start || true ); \
+  sleep 5; \
+  echo "=== running GuardSarm daemons ==="; ps -e | grep -i guardsarm || true; \
+  touch /var/ossec/logs/ossec.log; tail -f /var/ossec/logs/ossec.log'

@@ -4,14 +4,14 @@
 import pytest
 import time
 
-from wazuh_testing.constants.paths.configurations import AR_CONF
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.modules.agentd.patterns import AGENTD_CONNECTED_TO_SERVER
-from wazuh_testing.modules.execd.patterns import EXECD_RECEIVED_MESSAGE
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.tools.simulators.remoted_simulator import RemotedSimulator
-from wazuh_testing.utils import file
-from wazuh_testing.utils.callbacks import generate_callback
+from guardsarm_testing.constants.paths.configurations import AR_CONF
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.modules.agentd.patterns import AGENTD_CONNECTED_TO_SERVER
+from guardsarm_testing.modules.execd.patterns import EXECD_RECEIVED_MESSAGE
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.tools.simulators.remoted_simulator import RemotedSimulator
+from guardsarm_testing.utils import file
+from guardsarm_testing.utils.callbacks import generate_callback
 
 
 @pytest.fixture()
@@ -35,7 +35,7 @@ def send_execd_message(test_metadata: dict, remoted_simulator: RemotedSimulator)
 
     # Use independent monitors for the connection and the execd events so we can
     # safely mix full log scans with only-new-events tailing without sharing state.
-    connection_monitor = FileMonitor(WAZUH_LOG_PATH)
+    connection_monitor = FileMonitor(GUARDSARM_LOG_PATH)
 
     # Don't use only_new_events for the connection check since the agent may have already
     # connected during daemons_handler restart (which runs before this fixture).
@@ -51,6 +51,6 @@ def send_execd_message(test_metadata: dict, remoted_simulator: RemotedSimulator)
     # Don't tail only new events here: on fast platforms (Windows) execd can log the
     # reception line before we start monitoring, so we need to scan from the beginning
     # of the truncated file to catch it reliably.
-    execd_monitor = FileMonitor(WAZUH_LOG_PATH)
+    execd_monitor = FileMonitor(GUARDSARM_LOG_PATH)
     execd_monitor.start(callback=generate_callback(EXECD_RECEIVED_MESSAGE), timeout=60)
     assert execd_monitor.callback_result is not None, 'Execd did not receive the message'

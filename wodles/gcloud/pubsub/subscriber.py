@@ -12,7 +12,7 @@ from json import JSONDecodeError
 
 path.insert(0, dirname(dirname(dirname(abspath(__file__)))))
 import exceptions
-from integration import WazuhGCloudIntegration
+from integration import GuardSarmGCloudIntegration
 
 
 try:
@@ -22,11 +22,11 @@ except ImportError as e:
     raise exceptions.GCloudError(errcode=1003, package=e.name)
 
 
-class WazuhGCloudSubscriber(WazuhGCloudIntegration):
-    """Class for sending events from Google Cloud to Wazuh."""
+class GuardSarmGCloudSubscriber(GuardSarmGCloudIntegration):
+    """Class for sending events from Google Cloud to GuardSarm."""
 
     def __init__(self, credentials_file: str, project: str, logger: logging.Logger, subscription_id: str):
-        """Instantiate a WazuhGCloudSubscriber object.
+        """Instantiate a GuardSarmGCloudSubscriber object.
 
         Parameters
         ----------

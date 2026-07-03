@@ -1,5 +1,5 @@
 /*
- * Wazuh Vulnerability scanner - Scan Orchestrator
+ * GuardSarm Vulnerability scanner - Scan Orchestrator
  * Copyright (C) 2015, Wazuh Inc.
  * Nov 23, 2023.
  *
@@ -20,7 +20,7 @@
 #include <unistd.h>
 #include <vector>
 
-constexpr auto USER_GROUP {"wazuh"};
+constexpr auto USER_GROUP {"guardsarm"};
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"

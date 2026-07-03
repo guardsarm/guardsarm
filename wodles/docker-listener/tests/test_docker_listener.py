@@ -17,7 +17,7 @@ docker_listener = __import__("DockerListener")
 def test_DockerListener__init__():
     """Test if an instance of DockerListener is created properly."""
     dl = docker_listener.DockerListener()
-    for attribute in ['wazuh_path', 'wazuh_queue', 'msg_header', 'client', 'thread1', 'thread2']:
+    for attribute in ['guardsarm_path', 'guardsarm_queue', 'msg_header', 'client', 'thread1', 'thread2']:
         assert hasattr(dl, attribute)
 
 
@@ -145,7 +145,7 @@ def test_DockerListener_listen_ko(mock_process, mock_send, mock_connect):
 
 @patch('DockerListener.DockerListener.send_msg')
 def test_DockerListener_process(mock_send):
-    """Test process function sends the decoded events to the Wazuh socket."""
+    """Test process function sends the decoded events to the GuardSarm socket."""
     event = b"test"
     dl = docker_listener.DockerListener()
     dl.process(event)
@@ -164,7 +164,7 @@ def test_DockerListener_format_msg():
 
 @patch('DockerListener.socket.socket')
 def test_DockerListener_send_msg(mock_socket):
-    """Test send_msg sends the messages with the expected contents to the Wazuh socket."""
+    """Test send_msg sends the messages with the expected contents to the GuardSarm socket."""
     msg = '{"test": "value"}'
 
     m = MagicMock()
@@ -173,7 +173,7 @@ def test_DockerListener_send_msg(mock_socket):
     dl.send_msg(msg)
 
     mock_socket.assert_called_with(socket.AF_UNIX, socket.SOCK_DGRAM)
-    m.connect.assert_called_with(dl.wazuh_queue)
+    m.connect.assert_called_with(dl.guardsarm_queue)
     formatted_msg = json.dumps(dl.format_msg(msg))
     m.send.assert_called_with(f"{dl.msg_header}{formatted_msg}".encode())
     m.close.assert_called_once()

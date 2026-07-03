@@ -1,5 +1,5 @@
 /*
- * Wazuh SysInfo
+ * GuardSarm SysInfo
  * Copyright (C) 2015, Wazuh Inc.
  * November 11, 2020.
  *
@@ -15,7 +15,7 @@
 
 // Define EXPORTED for any platform
 #include "commonDefs.h"
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 #define EXPORTED
 #else
 #ifndef EXPORTED

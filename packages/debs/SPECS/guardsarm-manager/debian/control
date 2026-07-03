@@ -1,0 +1,28 @@
+Source: guardsarm-manager
+Section: admin
+Priority: extra
+Maintainer: GuardSarm <info@guardsarm.com>
+Build-Depends: debhelper (>= 7.0.50~), libssl-dev, linux-libc-dev, gawk, libaudit-dev
+Standards-Version: 3.8.4
+Homepage: https://guardsarm.com
+
+Package: guardsarm-manager
+Architecture: any
+Depends: ${shlibs:Depends}, libc6 (>= 2.7), curl
+Suggests: expect
+Conflicts: ossec-hids-agent, ossec-hids, guardsarm-api
+Replaces: guardsarm-api
+Description: GuardSarm manager
+ GuardSarm helps you to gain security visibility into your infrastructure by monitoring
+ hosts at an operating system and application level. It provides the following
+ capabilities: log analysis, file integrity monitoring, intrusions detection
+ and policy and compliance monitoring.
+
+Package: guardsarm-manager-dbg
+Section: debug
+Priority: optional
+Architecture: any
+Conflicts: guardsarm-manager (<< ${binary:Version}), guardsarm-manager (>> ${binary:Version})
+Depends: guardsarm-manager
+Description: Debug symbols for guardsarm-manager.
+  This package contains files necessary for debugging the guardsarm-manager with gdb.

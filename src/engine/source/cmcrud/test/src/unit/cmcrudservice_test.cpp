@@ -151,7 +151,7 @@ static constexpr const char* kPolicyJson = R"({
   "title": "Development 0.0.1",
   "hash": "cmcrud-unit-test-hash",
   "default_parent": "decoder/integration/0",
-  "root_decoder": "decoder/wazuh-core-message/0",
+  "root_decoder": "decoder/guardsarm-core-message/0",
   "integrations": [
     "42e28392-4f5e-473d-89e8-c9030e6fedc2",
     "a7fe64a2-0a03-414f-8692-8441bdfe6f69",
@@ -422,7 +422,7 @@ TEST_F(CrudServicePolicyTest, UpsertPolicy_InvalidOriginSpaceIsRejected)
   },
   "hash": "cmcrud-unit-test-hash",
   "default_parent": "decoder/integration/0",
-  "root_decoder": "decoder/wazuh-core-message/0",
+  "root_decoder": "decoder/guardsarm-core-message/0",
   "origin_space": "../bad-space",
   "integrations": [
     "42e28392-4f5e-473d-89e8-c9030e6fedc2"
@@ -1387,7 +1387,7 @@ TEST_F(CrudServiceImportNsFromVectorTest, FilterNamePrefixMismatch_Throws)
 static constexpr const char* kMinimalImportDoc = R"({
   "policy": {
     "enabled": true,
-    "root_decoder": "decoder/wazuh-core-message/0",
+    "root_decoder": "decoder/guardsarm-core-message/0",
     "integrations": [],
     "filters": [],
     "enrichments": [],
@@ -1401,7 +1401,7 @@ static constexpr const char* kMinimalImportDoc = R"({
 static constexpr const char* kImportDocWithKVDB = R"({
   "policy": {
     "enabled": true,
-    "root_decoder": "decoder/wazuh-core-message/0",
+    "root_decoder": "decoder/guardsarm-core-message/0",
     "integrations": [],
     "filters": [],
     "enrichments": [],
@@ -1424,7 +1424,7 @@ static constexpr const char* kImportDocWithKVDB = R"({
 static constexpr const char* kImportDocWithDecoder = R"({
   "policy": {
     "enabled": true,
-    "root_decoder": "decoder/wazuh-core-message/0",
+    "root_decoder": "decoder/guardsarm-core-message/0",
     "integrations": [],
     "filters": [],
     "enrichments": [],
@@ -1447,7 +1447,7 @@ static constexpr const char* kImportDocWithDecoder = R"({
 static constexpr const char* kImportDocWithFilter = R"({
   "policy": {
     "enabled": true,
-    "root_decoder": "decoder/wazuh-core-message/0",
+    "root_decoder": "decoder/guardsarm-core-message/0",
     "integrations": [],
     "filters": [],
     "enrichments": [],
@@ -1471,7 +1471,7 @@ static constexpr const char* kImportDocWithFilter = R"({
 static constexpr const char* kImportDocWithOutput = R"({
   "policy": {
     "enabled": true,
-    "root_decoder": "decoder/wazuh-core-message/0",
+    "root_decoder": "decoder/guardsarm-core-message/0",
     "integrations": [],
     "filters": [],
     "enrichments": [],
@@ -1494,7 +1494,7 @@ static constexpr const char* kImportDocWithOutput = R"({
 static constexpr const char* kImportDocWithIntegration = R"({
   "policy": {
     "enabled": true,
-    "root_decoder": "decoder/wazuh-core-message/0",
+    "root_decoder": "decoder/guardsarm-core-message/0",
     "integrations": [],
     "filters": [],
     "enrichments": [],

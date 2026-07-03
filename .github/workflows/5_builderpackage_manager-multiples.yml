@@ -1,4 +1,4 @@
-name: 5.X - Package - Build multiple Wazuh Manager Packages
+name: 5.X - Package - Build multiple GuardSarm Manager Packages
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
       - "src/**"
       - ".github/workflows/5_builderpackage_manager-multiples.yml"
       - ".github/workflows/5_builderpackage_manager.yml"
-      - "packages/*/SPECS/wazuh-manager/**"
+      - "packages/*/SPECS/guardsarm-manager/**"
       - "packages/*"
       - "packages/*/utils/*"
       - ".github/workflows/5_testintegration_manager.yml"
@@ -19,7 +19,7 @@ on:
       - ".github/actions/reinstall_cmake/**"
       - "tests/integration/conftest.py"
       - "tests/integration/test_api/**"
-      - "tests/integration/test_wazuh_db/**"
+      - "tests/integration/test_guardsarm_db/**"
       - "tests/integration/test_remoted/**"
       - "tests/integration/test_authd/**"
       # Agent-only trees, never built for the manager target (src/CMakeLists.txt gating)
@@ -29,7 +29,7 @@ on:
       - "!src/win32/**"
       # Manager build forces USE_SELINUX=no (src/Makefile); only agent specs package it
       - "!src/selinux/**"
-      # Test trees: UNIT_TEST/WAZUH_ENGINE_TEST-gated or excluded from the wheel (setup.py)
+      # Test trees: UNIT_TEST/GUARDSARM_ENGINE_TEST-gated or excluded from the wheel (setup.py)
       - "!src/unit_tests/**"
       - "!src/**/tests/**"
       - "!src/**/integrationTests/**"
@@ -37,7 +37,7 @@ on:
       # dispatched from here) and indexer_connector/** is detect-changes-mapped
       - "!src/data_provider/qa/**"
       - "!src/shared_modules/keystore/qa/**"
-      - "!src/wazuh_modules/vulnerability_scanner/qa/**"
+      - "!src/guardsarm_modules/vulnerability_scanner/qa/**"
       - "!src/engine/test/**"
       - "!src/engine/docs/**"
       - "!framework/**/tests/**"
@@ -90,7 +90,7 @@ concurrency:
 jobs:
   select-targets:
     if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
-    name: Select build targets (Wazuh Managers)
+    name: Select build targets (GuardSarm Managers)
     runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.result }}
@@ -236,9 +236,9 @@ jobs:
               f.write(f"inventory_sync_changed={'true' if inventory_sync_matched else 'false'}\n")
               f.write(f"inventory_sync_timeout={inv_timeout}\n")
 
-  build-wazuh-manager:
+  build-guardsarm-manager:
     if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
-    name: Build Wazuh Manager
+    name: Build GuardSarm Manager
     needs: select-targets
     permissions:
       contents: read
@@ -260,10 +260,10 @@ jobs:
     if: >
       (github.event_name != 'pull_request' || !github.event.pull_request.draft) &&
       needs.detect-changes.outputs.any_matched == 'true' &&
-      needs.build-wazuh-manager.result == 'success'
+      needs.build-guardsarm-manager.result == 'success'
     # Static name: GitHub never evaluates name expressions on skipped matrix jobs
     name: Integration tests
-    needs: [build-wazuh-manager, detect-changes]
+    needs: [build-guardsarm-manager, detect-changes]
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.detect-changes.outputs.matrix) }}
@@ -282,9 +282,9 @@ jobs:
     if: >
       (github.event_name != 'pull_request' || !github.event.pull_request.draft) &&
       needs.detect-changes.outputs.inventory_sync_changed == 'true' &&
-      needs.build-wazuh-manager.result == 'success'
+      needs.build-guardsarm-manager.result == 'success'
     name: ${{ needs.detect-changes.outputs.inventory_sync_changed == 'true' && 'Integration tests - inventory_sync' || 'Integration tests - inventory_sync - No relevant changes' }}
-    needs: [build-wazuh-manager, detect-changes]
+    needs: [build-guardsarm-manager, detect-changes]
     uses: ./.github/workflows/5_testintegration_inventory-sync.yml
     with:
       build_run_id: ${{ github.run_id }}

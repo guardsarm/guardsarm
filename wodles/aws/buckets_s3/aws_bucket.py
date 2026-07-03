@@ -15,7 +15,7 @@ from typing import Iterator
 from datetime import datetime, timedelta
 
 sys.path.insert(0, path.dirname(path.dirname(path.abspath(__file__))))
-import wazuh_integration
+import guardsarm_integration
 import aws_tools
 
 MAX_RECORD_RETENTION = 500
@@ -24,7 +24,7 @@ DB_DATE_FORMAT = "%Y%m%d"
 DEFAULT_DATABASE_NAME = "s3_cloudtrail"
 LATE_ARRIVAL_LOG_TABLES = {"cloudtrail", "alb", "clb", "nlb"}
 
-RETRY_CONFIGURATION_URL = 'https://documentation.wazuh.com/current/amazon/services/prerequisites/' \
+RETRY_CONFIGURATION_URL = 'https://documentation.guardsarm.com/current/amazon/services/prerequisites/' \
                           'considerations.html#Connection-configuration-for-retries'
 
 INVALID_CREDENTIALS_ERROR_CODE = "SignatureDoesNotMatch"
@@ -42,7 +42,7 @@ AWS_BUCKET_MSG_TEMPLATE = {'integration': 'aws',
                            'aws': {'log_info': {'aws_account_alias': '', 'log_file': '', 's3bucket': ''}}}
 
 
-class AWSBucket(wazuh_integration.WazuhAWSDatabase):
+class AWSBucket(guardsarm_integration.GuardSarmAWSDatabase):
     """
     Represents a bucket with events on the inside.
 
@@ -188,7 +188,7 @@ class AWSBucket(wazuh_integration.WazuhAWSDatabase):
         # Table name
         self.db_table_name = db_table_name
 
-        wazuh_integration.WazuhAWSDatabase.__init__(self,
+        guardsarm_integration.GuardSarmAWSDatabase.__init__(self,
                                                     db_name=self.db_name,
                                                     service_name='s3',
                                                     access_key=access_key,
@@ -515,7 +515,7 @@ class AWSBucket(wazuh_integration.WazuhAWSDatabase):
                                                    error_txt)
                     self.send_msg(error_msg)
                 except:
-                    aws_tools.debug("++ Failed to send message to Wazuh", 1)
+                    aws_tools.debug("++ Failed to send message to GuardSarm", 1)
             else:
                 aws_tools.error(error_txt)
                 sys.exit(error_code)

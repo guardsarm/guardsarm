@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **cmcrud** module is the **CRUD service layer** for the Wazuh engine's Content Manager. It sits between the HTTP API handlers and the underlying `cmstore`, mediating all create / read / update / delete operations on namespaces, policies, and resources (decoders, filters, outputs, integrations, KVDBs).
+The **cmcrud** module is the **CRUD service layer** for the GuardSarm engine's Content Manager. It sits between the HTTP API handlers and the underlying `cmstore`, mediating all create / read / update / delete operations on namespaces, policies, and resources (decoders, filters, outputs, integrations, KVDBs).
 
 Before any mutation reaches the store, `cmcrud` receives a structured `json::Json` payload, applies type-specific adaptations (canonical field ordering for assets), and delegates structural validation to `builder::IValidator`. This guarantees that every artifact persisted in `cmstore` has already been checked for consistency.
 

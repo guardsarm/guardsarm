@@ -6,8 +6,8 @@ This program is free software; you can redistribute it and/or modify it under th
 import pytest
 import os
 
-from wazuh_testing.constants.paths.configurations import DEFAULT_AUTHD_PASS_PATH
-from wazuh_testing.utils import file
+from guardsarm_testing.constants.paths.configurations import DEFAULT_AUTHD_PASS_PATH
+from guardsarm_testing.utils import file
 
 
 @pytest.fixture()

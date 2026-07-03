@@ -7,7 +7,7 @@
       "tiers": ["0 1"],
       "timeout_minutes": 60,
       "_comment_tiers": "Each element produces one matrix row; space-separated values become individual --tier flags",
-      "_comment_rbac": "rbac tests live under test_api/test_rbac/ — covered as a subset of test_api/. framework/wazuh/rbac/** is listed here so rbac-only changes also trigger this suite.",
+      "_comment_rbac": "rbac tests live under test_api/test_rbac/ — covered as a subset of test_api/. framework/guardsarm/rbac/** is listed here so rbac-only changes also trigger this suite.",
       "paths": [
         ".github/workflows/5_builderpackage_manager-multiples.yml",
         ".github/workflows/5_testintegration_manager.yml",
@@ -15,31 +15,31 @@
         ".github/workflows/.python-version-it",
         ".github/actions/reinstall_cmake/**",
         "api/**",
-        "framework/wazuh/rbac/**",
+        "framework/guardsarm/rbac/**",
         "src/Makefile",
         "tests/integration/conftest.py",
         "tests/integration/test_api/**"
       ]
     },
     {
-      "name": "wazuh_db",
+      "name": "guardsarm_db",
       "suite_type": "manager_install",
-      "pytest_target": "test_wazuh_db/",
+      "pytest_target": "test_guardsarm_db/",
       "tiers": ["0"],
       "timeout_minutes": 60,
-      "_comment_tiers": "wazuh-db integration tests are all tier 0 (smoke/functional against the wdb socket)",
+      "_comment_tiers": "guardsarm-db integration tests are all tier 0 (smoke/functional against the wdb socket)",
       "paths": [
         ".github/workflows/5_builderpackage_manager-multiples.yml",
         ".github/workflows/5_testintegration_manager.yml",
         ".github/test_modules_manager.json",
         ".github/workflows/.python-version-it",
         ".github/actions/reinstall_cmake/**",
-        "src/config/src/wazuh_db-config.c",
-        "src/config/include/wazuh_db-config.h",
-        "src/wazuh_db/**",
+        "src/config/src/guardsarm_db-config.c",
+        "src/config/include/guardsarm_db-config.h",
+        "src/guardsarm_db/**",
         "src/Makefile",
         "tests/integration/conftest.py",
-        "tests/integration/test_wazuh_db/**"
+        "tests/integration/test_guardsarm_db/**"
       ]
     },
     {
@@ -91,7 +91,7 @@
         ".github/workflows/5_testintegration_inventory-sync.yml",
         ".github/test_modules_manager.json",
         ".github/actions/reinstall_cmake/**",
-        "src/wazuh_modules/inventory_sync/**",
+        "src/guardsarm_modules/inventory_sync/**",
         "src/shared_modules/utils/flatbuffers/**",
         "src/shared_modules/indexer_connector/**",
         "src/Makefile"

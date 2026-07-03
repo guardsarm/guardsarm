@@ -12,11 +12,11 @@
 #include "shared.h"
 #include "sha256_op.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
     #ifdef WIN32
         #include "../../unit_tests/wrappers/windows/url_wrappers.h"
     #else
-        #include "../../unit_tests/wrappers/wazuh/shared/url_wrappers.h"
+        #include "../../unit_tests/wrappers/guardsarm/shared/url_wrappers.h"
     #endif
 #endif
 

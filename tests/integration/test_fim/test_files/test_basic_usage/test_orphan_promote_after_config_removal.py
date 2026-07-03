@@ -35,14 +35,14 @@ targets:
     - agent
 
 daemons:
-    - wazuh-syscheckd
+    - guardsarm-syscheckd
 
 os_platform:
     - linux
 
 references:
-    - https://github.com/wazuh/wazuh/issues/36134
-    - https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syscheck.html
+    - https://github.com/guardsarm/guardsarm/issues/36134
+    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/syscheck.html
 
 tags:
     - fim
@@ -55,16 +55,16 @@ import pytest
 
 from pathlib import Path
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.constants.platforms import WINDOWS
-from wazuh_testing.modules.agentd.configuration import AGENTD_DEBUG, AGENTD_WINDOWS_DEBUG
-from wazuh_testing.modules.fim.configuration import SYSCHECK_DEBUG
-from wazuh_testing.modules.fim.patterns import EVENT_TYPE_ADDED
-from wazuh_testing.modules.monitord.configuration import MONITORD_ROTATE_LOG
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils import configuration, file, services
-from wazuh_testing.utils.callbacks import generate_callback
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.constants.platforms import WINDOWS
+from guardsarm_testing.modules.agentd.configuration import AGENTD_DEBUG, AGENTD_WINDOWS_DEBUG
+from guardsarm_testing.modules.fim.configuration import SYSCHECK_DEBUG
+from guardsarm_testing.modules.fim.patterns import EVENT_TYPE_ADDED
+from guardsarm_testing.modules.monitord.configuration import MONITORD_ROTATE_LOG
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.utils import configuration, file, services
+from guardsarm_testing.utils.callbacks import generate_callback
+from guardsarm_testing.utils.configuration import get_test_cases_data, load_configuration_template
 
 from . import TEST_CASES_PATH, CONFIGS_PATH
 
@@ -86,7 +86,7 @@ if sys.platform == WINDOWS:
 
 
 # Log patterns specific to this regression — not (yet) exposed by
-# wazuh_testing.modules.fim.patterns.
+# guardsarm_testing.modules.fim.patterns.
 FAILED_TO_GET_CONFIG_PATTERN = r'.*ERROR: Failed to get configuration for path: (\S+)'
 SKIPPING_PROMOTION_PATTERN = (
     r'.*Skipping promotion of orphaned path \(no active configuration\): (\S+)'
@@ -127,10 +127,10 @@ def _remove_directories_section_from_ossec_conf(target_value: str) -> None:
     """Strip every <directories ...>target_value</directories> line from
     ossec.conf. Cheap textual edit — keeps the file otherwise intact so
     the agent picks up the same configuration except for the one rule we
-    drop. The surrounding `set_wazuh_configuration` fixture restores the
+    drop. The surrounding `set_guardsarm_configuration` fixture restores the
     file from a snapshot at teardown.
     """
-    conf_lines = configuration.get_wazuh_conf()
+    conf_lines = configuration.get_guardsarm_conf()
     pruned = [
         line for line in conf_lines
         if not (
@@ -138,7 +138,7 @@ def _remove_directories_section_from_ossec_conf(target_value: str) -> None:
             and f'>{target_value}<' in line
         )
     ]
-    configuration.write_wazuh_conf(pruned)
+    configuration.write_guardsarm_conf(pruned)
 
 
 @pytest.mark.parametrize(
@@ -149,7 +149,7 @@ def _remove_directories_section_from_ossec_conf(target_value: str) -> None:
 def test_orphan_promote_after_config_removal(
     test_configuration,
     test_metadata,
-    set_wazuh_configuration,
+    set_guardsarm_configuration,
     truncate_monitored_files,
     configure_local_internal_options,
     _setup_orphan_test_folders,
@@ -178,7 +178,7 @@ def test_orphan_promote_after_config_removal(
                    3) still emit the orphan delete event via
                       handle_orphaned_delete on the next scheduled scan.
 
-    wazuh_min_version: 5.0.0
+    guardsarm_min_version: 5.0.0
 
     tier: 0
     '''
@@ -193,7 +193,7 @@ def test_orphan_promote_after_config_removal(
     # the row lands in fim.db with sync=0 (the realtime path does not
     # flush the sync flag).
     file.write_file(str(target_file), 'evidence-36134')
-    FileMonitor(WAZUH_LOG_PATH).start(
+    FileMonitor(GUARDSARM_LOG_PATH).start(
         generate_callback(EVENT_TYPE_ADDED),
         timeout=30,
     )
@@ -204,7 +204,7 @@ def test_orphan_promote_after_config_removal(
     # a realtime FIM rule getting unassigned).
     services.control_service('stop')
     _remove_directories_section_from_ossec_conf(str(realtime_folder))
-    file.truncate_file(WAZUH_LOG_PATH)
+    file.truncate_file(GUARDSARM_LOG_PATH)
     services.control_service('start')
 
     # Wait for fim_initialize() to log its "Document limit (increased|
@@ -212,7 +212,7 @@ def test_orphan_promote_after_config_removal(
     # docs_to_promote in hand. If this never appears the promote branch
     # was short-circuited (e.g. no sync=1 rows) and the test setup is
     # wrong.
-    FileMonitor(WAZUH_LOG_PATH).start(
+    FileMonitor(GUARDSARM_LOG_PATH).start(
         generate_callback(DOCUMENT_LIMIT_CHANGED_PATTERN),
         timeout=60,
     )
@@ -221,7 +221,7 @@ def test_orphan_promote_after_config_removal(
     # lands in the log file before we read it.
     time.sleep(2)
 
-    log_text = Path(WAZUH_LOG_PATH).read_text()
+    log_text = Path(GUARDSARM_LOG_PATH).read_text()
 
     # Assertion 1 (the regression itself): no ERROR for any orphaned path.
     # We match by directory prefix because both the seed_file and the
@@ -250,7 +250,7 @@ def test_orphan_promote_after_config_removal(
 
     # Assertion 3: the existing orphan-delete path still handles cleanup
     # on the first scheduled scan after restart.
-    FileMonitor(WAZUH_LOG_PATH).start(
+    FileMonitor(GUARDSARM_LOG_PATH).start(
         generate_callback(HANDLE_ORPHANED_DELETE_PATTERN),
         timeout=90,
     )

@@ -215,13 +215,13 @@ class AgentSyncProtocol : public IAgentSyncProtocol
 
         /// @brief Converts internal Mode enum to protocol schema Mode.
         /// @param mode The internal Mode enum value.
-        /// @return The corresponding Wazuh::SyncSchema::Mode value.
-        Wazuh::SyncSchema::Mode toProtocolMode(Mode mode) const;
+        /// @return The corresponding GuardSarm::SyncSchema::Mode value.
+        GuardSarm::SyncSchema::Mode toProtocolMode(Mode mode) const;
 
         /// @brief Converts internal Option enum to protocol schema Option.
         /// @param option The internal Option enum value.
-        /// @return The corresponding Wazuh::SyncSchema::Option value.
-        Wazuh::SyncSchema::Option toProtocolOption(Option option) const;
+        /// @return The corresponding GuardSarm::SyncSchema::Option value.
+        GuardSarm::SyncSchema::Option toProtocolOption(Option option) const;
 
         /// @brief Synchronization state shared between threads during module sync.
         ///

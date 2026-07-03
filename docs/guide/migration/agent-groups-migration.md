@@ -1,25 +1,25 @@
-# Migrating Agent Groups to Wazuh 5.0
+# Migrating Agent Groups to GuardSarm 5.0
 
-In Wazuh 4.x, agent group assignments were stored in the manager's `global.db` database and shared group configurations lived under `/var/ossec/etc/shared/`. Each group folder contained an `agent.conf` and a compiled `merged.mg` file that the manager pushed to agents on check-in.
+In GuardSarm 4.x, agent group assignments were stored in the manager's `global.db` database and shared group configurations lived under `/var/ossec/etc/shared/`. Each group folder contained an `agent.conf` and a compiled `merged.mg` file that the manager pushed to agents on check-in.
 
-Starting with Wazuh 5.0, the manager installation path changed from `/var/ossec/` to `/var/wazuh-manager/`. Group configurations still reside under the same relative path (`etc/shared/`), but the absolute paths have changed. Group membership is also no longer inferred by the manager: the agent declares its group during the **enrollment handshake**, and the manager stores that assignment in `global.db`. This means an agent will only be placed in its original group if that group is configured on the agent **before** it (re)enrolls. There is no automatic checksum-based group guessing in Wazuh 5.0. The full mechanism is covered in [How group assignment works](#how-group-assignment-works) below.
+Starting with GuardSarm 5.0, the manager installation path changed from `/var/ossec/` to `/var/guardsarm-manager/`. Group configurations still reside under the same relative path (`etc/shared/`), but the absolute paths have changed. Group membership is also no longer inferred by the manager: the agent declares its group during the **enrollment handshake**, and the manager stores that assignment in `global.db`. This means an agent will only be placed in its original group if that group is configured on the agent **before** it (re)enrolls. There is no automatic checksum-based group guessing in GuardSarm 5.0. The full mechanism is covered in [How group assignment works](#how-group-assignment-works) below.
 
 > There is no automatic migration tooling for agent groups. You must manually transfer your group configuration files to the new manager before reconnecting any agents.
 
 ## How group assignment works
 
-Group assignment in Wazuh 5.0 is driven by the agent's enrollment:
+Group assignment in GuardSarm 5.0 is driven by the agent's enrollment:
 
-1. **Enrollment (the handshake that carries the group).** When an agent enrolls (registers) with the manager, it includes the group(s) configured in its `ossec.conf` under `<enrollment><groups>`. The manager's enrollment service (`wazuh-manager-authd`) validates the group and writes the assignment into `global.db`. If the declared group does not exist on the manager, **enrollment is rejected and the agent cannot connect**.
+1. **Enrollment (the handshake that carries the group).** When an agent enrolls (registers) with the manager, it includes the group(s) configured in its `ossec.conf` under `<enrollment><groups>`. The manager's enrollment service (`guardsarm-manager-authd`) validates the group and writes the assignment into `global.db`. If the declared group does not exist on the manager, **enrollment is rejected and the agent cannot connect**.
 2. **Persistence.** The assignment persists in `global.db` and survives agent and manager restarts, so it does not need to be resent on every connection.
 3. **Reconnection.** On each keepalive, the manager looks up the agent's group in `global.db` and, if found, compiles and pushes that group's shared configuration. If no group is recorded for the agent, the manager assigns the `default` group.
 
 > [!IMPORTANT]
-> Earlier Wazuh versions could *guess* an agent's group by matching its `merged.mg` checksum against the groups present on the manager (the `remoted.guess_agent_group` internal option). **This mechanism has been removed in Wazuh 5.0.** A reconnecting agent that has no group configured in its `ossec.conf` and no prior assignment in `global.db` will be placed in the `default` group. To restore its original group you must either re-enroll the agent with the group configured, or assign the group manually (see [Workaround: manual group assignment](#workaround-manual-group-assignment)).
+> Earlier GuardSarm versions could *guess* an agent's group by matching its `merged.mg` checksum against the groups present on the manager (the `remoted.guess_agent_group` internal option). **This mechanism has been removed in GuardSarm 5.0.** A reconnecting agent that has no group configured in its `ossec.conf` and no prior assignment in `global.db` will be placed in the `default` group. To restore its original group you must either re-enroll the agent with the group configured, or assign the group manually (see [Workaround: manual group assignment](#workaround-manual-group-assignment)).
 
 ## Prerequisites
 
-This guide assumes you will **back up the group configurations from the 4.x manager and then perform a fresh Wazuh 5.0 installation**, typically on the same host, removing 4.x and installing 5.0 in its place. The migration is carried through the backup you take *before* removing 4.x.
+This guide assumes you will **back up the group configurations from the 4.x manager and then perform a fresh GuardSarm 5.0 installation**, typically on the same host, removing 4.x and installing 5.0 in its place. The migration is carried through the backup you take *before* removing 4.x.
 
 Before proceeding, make sure you have:
 
@@ -29,7 +29,7 @@ Before proceeding, make sure you have:
   To turn off an agent:
   ```bash
   # On each agent
-  systemctl stop wazuh-agent
+  systemctl stop guardsarm-agent
   ```
   For large deployments, apply this across hosts using your orchestration tooling (Ansible, an SSH loop, MDM, GPO, etc.).
 
@@ -41,7 +41,7 @@ On the **4.x manager**, archive the group folders under `shared/`, excluding the
 
 ```bash
 cd /var/ossec/etc
-tar -cvzf /tmp/wazuh_groups_backup.tar.gz --exclude='*/merged.mg' shared/*/
+tar -cvzf /tmp/guardsarm_groups_backup.tar.gz --exclude='*/merged.mg' shared/*/
 ```
 
 The `shared/*/` glob matches only the group folders, so non-group files in `shared/` (such as `ar.conf` and `agent-template.conf`) are left out.
@@ -50,7 +50,7 @@ To migrate only specific groups, replace `shared/*/` with the folder names:
 
 ```bash
 cd /var/ossec/etc
-tar -cvzf /tmp/wazuh_groups_backup.tar.gz --exclude='*/merged.mg' \
+tar -cvzf /tmp/guardsarm_groups_backup.tar.gz --exclude='*/merged.mg' \
     shared/<group-name-1>/ shared/<group-name-2>/
 ```
 
@@ -63,21 +63,21 @@ Keep this archive somewhere that **survives the reinstall** (for example, off th
 > [!IMPORTANT]
 > Complete this step **before** connecting any agents to the 5.0 manager. The manager validates the declared group during enrollment: if an agent enrolls with a `<groups>` value that does not yet exist on the manager, **enrollment is rejected and the agent cannot connect**. (An agent with no `<groups>` tag still connects and lands in `default`.)
 
-After installing Wazuh 5.0, copy the backup archive back onto the manager host, then extract it and fix ownership:
+After installing GuardSarm 5.0, copy the backup archive back onto the manager host, then extract it and fix ownership:
 
 ```bash
-tar -xvzf /tmp/wazuh_groups_backup.tar.gz -C /var/wazuh-manager/etc/
-chown -R wazuh-manager:wazuh-manager /var/wazuh-manager/etc/shared/
+tar -xvzf /tmp/guardsarm_groups_backup.tar.gz -C /var/guardsarm-manager/etc/
+chown -R guardsarm-manager:guardsarm-manager /var/guardsarm-manager/etc/shared/
 ```
 
 Verify the group folders were restored:
 
 ```bash
-ls /var/wazuh-manager/etc/shared/
+ls /var/guardsarm-manager/etc/shared/
 ```
 
 > [!WARNING]
-> **Configuration validity:** The restored `agent.conf` files must be valid for Wazuh 5.0. Any deprecated options or renamed tags from the 4.x configuration format will cause the shared configuration to fail to compile. Review each group's `agent.conf` against the Wazuh 5.0 reference documentation and remove or update any incompatible settings before proceeding.
+> **Configuration validity:** The restored `agent.conf` files must be valid for GuardSarm 5.0. Any deprecated options or renamed tags from the 4.x configuration format will cause the shared configuration to fail to compile. Review each group's `agent.conf` against the GuardSarm 5.0 reference documentation and remove or update any incompatible settings before proceeding.
 
 ### 3. Ensure each agent has its group configured
 
@@ -104,7 +104,7 @@ Clear its key first, then start it:
 ```bash
 # On each agent
 rm -f /var/ossec/etc/client.keys
-systemctl start wazuh-agent
+systemctl start guardsarm-agent
 ```
 
 During enrollment the agent sends its configured group to the manager, which records the assignment in `global.db`. On the following keepalive the manager compiles and pushes the matching group's shared configuration.
@@ -112,14 +112,14 @@ During enrollment the agent sends its configured group to the manager, which rec
 > [!WARNING]
 > If an agent declares a group that does not exist on the manager, **enrollment is rejected** and the agent cannot connect (`ERROR: Invalid group: <group>. Unable to add agent`). See [Workaround: agent fails to connect (missing group)](#workaround-agent-fails-to-connect-missing-group) to resolve it.
 
-To verify, view the group assignments from the Wazuh dashboard under **Agents management -> Summary**.
+To verify, view the group assignments from the GuardSarm dashboard under **Agents management -> Summary**.
 
-![Agent list showing groups in the Wazuh 5.0 dashboard](../../images/agent-groups-migration/dashboard-agent-list.png)
+![Agent list showing groups in the GuardSarm 5.0 dashboard](../../images/agent-groups-migration/dashboard-agent-list.png)
 
-You can also check the group assignment for a specific agent using the Wazuh API.
+You can also check the group assignment for a specific agent using the GuardSarm API.
 
 > [!NOTE]
-> The API requires an authentication token. Request one from the manager with your API credentials (default user `wazuh`), then reuse it in the calls below. The token can expire, so request a new one if it stops working:
+> The API requires an authentication token. Request one from the manager with your API credentials (default user `guardsarm`), then reuse it in the calls below. The token can expire, so request a new one if it stops working:
 > ```bash
 > TOKEN=$(curl -u <user>:<password> -k -X POST \
 >     "https://<manager-ip>:55000/security/user/authenticate?raw=true")
@@ -130,14 +130,14 @@ curl -k -X GET "https://<manager-ip>:55000/agents?agents_list=<agent-id>&select=
      -H "Authorization: Bearer $TOKEN"
 ```
 
-You have now migrated your agent groups from Wazuh 4.x to Wazuh 5.0.
+You have now migrated your agent groups from GuardSarm 4.x to GuardSarm 5.0.
 
 ## Workaround: agent fails to connect (missing group)
 
 If an agent declares a group that does not exist on the manager, **enrollment is rejected** and the agent cannot connect. The agent log shows:
 
 ```
-wazuh-agentd: ERROR: Invalid group: <group>. Unable to add agent (from manager)
+guardsarm-agentd: ERROR: Invalid group: <group>. Unable to add agent (from manager)
 ```
 
 To resolve it, do one of the following:
@@ -150,9 +150,9 @@ Make sure the group folder is in place on the manager ([step 2](#2-restore-group
 
 This lets the agent connect; you add the group's configuration afterward. From the dashboard, go to **Agents management -> Groups -> Add new group** and enter the name of the missing group, then click **Save new group**:
 
-![Creating a group from the Wazuh 5.0 dashboard](../../images/agent-groups-migration/dashboard-create-group.png)
+![Creating a group from the GuardSarm 5.0 dashboard](../../images/agent-groups-migration/dashboard-create-group.png)
 
-You can also create it through the Wazuh API:
+You can also create it through the GuardSarm API:
 
 ```bash
 curl -k -X POST "https://<manager-ip>:55000/groups" \
@@ -165,7 +165,7 @@ Then restart the agent so it re-enrolls with the new group available on the mana
 
 To add the configuration afterward, either complete the migration of that group ([step 2](#2-restore-group-configurations-on-the-5x-manager)) or edit it from the dashboard: go to **Agents management -> Groups** and, in the **Actions** column, select the pencil icon (**Edit group configuration**) to edit it manually. Once you have finished, click **Save**:
 
-![Editing a group's configuration from the Wazuh 5.0 dashboard](../../images/agent-groups-migration/dashboard-edit-group-config.png)
+![Editing a group's configuration from the GuardSarm 5.0 dashboard](../../images/agent-groups-migration/dashboard-edit-group-config.png)
 
 ### Option 3: Drop the group from the agent
 
@@ -177,9 +177,9 @@ If an agent started without its group configured in `ossec.conf` (so no group wa
 
 From the dashboard, go to **Agents management -> Summary**. In the **Actions** column, click the `...` icon for the agent, then select **Edit groups**. In the popup window, type the group name or pick it from the dropdown list, then click **Save**.
 
-![Editing an agent's groups from the Wazuh 5.0 dashboard](../../images/agent-groups-migration/dashboard-edit-groups.png)
+![Editing an agent's groups from the GuardSarm 5.0 dashboard](../../images/agent-groups-migration/dashboard-edit-groups.png)
 
-You can also assign it through the Wazuh API:
+You can also assign it through the GuardSarm API:
 
 ```bash
 # Assign a single agent to a group
@@ -209,10 +209,10 @@ Group folder on the 4.x manager at `/var/ossec/etc/shared/linux-servers/`:
 ```bash
 # ls -la /var/ossec/etc/shared/linux-servers/
 total 8
-drwx------ 1 wazuh wazuh  38 Jun  2 18:39 .
-drwxrwx--- 1 root  wazuh  92 Jun  2 18:38 ..
--rw-rw---- 1 wazuh wazuh 215 Jun  2 18:39 agent.conf
--rw-r--r-- 1 wazuh wazuh 487 Jun  2 18:39 merged.mg
+drwx------ 1 guardsarm guardsarm  38 Jun  2 18:39 .
+drwxrwx--- 1 root  guardsarm  92 Jun  2 18:38 ..
+-rw-rw---- 1 guardsarm guardsarm 215 Jun  2 18:39 agent.conf
+-rw-r--r-- 1 guardsarm guardsarm 487 Jun  2 18:39 merged.mg
 ```
 
 Example `agent.conf`:
@@ -243,7 +243,7 @@ Agents 001 (`web-server-01`) and 002 (`web-server-02`) are members of `linux-ser
 
 ```bash
 # cd /var/ossec/etc
-# tar -cvzf /tmp/wazuh_groups_backup.tar.gz --exclude='*/merged.mg' shared/linux-servers/
+# tar -cvzf /tmp/guardsarm_groups_backup.tar.gz --exclude='*/merged.mg' shared/linux-servers/
 shared/linux-servers/
 shared/linux-servers/agent.conf
 ```
@@ -251,29 +251,29 @@ shared/linux-servers/agent.conf
 Inspect the archive to confirm contents:
 
 ```bash
-# tar -tvzf /tmp/wazuh_groups_backup.tar.gz
-drwx------ wazuh/wazuh       0 2026-06-02 18:39 shared/linux-servers/
--rw-rw---- wazuh/wazuh     215 2026-06-02 18:39 shared/linux-servers/agent.conf
+# tar -tvzf /tmp/guardsarm_groups_backup.tar.gz
+drwx------ guardsarm/guardsarm       0 2026-06-02 18:39 shared/linux-servers/
+-rw-rw---- guardsarm/guardsarm     215 2026-06-02 18:39 shared/linux-servers/agent.conf
 ```
 
 ### Step 2: Restore on 5.x
 
 ```bash
-# tar -xvzf /tmp/wazuh_groups_backup.tar.gz -C /var/wazuh-manager/etc/
+# tar -xvzf /tmp/guardsarm_groups_backup.tar.gz -C /var/guardsarm-manager/etc/
 shared/linux-servers/
 shared/linux-servers/agent.conf
-# chown -R wazuh-manager:wazuh-manager /var/wazuh-manager/etc/shared/
-# ls -la /var/wazuh-manager/etc/shared/linux-servers/
+# chown -R guardsarm-manager:guardsarm-manager /var/guardsarm-manager/etc/shared/
+# ls -la /var/guardsarm-manager/etc/shared/linux-servers/
 total 8
-drwx------ 1 wazuh-manager wazuh-manager  38 Jun  2 19:31 .
-drwxrwx--- 1 wazuh-manager wazuh-manager  78 Jun  2 19:31 ..
--rw-rw---- 1 wazuh-manager wazuh-manager 215 Jun  2 18:39 agent.conf
--rw-r--r-- 1 wazuh-manager wazuh-manager 246 Jun  2 19:31 merged.mg
+drwx------ 1 guardsarm-manager guardsarm-manager  38 Jun  2 19:31 .
+drwxrwx--- 1 guardsarm-manager guardsarm-manager  78 Jun  2 19:31 ..
+-rw-rw---- 1 guardsarm-manager guardsarm-manager 215 Jun  2 18:39 agent.conf
+-rw-r--r-- 1 guardsarm-manager guardsarm-manager 246 Jun  2 19:31 merged.mg
 ```
 
 The groups are now visible from the dashboard in **Agents management -> Groups**.
 
-![Wazuh dashboard showing restored groups](../../images/agent-groups-migration/dashboard-restored-groups.png)
+![GuardSarm dashboard showing restored groups](../../images/agent-groups-migration/dashboard-restored-groups.png)
 
 ### Step 3: Configure the group on one agent only
 
@@ -309,7 +309,7 @@ The group is sent during the enrollment handshake; the agent performs a fresh en
 On each agent:
 ```bash
 # rm -f /var/ossec/etc/client.keys
-# systemctl start wazuh-agent
+# systemctl start guardsarm-agent
 ```
 
 ### Step 5: Verify
@@ -348,7 +348,7 @@ Agent 001 enrolled with its group and was assigned `linux-servers`; agent 002 ha
 
 Agent 002 landed in `default` because its group was not in `ossec.conf`. From the dashboard, it is assigned to `linux-servers` through **Agents management -> Summary -> Actions -> Edit groups**, where the group is added in the popup and saved:
 
-![Editing an agent's groups from the Wazuh 5.0 dashboard](../../images/agent-groups-migration/dashboard-edit-groups.png)
+![Editing an agent's groups from the GuardSarm 5.0 dashboard](../../images/agent-groups-migration/dashboard-edit-groups.png)
 
 The same can be done from the API:
 
@@ -372,7 +372,7 @@ The same can be done from the API:
 
 Both agents now belong to `linux-servers`:
 
-![Wazuh dashboard showing both agents belong to linux-servers group](../../images/agent-groups-migration/dashboard-agent-list.png)
+![GuardSarm dashboard showing both agents belong to linux-servers group](../../images/agent-groups-migration/dashboard-agent-list.png)
 
 The same can be confirmed from the API:
 

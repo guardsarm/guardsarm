@@ -25,12 +25,12 @@ elseif(${TARGET} STREQUAL "agent" OR ${TARGET} STREQUAL "winagent")
     # `shared/` is excluded because msgs.c has #ifdef CLIENT branches that
     # change behavior vs the manager-only flow the tests were written against.
     if(${TARGET} STREQUAL "winagent")
-        # TEST_DEPS (DEPENDENCIES_O + libwazuh_test) pulls in objects whose
+        # TEST_DEPS (DEPENDENCIES_O + libguardsarm_test) pulls in objects whose
         # `#ifdef WIN32` paths reference syscheckd symbols (syscom_dispatch,
         # Start_win32_Syscheck, is_fim_shutdown). The os_crypto tests don't
         # exercise those paths, but the references force the linker to resolve
         # them. Use the existing __wrap_* helpers in
-        # src/unit_tests/wrappers/wazuh/syscheckd/ via link_libraries() so the
+        # src/unit_tests/wrappers/guardsarm/syscheckd/ via link_libraries() so the
         # flags propagate to every target defined by the subdirs added below.
         link_libraries(
             -Wl,--wrap=syscom_dispatch

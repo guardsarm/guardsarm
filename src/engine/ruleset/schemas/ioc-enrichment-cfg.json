@@ -1,8 +1,8 @@
 {
   "global": {
     "exclude_trees": [
-      "wazuh.threat.indicator",
-      "wazuh.threat.enrichments",
+      "guardsarm.threat.indicator",
+      "guardsarm.threat.enrichments",
       "threat.indicator",
       "threat.enrichments"
     ]

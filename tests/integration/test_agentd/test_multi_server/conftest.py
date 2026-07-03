@@ -4,8 +4,8 @@
 
 import pytest
 
-from wazuh_testing.constants.ports import DEFAULT_SSL_REMOTE_CONNECTION_PORT
-from wazuh_testing.tools.simulators.remoted_simulator import RemotedSimulator
+from guardsarm_testing.constants.ports import DEFAULT_SSL_REMOTE_CONNECTION_PORT
+from guardsarm_testing.tools.simulators.remoted_simulator import RemotedSimulator
 
 
 @pytest.fixture()

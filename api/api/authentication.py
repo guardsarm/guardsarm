@@ -18,18 +18,18 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from connexion.exceptions import Unauthorized
 
 import api.configuration as conf
-import wazuh.core.utils as core_utils
-import wazuh.rbac.utils as rbac_utils
+import guardsarm.core.utils as core_utils
+import guardsarm.rbac.utils as rbac_utils
 from api.constants import SECURITY_CONFIG_PATH
 from api.constants import SECURITY_PATH
 from api.util import raise_if_exc
-from wazuh import WazuhInternalError
-from wazuh.core.cluster.dapi.dapi import DistributedAPI
-from wazuh.core.cluster.utils import read_config
-from wazuh.core.common import wazuh_uid, wazuh_gid
-from wazuh.rbac.orm import AuthenticationManager, TokenManager, UserRolesManager
-from wazuh.rbac.preprocessor import optimize_resources
-from wazuh.core.decorators import dapi_allower
+from guardsarm import GuardSarmInternalError
+from guardsarm.core.cluster.dapi.dapi import DistributedAPI
+from guardsarm.core.cluster.utils import read_config
+from guardsarm.core.common import guardsarm_uid, guardsarm_gid
+from guardsarm.rbac.orm import AuthenticationManager, TokenManager, UserRolesManager
+from guardsarm.rbac.preprocessor import optimize_resources
+from guardsarm.core.decorators import dapi_allower
 
 INVALID_TOKEN = "Invalid token"
 EXPIRED_TOKEN = "Token expired"
@@ -83,7 +83,7 @@ def check_user(user: str, password: str, required_scopes=None) -> Union[dict, No
                           request_type='local_master',
                           is_async=False,
                           wait_for_complete=False,
-                          logger=logging.getLogger('wazuh-api')
+                          logger=logging.getLogger('guardsarm-api')
                           )
     data = raise_if_exc(pool.submit(asyncio.run, dapi.distribute_function()).result())
 
@@ -92,7 +92,7 @@ def check_user(user: str, password: str, required_scopes=None) -> Union[dict, No
 
 
 # Set JWT settings
-JWT_ISSUER = 'wazuh'
+JWT_ISSUER = 'guardsarm'
 JWT_ALGORITHM = 'ES512'
 _private_key_path = os.path.join(SECURITY_PATH, 'private_key.pem')
 _public_key_path = os.path.join(SECURITY_PATH, 'public_key.pem')
@@ -108,7 +108,7 @@ def generate_keypair():
 
     Raises
     ------
-    WazuhInternalError(6003)
+    GuardSarmInternalError(6003)
         If there was an error trying to load the JWT secret.
     """
     lock_file = None
@@ -136,7 +136,7 @@ def generate_keypair():
             # Keys exist - acquire shared lock for reading (if available)
             private_key, public_key = _read_keypair_locked(lock_file)
     except IOError:
-        raise WazuhInternalError(6003)
+        raise GuardSarmInternalError(6003)
     finally:
         if lock_file:
             lock_file.close()
@@ -194,8 +194,8 @@ def _write_new_keypair():
         key_file.write(public_key)
 
     try:
-        os.chown(_private_key_path, wazuh_uid(), wazuh_gid())
-        os.chown(_public_key_path, wazuh_uid(), wazuh_gid())
+        os.chown(_private_key_path, guardsarm_uid(), guardsarm_gid())
+        os.chown(_public_key_path, guardsarm_uid(), guardsarm_gid())
     except PermissionError:
         pass
     os.chmod(_private_key_path, 0o640)
@@ -233,7 +233,7 @@ def change_keypair():
         # Clear cache so next call to generate_keypair() loads new keys
         generate_keypair.cache_clear()
     except IOError:
-        raise WazuhInternalError(6003)
+        raise GuardSarmInternalError(6003)
     finally:
         if lock_file:
             lock_file.close()
@@ -276,7 +276,7 @@ def generate_token(user_id: str = None, data: dict = None, auth_context: dict = 
                           request_type='local_master',
                           is_async=False,
                           wait_for_complete=False,
-                          logger=logging.getLogger('wazuh-api')
+                          logger=logging.getLogger('guardsarm-api')
                           )
     result = raise_if_exc(pool.submit(asyncio.run, dapi.distribute_function()).result()).dikt
     # Get timestamp with millisecond precision directly
@@ -285,7 +285,7 @@ def generate_token(user_id: str = None, data: dict = None, auth_context: dict = 
 
     payload = {
                   "iss": JWT_ISSUER,
-                  "aud": "Wazuh API REST",
+                  "aud": "GuardSarm API REST",
                   "nbf": now_seconds,  # Standard claim: integer seconds since epoch (RFC 7519)
                   "nbf_ms": now_ms,  # Private claim: milliseconds for precise validation
                   "exp": now_seconds + result['auth_token_exp_timeout'],
@@ -364,7 +364,7 @@ def decode_token(token: str) -> dict:
     """
     try:
         # Decode JWT token with local secret
-        payload = jwt.decode(token, generate_keypair()[1], algorithms=[JWT_ALGORITHM], audience='Wazuh API REST')
+        payload = jwt.decode(token, generate_keypair()[1], algorithms=[JWT_ALGORITHM], audience='GuardSarm API REST')
 
         # Check token and add processed policies in the Master node
         # Use nbf_ms for millisecond precision validation, fallback to nbf * 1000 for backward compatibility
@@ -376,7 +376,7 @@ def decode_token(token: str) -> dict:
                               request_type='local_master',
                               is_async=False,
                               wait_for_complete=False,
-                              logger=logging.getLogger('wazuh-api')
+                              logger=logging.getLogger('guardsarm-api')
                               )
         data = raise_if_exc(pool.submit(asyncio.run, dapi.distribute_function()).result()).to_dict()
 
@@ -390,7 +390,7 @@ def decode_token(token: str) -> dict:
                               request_type='local_master',
                               is_async=False,
                               wait_for_complete=False,
-                              logger=logging.getLogger('wazuh-api')
+                              logger=logging.getLogger('guardsarm-api')
                               )
         result = raise_if_exc(pool.submit(asyncio.run, dapi.distribute_function()).result())
 

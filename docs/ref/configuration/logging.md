@@ -1,8 +1,8 @@
 # Logging Configuration
 
-The `<logging>` section controls the format of manager internal log output (`/var/wazuh-manager/logs/ossec.log`).
+The `<logging>` section controls the format of manager internal log output (`/var/guardsarm-manager/logs/ossec.log`).
 
-Configuration file: `/var/wazuh-manager/etc/wazuh-manager.conf`
+Configuration file: `/var/guardsarm-manager/etc/guardsarm-manager.conf`
 
 Parser: `src/shared/src/debug_op.c` (`os_logging_config`)
 

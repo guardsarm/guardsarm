@@ -1,5 +1,5 @@
 /*
- * Wazuh Vulnerability scanner - Scan Orchestrator
+ * GuardSarm Vulnerability scanner - Scan Orchestrator
  * Copyright (C) 2015, Wazuh Inc.
  * Nov 23, 2023.
  *

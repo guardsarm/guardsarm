@@ -12,7 +12,7 @@
 #define EXECD_H
 
 #ifndef ARGV0
-#define ARGV0 "wazuh-execd"
+#define ARGV0 "guardsarm-execd"
 #endif
 
 /* Arguments for the commands */
@@ -51,7 +51,7 @@ void ExecdRun(char *exec_msg);
 void ExecdTimeoutRun();
 void ExecdShutdown();
 #else
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 void ExecdStart(int q);
 #else
 void ExecdStart(int q) __attribute__((noreturn));

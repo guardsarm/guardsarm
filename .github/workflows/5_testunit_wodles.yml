@@ -121,5 +121,5 @@ jobs:
       - name: Generate test report
         if: inputs.generate_report
         run: |
-          git clone -b ${{ inputs.qa_branch }} --single-branch https://github.com/wazuh/qa-integration-framework.git
-          python qa-integration-framework/src/wazuh_testing/scripts/pytest_results_parser.py -f ${TEST_REPORT_PATH}
+          git clone -b ${{ inputs.qa_branch }} --single-branch https://github.com/guardsarm/qa-integration-framework.git
+          python qa-integration-framework/src/guardsarm_testing/scripts/pytest_results_parser.py -f ${TEST_REPORT_PATH}

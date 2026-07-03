@@ -5,7 +5,7 @@ project(content_manager_utest)
 # Copy input files to the build directory
 file(COPY input_files DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-if(NOT DEFINED WAZUH_MAIN_PROJECT)
+if(NOT DEFINED GUARDSARM_MAIN_PROJECT)
   get_filename_component(SRC_FOLDER ${CMAKE_SOURCE_DIR}/../../ ABSOLUTE)
 endif()
 
@@ -16,7 +16,7 @@ file(GLOB PROJECT_SOURCES *.cpp)
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
-# The pre-compiled rocksdb dependency (packages.wazuh.com) was built with GCC 14,
+# The pre-compiled rocksdb dependency (packages.guardsarm.com) was built with GCC 14,
 # which emits references to std::ios_base_library_init() not present in GCC 11's
 # libstdc++ (Ubuntu 22). This flag suppresses the link-time check for undefined
 # symbols in shared libraries; the symbol is harmlessly absent at runtime.
@@ -34,7 +34,7 @@ target_link_libraries(
   optimized
   gmock
   urlrequest
-  wazuhext
+  guardsarmext
   rocksdb
   pthread)
 

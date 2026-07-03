@@ -369,9 +369,9 @@ INSTANTIATE_TEST_SUITE_P(Asset,
                                     json::Json(R"({
                    "name": "filter/test/0",
                    "type": "pre-filter",
-                   "check": [{"wazuh.protocol.queue": 49}]
+                   "check": [{"guardsarm.protocol.queue": 49}]
                })"),
-                                    std::vector<std::string> {"wazuh.protocol.queue"},
+                                    std::vector<std::string> {"guardsarm.protocol.queue"},
                                     SUCCESS()),
                              // Output
                              BuildA(base::Name("output/test/0"),
@@ -405,12 +405,12 @@ protected:
         builderDeps.logparDebugLvl = 0;
 
         // Setup basic schema expectations
-        ON_CALL(*m_mocks->m_spSchemf, hasField(DotPath("wazuh.message"))).WillByDefault(testing::Return(true));
+        ON_CALL(*m_mocks->m_spSchemf, hasField(DotPath("guardsarm.message"))).WillByDefault(testing::Return(true));
         ON_CALL(*m_mocks->m_spSchemf, hasField(DotPath("event.code"))).WillByDefault(testing::Return(true));
         ON_CALL(*m_mocks->m_spSchemf, hasField(DotPath("source.ip"))).WillByDefault(testing::Return(true));
 
         builderDeps.logpar =
-            std::make_shared<hlp::logpar::Logpar>(json::Json {WAZUH_LOGPAR_TYPES_JSON}, m_mocks->m_spSchemf);
+            std::make_shared<hlp::logpar::Logpar>(json::Json {GUARDSARM_LOGPAR_TYPES_JSON}, m_mocks->m_spSchemf);
         builderDeps.kvdbManager = nullptr;
 
         auto emptyAllowedFields = std::make_shared<AllowedFields>();
@@ -644,7 +644,7 @@ protected:
         ON_CALL(*m_mocks->m_spSchemf, hasField(testing::_)).WillByDefault(testing::Return(true));
 
         builderDeps.logpar =
-            std::make_shared<hlp::logpar::Logpar>(json::Json {WAZUH_LOGPAR_TYPES_JSON}, m_mocks->m_spSchemf);
+            std::make_shared<hlp::logpar::Logpar>(json::Json {GUARDSARM_LOGPAR_TYPES_JSON}, m_mocks->m_spSchemf);
         builderDeps.kvdbManager = nullptr;
 
         auto emptyAllowedFields = std::make_shared<AllowedFields>();

@@ -1,24 +1,24 @@
-# Wazuh server cluster
+# GuardSarm server cluster
 
 For the full per-option reference (all options, defaults and allowed values verified against the parser) see [Cluster Configuration](../../configuration/cluster.md).
 
 ## Introduction
 
-The Wazuh server cluster is composed of multiple Wazuh server nodes running in a distributed environment. This deployment strategy provides horizontal scalability and improved performance. In environments with a large number of monitored endpoints, this setup can be combined with a network load balancer to distribute Wazuh agent connections across multiple nodes. This allows the Wazuh platform to manage a high number of agents efficiently while ensuring high availability.
+The GuardSarm server cluster is composed of multiple GuardSarm server nodes running in a distributed environment. This deployment strategy provides horizontal scalability and improved performance. In environments with a large number of monitored endpoints, this setup can be combined with a network load balancer to distribute GuardSarm agent connections across multiple nodes. This allows the GuardSarm platform to manage a high number of agents efficiently while ensuring high availability.
 
-The Wazuh server cluster consists of one **master node** and multiple **worker nodes**. Wazuh agents are configured to report to the server nodes within the cluster. This architecture improves scalability and overall server performance.
+The GuardSarm server cluster consists of one **master node** and multiple **worker nodes**. GuardSarm agents are configured to report to the server nodes within the cluster. This architecture improves scalability and overall server performance.
 
 ---
 
 ## Architecture
 
-There are two types of nodes in a Wazuh server cluster: **master nodes** and **worker nodes**. These roles define the responsibilities of each node and establish a hierarchy used during synchronization processes.
+There are two types of nodes in a GuardSarm server cluster: **master nodes** and **worker nodes**. These roles define the responsibilities of each node and establish a hierarchy used during synchronization processes.
 
-A Wazuh server cluster can have only one master node. During synchronization, data from the master node always takes precedence over data from worker nodes. This ensures consistency and uniformity across the cluster.
+A GuardSarm server cluster can have only one master node. During synchronization, data from the master node always takes precedence over data from worker nodes. This ensures consistency and uniformity across the cluster.
 
 > **Note**
 > Configuration changes applied to the file
-> `/var/wazuh-manager/etc/wazuh-manager.conf`
+> `/var/guardsarm-manager/etc/guardsarm-manager.conf`
 > on the master node are **not automatically synchronized** to worker nodes.
 > You must manually replicate these changes and restart the nodes for them to take effect.
 
@@ -46,7 +46,7 @@ Worker nodes are responsible for:
 
 - Redirecting agent enrollment requests to the master node
 - Synchronizing shared data from the master node
-- Receiving and processing events from Wazuh agents
+- Receiving and processing events from GuardSarm agents
 - Sending agent status updates to the master node
 
 If shared files are modified on a worker node, those changes are discarded during the next synchronization cycle and replaced with the master node’s version.
@@ -55,7 +55,7 @@ If shared files are modified on a worker node, those changes are discarded durin
 
 ## How it works
 
-The Wazuh server cluster is managed by the `wazuh-clusterd` daemon, which implements a master–worker architecture. All communications are initiated by worker nodes, and each worker communicates independently with the master.
+The GuardSarm server cluster is managed by the `guardsarm-clusterd` daemon, which implements a master–worker architecture. All communications are initiated by worker nodes, and each worker communicates independently with the master.
 
 Several internal threads handle different cluster operations:
 
@@ -77,4 +77,4 @@ Several internal threads handle different cluster operations:
 - **Local integrity thread**
   Periodically calculates file integrity using MD5 checksums and modification timestamps. This avoids recalculating integrity data for each worker connection.
 
-All cluster logs are written to `/var/wazuh-manager/logs/cluster.log`.
+All cluster logs are written to `/var/guardsarm-manager/logs/cluster.log`.

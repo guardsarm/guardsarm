@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Wazuh Template Selector
+# GuardSarm Template Selector
 # Copyright (C) 2015, Wazuh Inc.
 # November 18, 2016.
 #

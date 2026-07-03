@@ -18,7 +18,7 @@
 #include "active_responses.h"
 #include "startup_gate_op.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 // Remove static qualifier when unit testing
 #define STATIC
 #else
@@ -33,7 +33,7 @@ STATIC OSListNode *timeout_node;
 STATIC OSHash *repeated_hash;
 
 #ifdef WIN32
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
     #include "../../unit_tests/wrappers/windows/libc/stdio_wrappers.h"
 #endif
 static pthread_mutex_t timeout_list_mutex;
@@ -228,15 +228,15 @@ void ExecdRun(char *exec_msg, int *childcount)
         return;
     }
 
-    /* Get executable name and AR metadata from wazuh.active_response */
-    cJSON *json_wazuh = cJSON_GetObjectItem(json_root, "wazuh");
-    if (!cJSON_IsObject(json_wazuh)) {
+    /* Get executable name and AR metadata from guardsarm.active_response */
+    cJSON *json_guardsarm = cJSON_GetObjectItem(json_root, "guardsarm");
+    if (!cJSON_IsObject(json_guardsarm)) {
         merror(EXEC_INV_CMD, exec_msg);
         cJSON_Delete(json_root);
         return;
     }
 
-    cJSON *json_ar = cJSON_GetObjectItem(json_wazuh, "active_response");
+    cJSON *json_ar = cJSON_GetObjectItem(json_guardsarm, "active_response");
     if (!cJSON_IsObject(json_ar)) {
         merror(EXEC_INV_CMD, exec_msg);
         cJSON_Delete(json_root);
@@ -515,7 +515,7 @@ void ExecdStart(int q)
     /* Clear the buffer */
     memset(buffer, '\0', OS_MAXSTR + 1);
 
-#ifndef WAZUH_UNIT_TESTING
+#ifndef GUARDSARM_UNIT_TESTING
     /* Create list for timeout */
     timeout_list = OSList_Create();
     if (!timeout_list) {
@@ -581,7 +581,7 @@ void ExecdStart(int q)
 
         ExecdRun(buffer, &childcount);
 
-    #ifdef WAZUH_UNIT_TESTING
+    #ifdef GUARDSARM_UNIT_TESTING
         break;
     #endif
     }
@@ -592,7 +592,7 @@ void ExecdStart(int q)
 int WinExecdStart()
 {
     int c;
-    char *cfg = WAZUHCONF;
+    char *cfg = GUARDSARMCONF;
     winexec_queue = queue_init(OS_SIZE_128);
 
     /* Read config */
@@ -635,7 +635,7 @@ int WinExecdStart()
 
 // Create a thread to run windows AR simultaneous
 DWORD WINAPI win_exec_main(__attribute__((unused)) void * args) {
-    startup_gate_wait_for_ready("wazuh-execd");
+    startup_gate_wait_for_ready("guardsarm-execd");
 
     while(1) {
         char* exec_msg = queue_pop_ex(winexec_queue);

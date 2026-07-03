@@ -1,8 +1,8 @@
 # Remote Agent Upgrade Migration Guide (4.x to 5.x)
 
-The remote agent upgrade mechanism is preserved in 5.x. The same `PUT /agents/upgrade` and `PUT /agents/upgrade_custom` API endpoints exist, and the `/var/wazuh-manager/bin/agent_upgrade` binary is also available as a command-line alternative that calls the same underlying framework. The WPK-based transfer flow is unchanged. Two breaking requirements must be met before any remote upgrade to 5.0.0+ can succeed:
+The remote agent upgrade mechanism is preserved in 5.x. The same `PUT /agents/upgrade` and `PUT /agents/upgrade_custom` API endpoints exist, and the `/var/guardsarm-manager/bin/agent_upgrade` binary is also available as a command-line alternative that calls the same underlying framework. The WPK-based transfer flow is unchanged. Two breaking requirements must be met before any remote upgrade to 5.0.0+ can succeed:
 
-1. **TCP-only agent connectivity on port 1514.** In Wazuh 5.x, the agent ignores the `<protocol>` configuration option and always connects to the manager over TCP, regardless of what it was set to in 4.x. The manager still accepts UDP, but no 5.x agent will initiate a UDP connection. The WPK transfer uses the agent's current 4.x communication channel while the upgrade is being delivered, which can still be UDP for agents that have not restarted into 5.x yet. The risk arises after an agent that was connecting over UDP is upgraded: it restarts in TCP mode, and if outbound TCP on port 1514 is blocked in the firewall, the agent cannot reconnect and appears as `disconnected`, not `active`. Firewall rules must be updated to allow outbound TCP on port 1514 from the agent to the manager **before** the agent is upgraded to 5.x, or the agent will be unreachable after the upgrade.
+1. **TCP-only agent connectivity on port 1514.** In GuardSarm 5.x, the agent ignores the `<protocol>` configuration option and always connects to the manager over TCP, regardless of what it was set to in 4.x. The manager still accepts UDP, but no 5.x agent will initiate a UDP connection. The WPK transfer uses the agent's current 4.x communication channel while the upgrade is being delivered, which can still be UDP for agents that have not restarted into 5.x yet. The risk arises after an agent that was connecting over UDP is upgraded: it restarts in TCP mode, and if outbound TCP on port 1514 is blocked in the firewall, the agent cannot reconnect and appears as `disconnected`, not `active`. Firewall rules must be updated to allow outbound TCP on port 1514 from the agent to the manager **before** the agent is upgraded to 5.x, or the agent will be unreachable after the upgrade.
 2. **Intermediate version requirement.** Direct remote upgrade to v5.0.0+ from agents older than v4.14.0 is blocked by the upgrade module and cannot be overridden with `--force`. Agents on v4.13.x or earlier must be upgraded to v4.14.x first.
 
 ---
@@ -52,7 +52,7 @@ sudo firewall-cmd --reload
 **Windows, netsh (cmd as Administrator)**
 
 ```cmd
-netsh advfirewall firewall add rule name="Wazuh agent outbound 1514" dir=out action=allow protocol=TCP remoteip=<MANAGER_IP> remoteport=1514
+netsh advfirewall firewall add rule name="GuardSarm agent outbound 1514" dir=out action=allow protocol=TCP remoteip=<MANAGER_IP> remoteport=1514
 ```
 
 **macOS, pf**
@@ -82,7 +82,7 @@ curl -k -X GET "https://localhost:55000/agents?pretty=true&select=id,name,versio
 Via binary:
 
 ```bash
-/var/wazuh-manager/bin/agent_upgrade -l
+/var/guardsarm-manager/bin/agent_upgrade -l
 ```
 
 ```
@@ -96,7 +96,7 @@ The `-l` flag lists all outdated agents with their current version. Agents on v4
 
 ### 3. Confirm manager has WPK repository access
 
-The `agent_upgrade` module on the manager downloads the WPK from the Wazuh repository before sending it to the agent. If the manager does not have outbound access to the WPK repository, prepare a custom WPK and use the custom upgrade method instead, see [Custom WPK upgrade](#custom-wpk-upgrade).
+The `agent_upgrade` module on the manager downloads the WPK from the GuardSarm repository before sending it to the agent. If the manager does not have outbound access to the WPK repository, prepare a custom WPK and use the custom upgrade method instead, see [Custom WPK upgrade](#custom-wpk-upgrade).
 
 ---
 
@@ -136,7 +136,7 @@ All six commands travel over the agent-manager channel that is active before the
 **Step 1: Authenticate:**
 
 ```bash
-TOKEN=$(curl -sk -u wazuh-wui:wazuh-wui -X POST \
+TOKEN=$(curl -sk -u guardsarm-wui:guardsarm-wui -X POST \
   "https://<manager_ip>:55000/security/user/authenticate?raw=true")
 ```
 
@@ -223,13 +223,13 @@ Expected `status` values during a successful upgrade: `In queue` → `Updating` 
 The binary blocks until the upgrade completes and prints the result directly:
 
 ```bash
-/var/wazuh-manager/bin/agent_upgrade -a 001 002
+/var/guardsarm-manager/bin/agent_upgrade -a 001 002
 ```
 
 To target a specific version:
 
 ```bash
-/var/wazuh-manager/bin/agent_upgrade -a 001 002 -v v5.0.0
+/var/guardsarm-manager/bin/agent_upgrade -a 001 002 -v v5.0.0
 ```
 
 Available flags:
@@ -261,11 +261,11 @@ curl -k -X PUT "https://localhost:55000/agents/upgrade?pretty=true&agents_list=0
 Via binary:
 
 ```bash
-/var/wazuh-manager/bin/agent_upgrade -a 002 -v v4.14.5
+/var/guardsarm-manager/bin/agent_upgrade -a 002 -v v4.14.5
 ```
 
 ```
-/var/wazuh-manager/bin/agent_upgrade -a 002 -v v4.14.5
+/var/guardsarm-manager/bin/agent_upgrade -a 002 -v v4.14.5
 
 Upgrading...
 
@@ -288,7 +288,7 @@ curl -k -X PUT "https://localhost:55000/agents/upgrade?pretty=true&agents_list=0
 Via binary:
 
 ```bash
-/var/wazuh-manager/bin/agent_upgrade -a 002
+/var/guardsarm-manager/bin/agent_upgrade -a 002
 ```
 
 ---
@@ -300,13 +300,13 @@ Use the custom upgrade method when the manager does not have access to the WPK r
 ### Via API
 
 ```bash
-curl -k -X PUT "https://localhost:55000/agents/upgrade_custom?pretty=true&agents_list=002&file_path=/var/wazuh-manager/var/upgrade/wazuh_agent_v5.0.0_linux_x86_64.wpk&installer=upgrade.sh" -H "Authorization: Bearer $TOKEN"
+curl -k -X PUT "https://localhost:55000/agents/upgrade_custom?pretty=true&agents_list=002&file_path=/var/guardsarm-manager/var/upgrade/guardsarm_agent_v5.0.0_linux_x86_64.wpk&installer=upgrade.sh" -H "Authorization: Bearer $TOKEN"
 ```
 
 ### Via binary
 
 ```bash
-/var/wazuh-manager/bin/agent_upgrade -a 001 -f /var/wazuh-manager/var/upgrade/wazuh_agent_v5.0.0_linux_x86_64.wpk -x upgrade.sh
+/var/guardsarm-manager/bin/agent_upgrade -a 001 -f /var/guardsarm-manager/var/upgrade/guardsarm_agent_v5.0.0_linux_x86_64.wpk -x upgrade.sh
 ```
 
 | Flag | Description |
@@ -314,7 +314,7 @@ curl -k -X PUT "https://localhost:55000/agents/upgrade_custom?pretty=true&agents
 | `-f`/`--file` | Path to the WPK file on the manager filesystem |
 | `-x`/`--execute` | Installer script inside the WPK (`upgrade.sh` for Linux/macOS, `upgrade.bat` for Windows) |
 
-The `agent_upgrade` module still validates the intermediate version requirement for custom WPK files whose filename follows the canonical pattern `wazuh_agent_v<VERSION>_<rest>.wpk`. Files with non-standard names skip the manager-side version check and rely on the agent-side pre-install script to block an incompatible version.
+The `agent_upgrade` module still validates the intermediate version requirement for custom WPK files whose filename follows the canonical pattern `guardsarm_agent_v<VERSION>_<rest>.wpk`. Files with non-standard names skip the manager-side version check and rely on the agent-side pre-install script to block an incompatible version.
 
 ---
 

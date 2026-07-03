@@ -1,6 +1,6 @@
 # Getting Started
 
-This section walks through deploying the Wazuh Manager, from sizing the host to
+This section walks through deploying the GuardSarm Manager, from sizing the host to
 a running installation:
 
 - [Requirements](requirements.md) — supported operating systems and minimum hardware.

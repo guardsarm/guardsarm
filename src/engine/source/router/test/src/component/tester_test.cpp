@@ -105,7 +105,7 @@ public:
                     {
                         return json::Json {TESTER_JSON};
                     }
-                    if (name == "policy/wazuh/0")
+                    if (name == "policy/guardsarm/0")
                     {
                         return json::Json {POLICY_JSON};
                     }
@@ -113,7 +113,7 @@ public:
                     {
                         return json::Json {EPS_JSON};
                     }
-                    if (name == "integration/wazuh-core-fake/0")
+                    if (name == "integration/guardsarm-core-fake/0")
                     {
                         return json::Json {INTEGRATION_JSON};
                     }
@@ -153,7 +153,7 @@ void expectBuildPolicyOk(std::shared_ptr<builder::mocks::MockBuilder> mockbuilde
 } // namespace
 TEST_F(OrchestratorTesterTest, AddTestEntry)
 {
-    auto entry = makeTestEntry("test", "wazuh", 0);
+    auto entry = makeTestEntry("test", "guardsarm", 0);
 
     EXPECT_CALL(*m_mockStore, upsertDoc(testing::_, testing::_)).WillRepeatedly(testing::Return(std::nullopt));
 
@@ -167,8 +167,8 @@ TEST_F(OrchestratorTesterTest, AddTestEntry)
 
 TEST_F(OrchestratorTesterTest, AddMultipleTestEntry)
 {
-    auto entry = makeTestEntry("test", "wazuh", 0);
-    auto entryTwo = makeTestEntry("testTwo", "wazuh", 0);
+    auto entry = makeTestEntry("test", "guardsarm", 0);
+    auto entryTwo = makeTestEntry("testTwo", "guardsarm", 0);
 
     EXPECT_CALL(*m_mockStore, upsertDoc(testing::_, testing::_)).WillRepeatedly(testing::Return(std::nullopt));
 
@@ -184,7 +184,7 @@ TEST_F(OrchestratorTesterTest, AddMultipleTestEntry)
 
 TEST_F(OrchestratorTesterTest, AddEqualTestEntry)
 {
-    auto entry = makeTestEntry("test", "wazuh", 0);
+    auto entry = makeTestEntry("test", "guardsarm", 0);
 
     EXPECT_CALL(*m_mockStore, upsertDoc(testing::_, testing::_)).WillRepeatedly(testing::Return(std::nullopt));
 
@@ -210,7 +210,7 @@ TEST_F(OrchestratorTesterTest, DeleteTestEntryWithoutName)
 
 TEST_F(OrchestratorTesterTest, DeleteTestEntry)
 {
-    auto entry = makeTestEntry("test", "wazuh", 0);
+    auto entry = makeTestEntry("test", "guardsarm", 0);
 
     EXPECT_CALL(*m_mockStore, upsertDoc(testing::_, testing::_)).WillRepeatedly(testing::Return(std::nullopt));
 
@@ -225,7 +225,7 @@ TEST_F(OrchestratorTesterTest, DeleteTestEntry)
 
 TEST_F(OrchestratorTesterTest, DeleteTheEqualTestEntryTwoTimes)
 {
-    auto entry = makeTestEntry("test", "wazuh", 0);
+    auto entry = makeTestEntry("test", "guardsarm", 0);
 
     EXPECT_CALL(*m_mockStore, upsertDoc(testing::_, testing::_)).WillRepeatedly(testing::Return(std::nullopt));
 
@@ -251,8 +251,8 @@ TEST_F(OrchestratorTesterTest, GetTestEntryWithoutName)
 
 TEST_F(OrchestratorTesterTest, GetTestEntry)
 {
-    auto entry = makeTestEntry("test", "wazuh", 0);
-    auto entryTwo = makeTestEntry("testTwo", "wazuh", 0);
+    auto entry = makeTestEntry("test", "guardsarm", 0);
+    auto entryTwo = makeTestEntry("testTwo", "guardsarm", 0);
 
     EXPECT_CALL(*m_mockStore, upsertDoc(testing::_, testing::_)).WillRepeatedly(testing::Return(std::nullopt));
 
@@ -280,7 +280,7 @@ TEST_F(OrchestratorTesterTest, ReloadTestEntryWithoutName)
 
 TEST_F(OrchestratorTesterTest, ReloadTestEntry)
 {
-    auto entry = makeTestEntry("test", "wazuh", 0);
+    auto entry = makeTestEntry("test", "guardsarm", 0);
 
     EXPECT_CALL(*m_mockStore, upsertDoc(testing::_, testing::_)).WillRepeatedly(testing::Return(std::nullopt));
 
@@ -305,7 +305,7 @@ TEST_F(OrchestratorTesterTest, GetAssetsTestEntryError)
 
 TEST_F(OrchestratorTesterTest, GetAssetsTestEntry)
 {
-    auto entry = makeTestEntry("test", "wazuh", 0);
+    auto entry = makeTestEntry("test", "guardsarm", 0);
 
     EXPECT_CALL(*m_mockStore, upsertDoc(testing::_, testing::_)).WillRepeatedly(testing::Return(std::nullopt));
 
@@ -327,7 +327,7 @@ TEST_F(OrchestratorTesterTest, GetAssetsTestEntry)
 
 TEST_F(OrchestratorTesterTest, IngestTest)
 {
-    auto entry = makeTestEntry("test", "wazuh", 0);
+    auto entry = makeTestEntry("test", "guardsarm", 0);
 
     EXPECT_CALL(*m_mockStore, upsertDoc(testing::_, testing::_)).WillRepeatedly(testing::Return(std::nullopt));
 
@@ -387,7 +387,7 @@ TEST_F(OrchestratorTesterTest, IngestTest)
 
     auto result = base::getResponse(optResult);
 
-    // The TesterWorker stamps @timestamp and wazuh/event/id before processing
+    // The TesterWorker stamps @timestamp and guardsarm/event/id before processing
     auto& ev = result.event();
     EXPECT_TRUE(ev->isString("/message"));
     std::string msg;
@@ -395,8 +395,8 @@ TEST_F(OrchestratorTesterTest, IngestTest)
     EXPECT_STREQ(msg.c_str(), "test");
     EXPECT_TRUE(ev->exists("/@timestamp"));
     EXPECT_TRUE(ev->isString("/@timestamp"));
-    EXPECT_TRUE(ev->exists("/wazuh/event/id"));
-    EXPECT_TRUE(ev->isString("/wazuh/event/id"));
+    EXPECT_TRUE(ev->exists("/guardsarm/event/id"));
+    EXPECT_TRUE(ev->isString("/guardsarm/event/id"));
 
     m_orchestrator->stop();
 }

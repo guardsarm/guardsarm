@@ -178,8 +178,8 @@ extern "C"
     void init()
     {
         using LogginFnWrapperType = void (*)(int, const char*, const char*, int, const char*, const char*, va_list);
-        const auto logWrapper = base::libwazuhshared::getFunction<LogginFnWrapperType>("mtLoggingFunctionsWrapper");
-        base::libwazuhshared::setLoggerTag(logging::default_tag());
+        const auto logWrapper = base::libguardsarmshared::getFunction<LogginFnWrapperType>("mtLoggingFunctionsWrapper");
+        base::libguardsarmshared::setLoggerTag(logging::default_tag());
 
         initializeFullLogFunction(
             [logWrapper](const int logLevel,
@@ -211,7 +211,7 @@ void applyLevelStandalone(logging::Level target, int debugCount)
     }
 }
 
-void applyLevelWazuh(logging::Level target, int debugCount)
+void applyLevelGuardSarm(logging::Level target, int debugCount)
 {
     // -d takes priority over the configuration
     const logging::Level effective = (debugCount > 1)    ? logging::Level::Trace
@@ -224,7 +224,7 @@ void applyLevelWazuh(logging::Level target, int debugCount)
     }
 
     using NowDebugFnType = void (*)();
-    const auto nowDebug = base::libwazuhshared::getFunction<NowDebugFnType>("nowDebug");
+    const auto nowDebug = base::libguardsarmshared::getFunction<NowDebugFnType>("nowDebug");
 
     const int times = (effective == logging::Level::Debug) ? 1 : 2;
     for (int i = 0; i < times; ++i) nowDebug();
@@ -237,7 +237,7 @@ void applyLevelWazuh(logging::Level target, int debugCount)
  *        for use in standalone mode.
  *
  * This function returns a logging function that uses spdlog internally and is compatible
- * with the GLOBAL_LOG_FUNCTION signature used throughout the Wazuh codebase.
+ * with the GLOBAL_LOG_FUNCTION signature used throughout the GuardSarm codebase.
  *
  * @return A function that can be used to log messages using spdlog in standalone mode.
  *         The returned function has the signature:
@@ -254,7 +254,7 @@ createStandaloneLogFunction()
               const char* msg,
               va_list args) -> void
     {
-        // Convert the log level from Wazuh format to logging::Level
+        // Convert the log level from GuardSarm format to logging::Level
         logging::Level level;
         switch (logLevel)
         {
@@ -281,34 +281,34 @@ LoggingConfig getStandaloneLoggingConfig()
 
         // Get logging configuration from environment variables
         // Environment variables (defaults match Log4j2 policies):
-        //   WAZUH_STANDALONE_LOG_LEVEL                (default: "info")
-        //   WAZUH_STANDALONE_LOG_FILE_PATH            (default: /var/log/wazuh-indexer/wazuh-engine.log)
-        //   WAZUH_STANDALONE_LOG_ROTATION_ENABLED     (default: true)
-        //   WAZUH_STANDALONE_LOG_MAX_FILE_SIZE        (default: 134217728 = 128 MB)
-        //   WAZUH_STANDALONE_LOG_ROTATION_HOUR        (default: 0 = midnight)
-        //   WAZUH_STANDALONE_LOG_ROTATION_MINUTE      (default: 0)
-        //   WAZUH_STANDALONE_LOG_MAX_FILES            (default: 7)
-        //   WAZUH_STANDALONE_LOG_MAX_ACCUMULATED_SIZE (default: 2147483648 = 2 GB)
-        //   WAZUH_STANDALONE_LOG_COMPRESSION_ENABLED  (default: true)
-        //   WAZUH_STANDALONE_LOG_COMPRESSION_LEVEL    (default: 5)
+        //   GUARDSARM_STANDALONE_LOG_LEVEL                (default: "info")
+        //   GUARDSARM_STANDALONE_LOG_FILE_PATH            (default: /var/log/guardsarm-indexer/guardsarm-engine.log)
+        //   GUARDSARM_STANDALONE_LOG_ROTATION_ENABLED     (default: true)
+        //   GUARDSARM_STANDALONE_LOG_MAX_FILE_SIZE        (default: 134217728 = 128 MB)
+        //   GUARDSARM_STANDALONE_LOG_ROTATION_HOUR        (default: 0 = midnight)
+        //   GUARDSARM_STANDALONE_LOG_ROTATION_MINUTE      (default: 0)
+        //   GUARDSARM_STANDALONE_LOG_MAX_FILES            (default: 7)
+        //   GUARDSARM_STANDALONE_LOG_MAX_ACCUMULATED_SIZE (default: 2147483648 = 2 GB)
+        //   GUARDSARM_STANDALONE_LOG_COMPRESSION_ENABLED  (default: true)
+        //   GUARDSARM_STANDALONE_LOG_COMPRESSION_LEVEL    (default: 5)
 
-        auto verbosity = base::process::getEnvOrDefault("WAZUH_STANDALONE_LOG_LEVEL", "info");
+        auto verbosity = base::process::getEnvOrDefault("GUARDSARM_STANDALONE_LOG_LEVEL", "info");
         cfg.level = strToLevel(verbosity);
-        cfg.filePath = base::process::getEnvOrDefault("WAZUH_STANDALONE_LOG_FILE_PATH", "");
+        cfg.filePath = base::process::getEnvOrDefault("GUARDSARM_STANDALONE_LOG_FILE_PATH", "");
         cfg.truncate = false; // Don't truncate on restart
 
         // Rotation configuration (replicates Log4j2 policies)
-        cfg.enableRotation = base::process::getEnvBoolOrDefault("WAZUH_STANDALONE_LOG_ROTATION_ENABLED", true);
-        cfg.maxFileSize = base::process::getEnvSizeOrDefault("WAZUH_STANDALONE_LOG_MAX_FILE_SIZE", 134217728); // 128 MB
-        cfg.rotationHour = base::process::getEnvIntOrDefault("WAZUH_STANDALONE_LOG_ROTATION_HOUR", 0);
-        cfg.rotationMinute = base::process::getEnvIntOrDefault("WAZUH_STANDALONE_LOG_ROTATION_MINUTE", 0);
-        cfg.maxFiles = static_cast<uint16_t>(base::process::getEnvIntOrDefault("WAZUH_STANDALONE_LOG_MAX_FILES", 7));
+        cfg.enableRotation = base::process::getEnvBoolOrDefault("GUARDSARM_STANDALONE_LOG_ROTATION_ENABLED", true);
+        cfg.maxFileSize = base::process::getEnvSizeOrDefault("GUARDSARM_STANDALONE_LOG_MAX_FILE_SIZE", 134217728); // 128 MB
+        cfg.rotationHour = base::process::getEnvIntOrDefault("GUARDSARM_STANDALONE_LOG_ROTATION_HOUR", 0);
+        cfg.rotationMinute = base::process::getEnvIntOrDefault("GUARDSARM_STANDALONE_LOG_ROTATION_MINUTE", 0);
+        cfg.maxFiles = static_cast<uint16_t>(base::process::getEnvIntOrDefault("GUARDSARM_STANDALONE_LOG_MAX_FILES", 7));
         cfg.maxAccumulatedSize =
-            base::process::getEnvSizeOrDefault("WAZUH_STANDALONE_LOG_MAX_ACCUMULATED_SIZE", 2147483648); // 2 GB
+            base::process::getEnvSizeOrDefault("GUARDSARM_STANDALONE_LOG_MAX_ACCUMULATED_SIZE", 2147483648); // 2 GB
 
         // Compression configuration
-        cfg.compressionEnabled = base::process::getEnvBoolOrDefault("WAZUH_STANDALONE_LOG_COMPRESSION_ENABLED", true);
-        cfg.compressionLevel = base::process::getEnvIntOrDefault("WAZUH_STANDALONE_LOG_COMPRESSION_LEVEL", 5);
+        cfg.compressionEnabled = base::process::getEnvBoolOrDefault("GUARDSARM_STANDALONE_LOG_COMPRESSION_ENABLED", true);
+        cfg.compressionLevel = base::process::getEnvIntOrDefault("GUARDSARM_STANDALONE_LOG_COMPRESSION_LEVEL", 5);
 
         return cfg;
     }();

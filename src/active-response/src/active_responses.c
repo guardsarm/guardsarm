@@ -40,7 +40,7 @@ int setup_and_check_message(char **argv, cJSON **message) {
 #ifndef WIN32
     char *home_path = w_homedir(argv[0]);
 
-    /* Trim absolute path to get Wazuh's installation directory */
+    /* Trim absolute path to get GuardSarm's installation directory */
     home_path = w_strtok_r_str_delim("/active-response", &home_path);
 
     /* Change working directory */
@@ -144,7 +144,7 @@ int send_keys_and_check_message(char **argv, char **keys) {
 
 cJSON* get_json_from_input(const char *input) {
     cJSON *input_json = NULL;
-    cJSON *wazuh_json = NULL;
+    cJSON *guardsarm_json = NULL;
     cJSON *command_json = NULL;
     const char *json_err;
 
@@ -160,9 +160,9 @@ cJSON* get_json_from_input(const char *input) {
         return NULL;
     }
 
-    // Detect wazuh metadata (WCS format)
-    wazuh_json = cJSON_GetObjectItem(input_json, "wazuh");
-    if (!cJSON_IsObject(wazuh_json)) {
+    // Detect guardsarm metadata (WCS format)
+    guardsarm_json = cJSON_GetObjectItem(input_json, "guardsarm");
+    if (!cJSON_IsObject(guardsarm_json)) {
         cJSON_Delete(input_json);
         return NULL;
     }
@@ -184,7 +184,7 @@ const char* get_command_from_json(const cJSON *input) {
 
 const cJSON* get_alert_from_json(const cJSON *input) {
     // WCS format: the entire root JSON contains the alert data
-    // This includes wazuh, event, source, user, etc. at the root level
+    // This includes guardsarm, event, source, user, etc. at the root level
     if (!cJSON_IsObject(input)) {
         return NULL;
     }

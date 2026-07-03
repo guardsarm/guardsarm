@@ -21,7 +21,7 @@
 #include "os_regex.h"
 
 
-#define WAZUHCONF   "ossec.conf"
+#define GUARDSARMCONF   "ossec.conf"
 #define OS_MAXSTR   1024
 
 #define localtime_r(x, y) localtime_s(y, x)
@@ -101,7 +101,7 @@ int config_dir(char *name, char *dir, char *vfile)
         return (0);
     }
 
-    if (dogrep(WAZUHCONF, vfile)) {
+    if (dogrep(GUARDSARMCONF, vfile)) {
         printf("%s: Log file already configured: '%s'.\n",
                name, vfile);
         return (1);
@@ -111,10 +111,10 @@ int config_dir(char *name, char *dir, char *vfile)
     printf("%s: You may have it configured in a format different\n"
            "               than W3C Extended or you just don't have today's\n"
            "               log available.\n", name);
-    printf("%s: https://documentation.wazuh.com\n\n", name);
+    printf("%s: https://documentation.guardsarm.com\n\n", name);
 
     /* Add IIS config */
-    fp = wfopen(WAZUHCONF, "a");
+    fp = wfopen(GUARDSARMCONF, "a");
     if (!fp) {
         printf("%s: Unable to edit configuration file.\n", name);
         return (1);
@@ -149,7 +149,7 @@ int config_iis(char *name, char *file, char *vfile)
 
     total++;
 
-    if (dogrep(WAZUHCONF, vfile)) {
+    if (dogrep(GUARDSARMCONF, vfile)) {
         printf("%s: Log file already configured: '%s'.\n",
                name, vfile);
         return (1);
@@ -158,7 +158,7 @@ int config_iis(char *name, char *file, char *vfile)
     printf("%s: Adding IIS log file to be monitored: '%s'.\n", name, vfile);
 
     /* Add iis config config */
-    fp = wfopen(WAZUHCONF, "a");
+    fp = wfopen(GUARDSARMCONF, "a");
     if (!fp) {
         printf("%s: Unable to edit configuration file.\n", name);
         return (1);
@@ -195,9 +195,9 @@ int main(int argc, char **argv)
         }
     }
 
-    /* Check if wazuh was installed already */
-    if (!fileexist(WAZUHCONF)) {
-        printf("%s: Unable to find wazuh config: '%s'", argv[0], WAZUHCONF);
+    /* Check if guardsarm was installed already */
+    if (!fileexist(GUARDSARMCONF)) {
+        printf("%s: Unable to find guardsarm config: '%s'", argv[0], GUARDSARMCONF);
         exit(0);
     }
 
@@ -209,7 +209,7 @@ int main(int argc, char **argv)
 
     printf("%s: Looking for IIS log files to monitor.\r\n",
            argv[0]);
-    printf("%s: For more information: https://documentation.wazuh.com\r\n",
+    printf("%s: For more information: https://documentation.guardsarm.com\r\n",
            argv[0]);
     printf("\r\n");
 

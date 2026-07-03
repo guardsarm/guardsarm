@@ -189,7 +189,7 @@ static void _log_function(int level, const char *tag, const char * file, int lin
     }
 
     if (flags.log_plain) {
-      /* If under chroot, log directly to /logs/<wazuh log file> */
+      /* If under chroot, log directly to /logs/<guardsarm log file> */
 
 #ifndef WIN32
         int oldmask;
@@ -279,18 +279,18 @@ void w_logging_init(){
 
 void os_logging_config(){
   OS_XML xml;
-  const char * xmlf[] = {WAZUHCONFIG, "logging", "log_format", NULL};
+  const char * xmlf[] = {GUARDSARMCONFIG, "logging", "log_format", NULL};
   char * logformat;
   char ** parts = NULL;
   int i;
 
   pid = (int)getpid();
 
-  if (OS_ReadXML(WAZUHCONF, &xml) < 0){
+  if (OS_ReadXML(GUARDSARMCONF, &xml) < 0){
     flags.log_plain = 1;
     flags.log_json = 0;
     OS_ClearXML(&xml);
-    mlerror_exit(LOGLEVEL_ERROR, XML_ERROR, WAZUHCONF, xml.err, xml.err_line);
+    mlerror_exit(LOGLEVEL_ERROR, XML_ERROR, GUARDSARMCONF, xml.err, xml.err_line);
   }
 
   logformat = OS_GetOneContentforElement(&xml, xmlf);

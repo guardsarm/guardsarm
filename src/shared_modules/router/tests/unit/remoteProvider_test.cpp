@@ -1,5 +1,5 @@
 /*
- * Wazuh router - RemoteProvider tests
+ * GuardSarm router - RemoteProvider tests
  * Copyright (C) 2015, Wazuh Inc.
  * June 25, 2025.
  *

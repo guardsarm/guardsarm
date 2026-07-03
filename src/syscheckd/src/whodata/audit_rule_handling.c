@@ -14,7 +14,7 @@
 
 #ifdef ENABLE_AUDIT
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 #define static
 #endif
 

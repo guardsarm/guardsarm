@@ -42,13 +42,13 @@ TEST(RawEventIndexerComponentTest, EndToEndWorkflowWithDefaultIndex)
 TEST(RawEventIndexerComponentTest, SupportsConcurrentIndexingWhenEnabled)
 {
     auto connector = std::make_shared<StrictMock<wiconnector::mocks::MockWIndexerConnector>>();
-    raweventindexer::RawEventIndexer indexer(connector, "wazuh-events-raw-v5-concurrent");
+    raweventindexer::RawEventIndexer indexer(connector, "guardsarm-events-raw-v5-concurrent");
     indexer.enable();
 
     constexpr int kThreads = 8;
     constexpr int kEventsPerThread = 50;
 
-    EXPECT_CALL(*connector, index(Eq(std::string_view {"wazuh-events-raw-v5-concurrent"}), ::testing::_))
+    EXPECT_CALL(*connector, index(Eq(std::string_view {"guardsarm-events-raw-v5-concurrent"}), ::testing::_))
         .Times(kThreads * kEventsPerThread);
 
     std::vector<std::thread> workers;
@@ -75,7 +75,7 @@ TEST(RawEventIndexerComponentTest, SupportsConcurrentIndexingWhenEnabled)
 TEST(RawEventIndexerComponentTest, NoThrowWhenConnectorExpiresAtRuntime)
 {
     auto connector = std::make_shared<StrictMock<wiconnector::mocks::MockWIndexerConnector>>();
-    raweventindexer::RawEventIndexer indexer(connector, "wazuh-events-raw-v5");
+    raweventindexer::RawEventIndexer indexer(connector, "guardsarm-events-raw-v5");
     indexer.enable();
 
     connector.reset();

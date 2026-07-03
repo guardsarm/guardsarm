@@ -8,7 +8,7 @@
  * Foundation.
  */
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 // Remove static qualifier when unit testing
 #define STATIC
 #else
@@ -273,7 +273,7 @@ void * remcom_main(__attribute__((unused)) void * arg) {
         }
         os_free(buffer);
 
-    #ifdef WAZUH_UNIT_TESTING
+    #ifdef GUARDSARM_UNIT_TESTING
         break;
     #endif
     }

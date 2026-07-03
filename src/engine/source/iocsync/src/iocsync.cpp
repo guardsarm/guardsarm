@@ -178,7 +178,7 @@ bool IocSync::existIocDataInRemote()
 
     return base::utils::executeWithRetry([&indexerPtr]() { return indexerPtr->existsIocDataIndex(); },
                                          fmt::format("{}", COMPONENT_NAME),
-                                         "Check if IOC data index exists in wazuh-indexer",
+                                         "Check if IOC data index exists in guardsarm-indexer",
                                          m_attempts,
                                          m_waitSeconds,
                                          m_shutdownRequested);
@@ -191,7 +191,7 @@ std::optional<std::unordered_map<std::string, std::string>> IocSync::getRemoteHa
     return base::utils::executeWithRetry(
         [&indexerPtr]() { return indexerPtr->getIocTypeHashes(wiconnector::IOC_ENRICHMENT_CONSUMER_ID); },
         fmt::format("{}", COMPONENT_NAME),
-        "Get IOC type hashes from wazuh-indexer",
+        "Get IOC type hashes from guardsarm-indexer",
         m_attempts,
         m_waitSeconds,
         m_shutdownRequested);
@@ -507,7 +507,7 @@ void IocSync::synchronize()
 
             if (!ready)
             {
-                LOG_INFO("[IOC::Sync] IOC syncronization skipped because wazuh-indexer consumer for IOCs is not ready "
+                LOG_INFO("[IOC::Sync] IOC syncronization skipped because guardsarm-indexer consumer for IOCs is not ready "
                          "for sync (might be updating or no data yet)");
                 reportSyncFailure(); // types without a usable version → FAILED (could not sync)
                 return;

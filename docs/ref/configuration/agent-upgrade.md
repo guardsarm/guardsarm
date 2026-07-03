@@ -5,13 +5,13 @@ This page covers two closely related `<wodle>` sections that together handle rem
 - `<wodle name="agent-upgrade">` — WPK distribution and upgrade orchestration (manager-side options only)
 - `<wodle name="task-manager">` — Upgrade task lifecycle and database cleanup
 
-Configuration file: `/var/wazuh-manager/etc/wazuh-manager.conf`
+Configuration file: `/var/guardsarm-manager/etc/guardsarm-manager.conf`
 
 Parsers:
 - `src/config/src/wmodules-agent-upgrade.c` (manager build — `#ifndef CLIENT`)
 - `src/config/src/wmodules-task-manager.c`
 
-> **Note:** The `wm_agent_upgrade` module is compiled differently for managers and agents. Options documented here are the manager-side options only (`#ifndef CLIENT`). Agent-side options (`notification_wait_start`, `notification_wait_max`, `notification_wait_factor`, `ca_verification`) are configured in the agent's own `wazuh-agent.conf` and are not recognized by the manager parser.
+> **Note:** The `wm_agent_upgrade` module is compiled differently for managers and agents. Options documented here are the manager-side options only (`#ifndef CLIENT`). Agent-side options (`notification_wait_start`, `notification_wait_max`, `notification_wait_factor`, `ca_verification`) are configured in the agent's own `guardsarm-agent.conf` and are not recognized by the manager parser.
 
 ## agent-upgrade Options
 
@@ -24,7 +24,7 @@ Enable or disable the agent upgrade module.
 
 ### wpk_repository
 
-Base URL from which WPK upgrade packages are downloaded. A trailing `/` is added automatically at runtime if absent. If not set, the manager constructs the URL as `packages.wazuh.com/<major>.x/wpk/` using the manager's own major version.
+Base URL from which WPK upgrade packages are downloaded. A trailing `/` is added automatically at runtime if absent. If not set, the manager constructs the URL as `packages.guardsarm.com/<major>.x/wpk/` using the manager's own major version.
 
 - **Default value**: none (auto-derived from manager version)
 - **Allowed values**: Any valid URL

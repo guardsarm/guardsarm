@@ -50,12 +50,12 @@ def test_wait_time_default():
 # ---------------------------------------------------------------------------
 
 def test_init_sets_expected_attributes():
-    """DockerListener.__init__ sets wazuh_queue, msg_header, and None client/threads."""
+    """DockerListener.__init__ sets guardsarm_queue, msg_header, and None client/threads."""
     listener = DockerListener()
-    logger.info("wazuh_queue => %r", listener.wazuh_queue)
+    logger.info("guardsarm_queue => %r", listener.guardsarm_queue)
     logger.info("msg_header  => %r", listener.msg_header)
-    assert listener.wazuh_queue.endswith(os.path.join('queue', 'sockets', 'queue'))
-    assert listener.msg_header == '1:Wazuh-Docker:'
+    assert listener.guardsarm_queue.endswith(os.path.join('queue', 'sockets', 'queue'))
+    assert listener.msg_header == '1:GuardSarm-Docker:'
     assert listener.client is None
     assert listener.thread1 is None
     assert listener.thread2 is None
@@ -114,7 +114,7 @@ def test_process_decodes_event_and_calls_send_msg():
 
 @patch('DockerListener.socket.socket')
 def test_send_msg_connects_and_sends(mock_socket_cls):
-    """send_msg connects to wazuh_queue and sends the encoded message."""
+    """send_msg connects to guardsarm_queue and sends the encoded message."""
     listener = DockerListener()
     mock_sock = MagicMock()
     mock_socket_cls.return_value = mock_sock
@@ -128,7 +128,7 @@ def test_send_msg_connects_and_sends(mock_socket_cls):
     ).encode()
 
     logger.info("send called with => %r", mock_sock.send.call_args)
-    mock_sock.connect.assert_called_once_with(listener.wazuh_queue)
+    mock_sock.connect.assert_called_once_with(listener.guardsarm_queue)
     mock_sock.send.assert_called_once_with(expected)
     mock_sock.close.assert_called_once()
 

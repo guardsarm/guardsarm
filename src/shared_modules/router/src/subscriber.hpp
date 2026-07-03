@@ -1,5 +1,5 @@
 /*
- * Wazuh router
+ * GuardSarm router
  * Copyright (C) 2015, Wazuh Inc.
  * March 25, 2023.
  *

@@ -21,7 +21,7 @@ from connexion.security import AbstractSecurityHandler
 
 from secure import Secure, ContentSecurityPolicy, XFrameOptions, Server
 
-from wazuh.core.utils import get_utc_now
+from guardsarm.core.utils import get_utc_now
 
 from api import configuration
 from api.alogging import custom_logging
@@ -40,12 +40,12 @@ LOGIN_ENDPOINT = '/security/user/authenticate'
 HASH_AUTH_CONTEXT_KEY = 'hash_auth_context'
 
 # API secure headers
-server = Server().set("Wazuh")
+server = Server().set("GuardSarm")
 csp = ContentSecurityPolicy().set('none')
 xfo = XFrameOptions().deny()
 secure_headers = Secure(server=server, csp=csp, xfo=xfo)
 
-logger = logging.getLogger('wazuh-api')
+logger = logging.getLogger('guardsarm-api')
 start_stop_logger = logging.getLogger('start-stop-api')
 
 ip_stats = dict()
@@ -89,7 +89,7 @@ async def access_log(request: ConnexionRequest, response: Response, prev_time: t
             elif auth_type == 'bearer':
                 s = jwt.decode(user_passw, generate_keypair()[1],
                             algorithms=[JWT_ALGORITHM],
-                            audience='Wazuh API REST',
+                            audience='GuardSarm API REST',
                             options={'verify_exp': False})
                 user = s['sub']
                 if HASH_AUTH_CONTEXT_KEY in s:
@@ -225,11 +225,11 @@ class CheckBlockedIP(BaseHTTPMiddleware):
         return await call_next(request)
 
 
-class WazuhAccessLoggerMiddleware(BaseHTTPMiddleware):
+class GuardSarmAccessLoggerMiddleware(BaseHTTPMiddleware):
     """Middleware to log custom Access messages."""
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        """Log Wazuh access information.
+        """Log GuardSarm access information.
 
         Parameters
         ----------
@@ -250,7 +250,7 @@ class WazuhAccessLoggerMiddleware(BaseHTTPMiddleware):
             try:
                 # Load the request body to the _json field before calling the controller so it's cached before the stream 
                 # is consumed. If there's a json error we skip it so it's handled later.
-                # Related to https://github.com/wazuh/wazuh/issues/24060.
+                # Related to https://github.com/guardsarm/guardsarm/issues/24060.
                 _ = await request.json()
             except json.decoder.JSONDecodeError:
                 pass

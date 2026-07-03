@@ -1,13 +1,13 @@
 - name: REMOTED_ENDPOINT
   description: remoted statistics endpoint
   configuration_parameters:
-    ENDPOINT: wazuh-manager-remoted
+    ENDPOINT: guardsarm-manager-remoted
   metadata:
-    endpoint: wazuh-manager-remoted
+    endpoint: guardsarm-manager-remoted
 
 - name: ANALYSISD_ENDPOINT
   description: analysisd statistics endpoint
   configuration_parameters:
-    ENDPOINT: wazuh-manager-analysisd
+    ENDPOINT: guardsarm-manager-analysisd
   metadata:
-    endpoint: wazuh-manager-analysisd
+    endpoint: guardsarm-manager-analysisd

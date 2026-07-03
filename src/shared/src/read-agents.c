@@ -11,8 +11,8 @@
 #include "shared.h"
 #include "read-agents.h"
 #include "os_net.h"
-#include "wazuhdb_op.h"
-#include "wazuhdb_queries_op.h"
+#include "guardsarmdb_op.h"
+#include "guardsarmdb_queries_op.h"
 
 /* Delete diff folders */
 void delete_diff(const char *name)

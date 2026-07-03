@@ -86,9 +86,9 @@ metadata:
   author: <ORGANIZATION/AUTHOR OF DECODER>
   date: <YYYY-MM-DD>
   references:
-    - https://github.com/wazuh/wazuh/tree/main/docs/ref/modules/engine/
+    - https://github.com/guardsarm/guardsarm/tree/main/docs/ref/modules/engine/
   compatibility:
-    - Wazuh 5.0
+    - GuardSarm 5.0
   supports:
     - Ubuntu 24.04 LTS
 check: $process.name == 'sshd' OR $process.name == 'sudo'

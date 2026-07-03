@@ -2,7 +2,7 @@
 
 The `<wodle name="docker-listener">` section monitors Docker events and container metadata on a schedule. It is available on both agents and the manager.
 
-Configuration file: `/var/wazuh-manager/etc/wazuh-manager.conf`
+Configuration file: `/var/guardsarm-manager/etc/guardsarm-manager.conf`
 
 Parser: `src/config/src/wmodules-docker.c`
 

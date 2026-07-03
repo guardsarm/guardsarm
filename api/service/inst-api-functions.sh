@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Wazuh API Installer Functions
+# GuardSarm API Installer Functions
 # Copyright (C) 2015, Wazuh Inc.
 #
 # This program is free software; you can redistribute it
@@ -11,7 +11,7 @@
 
 API_PATH=${INSTALLDIR}/api
 API_PATH_BACKUP=${INSTALLDIR}/~api
-WAZUH_GROUP="${WAZUH_GROUP:-wazuh}"
+GUARDSARM_GROUP="${GUARDSARM_GROUP:-guardsarm}"
 
 
 
@@ -22,9 +22,9 @@ backup_old_api() {
         rm -rf "${API_PATH_BACKUP}"
     fi
 
-    # Wazuh 5.x only preserves the current API configuration layout.
+    # GuardSarm 5.x only preserves the current API configuration layout.
     if [ -d "${API_PATH}/configuration" ] && [ -n "$(ls -A "${API_PATH}/configuration")" ]; then
-        install -o root -g ${WAZUH_GROUP} -m 0770 -d "${API_PATH_BACKUP}"
+        install -o root -g ${GUARDSARM_GROUP} -m 0770 -d "${API_PATH_BACKUP}"
         cp -rLfp "${API_PATH}/configuration" "${API_PATH_BACKUP}/"
     else
         echo "No API configuration found to back up."
@@ -38,7 +38,7 @@ backup_old_api() {
 
 restore_old_api() {
     if [ -d "${API_PATH_BACKUP}/configuration" ]; then
-        install -o root -g ${WAZUH_GROUP} -m 0770 -d "${API_PATH}/configuration"
+        install -o root -g ${GUARDSARM_GROUP} -m 0770 -d "${API_PATH}/configuration"
         cp -rLfp "${API_PATH_BACKUP}/configuration/." "${API_PATH}/configuration/"
     else
         echo "No API configuration backup found to restore."

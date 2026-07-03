@@ -14,12 +14,12 @@ import pytest
 from connexion import ProblemException
 
 from api.controllers.util import JSON_CONTENT_TYPE
-with patch('wazuh.core.common.wazuh_uid'):
-    with patch('wazuh.core.common.wazuh_gid'):
+with patch('guardsarm.core.common.guardsarm_uid'):
+    with patch('guardsarm.core.common.guardsarm_gid'):
         sys.modules['api.authentication'] = MagicMock()
         from api.models import base_model_ as bm
         from api.util import deserialize_model
-        from wazuh import WazuhError
+        from guardsarm import GuardSarmError
 
         del sys.modules['api.authentication']
 
@@ -71,7 +71,7 @@ class ToDictObject:
 
 def test_model_from_dict():
     """Test class Model `from_dict` method."""
-    exc = WazuhError(1000)
+    exc = GuardSarmError(1000)
     with pytest.raises(exc.__class__):
         bm.Model.from_dict(exc)
 

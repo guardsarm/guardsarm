@@ -19,11 +19,11 @@
 
 #include "../wrappers/posix/select_wrappers.h"
 #include "../wrappers/posix/unistd_wrappers.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/os_net/os_net_wrappers.h"
-#include "../wrappers/wazuh/remoted/state_wrappers.h"
-#include "../wrappers/wazuh/remoted/config_wrappers.h"
-#include "../wrappers/wazuh/remoted/manager_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/os_net/os_net_wrappers.h"
+#include "../wrappers/guardsarm/remoted/state_wrappers.h"
+#include "../wrappers/guardsarm/remoted/config_wrappers.h"
+#include "../wrappers/guardsarm/remoted/manager_wrappers.h"
 
 char* remcom_output_builder(int error_code, const char* message, cJSON* data_json);
 size_t remcom_dispatch(char * command, char ** output);

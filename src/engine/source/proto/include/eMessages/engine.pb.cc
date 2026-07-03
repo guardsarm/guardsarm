@@ -21,7 +21,7 @@ namespace _pb = ::PROTOBUF_NAMESPACE_ID;
 namespace _pbi = _pb::internal;
 
 namespace com {
-namespace wazuh {
+namespace guardsarm {
 namespace api {
 namespace engine {
 PROTOBUF_CONSTEXPR GenericStatus_Response::GenericStatus_Response(
@@ -41,36 +41,36 @@ struct GenericStatus_ResponseDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 GenericStatus_ResponseDefaultTypeInternal _GenericStatus_Response_default_instance_;
 }  // namespace engine
 }  // namespace api
-}  // namespace wazuh
+}  // namespace guardsarm
 }  // namespace com
 static ::_pb::Metadata file_level_metadata_engine_2eproto[1];
 static const ::_pb::EnumDescriptor* file_level_enum_descriptors_engine_2eproto[1];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_engine_2eproto = nullptr;
 
 const uint32_t TableStruct_engine_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::GenericStatus_Response, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::GenericStatus_Response, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::GenericStatus_Response, _impl_._has_bits_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::GenericStatus_Response, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::GenericStatus_Response, _impl_.status_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::GenericStatus_Response, _impl_.error_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::GenericStatus_Response, _impl_.status_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::GenericStatus_Response, _impl_.error_),
   ~0u,
   0,
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 8, -1, sizeof(::com::wazuh::api::engine::GenericStatus_Response)},
+  { 0, 8, -1, sizeof(::com::guardsarm::api::engine::GenericStatus_Response)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
-  &::com::wazuh::api::engine::_GenericStatus_Response_default_instance_._instance,
+  &::com::guardsarm::api::engine::_GenericStatus_Response_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_engine_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\014engine.proto\022\024com.wazuh.api.engine\"j\n\026"
+  "\n\014engine.proto\022\024com.guardsarm.api.engine\"j\n\026"
   "GenericStatus_Response\0222\n\006status\030\001 \001(\0162\""
-  ".com.wazuh.api.engine.ReturnStatus\022\022\n\005er"
+  ".com.guardsarm.api.engine.ReturnStatus\022\022\n\005er"
   "ror\030\002 \001(\tH\000\210\001\001B\010\n\006_error*.\n\014ReturnStatus"
   "\022\013\n\007UNKNOWN\020\000\022\006\n\002OK\020\001\022\t\n\005ERROR\020\002b\006proto3"
   ;
@@ -90,7 +90,7 @@ PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_engine_2
 // Force running AddDescriptors() at dynamic initialization time.
 PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_engine_2eproto(&descriptor_table_engine_2eproto);
 namespace com {
-namespace wazuh {
+namespace guardsarm {
 namespace api {
 namespace engine {
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ReturnStatus_descriptor() {
@@ -123,7 +123,7 @@ GenericStatus_Response::GenericStatus_Response(::PROTOBUF_NAMESPACE_ID::Arena* a
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
   SharedCtor(arena, is_message_owned);
-  // @@protoc_insertion_point(arena_constructor:com.wazuh.api.engine.GenericStatus_Response)
+  // @@protoc_insertion_point(arena_constructor:com.guardsarm.api.engine.GenericStatus_Response)
 }
 GenericStatus_Response::GenericStatus_Response(const GenericStatus_Response& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
@@ -144,7 +144,7 @@ GenericStatus_Response::GenericStatus_Response(const GenericStatus_Response& fro
       _this->GetArenaForAllocation());
   }
   _this->_impl_.status_ = from._impl_.status_;
-  // @@protoc_insertion_point(copy_constructor:com.wazuh.api.engine.GenericStatus_Response)
+  // @@protoc_insertion_point(copy_constructor:com.guardsarm.api.engine.GenericStatus_Response)
 }
 
 inline void GenericStatus_Response::SharedCtor(
@@ -164,7 +164,7 @@ inline void GenericStatus_Response::SharedCtor(
 }
 
 GenericStatus_Response::~GenericStatus_Response() {
-  // @@protoc_insertion_point(destructor:com.wazuh.api.engine.GenericStatus_Response)
+  // @@protoc_insertion_point(destructor:com.guardsarm.api.engine.GenericStatus_Response)
   if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
   (void)arena;
     return;
@@ -182,7 +182,7 @@ void GenericStatus_Response::SetCachedSize(int size) const {
 }
 
 void GenericStatus_Response::Clear() {
-// @@protoc_insertion_point(message_clear_start:com.wazuh.api.engine.GenericStatus_Response)
+// @@protoc_insertion_point(message_clear_start:com.guardsarm.api.engine.GenericStatus_Response)
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -203,12 +203,12 @@ const char* GenericStatus_Response::_InternalParse(const char* ptr, ::_pbi::Pars
     uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // .com.wazuh.api.engine.ReturnStatus status = 1;
+      // .com.guardsarm.api.engine.ReturnStatus status = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
-          _internal_set_status(static_cast<::com::wazuh::api::engine::ReturnStatus>(val));
+          _internal_set_status(static_cast<::com::guardsarm::api::engine::ReturnStatus>(val));
         } else
           goto handle_unusual;
         continue;
@@ -218,7 +218,7 @@ const char* GenericStatus_Response::_InternalParse(const char* ptr, ::_pbi::Pars
           auto str = _internal_mutable_error();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "com.wazuh.api.engine.GenericStatus_Response.error"));
+          CHK_(::_pbi::VerifyUTF8(str, "com.guardsarm.api.engine.GenericStatus_Response.error"));
         } else
           goto handle_unusual;
         continue;
@@ -248,11 +248,11 @@ failure:
 
 uint8_t* GenericStatus_Response::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:com.wazuh.api.engine.GenericStatus_Response)
+  // @@protoc_insertion_point(serialize_to_array_start:com.guardsarm.api.engine.GenericStatus_Response)
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .com.wazuh.api.engine.ReturnStatus status = 1;
+  // .com.guardsarm.api.engine.ReturnStatus status = 1;
   if (this->_internal_status() != 0) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteEnumToArray(
@@ -264,7 +264,7 @@ uint8_t* GenericStatus_Response::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_error().data(), static_cast<int>(this->_internal_error().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "com.wazuh.api.engine.GenericStatus_Response.error");
+      "com.guardsarm.api.engine.GenericStatus_Response.error");
     target = stream->WriteStringMaybeAliased(
         2, this->_internal_error(), target);
   }
@@ -273,12 +273,12 @@ uint8_t* GenericStatus_Response::_InternalSerialize(
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:com.wazuh.api.engine.GenericStatus_Response)
+  // @@protoc_insertion_point(serialize_to_array_end:com.guardsarm.api.engine.GenericStatus_Response)
   return target;
 }
 
 size_t GenericStatus_Response::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:com.wazuh.api.engine.GenericStatus_Response)
+// @@protoc_insertion_point(message_byte_size_start:com.guardsarm.api.engine.GenericStatus_Response)
   size_t total_size = 0;
 
   uint32_t cached_has_bits = 0;
@@ -293,7 +293,7 @@ size_t GenericStatus_Response::ByteSizeLong() const {
         this->_internal_error());
   }
 
-  // .com.wazuh.api.engine.ReturnStatus status = 1;
+  // .com.guardsarm.api.engine.ReturnStatus status = 1;
   if (this->_internal_status() != 0) {
     total_size += 1 +
       ::_pbi::WireFormatLite::EnumSize(this->_internal_status());
@@ -312,7 +312,7 @@ const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GenericStatus_Response::GetCla
 void GenericStatus_Response::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
   auto* const _this = static_cast<GenericStatus_Response*>(&to_msg);
   auto& from = static_cast<const GenericStatus_Response&>(from_msg);
-  // @@protoc_insertion_point(class_specific_merge_from_start:com.wazuh.api.engine.GenericStatus_Response)
+  // @@protoc_insertion_point(class_specific_merge_from_start:com.guardsarm.api.engine.GenericStatus_Response)
   GOOGLE_DCHECK_NE(&from, _this);
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
@@ -327,7 +327,7 @@ void GenericStatus_Response::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg,
 }
 
 void GenericStatus_Response::CopyFrom(const GenericStatus_Response& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:com.wazuh.api.engine.GenericStatus_Response)
+// @@protoc_insertion_point(class_specific_copy_from_start:com.guardsarm.api.engine.GenericStatus_Response)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -359,12 +359,12 @@ void GenericStatus_Response::InternalSwap(GenericStatus_Response* other) {
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace engine
 }  // namespace api
-}  // namespace wazuh
+}  // namespace guardsarm
 }  // namespace com
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::com::wazuh::api::engine::GenericStatus_Response*
-Arena::CreateMaybeMessage< ::com::wazuh::api::engine::GenericStatus_Response >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::com::wazuh::api::engine::GenericStatus_Response >(arena);
+template<> PROTOBUF_NOINLINE ::com::guardsarm::api::engine::GenericStatus_Response*
+Arena::CreateMaybeMessage< ::com::guardsarm::api::engine::GenericStatus_Response >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::com::guardsarm::api::engine::GenericStatus_Response >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

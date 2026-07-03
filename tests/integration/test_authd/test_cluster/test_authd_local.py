@@ -7,7 +7,7 @@ copyright: Copyright (C) 2015-2024, Wazuh Inc.
 
 type: integration
 
-brief: This module verifies the correct behavior of 'wazuh-manager-authd' under different messages
+brief: This module verifies the correct behavior of 'guardsarm-manager-authd' under different messages
        in a Cluster scenario (for Master).
 
 components:
@@ -17,8 +17,8 @@ targets:
     - manager
 
 daemons:
-    - wazuh-manager-authd
-    - wazuh-manager-db
+    - guardsarm-manager-authd
+    - guardsarm-manager-db
 
 os_platform:
     - linux
@@ -41,10 +41,10 @@ from pathlib import Path
 
 import pytest
 
-from wazuh_testing.constants.paths.sockets import WAZUH_DB_SOCKET_PATH, AUTHD_SOCKET_PATH
-from wazuh_testing.constants.daemons import AUTHD_DAEMON, WAZUH_DB_DAEMON
-from wazuh_testing.utils.configuration import load_configuration_template, get_test_cases_data
-from wazuh_testing.modules.authd.configuration import AUTHD_DEBUG_CONFIG
+from guardsarm_testing.constants.paths.sockets import GUARDSARM_DB_SOCKET_PATH, AUTHD_SOCKET_PATH
+from guardsarm_testing.constants.daemons import AUTHD_DAEMON, GUARDSARM_DB_DAEMON
+from guardsarm_testing.utils.configuration import load_configuration_template, get_test_cases_data
+from guardsarm_testing.modules.authd.configuration import AUTHD_DEBUG_CONFIG
 
 from . import CONFIGURATIONS_FOLDER_PATH, TEST_CASES_FOLDER_PATH
 
@@ -59,25 +59,25 @@ test_configuration, test_metadata, test_cases_ids = get_test_cases_data(test_cas
 test_configuration = load_configuration_template(test_configuration_path, test_configuration, test_metadata)
 
 # Variables
-receiver_sockets_params = [ (AUTHD_SOCKET_PATH, 'AF_UNIX', 'TCP'), (WAZUH_DB_SOCKET_PATH, 'AF_UNIX', 'TCP')]
+receiver_sockets_params = [ (AUTHD_SOCKET_PATH, 'AF_UNIX', 'TCP'), (GUARDSARM_DB_SOCKET_PATH, 'AF_UNIX', 'TCP')]
 
 daemons_handler_configuration = {'all_daemons': True}
 local_internal_options = {AUTHD_DEBUG_CONFIG: '2'}
 
-monitored_sockets_params = [(AUTHD_DAEMON, None, True), (WAZUH_DB_DAEMON, None, True)]
+monitored_sockets_params = [(AUTHD_DAEMON, None, True), (GUARDSARM_DB_DAEMON, None, True)]
 receiver_sockets, monitored_sockets = None, None
 
 
 # Tests
 @pytest.mark.parametrize('test_configuration,test_metadata', zip(test_configuration, test_metadata), ids=test_cases_ids)
-def test_authd_local_messages(test_configuration, test_metadata, set_wazuh_configuration,
+def test_authd_local_messages(test_configuration, test_metadata, set_guardsarm_configuration,
                               truncate_monitored_files, insert_pre_existent_agents, configure_local_internal_options,
                               daemons_handler, wait_for_authd_startup, set_up_groups, connect_to_sockets):
     '''
     description:
         Checks that every input message in trough local authd port generates the adequate response to worker.
 
-    wazuh_min_version:
+    guardsarm_min_version:
         5.0.0
 
     tier: 0
@@ -89,9 +89,9 @@ def test_authd_local_messages(test_configuration, test_metadata, set_wazuh_confi
         - test_metadata:
             type: dict
             brief: Test case metadata.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
-            brief: Load basic wazuh configuration.
+            brief: Load basic guardsarm configuration.
         - connect_to_sockets:
             type: fixture
             brief: Bind to the configured sockets at function scope.
@@ -106,7 +106,7 @@ def test_authd_local_messages(test_configuration, test_metadata, set_wazuh_confi
             brief: Handle the monitoring of a specified file.
         - daemons_handler:
             type: fixture
-            brief: Restarts wazuh or a specific daemon passed.
+            brief: Restarts guardsarm or a specific daemon passed.
         - wait_for_authd_startup:
             type: fixture
             brief: Waits until Authd is accepting connections.

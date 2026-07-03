@@ -118,7 +118,7 @@ int receive_msg()
             /* Force reconnect agent to the manager */
             else if (strncmp(tmp_msg, HC_FORCE_RECONNECT, strlen(HC_FORCE_RECONNECT)) == 0) {
                 /* Set lock and wait for it */
-                mdebug1("Wazuh Agent will be reconnected because a reconnect message was received");
+                mdebug1("GuardSarm Agent will be reconnected because a reconnect message was received");
                 os_setwait();
                 w_agentd_state_update(UPDATE_STATUS, (void *) GA_STATUS_NACTIVE);
 
@@ -243,7 +243,7 @@ int receive_msg()
                                 if (!UnmergeFiles(file, SHAREDCFG_DIR, OS_TEXT, &ignore_list)) {
                                     char msg_output[OS_MAXSTR];
 
-                                    snprintf(msg_output, OS_MAXSTR, "%c:%s:%s",  LOCALFILE_MQ, "wazuh-agent", AG_IN_UNMERGE);
+                                    snprintf(msg_output, OS_MAXSTR, "%c:%s:%s",  LOCALFILE_MQ, "guardsarm-agent", AG_IN_UNMERGE);
                                     send_msg(msg_output, -1);
                                 }
                                 else {
@@ -262,7 +262,7 @@ int receive_msg()
                                             } else {
                                                 minfo("Agent is reloading due to shared configuration changes.");
                                             }
-                                            // The reload chain (modulesd CONTROL_SOCK -> wazuh-control
+                                            // The reload chain (modulesd CONTROL_SOCK -> guardsarm-control
                                             // reload -> SIGUSR1) is the normal release path; doing it
                                             // there ensures modules don't briefly start with the new
                                             // config and then get killed when the chain restarts them.

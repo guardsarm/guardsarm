@@ -112,7 +112,7 @@ TEST_F(SpaceEnrichmentTest, SetsOriginSpaceWithoutTestMode)
     EXPECT_FALSE(result.hasTrace());
 
     std::string space;
-    event->getString(space, "/wazuh/space/name");
+    event->getString(space, "/guardsarm/space/name");
     EXPECT_EQ(space, "myspace");
 }
 
@@ -128,7 +128,7 @@ TEST_F(SpaceEnrichmentTest, SetsOriginSpaceWithTestMode)
     EXPECT_THAT(result.trace(), HasSubstr("SUCCESS"));
 
     std::string space;
-    event->getString(space, "/wazuh/space/name");
+    event->getString(space, "/guardsarm/space/name");
     EXPECT_EQ(space, "myspace");
 }
 
@@ -208,7 +208,7 @@ TEST_F(DiscardedEventsFilterTest, DiscardedEventNoTestMode)
     auto policy = makePolicy("testspace", false);
     auto [expr, name] = getDiscardedEventsFilter(policy, false, mockCounter);
 
-    auto event = makeEvent(R"({"wazuh":{"space":{"event_discarded": true}}})");
+    auto event = makeEvent(R"({"guardsarm":{"space":{"event_discarded": true}}})");
     EXPECT_CALL(*mockCounter, add(1)).Times(1);
     auto result = evalTerm(expr, event);
     EXPECT_FALSE(result.success());
@@ -221,7 +221,7 @@ TEST_F(DiscardedEventsFilterTest, DiscardedEventTestMode)
     auto policy = makePolicy("testspace", false);
     auto [expr, name] = getDiscardedEventsFilter(policy, true, mockCounter);
 
-    auto event = makeEvent(R"({"wazuh":{"space":{"event_discarded": true}}})");
+    auto event = makeEvent(R"({"guardsarm":{"space":{"event_discarded": true}}})");
     EXPECT_CALL(*mockCounter, add(1)).Times(1);
     auto result = evalTerm(expr, event);
     EXPECT_FALSE(result.success());
@@ -252,7 +252,7 @@ TEST_F(UnclassifiedCounterTest, ClassifiedCategoryNoIncrement)
 {
     auto expr = postOutputUnclassifiedCounter("space1", mockCounter);
 
-    auto event = makeEvent(R"({"wazuh":{"integration":{"category":"security"}}})");
+    auto event = makeEvent(R"({"guardsarm":{"integration":{"category":"security"}}})");
     EXPECT_CALL(*mockCounter, add(_)).Times(0);
     auto result = evalTerm(expr, event);
     EXPECT_TRUE(result.success());
@@ -263,7 +263,7 @@ TEST_F(UnclassifiedCounterTest, UnclassifiedCategoryIncrements)
 {
     auto expr = postOutputUnclassifiedCounter("space1", mockCounter);
 
-    auto event = makeEvent(R"({"wazuh":{"integration":{"category":"unclassified"}}})");
+    auto event = makeEvent(R"({"guardsarm":{"integration":{"category":"unclassified"}}})");
     EXPECT_CALL(*mockCounter, add(1)).Times(1);
     auto result = evalTerm(expr, event);
     EXPECT_TRUE(result.success());

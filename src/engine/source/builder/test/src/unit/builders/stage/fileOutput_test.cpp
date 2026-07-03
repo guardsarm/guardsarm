@@ -8,7 +8,7 @@ using namespace builder::builders;
 namespace
 {
 const streamlog::RotationConfig TEST_BASE_CONFIG {.basePath = "/tmp/test-logs",
-                                                  .pattern = "${YYYY}/${MMM}/wazuh-${name}-${DD}.json",
+                                                  .pattern = "${YYYY}/${MMM}/guardsarm-${name}-${DD}.json",
                                                   .maxSize = 0,
                                                   .bufferSize = 1 << 20,
                                                   .shouldCompress = false,
@@ -60,9 +60,9 @@ INSTANTIATE_TEST_SUITE_P(
         StageT(R"({})", FileOutputTestHelper::getBuilder(), FAILURE()),
         StageT(R"("")", FileOutputTestHelper::getBuilder(), FAILURE()),
         // succeed
-        StageT(R"("wazuh-events-v5")",
+        StageT(R"("guardsarm-events-v5")",
                FileOutputTestHelper::getBuilder(true),
-               SUCCESS(base::Term<base::EngineOp>::create("write.output(file/test_space-wazuh-events-v5)", {})))
+               SUCCESS(base::Term<base::EngineOp>::create("write.output(file/test_space-guardsarm-events-v5)", {})))
         // end
         ),
     testNameFormatter<StageBuilderTest>("FileOutput"));
@@ -75,7 +75,7 @@ TEST_F(FileOutputBuilderTest, ThrowsWhenOriginSpaceIsEmpty)
     auto logManager = std::make_shared<testing::NiceMock<streamlog::mocks::MockILogManager>>();
     EXPECT_CALL(*logManager, ensureAndGetWriter(testing::_, testing::_, testing::_)).Times(0);
 
-    EXPECT_THROW(fileOutputBuilder(json::Json("\"wazuh-events-v5\""), mocks->ctx, logManager, TEST_BASE_CONFIG),
+    EXPECT_THROW(fileOutputBuilder(json::Json("\"guardsarm-events-v5\""), mocks->ctx, logManager, TEST_BASE_CONFIG),
                  std::runtime_error);
 }
 
@@ -84,9 +84,9 @@ TEST_F(FileOutputBuilderTest, PropagatesInvalidComposedChannelName)
     mocks->context.originSpace = "invalid space";
 
     auto logManager = std::make_shared<testing::NiceMock<streamlog::mocks::MockILogManager>>();
-    EXPECT_CALL(*logManager, ensureAndGetWriter("invalid space-wazuh-events-v5", testing::_, "json"))
+    EXPECT_CALL(*logManager, ensureAndGetWriter("invalid space-guardsarm-events-v5", testing::_, "json"))
         .WillOnce(testing::Throw(std::runtime_error("invalid channel name")));
 
-    EXPECT_THROW(fileOutputBuilder(json::Json("\"wazuh-events-v5\""), mocks->ctx, logManager, TEST_BASE_CONFIG),
+    EXPECT_THROW(fileOutputBuilder(json::Json("\"guardsarm-events-v5\""), mocks->ctx, logManager, TEST_BASE_CONFIG),
                  std::runtime_error);
 }

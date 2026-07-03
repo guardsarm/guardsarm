@@ -2,7 +2,7 @@
 
 ## Overview
 
-File Integrity Monitoring (FIM) is a core security capability in Wazuh that tracks changes to files, directories, and Windows registry entries. The FIM engine, implemented through the **syscheck** module, detects unauthorized modifications, deletions, or creations that could indicate a compromise, misconfiguration, or policy violation.
+File Integrity Monitoring (FIM) is a core security capability in GuardSarm that tracks changes to files, directories, and Windows registry entries. The FIM engine, implemented through the **syscheck** module, detects unauthorized modifications, deletions, or creations that could indicate a compromise, misconfiguration, or policy violation.
 
 FIM operates in two complementary modes:
 
@@ -562,9 +562,9 @@ Specific key configurations take precedence over wildcard configurations:
 
 ## Example Configurations
 
-> These are representative examples. For the exact shipped defaults, refer to `etc/ossec.conf` and `etc/ossec-agent.conf` in the Wazuh installation directory.
+> These are representative examples. For the exact shipped defaults, refer to `etc/ossec.conf` and `etc/ossec-agent.conf` in the GuardSarm installation directory.
 
-### Wazuh Manager
+### GuardSarm Manager
 
 ```xml
 <!-- File integrity monitoring -->
@@ -583,7 +583,7 @@ Specific key configurations take precedence over wildcard configurations:
 </syscheck>
 ```
 
-### Wazuh Agent — Linux/Unix
+### GuardSarm Agent — Linux/Unix
 
 ```xml
 <syscheck>
@@ -604,7 +604,7 @@ Specific key configurations take precedence over wildcard configurations:
 </syscheck>
 ```
 
-### Wazuh Agent — Windows
+### GuardSarm Agent — Windows
 
 ```xml
 <syscheck>
@@ -627,7 +627,7 @@ Specific key configurations take precedence over wildcard configurations:
 </syscheck>
 ```
 
-### Wazuh Agent — macOS
+### GuardSarm Agent — macOS
 
 ```xml
 <syscheck>
@@ -982,7 +982,7 @@ The following use cases describe concrete end-to-end test scenarios for verifyin
 ```
 
 **Steps:**
-1. Restart the Wazuh agent.
+1. Restart the GuardSarm agent.
 2. Wait for the first FIM scan to complete.
 
 **Expected result:** Stateless events are generated for all files in `/etc`, visible in the manager as initial scan events.
@@ -1035,7 +1035,7 @@ The following use cases describe concrete end-to-end test scenarios for verifyin
 ### No alerts are generated
 
 - Confirm `<disabled>no</disabled>` in the agent's `ossec.conf`.
-- Verify the agent is connected to the manager (`wazuh-agentd` service running, agent listed as active in the dashboard).
+- Verify the agent is connected to the manager (`guardsarm-agentd` service running, agent listed as active in the dashboard).
 - Check that the monitored path exists on the agent.
 - Confirm a baseline scan has run — new-file and modification alerts require a completed initial scan to have a baseline to compare against. Check agent logs (`/var/ossec/logs/ossec.log`) for `syscheck: INFO` messages indicating scan completion.
 
@@ -1079,8 +1079,8 @@ The following use cases describe concrete end-to-end test scenarios for verifyin
 
 ## Related Documentation
 
-- [Wazuh FIM Overview](https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html)
-- [Who-data Monitoring](https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/auditing-whodata.html)
-- [FIM Alerts Reference](https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/fim-alerts.html)
-- [agent.conf — Centralized Agent Configuration](https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html)
-- [Wazuh Rules Reference](https://documentation.wazuh.com/current/user-manual/ruleset/ruleset-xml-syntax/rules.html)
+- [GuardSarm FIM Overview](https://documentation.guardsarm.com/current/user-manual/capabilities/file-integrity/index.html)
+- [Who-data Monitoring](https://documentation.guardsarm.com/current/user-manual/capabilities/file-integrity/auditing-whodata.html)
+- [FIM Alerts Reference](https://documentation.guardsarm.com/current/user-manual/capabilities/file-integrity/fim-alerts.html)
+- [agent.conf — Centralized Agent Configuration](https://documentation.guardsarm.com/current/user-manual/reference/centralized-configuration.html)
+- [GuardSarm Rules Reference](https://documentation.guardsarm.com/current/user-manual/ruleset/ruleset-xml-syntax/rules.html)

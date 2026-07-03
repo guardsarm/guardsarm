@@ -419,9 +419,9 @@ INSTANTIATE_TEST_SUITE_P(
                 protoReq.set_space("test-session");
 
                 google::protobuf::Struct meta;
-                auto& wazuhValue = (*meta.mutable_fields())["wazuh"];
-                auto* wazuhStruct = wazuhValue.mutable_struct_value();
-                (*wazuhStruct->mutable_fields())["agent_name"].set_string_value("AgentName");
+                auto& guardsarmValue = (*meta.mutable_fields())["guardsarm"];
+                auto* guardsarmStruct = guardsarmValue.mutable_struct_value();
+                (*guardsarmStruct->mutable_fields())["agent_name"].set_string_value("AgentName");
                 *protoReq.mutable_metadata() = meta;
                 return protoReq;
             },
@@ -452,7 +452,7 @@ INSTANTIATE_TEST_SUITE_P(
                 protoReq.set_trace_level("NONE");
 
                 google::protobuf::Struct meta;
-                (*meta.mutable_fields())["notwazuh.agent"].set_string_value("RandomField");
+                (*meta.mutable_fields())["notguardsarm.agent"].set_string_value("RandomField");
                 *protoReq.mutable_metadata() = meta;
                 return protoReq;
             },
@@ -460,7 +460,7 @@ INSTANTIATE_TEST_SUITE_P(
             []()
             {
                 return userErrorResponse<eEngine::tester::RunPost_Response>(
-                    "Metadata should contain 'wazuh' as root");
+                    "Metadata should contain 'guardsarm' as root");
             },
             []() { return makeSchemaValidator(false); },
         },
@@ -476,7 +476,7 @@ INSTANTIATE_TEST_SUITE_P(
                 protoReq.set_trace_level("NONE");
 
                 google::protobuf::Struct meta;
-                (*meta.mutable_fields())["wazuh"].set_number_value(123);
+                (*meta.mutable_fields())["guardsarm"].set_number_value(123);
                 *protoReq.mutable_metadata() = meta;
                 return protoReq;
             },
@@ -484,7 +484,7 @@ INSTANTIATE_TEST_SUITE_P(
             []()
             {
                 return userErrorResponse<eEngine::tester::RunPost_Response>(
-                    "Metadata should contain 'wazuh' as root");
+                    "Metadata should contain 'guardsarm' as root");
             },
             []() { return makeSchemaValidator(false); },
         },
@@ -574,9 +574,9 @@ INSTANTIATE_TEST_SUITE_P(
                 protoReq.set_trace_level("NONE");
 
                 google::protobuf::Struct meta;
-                auto& wazuhValue = (*meta.mutable_fields())["wazuh"];
-                auto* wazuhStruct = wazuhValue.mutable_struct_value();
-                (*wazuhStruct->mutable_fields())["foo"].set_string_value("bar");
+                auto& guardsarmValue = (*meta.mutable_fields())["guardsarm"];
+                auto* guardsarmStruct = guardsarmValue.mutable_struct_value();
+                (*guardsarmStruct->mutable_fields())["foo"].set_string_value("bar");
                 *protoReq.mutable_metadata() = meta;
 
                 return protoReq;
@@ -585,7 +585,7 @@ INSTANTIATE_TEST_SUITE_P(
             []()
             {
                 return userErrorResponse<eEngine::tester::RunPost_Response>(
-                    "Metadata field 'wazuh.foo' doesn't exist or doesn't match the expected one from the schema");
+                    "Metadata field 'guardsarm.foo' doesn't exist or doesn't match the expected one from the schema");
             },
             []() { return makeSchemaValidator(false); },
         },
@@ -600,9 +600,9 @@ INSTANTIATE_TEST_SUITE_P(
                 protoReq.set_trace_level("NONE");
 
                 google::protobuf::Struct meta;
-                auto& wazuhValue = (*meta.mutable_fields())["wazuh"];
-                auto* wazuhStruct = wazuhValue.mutable_struct_value();
-                (*wazuhStruct->mutable_fields())["foo"].set_string_value("bar");
+                auto& guardsarmValue = (*meta.mutable_fields())["guardsarm"];
+                auto* guardsarmStruct = guardsarmValue.mutable_struct_value();
+                (*guardsarmStruct->mutable_fields())["foo"].set_string_value("bar");
                 *protoReq.mutable_metadata() = meta;
 
                 return protoReq;

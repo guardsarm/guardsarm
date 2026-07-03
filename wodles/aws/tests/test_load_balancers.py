@@ -23,7 +23,7 @@ def test_aws_lb_bucket_initializes_properly(mock_custom_bucket):
     mock_custom_bucket.assert_called_once()
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 def test_aws_lb_bucket_get_base_prefix(mock_sts):
     """Test 'get_base_prefix' returns the expected prefix with the format <prefix>/AWSLogs/<suffix>"""
     instance = utils.get_mocked_bucket(class_=load_balancers.AWSLBBucket, prefix=f'{utils.TEST_PREFIX}/',

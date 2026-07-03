@@ -12,7 +12,7 @@ using namespace json;
 // =============================================================================
 
 static const std::string SMALL_FLAT_JSON = R"({
-    "name": "wazuh-agent",
+    "name": "guardsarm-agent",
     "id": "001",
     "version": "5.0.0",
     "status": "active",
@@ -22,7 +22,7 @@ static const std::string SMALL_FLAT_JSON = R"({
 // --- Documents WITH duplicate keys (for removeDuplicateKeys benchmarks) ---
 
 static const std::string SMALL_WITH_DUPS = R"({
-    "name": "wazuh-agent",
+    "name": "guardsarm-agent",
     "id": "001",
     "name": "duplicate-name",
     "status": "active",
@@ -32,7 +32,7 @@ static const std::string SMALL_WITH_DUPS = R"({
 static const std::string MEDIUM_WITH_DUPS = R"({
     "agent": {
         "id": "001",
-        "name": "wazuh-agent",
+        "name": "guardsarm-agent",
         "id": "002",
         "host": {
             "hostname": "server01",
@@ -55,7 +55,7 @@ static const std::string MEDIUM_WITH_DUPS = R"({
 static const std::string MEDIUM_NESTED_JSON = R"({
     "agent": {
         "id": "001",
-        "name": "wazuh-agent",
+        "name": "guardsarm-agent",
         "version": "5.0.0",
         "host": {
             "hostname": "server01",
@@ -91,7 +91,7 @@ static const std::string LARGE_DEEPLY_NESTED_JSON = R"({
         "type": ["info"],
         "severity": 3,
         "created": "2026-01-15T10:30:00.000Z",
-        "provider": "wazuh",
+        "provider": "guardsarm",
         "module": "syscheck"
     },
     "agent": {

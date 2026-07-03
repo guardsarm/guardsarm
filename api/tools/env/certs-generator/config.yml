@@ -1,18 +1,18 @@
 nodes:
   indexer:
-    - name: wazuh.indexer
-      ip: wazuh.indexer
+    - name: guardsarm.indexer
+      ip: guardsarm.indexer
 
   server:
-    - name: wazuh.manager
-      ip: wazuh.manager
+    - name: guardsarm.manager
+      ip: guardsarm.manager
       node_type: master
-    - name: wazuh.worker1
-      ip: wazuh.worker
+    - name: guardsarm.worker1
+      ip: guardsarm.worker
       node_type: worker
-    - name: wazuh.worker2
-      ip: wazuh2.worker
+    - name: guardsarm.worker2
+      ip: guardsarm2.worker
       node_type: worker
   dashboard:
-    - name: wazuh.dashboard
-      ip: wazuh.dashboard
+    - name: guardsarm.dashboard
+      ip: guardsarm.dashboard

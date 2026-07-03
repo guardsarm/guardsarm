@@ -70,7 +70,7 @@
 #define FIM_EBPF_LSM_ACTIVE                 "(6051): BPF LSM is active in the running kernel; using LSM hooks for create/modify/delete events."
 #define FIM_EBPF_LSM_INACTIVE               "(6052): BPF LSM is not active (not present in /sys/kernel/security/lsm); falling back to kprobe hooks. To enable LSM-based capture append 'bpf' to the kernel boot parameter 'lsm=' and reboot."
 
-/* wazuh-logtest information messages */
+/* guardsarm-logtest information messages */
 #define LOGTEST_INITIALIZED                 "(7200): Logtest started"
 #define LOGTEST_DISABLED                    "(7201): Logtest disabled"
 #define LOGTEST_INFO_TOKEN_SESSION          "(7202): Session initialized with token '%s'"
@@ -87,8 +87,8 @@
 #define LOGCOLLECTOR_TIMESTAMP_REFRESHED    "(9204): 'Journald' timestamp was refreshed due to rotation."
 
 /* Agent info messages */
-#define AG_UNINSTALL_VALIDATION_START       "(9500): Starting user validation to uninstall the Wazuh agent package."
-#define AG_UNINSTALL_VALIDATION_GRANTED     "(9501): Validation of the uninstallation of the Wazuh agent package granted."
-#define AG_UNINSTALL_VALIDATION_DENIED      "(9502): Validation of the uninstallation of the Wazuh agent package denied."
+#define AG_UNINSTALL_VALIDATION_START       "(9500): Starting user validation to uninstall the GuardSarm agent package."
+#define AG_UNINSTALL_VALIDATION_GRANTED     "(9501): Validation of the uninstallation of the GuardSarm agent package granted."
+#define AG_UNINSTALL_VALIDATION_DENIED      "(9502): Validation of the uninstallation of the GuardSarm agent package denied."
 
 #endif /* INFO_MESSAGES_H */

@@ -2,23 +2,23 @@
 
 ## Introduction
 
-The Wazuh GCP (Google Cloud Platform) module retrieves logs from Google Cloud services and forwards them to the Wazuh analysis engine. The module supports two collection methods:
+The GuardSarm GCP (Google Cloud Platform) module retrieves logs from Google Cloud services and forwards them to the GuardSarm analysis engine. The module supports two collection methods:
 
 - **Pub/Sub**: Subscribes to a Google Cloud Pub/Sub topic to receive log messages in real time.
 - **Cloud Storage buckets**: Reads logs stored in Google Cloud Storage buckets (for example, access logs).
 
-The GCP module runs as a Wazuh wodle on the Wazuh agent. It invokes the `wodles/gcloud/gcloud` Python script to connect to Google Cloud services using a service account credentials file.
+The GCP module runs as a GuardSarm wodle on the GuardSarm agent. It invokes the `wodles/gcloud/gcloud` Python script to connect to Google Cloud services using a service account credentials file.
 
 ## Prerequisites
 
 - A Google Cloud project with the required APIs enabled (Pub/Sub API or Cloud Storage API).
 - A service account with appropriate permissions and a downloaded JSON credentials file.
-- The credentials file must be accessible to the Wazuh agent.
-- Python 3 and the required Google Cloud Python libraries installed on the Wazuh agent.
+- The credentials file must be accessible to the GuardSarm agent.
+- Python 3 and the required Google Cloud Python libraries installed on the GuardSarm agent.
 
 ## Configuration
 
-The GCP module is configured inside the `<ossec_config>` block of the Wazuh agent configuration file (`ossec.conf`).
+The GCP module is configured inside the `<ossec_config>` block of the GuardSarm agent configuration file (`ossec.conf`).
 
 ### Pub/Sub configuration
 
@@ -26,7 +26,7 @@ The GCP module is configured inside the `<ossec_config>` block of the Wazuh agen
   <wodle name="gcp-pubsub">
     <enabled>yes</enabled>
     <project_id>my-gcp-project</project_id>
-    <subscription_name>wazuh-subscription</subscription_name>
+    <subscription_name>guardsarm-subscription</subscription_name>
     <credentials_file>/var/ossec/etc/credentials.json</credentials_file>
     <max_messages>100</max_messages>
     <num_threads>1</num_threads>
@@ -84,8 +84,8 @@ The GCP module is configured inside the `<ossec_config>` block of the Wazuh agen
 ### Create a Pub/Sub topic and subscription
 
 1. In the Google Cloud Console, navigate to **Pub/Sub** > **Topics**.
-2. Create a new topic (for example, `wazuh-topic`).
-3. Create a subscription for the topic (for example, `wazuh-subscription`).
+2. Create a new topic (for example, `guardsarm-topic`).
+3. Create a subscription for the topic (for example, `guardsarm-subscription`).
 4. Configure a log sink in **Logging** > **Log Router** to route audit logs to the Pub/Sub topic.
 
 ### Create a service account
@@ -94,20 +94,20 @@ The GCP module is configured inside the `<ossec_config>` block of the Wazuh agen
 2. Create a new service account with the following roles:
    - `Pub/Sub Subscriber` (for Pub/Sub integration)
    - `Storage Object Viewer` (for bucket integration)
-3. Generate a JSON key and download it to the Wazuh agent.
+3. Generate a JSON key and download it to the GuardSarm agent.
 
 ## Verify the integration
 
-After configuring the module, restart the Wazuh agent:
+After configuring the module, restart the GuardSarm agent:
 
 ```bash
-systemctl restart wazuh-agent
+systemctl restart guardsarm-agent
 ```
 
-Check the Wazuh agent logs for GCP module activity:
+Check the GuardSarm agent logs for GCP module activity:
 
 ```bash
 grep "gcp" /var/ossec/logs/ossec.log
 ```
 
-GCP events appear in the Wazuh alerts with the `gcp` data field populated.
+GCP events appear in the GuardSarm alerts with the `gcp` data field populated.

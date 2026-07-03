@@ -14,10 +14,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/syscheckd/config_wrappers.h"
-#include "../wrappers/wazuh/syscheckd/fim_sync_wrappers.h"
-#include "../wrappers/wazuh/shared_modules/agent_sync_protocol_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/syscheckd/config_wrappers.h"
+#include "../wrappers/guardsarm/syscheckd/fim_sync_wrappers.h"
+#include "../wrappers/guardsarm/shared_modules/agent_sync_protocol_wrappers.h"
 #include "syscheck.h"
 #include "syscheck-config.h"
 

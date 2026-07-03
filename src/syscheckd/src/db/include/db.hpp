@@ -1,5 +1,5 @@
 /*
- * Wazuh DB
+ * GuardSarm DB
  * Copyright (C) 2015, Wazuh Inc.
  * January 12, 2022.
  *

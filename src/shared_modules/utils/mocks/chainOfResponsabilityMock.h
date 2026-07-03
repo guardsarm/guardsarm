@@ -1,5 +1,5 @@
 /*
- * Wazuh databaseFeedManager
+ * GuardSarm databaseFeedManager
  * Copyright (C) 2015, Wazuh Inc.
  * January 11, 2024.
  *

@@ -75,7 +75,7 @@ on:
         required: false
         default: ''
       start_service:
-        description: 'Start Wazuh agent service before tests'
+        description: 'Start GuardSarm agent service before tests'
         required: false
         default: 'false'
       skip_tests:
@@ -89,7 +89,7 @@ jobs:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
       BRANCH_BASE: ${{ inputs.base_branch || github.base_ref }}
       BUILD_WORKFLOW: 5_builderpackage_agent-windows.yml
-      AGENT_PACKAGE_REGEXP: wazuh-agent.*windows.*\.msi
+      AGENT_PACKAGE_REGEXP: guardsarm-agent.*windows.*\.msi
       PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     runs-on:
       - codebuild-github-actions-codebuild-runner-agent-windows-amd-${{ github.run_id }}-${{ github.run_attempt }}
@@ -117,7 +117,7 @@ jobs:
         id: cache-msi
         uses: actions/cache@v4
         with:
-          path: C:\wazuh-package
+          path: C:\guardsarm-package
           key: msi-${{ env.PR_HEAD_SHA }}
       # ================= DOWNLOAD =================
       - name: Download MSI package artifact
@@ -128,54 +128,54 @@ jobs:
           run_id: ${{ inputs.build_run_id }}
           name_is_regexp: true
           name: ${{ env.AGENT_PACKAGE_REGEXP }}
-          path: C:\wazuh-package\
+          path: C:\guardsarm-package\
           if_no_artifact_found: fail
       # ================= INSTALL =================
-      - name: Install wazuh agent
+      - name: Install guardsarm agent
         if: ${{ !(inputs.skip_tests == true || inputs.skip_tests == 'true') }}
         shell: pwsh
         run: |
-          $package = Get-ChildItem -Path "C:\wazuh-package" -Filter "wazuh-agent*windows*.msi" -File -Recurse |
+          $package = Get-ChildItem -Path "C:\guardsarm-package" -Filter "guardsarm-agent*windows*.msi" -File -Recurse |
             Where-Object { $_.Name -notmatch 'debug' } | Select-Object -First 1
           if (-not $package) {
-            Write-Host "ERROR: No MSI package found in C:\wazuh-package"
-            Get-ChildItem -Path "C:\wazuh-package" -Recurse | Format-Table Name, FullName
+            Write-Host "ERROR: No MSI package found in C:\guardsarm-package"
+            Get-ChildItem -Path "C:\guardsarm-package" -Recurse | Format-Table Name, FullName
             exit 1
           }
-          Start-Process msiexec.exe -ArgumentList "/i `"$($package.FullName)`" /q WAZUH_MANAGER=`"127.0.0.1`"" -Wait -NoNewWindow
+          Start-Process msiexec.exe -ArgumentList "/i `"$($package.FullName)`" /q GUARDSARM_MANAGER=`"127.0.0.1`"" -Wait -NoNewWindow
       # ================= QA FRAMEWORK =================
       - name: Download and install qa-integration-framework
         if: ${{ !(inputs.skip_tests == true || inputs.skip_tests == 'true') }}
         shell: pwsh
         run: |
           $VERSION = (Get-Content -Raw VERSION.json | ConvertFrom-Json).version
-          if (git ls-remote https://github.com/wazuh/qa-integration-framework.git $env:BRANCH_NAME) {
+          if (git ls-remote https://github.com/guardsarm/qa-integration-framework.git $env:BRANCH_NAME) {
               $QA_BRANCH = $env:BRANCH_NAME
-          } elseif (git ls-remote https://github.com/wazuh/qa-integration-framework.git $env:BRANCH_BASE) {
+          } elseif (git ls-remote https://github.com/guardsarm/qa-integration-framework.git $env:BRANCH_BASE) {
               $QA_BRANCH = $env:BRANCH_BASE
-          } elseif (git ls-remote https://github.com/wazuh/qa-integration-framework.git $VERSION) {
+          } elseif (git ls-remote https://github.com/guardsarm/qa-integration-framework.git $VERSION) {
               $QA_BRANCH = $VERSION
           } else {
               $QA_BRANCH = "main"
           }
-          git clone -b $QA_BRANCH --single-branch https://github.com/wazuh/qa-integration-framework.git
+          git clone -b $QA_BRANCH --single-branch https://github.com/guardsarm/qa-integration-framework.git
           pip install qa-integration-framework/
           Remove-Item qa-integration-framework -Recurse -Force
-      - name: Copy integration tests to C:\wazuh
+      - name: Copy integration tests to C:\guardsarm
         if: ${{ !(inputs.skip_tests == true || inputs.skip_tests == 'true') }}
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path C:\wazuh\tests | Out-Null
-          Copy-Item -Path "$env:GITHUB_WORKSPACE\tests\*" -Destination C:\wazuh\tests -Recurse -Force
+          New-Item -ItemType Directory -Force -Path C:\guardsarm\tests | Out-Null
+          Copy-Item -Path "$env:GITHUB_WORKSPACE\tests\*" -Destination C:\guardsarm\tests -Recurse -Force
       # ================= EXECUTION =================
-      - name: Start Wazuh agent service
+      - name: Start GuardSarm agent service
         if: ${{ !(inputs.skip_tests == true || inputs.skip_tests == 'true') && (inputs.start_service == true || inputs.start_service == 'true') }}
-        run: NET START wazuh
+        run: NET START guardsarm
       - name: Run ${{ inputs.module_name }} integration tests
         if: ${{ !(inputs.skip_tests == true || inputs.skip_tests == 'true') }}
         shell: pwsh
         run: |
-          cd C:\wazuh\tests\integration
+          cd C:\guardsarm\tests\integration
           $env:GITHUB_SHA="${{ github.sha }}"
           $env:GITHUB_REF_NAME="$env:BRANCH_NAME"
           python -m pytest ${{ inputs.pytest_extra_args }} ${{ inputs.pytest_tier_args }} ${{ inputs.pytest_target }} ${{ inputs.pytest_ignore_args }} --html=results.html --self-contained-html 2>&1 | Tee-Object -FilePath pytest.log
@@ -193,5 +193,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.module_name }}-win-${{ inputs.shard_name }}-test-results-${{ github.run_id }}
-          path: C:\wazuh\tests\integration\results.html
+          path: C:\guardsarm\tests\integration\results.html
           retention-days: 7

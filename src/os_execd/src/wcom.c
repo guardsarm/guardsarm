@@ -258,9 +258,9 @@ error:
 }
 
 size_t wcom_check_manager_config(char **output) {
-    static const char *daemons[] = {"bin/wazuh-manager-authd", "bin/wazuh-manager-remoted",
-                                    "bin/wazuh-manager-analysisd",
-                                    "bin/wazuh-manager-modulesd", "bin/wazuh-manager-clusterd",
+    static const char *daemons[] = {"bin/guardsarm-manager-authd", "bin/guardsarm-manager-remoted",
+                                    "bin/guardsarm-manager-analysisd",
+                                    "bin/guardsarm-manager-modulesd", "bin/guardsarm-manager-clusterd",
                                     NULL
                                     };
 
@@ -272,7 +272,7 @@ size_t wcom_check_manager_config(char **output) {
     cJSON *response = cJSON_CreateObject();
 
     OS_XML xml_check;
-    const char *cfg = WAZUHCONF;
+    const char *cfg = GUARDSARMCONF;
 
     if (OS_ReadXML(cfg, &xml_check) < 0) {
         snprintf(response_string, 0, "Error reading %s file", cfg);

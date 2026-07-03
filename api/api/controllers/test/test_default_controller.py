@@ -8,21 +8,21 @@ from unittest.mock import MagicMock, patch
 import pytest
 from connexion.lifecycle import ConnexionResponse
 
-with patch('wazuh.common.wazuh_uid'):
-    with patch('wazuh.common.wazuh_gid'):
-        sys.modules['wazuh.rbac.orm'] = MagicMock()
-        import wazuh.rbac.decorators
+with patch('guardsarm.common.guardsarm_uid'):
+    with patch('guardsarm.common.guardsarm_gid'):
+        sys.modules['guardsarm.rbac.orm'] = MagicMock()
+        import guardsarm.rbac.decorators
         from api.controllers.default_controller import (BasicInfo, DATE_FORMAT,
                                                         default_info, socket)
-        from wazuh.tests.util import RBAC_bypasser
-        from wazuh.core.utils import get_utc_now
-        wazuh.rbac.decorators.expose_resources = RBAC_bypasser
-        del sys.modules['wazuh.rbac.orm']
+        from guardsarm.tests.util import RBAC_bypasser
+        from guardsarm.core.utils import get_utc_now
+        guardsarm.rbac.decorators.expose_resources = RBAC_bypasser
+        del sys.modules['guardsarm.rbac.orm']
 
 
 @pytest.mark.asyncio
 @patch('api.controllers.default_controller.load_spec', return_value=MagicMock())
-@patch('api.controllers.default_controller.WazuhResult', return_value={})
+@patch('api.controllers.default_controller.GuardSarmResult', return_value={})
 async def test_default_info(mock_wresult, mock_lspec):
     """Verify 'default_info' endpoint is working as expected."""
     result = await default_info()

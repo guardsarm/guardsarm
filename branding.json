@@ -1,0 +1,15 @@
+{
+    "product_name": "GuardSarm",
+    "product_short_name": "GuardSarm",
+    "product_id": "guardsarm",
+    "product_upper": "GUARDSARM",
+    "product_version": "1.0.0",
+    "vendor_name": "GuardSarm",
+    "legal_entity": "GuardSarm, Inc.",
+    "author": "GuardSarm",
+    "contact": "info@guardsarm.com",
+    "security_contact": "security@guardsarm.com",
+    "site": "https://guardsarm.com",
+    "doc_url": "https://documentation.guardsarm.com",
+    "github_org": "https://github.com/guardsarm"
+}

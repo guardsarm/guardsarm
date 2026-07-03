@@ -22,14 +22,14 @@ set_target_properties(
     LINKER_LANGUAGE C
 )
 
-target_link_libraries(CONFIG_O ${WAZUHLIB} ${WAZUHEXT} -lpthread)
+target_link_libraries(CONFIG_O ${GUARDSARMLIB} ${GUARDSARMEXT} -lpthread)
 
 if(${TARGET} STREQUAL "winagent")
     link_directories(${SRC_FOLDER}/build/bin)
 endif(${TARGET} STREQUAL "winagent")
 
 # Include wrappers
-include(${SRC_FOLDER}/unit_tests/wrappers/wazuh/shared/shared.cmake)
+include(${SRC_FOLDER}/unit_tests/wrappers/guardsarm/shared/shared.cmake)
 
 # Generate config tests
 list(APPEND config_names "test_client-config_validate_ipv6_link_local_interface")
@@ -53,8 +53,8 @@ foreach(counter RANGE ${count})
 
     target_link_libraries(
         ${test_name}
-        ${WAZUHLIB}
-        ${WAZUHEXT}
+        ${GUARDSARMLIB}
+        ${GUARDSARMEXT}
         CONFIG_O
         ${TEST_DEPS}
     )

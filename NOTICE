@@ -1,0 +1,34 @@
+GuardSarm
+Copyright (C) 2026 GuardSarm, Inc.
+
+This product is a derivative work ("fork") of the Wazuh security platform and,
+through Wazuh, of the OSSEC project. GuardSarm applies user-visible branding and
+modifications on top of that upstream code. It is distributed under the same
+license as the upstream projects: the GNU General Public License, version 2
+(see the LICENSE file).
+
+The following upstream copyrights and attributions are retained in full and are
+NOT superseded by the GuardSarm branding:
+
+  Wazuh
+  Copyright (C) 2015, Wazuh Inc.
+  https://wazuh.com
+
+  OSSEC HIDS
+  Copyright (C) 2009 Trend Micro Inc.
+  Originally created by Daniel B. Cid.
+
+All source files retain their original copyright headers ("Copyright (C) 2015,
+Wazuh Inc." and, where applicable, "Copyright (C) 2009 Trend Micro Inc.").
+GuardSarm does not claim authorship of upstream code.
+
+Third-party components bundled with or depended upon by this product retain
+their own licenses and copyrights; see the "Software and libraries used" section
+of README.md and the individual component sources for details.
+
+Trademarks: "Wazuh" and "OSSEC" are the property of their respective owners.
+GuardSarm is not endorsed by or affiliated with Wazuh Inc. Where the name
+"Wazuh" appears in this product outside of the retained legal notices above, it
+does so to preserve backward compatibility with existing Wazuh deployments
+(protocol identifiers, filesystem paths, service and package names, data schema
+and index names, and API contracts). See docs/guardsarm-compatibility.md.

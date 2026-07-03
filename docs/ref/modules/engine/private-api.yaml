@@ -1,11 +1,11 @@
 openapi: 3.0.3
 info:
-  title: Wazuh-Engine Private API
-  description: Internal-only API endpoints of the Wazuh Engine used by development, testing, and maintenance tooling. Public endpoints are documented separately in public-api.yaml.
+  title: GuardSarm-Engine Private API
+  description: Internal-only API endpoints of the GuardSarm Engine used by development, testing, and maintenance tooling. Public endpoints are documented separately in public-api.yaml.
   version: 1.0.0
 servers:
-- url: http+unix:/run/wazuh-server/analysis
-  description: Wazuh server using Unix socket over HTTP
+- url: http+unix:/run/guardsarm-server/analysis
+  description: GuardSarm server using Unix socket over HTTP
 tags:
 - name: Router
   description: Operations for managing environments and routing
@@ -25,7 +25,7 @@ paths:
       tags:
       - Router
       summary: Create a new route
-      description: 'This endpoint allows the creation of a new route in the Wazuh Engine API.
+      description: 'This endpoint allows the creation of a new route in the GuardSarm Engine API.
 
         '
       requestBody:
@@ -91,7 +91,7 @@ paths:
       tags:
       - Router
       summary: Delete a route
-      description: 'This endpoint allows deleting a specific route in the Wazuh Engine API.
+      description: 'This endpoint allows deleting a specific route in the GuardSarm Engine API.
 
         '
       requestBody:
@@ -148,7 +148,7 @@ paths:
                 error: null
                 route:
                   name: example-route
-                  namespaceId: wazuh
+                  namespaceId: guardsarm
                   priority: 10
                   description: Example route
                   entry_status: ENABLED
@@ -177,7 +177,7 @@ paths:
       tags:
       - Router
       summary: Reload a route
-      description: 'This endpoint allows reloading a specific route in the Wazuh Engine API.
+      description: 'This endpoint allows reloading a specific route in the GuardSarm Engine API.
 
         '
       requestBody:
@@ -210,7 +210,7 @@ paths:
                   summary: Some asset has validation errors
                   value:
                     status: ERROR
-                    error: 'Failed to reload the route: Failed to create environment with namespace ''wazuh'': Expected ''name'' key in asset document but got ''n'''
+                    error: 'Failed to reload the route: Failed to create environment with namespace ''guardsarm'': Expected ''name'' key in asset document but got ''n'''
         '500':
           $ref: '#/components/responses/InternalServerError_500'
   /_internal/router/route/patchPriority:
@@ -264,7 +264,7 @@ paths:
       tags:
       - Router
       summary: Retrieve all routes
-      description: 'This endpoint retrieves the list of existing routes in the Wazuh Engine API.
+      description: 'This endpoint retrieves the list of existing routes in the GuardSarm Engine API.
 
         '
       requestBody:
@@ -285,7 +285,7 @@ paths:
                 error: null
                 routes:
                 - name: example-route
-                  namespaceId: wazuh
+                  namespaceId: guardsarm
                   priority: 10
                   description: Example route
                   entry_status: ENABLED
@@ -342,7 +342,7 @@ paths:
                   summary: Namespace has no assets
                   value:
                     status: ERROR
-                    error: 'Failed to create the ''testing'' environment: Namespace ''wazuh'' has no assets'
+                    error: 'Failed to create the ''testing'' environment: Namespace ''guardsarm'' has no assets'
         '500':
           $ref: '#/components/responses/InternalServerError_500'
   /_internal/tester/session/delete:
@@ -462,7 +462,7 @@ paths:
       tags:
       - Tester
       summary: Run a test in a session
-      description: "Injects a single event into the engine using a previously created and loaded testing session.\n\nAdditional metadata about the agent can be provided in the `agent_metadata` field, which\nis merged into the event before ingestion. It must be a **JSON object** (not a JSON-encoded string).\nIt can be an empty JSON object (`{}`).\n\nAfter the pipeline finishes, the final output event is validated against the Wazuh Common\nSchema (WCS). Validation is **non-blocking**: the pipeline result is always returned\nregardless of validation errors. The result is reported in `result.validation` when the\nschema validator is available.\n\nEach entry in `result.validation.errors` has:\n- `path` \u2014 field path using dot notation for nesting and `[N]` for array indices\n  (e.g. `\"event.severity\"`, `\"tags[1]\"`).\n- `kind` \u2014 one of:\n  - `unknown_field` \u2014 field is not defined in WCS and is not a temporary field.\n  - `temporary_field_not_allowed` \u2014 field is a pipeline-internal\
+      description: "Injects a single event into the engine using a previously created and loaded testing session.\n\nAdditional metadata about the agent can be provided in the `agent_metadata` field, which\nis merged into the event before ingestion. It must be a **JSON object** (not a JSON-encoded string).\nIt can be an empty JSON object (`{}`).\n\nAfter the pipeline finishes, the final output event is validated against the GuardSarm Common\nSchema (WCS). Validation is **non-blocking**: the pipeline result is always returned\nregardless of validation errors. The result is reported in `result.validation` when the\nschema validator is available.\n\nEach entry in `result.validation.errors` has:\n- `path` \u2014 field path using dot notation for nesting and `[N]` for array indices\n  (e.g. `\"event.severity\"`, `\"tags[1]\"`).\n- `kind` \u2014 one of:\n  - `unknown_field` \u2014 field is not defined in WCS and is not a temporary field.\n  - `temporary_field_not_allowed` \u2014 field is a pipeline-internal\
         \ field (root starts with `_`).\n  - `invalid_type` \u2014 value does not match the WCS type for that field.\n- `expected` / `actual` \u2014 present only for `invalid_type` errors.\n\n`result.validation` is only present when the schema validator is available and the\npipeline produced an output event.\n\nErrors are sorted by path, with kind as tiebreaker.\n"
       requestBody:
         required: true
@@ -484,7 +484,7 @@ paths:
                     status: OK
                     result:
                       output:
-                        wazuh:
+                        guardsarm:
                           protocol:
                             queue: 49
                             location: /tmp/json
@@ -510,7 +510,7 @@ paths:
                     status: OK
                     result:
                       output:
-                        wazuh:
+                        guardsarm:
                           protocol:
                             queue: 49
                             location: /tmp/json
@@ -695,12 +695,12 @@ paths:
                     status: OK
                     entries:
                     - name: GeoLite2-City.mmdb
-                      path: /var/wazuh-manager/geo/GeoLite2-City.mmdb
+                      path: /var/guardsarm-manager/geo/GeoLite2-City.mmdb
                       hash: a1b2c3d4e5f6
                       createdAt: '2024-01-15T10:30:00Z'
                       type: city
                     - name: GeoLite2-ASN.mmdb
-                      path: /var/wazuh-manager/geo/GeoLite2-ASN.mmdb
+                      path: /var/guardsarm-manager/geo/GeoLite2-ASN.mmdb
                       hash: f6e5d4c3b2a1
                       createdAt: '2024-01-15T10:30:00Z'
                       type: asn

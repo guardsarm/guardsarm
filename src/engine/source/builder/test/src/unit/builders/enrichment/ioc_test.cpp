@@ -148,7 +148,7 @@ TEST(IocEnrichmentTest, LookupKeySingleSource)
     evalExpression(expr, event);
 
     // Verify enrichment was appended
-    EXPECT_TRUE(event->exists("/wazuh/threat/enrichments"));
+    EXPECT_TRUE(event->exists("/guardsarm/threat/enrichments"));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -169,7 +169,7 @@ TEST(IocEnrichmentTest, LookupKeyMultipleSources)
     evalExpression(expr, event);
 
     // No match found so no enrichments
-    EXPECT_FALSE(event->exists("/wazuh/threat/enrichments"));
+    EXPECT_FALSE(event->exists("/guardsarm/threat/enrichments"));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -190,7 +190,7 @@ TEST(IocEnrichmentTest, LookupKeyConnection)
     auto event = makeEvent(R"({"source": {"ip": "192.168.1.1", "port": 8080}})");
     evalExpression(expr, event);
 
-    EXPECT_TRUE(event->exists("/wazuh/threat/enrichments"));
+    EXPECT_TRUE(event->exists("/guardsarm/threat/enrichments"));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -208,7 +208,7 @@ TEST(IocEnrichmentTest, MissingSourceField)
     auto event = makeEvent(R"({"file": {"name": "test.txt"}})");
     evalExpression(expr, event);
 
-    EXPECT_FALSE(event->exists("/wazuh/threat/enrichments"));
+    EXPECT_FALSE(event->exists("/guardsarm/threat/enrichments"));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -227,7 +227,7 @@ TEST(IocEnrichmentTest, KvdbLookupNoMatch)
     auto event = makeEvent(R"({"file": {"hash": {"md5": "deadbeef"}}})");
     evalExpression(expr, event);
 
-    EXPECT_FALSE(event->exists("/wazuh/threat/enrichments"));
+    EXPECT_FALSE(event->exists("/guardsarm/threat/enrichments"));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -249,9 +249,9 @@ TEST(IocEnrichmentTest, KvdbLookupMatch)
     evalExpression(expr, event);
 
     // Verify enrichment array exists and has expected structure
-    EXPECT_TRUE(event->exists("/wazuh/threat/enrichments"));
-    EXPECT_TRUE(event->exists("/wazuh/threat/enrichments/0/indicator"));
-    EXPECT_TRUE(event->exists("/wazuh/threat/enrichments/0/matched/field"));
+    EXPECT_TRUE(event->exists("/guardsarm/threat/enrichments"));
+    EXPECT_TRUE(event->exists("/guardsarm/threat/enrichments/0/indicator"));
+    EXPECT_TRUE(event->exists("/guardsarm/threat/enrichments/0/matched/field"));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -309,7 +309,7 @@ TEST(IocEnrichmentTest, TestModeIocMatchFound)
     auto event = makeEvent(R"({"file": {"hash": {"md5": "DEADBEEF"}}})");
     evalExpression(expr, event);
 
-    EXPECT_TRUE(event->exists("/wazuh/threat/enrichments"));
+    EXPECT_TRUE(event->exists("/guardsarm/threat/enrichments"));
 }
 
 TEST(IocEnrichmentTest, TestModeIocNotFound)
@@ -325,7 +325,7 @@ TEST(IocEnrichmentTest, TestModeIocNotFound)
     auto event = makeEvent(R"({"file": {"hash": {"md5": "deadbeef"}}})");
     evalExpression(expr, event);
 
-    EXPECT_FALSE(event->exists("/wazuh/threat/enrichments"));
+    EXPECT_FALSE(event->exists("/guardsarm/threat/enrichments"));
 }
 
 TEST(IocEnrichmentTest, TestModeMissingSourceField)
@@ -339,7 +339,7 @@ TEST(IocEnrichmentTest, TestModeMissingSourceField)
     auto event = makeEvent(R"({"file": {"name": "test.txt"}})");
     evalExpression(expr, event);
 
-    EXPECT_FALSE(event->exists("/wazuh/threat/enrichments"));
+    EXPECT_FALSE(event->exists("/guardsarm/threat/enrichments"));
 }
 
 TEST(IocEnrichmentTest, TestModeConnectionMatchFound)
@@ -356,5 +356,5 @@ TEST(IocEnrichmentTest, TestModeConnectionMatchFound)
     auto event = makeEvent(R"({"source": {"ip": "10.0.0.1", "port": 443}})");
     evalExpression(expr, event);
 
-    EXPECT_TRUE(event->exists("/wazuh/threat/enrichments"));
+    EXPECT_TRUE(event->exists("/guardsarm/threat/enrichments"));
 }

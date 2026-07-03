@@ -18,7 +18,7 @@
 #include "auth.h"
 #include "sec.h"
 
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
 
 void keys_init(keystore *keys, key_mode_t key_mode, int save_removed) {
     /* Initialize hashes */

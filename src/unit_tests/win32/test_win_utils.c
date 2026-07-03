@@ -15,7 +15,7 @@
 #include "../wrappers/externals/cJSON/cJSON_wrappers.h"
 #include "../wrappers/common.h"
 #include "../../data_provider/include/sysInfo.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
 
 #ifdef TEST_WINAGENT
 

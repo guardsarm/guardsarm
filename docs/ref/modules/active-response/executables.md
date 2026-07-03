@@ -1,10 +1,10 @@
 # Active Response Executables Reference
 
-This document provides a complete inventory of all Active Response executables available in Wazuh 5.0, including their purpose, supported platforms, input requirements, and implementation details.
+This document provides a complete inventory of all Active Response executables available in GuardSarm 5.0, including their purpose, supported platforms, input requirements, and implementation details.
 
 ## Overview
 
-Wazuh provides **5 Active Response executables** covering IP blocking and account management across multiple platforms. Each executable is compiled from platform-specific C source code optimized for the target operating system.
+GuardSarm provides **5 Active Response executables** covering IP blocking and account management across multiple platforms. Each executable is compiled from platform-specific C source code optimized for the target operating system.
 
 ## Executable Inventory
 
@@ -36,16 +36,16 @@ Wazuh provides **5 Active Response executables** covering IP blocking and accoun
 |----------|--------|------|-----------------|
 | 1 | firewalld | `firewall-cmd` | `firewall-cmd --add-rich-rule='rule family="ipv4" source address="192.168.1.100" reject'` |
 | 2 | iptables | `iptables` / `ip6tables` | `iptables -I INPUT -s 192.168.1.100 -j DROP` |
-| 3 | pf | `pfctl` | `pfctl -t wazuh_fwtable -T add 192.168.1.100` |
+| 3 | pf | `pfctl` | `pfctl -t guardsarm_fwtable -T add 192.168.1.100` |
 | 4 | ipfw | `ipfw` | `ipfw table 00001 add 192.168.1.100` |
-| 5 | npf | `npfctl` | `npfctl table wazuh_blacklist add 192.168.1.100` |
+| 5 | npf | `npfctl` | `npfctl table guardsarm_blacklist add 192.168.1.100` |
 | 6 | route | `route` | `route add 192.168.1.100 reject` |
 | 7 | hosts.deny | edit file | `ALL: 192.168.1.100` (appended to `/etc/hosts.deny`) |
 
 **Input Fields**:
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "active_response": {
       "name": "block-ip",
       "executable": "block-ip",
@@ -85,13 +85,13 @@ Wazuh provides **5 Active Response executables** covering IP blocking and accoun
 
 | Priority | Method | Tool | Command Example |
 |----------|--------|------|-----------------|
-| 1 | pf | `pfctl` | `pfctl -t wazuh_fwtable -T add 192.168.1.100` |
+| 1 | pf | `pfctl` | `pfctl -t guardsarm_fwtable -T add 192.168.1.100` |
 | 2 | hosts.deny | edit file | `ALL: 192.168.1.100` (appended to `/etc/hosts.deny`) |
 
 **Input Fields**:
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "active_response": {
       "name": "block-ip",
       "executable": "block-ip",
@@ -106,23 +106,23 @@ Wazuh provides **5 Active Response executables** covering IP blocking and accoun
 ```
 
 **macOS-Specific Details**:
-- **PF Table**: Uses table name `wazuh_fwtable`
+- **PF Table**: Uses table name `guardsarm_fwtable`
 - **Connection Killing**: When blocking, also kills existing connections: `pfctl -k 192.168.1.100`
-- **Anchor Configuration**: Requires PF anchor `wazuh_anchor` to be configured in `/etc/pf.conf`
+- **Anchor Configuration**: Requires PF anchor `guardsarm_anchor` to be configured in `/etc/pf.conf`
 - **Permissions**: Requires root privileges
 
 **Example pf.conf setup**:
 ```
 # /etc/pf.conf
-anchor "wazuh_anchor"
-load anchor "wazuh_anchor" from "/etc/pf.anchors/wazuh_anchor"
+anchor "guardsarm_anchor"
+load anchor "guardsarm_anchor" from "/etc/pf.anchors/guardsarm_anchor"
 ```
 
 **Example anchor file**:
 ```
-# /etc/pf.anchors/wazuh_anchor
-table <wazuh_fwtable> persist
-block in quick from <wazuh_fwtable>
+# /etc/pf.anchors/guardsarm_anchor
+table <guardsarm_fwtable> persist
+block in quick from <guardsarm_fwtable>
 ```
 
 **Return Codes**:
@@ -149,13 +149,13 @@ block in quick from <wazuh_fwtable>
 
 | Priority | Method | Tool | Command Example |
 |----------|--------|------|-----------------|
-| 1 | netsh | `netsh.exe` | `netsh advfirewall firewall add rule name="Wazuh AR: 192.168.1.100" dir=in action=block remoteip=192.168.1.100` |
+| 1 | netsh | `netsh.exe` | `netsh advfirewall firewall add rule name="GuardSarm AR: 192.168.1.100" dir=in action=block remoteip=192.168.1.100` |
 | 2 | route | `route.exe` | `route add 192.168.1.100 mask 255.255.255.255 <gateway> metric 1` |
 
 **Input Fields**:
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "active_response": {
       "name": "block-ip",
       "executable": "block-ip",
@@ -170,7 +170,7 @@ block in quick from <wazuh_fwtable>
 ```
 
 **Windows-Specific Details**:
-- **Firewall Rules**: Creates named rules: `"Wazuh AR: <IP>"`
+- **Firewall Rules**: Creates named rules: `"GuardSarm AR: <IP>"`
 - **Rule Direction**: Inbound blocking only (`dir=in`)
 - **Route Fallback**: Adds blackhole route if netsh fails
 - **Gateway Detection**: Uses `ipconfig` to find default gateway for route method
@@ -178,7 +178,7 @@ block in quick from <wazuh_fwtable>
 - **Permissions**: Requires Administrator privileges
 
 **Removal**:
-- Enable: `netsh advfirewall firewall delete rule name="Wazuh AR: 192.168.1.100"`
+- Enable: `netsh advfirewall firewall delete rule name="GuardSarm AR: 192.168.1.100"`
 - Route: `route delete 192.168.1.100`
 
 **Return Codes**:
@@ -220,7 +220,7 @@ block in quick from <wazuh_fwtable>
 **Input Fields**:
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "active_response": {
       "name": "disable-account",
       "executable": "disable-account",
@@ -276,7 +276,7 @@ All executables read JSON from **stdin** with this structure:
 
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "active_response": {
       "name": "string",
       "executable": "string",
@@ -358,7 +358,7 @@ Users can create custom Active Response scripts following these guidelines:
 
 1. **Executable**: Script must have execute permissions (chmod 750)
 2. **Location**: Place in `/var/ossec/active-response/bin/` (without file extension)
-3. **Ownership**: Set owner to `root:wazuh`
+3. **Ownership**: Set owner to `root:guardsarm`
 4. **Shebang**: Include proper shebang line (e.g., `#!/bin/bash` or `#!/usr/bin/python3`)
 5. **JSON Input**: Read JSON from stdin using `read -r` (bash) or `sys.stdin` (Python)
 6. **Commands**: Support both `enable` and `disable` commands
@@ -421,7 +421,7 @@ log_message "Received input (${#INPUT} bytes)"
 
 # Parse JSON fields
 COMMAND=$(echo "$INPUT" | jq -r '.command // empty')
-AR_TYPE=$(echo "$INPUT" | jq -r '.wazuh.active_response.type // empty')
+AR_TYPE=$(echo "$INPUT" | jq -r '.guardsarm.active_response.type // empty')
 FILE_PATH=$(echo "$INPUT" | jq -r '.file.path // empty')
 
 log_message "Command: $COMMAND, Type: $AR_TYPE, File: $FILE_PATH"
@@ -677,12 +677,12 @@ if __name__ == "__main__":
 # Bash script (Example 1)
 sudo cp custom-fim-response.sh /var/ossec/active-response/bin/custom-fim-response
 sudo chmod 750 /var/ossec/active-response/bin/custom-fim-response
-sudo chown root:wazuh /var/ossec/active-response/bin/custom-fim-response
+sudo chown root:guardsarm /var/ossec/active-response/bin/custom-fim-response
 
 # Python script (Example 2)
 sudo cp custom-ar.py /var/ossec/active-response/bin/custom-ar
 sudo chmod 750 /var/ossec/active-response/bin/custom-ar
-sudo chown root:wazuh /var/ossec/active-response/bin/custom-ar
+sudo chown root:guardsarm /var/ossec/active-response/bin/custom-ar
 ```
 
 ### Best Practices
@@ -693,12 +693,12 @@ sudo chown root:wazuh /var/ossec/active-response/bin/custom-ar
 - **Path Processing**: Use `PurePosixPath(PureWindowsPath())` for cross-platform path handling
 - **Validate Input**: Check JSON structure and required fields before processing
 - **Implement Deduplication**: For stateful scripts, always use the keys protocol
-- **WCS Fields**: Access fields using Wazuh Common Schema (`rule.id`, `source.ip`, `user.name`, `file.path`)
+- **WCS Fields**: Access fields using GuardSarm Common Schema (`rule.id`, `source.ip`, `user.name`, `file.path`)
 - **Log Everything**: Detailed logging to `active-responses.log` aids troubleshooting
 - **Test Thoroughly**: Test both enable and disable commands with real alerts
 - **Handle Errors**: Gracefully handle missing fields, invalid JSON, and failed operations
 - **Use Absolute Paths**: Don't rely on PATH environment variable for external commands
-- **Check Privileges**: Verify script has necessary permissions (root/wazuh ownership)
+- **Check Privileges**: Verify script has necessary permissions (root/guardsarm ownership)
 - **Python3**: Ensure Python 3 is installed on all agents before deployment
 - **Dependencies**: Document any required libraries or external tools (e.g., `jq` for bash)
 
@@ -712,11 +712,11 @@ Test AR scripts directly:
 
 ```bash
 # Test enable command
-echo '{"wazuh":{"active_response":{"name":"block-ip","executable":"block-ip","type":"stateless"}},"source":{"ip":"192.168.1.100"},"command":"enable"}' | \
+echo '{"guardsarm":{"active_response":{"name":"block-ip","executable":"block-ip","type":"stateless"}},"source":{"ip":"192.168.1.100"},"command":"enable"}' | \
   /var/ossec/active-response/bin/block-ip
 
 # Test disable command
-echo '{"wazuh":{"active_response":{"name":"block-ip","executable":"block-ip","type":"stateless"}},"source":{"ip":"192.168.1.100"},"command":"disable"}' | \
+echo '{"guardsarm":{"active_response":{"name":"block-ip","executable":"block-ip","type":"stateless"}},"source":{"ip":"192.168.1.100"},"command":"disable"}' | \
   /var/ossec/active-response/bin/block-ip
 ```
 
@@ -734,12 +734,12 @@ firewall-cmd --list-rich-rules | grep 192.168.1.100
 
 **macOS (pf)**:
 ```bash
-pfctl -t wazuh_fwtable -T show
+pfctl -t guardsarm_fwtable -T show
 ```
 
 **Windows (netsh)**:
 ```powershell
-netsh advfirewall firewall show rule name="Wazuh AR: 192.168.1.100"
+netsh advfirewall firewall show rule name="GuardSarm AR: 192.168.1.100"
 ```
 
 ### Check Logs

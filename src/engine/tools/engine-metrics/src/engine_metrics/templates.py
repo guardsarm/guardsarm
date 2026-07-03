@@ -4,7 +4,7 @@ DASHBOARD_HTML = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Wazuh Engine Metrics Dashboard</title>
+    <title>GuardSarm Engine Metrics Dashboard</title>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
     <style>
@@ -55,7 +55,7 @@ DASHBOARD_HTML = """
 </head>
 <body>
     <div class="container">
-        <h1>Wazuh Engine Metrics Dashboard</h1>
+        <h1>GuardSarm Engine Metrics Dashboard</h1>
         <div id="status" class="status disconnected">Connecting...</div>
 
         <div style="

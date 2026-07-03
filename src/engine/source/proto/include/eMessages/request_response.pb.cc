@@ -21,7 +21,7 @@ namespace _pb = ::PROTOBUF_NAMESPACE_ID;
 namespace _pbi = _pb::internal;
 
 namespace com {
-namespace wazuh {
+namespace guardsarm {
 namespace api {
 namespace engine {
 namespace test {
@@ -63,63 +63,63 @@ PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORIT
 }  // namespace test
 }  // namespace engine
 }  // namespace api
-}  // namespace wazuh
+}  // namespace guardsarm
 }  // namespace com
 static ::_pb::Metadata file_level_metadata_request_5fresponse_2eproto[2];
 static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_request_5fresponse_2eproto = nullptr;
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_request_5fresponse_2eproto = nullptr;
 
 const uint32_t TableStruct_request_5fresponse_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::test::Request, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::test::Request, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::test::Request, _impl_._has_bits_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::test::Request, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::test::Request, _impl_.defaultstr_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::test::Request, _impl_.defaultint_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::test::Request, _impl_.defaultbool_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::test::Request, _impl_.valuestring_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::test::Request, _impl_.anyjson_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::test::Request, _impl_.defaultstr_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::test::Request, _impl_.defaultint_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::test::Request, _impl_.defaultbool_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::test::Request, _impl_.valuestring_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::test::Request, _impl_.anyjson_),
   ~0u,
   ~0u,
   ~0u,
   0,
   1,
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::test::Response, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::test::Response, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::test::Response, _impl_._has_bits_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::test::Response, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::test::Response, _impl_.status_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::test::Response, _impl_.error_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::test::Response, _impl_.valueobj_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::test::Response, _impl_.valuestring_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::test::Response, _impl_.status_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::test::Response, _impl_.error_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::test::Response, _impl_.valueobj_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::test::Response, _impl_.valuestring_),
   ~0u,
   0,
   2,
   1,
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 11, -1, sizeof(::com::wazuh::api::engine::test::Request)},
-  { 16, 26, -1, sizeof(::com::wazuh::api::engine::test::Response)},
+  { 0, 11, -1, sizeof(::com::guardsarm::api::engine::test::Request)},
+  { 16, 26, -1, sizeof(::com::guardsarm::api::engine::test::Response)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
-  &::com::wazuh::api::engine::test::_Request_default_instance_._instance,
-  &::com::wazuh::api::engine::test::_Response_default_instance_._instance,
+  &::com::guardsarm::api::engine::test::_Request_default_instance_._instance,
+  &::com::guardsarm::api::engine::test::_Response_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_request_5fresponse_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\026request_response.proto\022\031com.wazuh.api."
+  "\n\026request_response.proto\022\031com.guardsarm.api."
   "engine.test\032\014engine.proto\032\034google/protob"
   "uf/struct.proto\"\252\001\n\007Request\022\022\n\ndefaultSt"
   "r\030\001 \001(\t\022\022\n\ndefaultInt\030\002 \001(\005\022\023\n\013defaultBo"
   "ol\030\003 \001(\010\022\030\n\013valueString\030\004 \001(\tH\000\210\001\001\022,\n\007an"
   "yJSON\030\005 \001(\0132\026.google.protobuf.ValueH\001\210\001\001"
   "B\016\n\014_valueStringB\n\n\010_anyJSON\"\302\001\n\010Respons"
-  "e\0222\n\006status\030\001 \001(\0162\".com.wazuh.api.engine"
+  "e\0222\n\006status\030\001 \001(\0162\".com.guardsarm.api.engine"
   ".ReturnStatus\022\022\n\005error\030\002 \001(\tH\000\210\001\001\022-\n\010val"
   "ueObj\030\003 \001(\0132\026.google.protobuf.ValueH\001\210\001\001"
   "\022\030\n\013valueString\030\004 \001(\tH\002\210\001\001B\010\n\006_errorB\013\n\t"
@@ -145,7 +145,7 @@ PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_request_
 // Force running AddDescriptors() at dynamic initialization time.
 PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_request_5fresponse_2eproto(&descriptor_table_request_5fresponse_2eproto);
 namespace com {
-namespace wazuh {
+namespace guardsarm {
 namespace api {
 namespace engine {
 namespace test {
@@ -176,7 +176,7 @@ Request::Request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
   SharedCtor(arena, is_message_owned);
-  // @@protoc_insertion_point(arena_constructor:com.wazuh.api.engine.test.Request)
+  // @@protoc_insertion_point(arena_constructor:com.guardsarm.api.engine.test.Request)
 }
 Request::Request(const Request& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
@@ -213,7 +213,7 @@ Request::Request(const Request& from)
   ::memcpy(&_impl_.defaultint_, &from._impl_.defaultint_,
     static_cast<size_t>(reinterpret_cast<char*>(&_impl_.defaultbool_) -
     reinterpret_cast<char*>(&_impl_.defaultint_)) + sizeof(_impl_.defaultbool_));
-  // @@protoc_insertion_point(copy_constructor:com.wazuh.api.engine.test.Request)
+  // @@protoc_insertion_point(copy_constructor:com.guardsarm.api.engine.test.Request)
 }
 
 inline void Request::SharedCtor(
@@ -240,7 +240,7 @@ inline void Request::SharedCtor(
 }
 
 Request::~Request() {
-  // @@protoc_insertion_point(destructor:com.wazuh.api.engine.test.Request)
+  // @@protoc_insertion_point(destructor:com.guardsarm.api.engine.test.Request)
   if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
   (void)arena;
     return;
@@ -260,7 +260,7 @@ void Request::SetCachedSize(int size) const {
 }
 
 void Request::Clear() {
-// @@protoc_insertion_point(message_clear_start:com.wazuh.api.engine.test.Request)
+// @@protoc_insertion_point(message_clear_start:com.guardsarm.api.engine.test.Request)
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -296,7 +296,7 @@ const char* Request::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) 
           auto str = _internal_mutable_defaultstr();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "com.wazuh.api.engine.test.Request.defaultStr"));
+          CHK_(::_pbi::VerifyUTF8(str, "com.guardsarm.api.engine.test.Request.defaultStr"));
         } else
           goto handle_unusual;
         continue;
@@ -322,7 +322,7 @@ const char* Request::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) 
           auto str = _internal_mutable_valuestring();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "com.wazuh.api.engine.test.Request.valueString"));
+          CHK_(::_pbi::VerifyUTF8(str, "com.guardsarm.api.engine.test.Request.valueString"));
         } else
           goto handle_unusual;
         continue;
@@ -360,7 +360,7 @@ failure:
 
 uint8_t* Request::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:com.wazuh.api.engine.test.Request)
+  // @@protoc_insertion_point(serialize_to_array_start:com.guardsarm.api.engine.test.Request)
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -369,7 +369,7 @@ uint8_t* Request::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_defaultstr().data(), static_cast<int>(this->_internal_defaultstr().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "com.wazuh.api.engine.test.Request.defaultStr");
+      "com.guardsarm.api.engine.test.Request.defaultStr");
     target = stream->WriteStringMaybeAliased(
         1, this->_internal_defaultstr(), target);
   }
@@ -391,7 +391,7 @@ uint8_t* Request::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_valuestring().data(), static_cast<int>(this->_internal_valuestring().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "com.wazuh.api.engine.test.Request.valueString");
+      "com.guardsarm.api.engine.test.Request.valueString");
     target = stream->WriteStringMaybeAliased(
         4, this->_internal_valuestring(), target);
   }
@@ -407,12 +407,12 @@ uint8_t* Request::_InternalSerialize(
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:com.wazuh.api.engine.test.Request)
+  // @@protoc_insertion_point(serialize_to_array_end:com.guardsarm.api.engine.test.Request)
   return target;
 }
 
 size_t Request::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:com.wazuh.api.engine.test.Request)
+// @@protoc_insertion_point(message_byte_size_start:com.guardsarm.api.engine.test.Request)
   size_t total_size = 0;
 
   uint32_t cached_has_bits = 0;
@@ -466,7 +466,7 @@ const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Request::GetClassData() const 
 void Request::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
   auto* const _this = static_cast<Request*>(&to_msg);
   auto& from = static_cast<const Request&>(from_msg);
-  // @@protoc_insertion_point(class_specific_merge_from_start:com.wazuh.api.engine.test.Request)
+  // @@protoc_insertion_point(class_specific_merge_from_start:com.guardsarm.api.engine.test.Request)
   GOOGLE_DCHECK_NE(&from, _this);
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
@@ -494,7 +494,7 @@ void Request::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOB
 }
 
 void Request::CopyFrom(const Request& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:com.wazuh.api.engine.test.Request)
+// @@protoc_insertion_point(class_specific_copy_from_start:com.guardsarm.api.engine.test.Request)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -561,7 +561,7 @@ Response::Response(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
   SharedCtor(arena, is_message_owned);
-  // @@protoc_insertion_point(arena_constructor:com.wazuh.api.engine.test.Response)
+  // @@protoc_insertion_point(arena_constructor:com.guardsarm.api.engine.test.Response)
 }
 Response::Response(const Response& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
@@ -595,7 +595,7 @@ Response::Response(const Response& from)
     _this->_impl_.valueobj_ = new ::PROTOBUF_NAMESPACE_ID::Value(*from._impl_.valueobj_);
   }
   _this->_impl_.status_ = from._impl_.status_;
-  // @@protoc_insertion_point(copy_constructor:com.wazuh.api.engine.test.Response)
+  // @@protoc_insertion_point(copy_constructor:com.guardsarm.api.engine.test.Response)
 }
 
 inline void Response::SharedCtor(
@@ -621,7 +621,7 @@ inline void Response::SharedCtor(
 }
 
 Response::~Response() {
-  // @@protoc_insertion_point(destructor:com.wazuh.api.engine.test.Response)
+  // @@protoc_insertion_point(destructor:com.guardsarm.api.engine.test.Response)
   if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
   (void)arena;
     return;
@@ -641,7 +641,7 @@ void Response::SetCachedSize(int size) const {
 }
 
 void Response::Clear() {
-// @@protoc_insertion_point(message_clear_start:com.wazuh.api.engine.test.Response)
+// @@protoc_insertion_point(message_clear_start:com.guardsarm.api.engine.test.Response)
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -671,12 +671,12 @@ const char* Response::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx)
     uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // .com.wazuh.api.engine.ReturnStatus status = 1;
+      // .com.guardsarm.api.engine.ReturnStatus status = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
-          _internal_set_status(static_cast<::com::wazuh::api::engine::ReturnStatus>(val));
+          _internal_set_status(static_cast<::com::guardsarm::api::engine::ReturnStatus>(val));
         } else
           goto handle_unusual;
         continue;
@@ -686,7 +686,7 @@ const char* Response::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx)
           auto str = _internal_mutable_error();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "com.wazuh.api.engine.test.Response.error"));
+          CHK_(::_pbi::VerifyUTF8(str, "com.guardsarm.api.engine.test.Response.error"));
         } else
           goto handle_unusual;
         continue;
@@ -704,7 +704,7 @@ const char* Response::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx)
           auto str = _internal_mutable_valuestring();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "com.wazuh.api.engine.test.Response.valueString"));
+          CHK_(::_pbi::VerifyUTF8(str, "com.guardsarm.api.engine.test.Response.valueString"));
         } else
           goto handle_unusual;
         continue;
@@ -734,11 +734,11 @@ failure:
 
 uint8_t* Response::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:com.wazuh.api.engine.test.Response)
+  // @@protoc_insertion_point(serialize_to_array_start:com.guardsarm.api.engine.test.Response)
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .com.wazuh.api.engine.ReturnStatus status = 1;
+  // .com.guardsarm.api.engine.ReturnStatus status = 1;
   if (this->_internal_status() != 0) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteEnumToArray(
@@ -750,7 +750,7 @@ uint8_t* Response::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_error().data(), static_cast<int>(this->_internal_error().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "com.wazuh.api.engine.test.Response.error");
+      "com.guardsarm.api.engine.test.Response.error");
     target = stream->WriteStringMaybeAliased(
         2, this->_internal_error(), target);
   }
@@ -767,7 +767,7 @@ uint8_t* Response::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_valuestring().data(), static_cast<int>(this->_internal_valuestring().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "com.wazuh.api.engine.test.Response.valueString");
+      "com.guardsarm.api.engine.test.Response.valueString");
     target = stream->WriteStringMaybeAliased(
         4, this->_internal_valuestring(), target);
   }
@@ -776,12 +776,12 @@ uint8_t* Response::_InternalSerialize(
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:com.wazuh.api.engine.test.Response)
+  // @@protoc_insertion_point(serialize_to_array_end:com.guardsarm.api.engine.test.Response)
   return target;
 }
 
 size_t Response::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:com.wazuh.api.engine.test.Response)
+// @@protoc_insertion_point(message_byte_size_start:com.guardsarm.api.engine.test.Response)
   size_t total_size = 0;
 
   uint32_t cached_has_bits = 0;
@@ -812,7 +812,7 @@ size_t Response::ByteSizeLong() const {
     }
 
   }
-  // .com.wazuh.api.engine.ReturnStatus status = 1;
+  // .com.guardsarm.api.engine.ReturnStatus status = 1;
   if (this->_internal_status() != 0) {
     total_size += 1 +
       ::_pbi::WireFormatLite::EnumSize(this->_internal_status());
@@ -831,7 +831,7 @@ const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Response::GetClassData() const
 void Response::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
   auto* const _this = static_cast<Response*>(&to_msg);
   auto& from = static_cast<const Response&>(from_msg);
-  // @@protoc_insertion_point(class_specific_merge_from_start:com.wazuh.api.engine.test.Response)
+  // @@protoc_insertion_point(class_specific_merge_from_start:com.guardsarm.api.engine.test.Response)
   GOOGLE_DCHECK_NE(&from, _this);
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
@@ -856,7 +856,7 @@ void Response::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTO
 }
 
 void Response::CopyFrom(const Response& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:com.wazuh.api.engine.test.Response)
+// @@protoc_insertion_point(class_specific_copy_from_start:com.guardsarm.api.engine.test.Response)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -898,16 +898,16 @@ void Response::InternalSwap(Response* other) {
 }  // namespace test
 }  // namespace engine
 }  // namespace api
-}  // namespace wazuh
+}  // namespace guardsarm
 }  // namespace com
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::com::wazuh::api::engine::test::Request*
-Arena::CreateMaybeMessage< ::com::wazuh::api::engine::test::Request >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::com::wazuh::api::engine::test::Request >(arena);
+template<> PROTOBUF_NOINLINE ::com::guardsarm::api::engine::test::Request*
+Arena::CreateMaybeMessage< ::com::guardsarm::api::engine::test::Request >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::com::guardsarm::api::engine::test::Request >(arena);
 }
-template<> PROTOBUF_NOINLINE ::com::wazuh::api::engine::test::Response*
-Arena::CreateMaybeMessage< ::com::wazuh::api::engine::test::Response >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::com::wazuh::api::engine::test::Response >(arena);
+template<> PROTOBUF_NOINLINE ::com::guardsarm::api::engine::test::Response*
+Arena::CreateMaybeMessage< ::com::guardsarm::api::engine::test::Response >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::com::guardsarm::api::engine::test::Response >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

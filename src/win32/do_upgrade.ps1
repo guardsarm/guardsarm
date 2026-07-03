@@ -52,28 +52,28 @@ function get-version {
 
 function remove_upgrade_files {
     Remove-Item -Path ".\upgrade\*"  -Exclude "*.log", "upgrade_result" -ErrorAction SilentlyContinue
-    Remove-Item -Path ".\wazuh-agent*.msi" -ErrorAction SilentlyContinue
+    Remove-Item -Path ".\guardsarm-agent*.msi" -ErrorAction SilentlyContinue
     Remove-Item -Path ".\do_upgrade.ps1" -ErrorAction SilentlyContinue
 }
 
 
-function get_wazuh_installation_directory {
+function get_guardsarm_installation_directory {
     Start-NativePowerShell {
         # Registry paths to check (in order of preference)
         $registryPaths = @(
             @{Path = "HKLM:\SOFTWARE\WOW6432Node\Wazuh, Inc.\Wazuh Agent"; Key = "WazuhInstallDir"},
-            @{Path = "HKLM:\SOFTWARE\WOW6432Node\Wazuh\Wazuh Agent"; Key = "WazuhInstallDir"},
+            @{Path = "HKLM:\SOFTWARE\WOW6432Node\GuardSarm\GuardSarm Agent"; Key = "GuardSarmInstallDir"},
             @{Path = "HKLM:\SOFTWARE\WOW6432Node\ossec"; Key = "Install_Dir"}
         )
 
-        $WazuhInstallDir = $null
+        $GuardSarmInstallDir = $null
 
         # Try each registry path
         foreach ($reg in $registryPaths) {
             try {
-                $WazuhInstallDir = (Get-ItemProperty -Path $reg.Path -ErrorAction SilentlyContinue).($reg.Key)
-                if ($null -ne $WazuhInstallDir) {
-                    Write-output "$(Get-Date -format u) - Found Wazuh installation at: $($reg.Path)\$($reg.Key) = $WazuhInstallDir" >> .\upgrade\upgrade.log
+                $GuardSarmInstallDir = (Get-ItemProperty -Path $reg.Path -ErrorAction SilentlyContinue).($reg.Key)
+                if ($null -ne $GuardSarmInstallDir) {
+                    Write-output "$(Get-Date -format u) - Found GuardSarm installation at: $($reg.Path)\$($reg.Key) = $GuardSarmInstallDir" >> .\upgrade\upgrade.log
                     break
                 }
             }
@@ -83,45 +83,45 @@ function get_wazuh_installation_directory {
         }
 
         # Fallback to current directory if not found in registry
-        if ($null -eq $WazuhInstallDir) {
-            Write-output "$(Get-Date -format u) - Couldn't find Wazuh in registry. Using current directory" >> .\upgrade\upgrade.log
-            $WazuhInstallDir = (Get-Location).Path.TrimEnd('\')
+        if ($null -eq $GuardSarmInstallDir) {
+            Write-output "$(Get-Date -format u) - Couldn't find GuardSarm in registry. Using current directory" >> .\upgrade\upgrade.log
+            $GuardSarmInstallDir = (Get-Location).Path.TrimEnd('\')
         }
 
-        return $WazuhInstallDir
+        return $GuardSarmInstallDir
     }
 }
 
 # Check process status
 function check-process {
-    $process_id = (Get-Process wazuh-agent).id
+    $process_id = (Get-Process guardsarm-agent).id
     $counter = 10
     while($process_id -eq $null -And $counter -gt 0) {
         $counter--
-        Start-Service -Name "Wazuh"
+        Start-Service -Name "GuardSarm"
         Start-Sleep 2
-        $process_id = (Get-Process wazuh-agent).id
+        $process_id = (Get-Process guardsarm-agent).id
     }
     write-output "$(Get-Date -format u) - Process ID: $($process_id)." >> .\upgrade\upgrade.log
 }
 
-# Check new version and restart the Wazuh service
+# Check new version and restart the GuardSarm service
 function check-installation {
     $actual_version = get-version
     $counter = 5
     while($actual_version -eq $current_version -And $counter -gt 0) {
-        write-output "$(Get-Date -format u) - Waiting for the Wazuh-Agent installation to end." >> .\upgrade\upgrade.log
+        write-output "$(Get-Date -format u) - Waiting for the GuardSarm-Agent installation to end." >> .\upgrade\upgrade.log
         $counter--
         Start-Sleep 2
         $actual_version = get-version
     }
-    write-output "$(Get-Date -format u) - Starting Wazuh-Agent service." >> .\upgrade\upgrade.log
-    Start-Service -Name "Wazuh"
+    write-output "$(Get-Date -format u) - Starting GuardSarm-Agent service." >> .\upgrade\upgrade.log
+    Start-Service -Name "GuardSarm"
 }
 
 # Function to extract the version from the MSI using msiexec
 function get_msi_version {
-    $msiPath = (Get-Item ".\wazuh-agent*.msi").FullName
+    $msiPath = (Get-Item ".\guardsarm-agent*.msi").FullName
     write-output "$(Get-Date -format u) - Extracting the version from MSI file." >> .\upgrade\upgrade.log
     try {
         # Extracting the version using msiexec and waiting for it to complete
@@ -185,21 +185,21 @@ function install {
         Write-Output "$(Get-Date -format u) - Tried to stop process win32ui: $($_.Exception.Message)" >> .\upgrade\upgrade.log
     }
 
-    # Try to stop Wazuh service
+    # Try to stop GuardSarm service
     try {
-        Write-Output "$(Get-Date -format u) - Stopping Wazuh service." >> .\upgrade\upgrade.log
-        Stop-Service -Name "Wazuh" -Force -ErrorAction Stop
+        Write-Output "$(Get-Date -format u) - Stopping GuardSarm service." >> .\upgrade\upgrade.log
+        Stop-Service -Name "GuardSarm" -Force -ErrorAction Stop
     } catch {
-        Write-Output "$(Get-Date -format u) - Tried to stop Wazuh service: $($_.Exception.Message)" >> .\upgrade\upgrade.log
+        Write-Output "$(Get-Date -format u) - Tried to stop GuardSarm service: $($_.Exception.Message)" >> .\upgrade\upgrade.log
     }
 
-    # Wait for Wazuh service to fully stop
+    # Wait for GuardSarm service to fully stop
     Start-Sleep -Seconds 5
     Remove-Item .\upgrade\upgrade_result -ErrorAction SilentlyContinue
     Write-Output "$(Get-Date -format u) - Starting upgrade process." >> .\upgrade\upgrade.log
 
     try {
-        $msiPath = (Get-Item ".\wazuh-agent*.msi").Name
+        $msiPath = (Get-Item ".\guardsarm-agent*.msi").Name
 
         if ($msi_new_version -ne $null -and $msi_new_version -eq $current_version) {
             Write-Output "$(Get-Date -format u) - Reinstalling the same version." >> .\upgrade\upgrade.log
@@ -229,13 +229,13 @@ function install {
     return $true
 }
 
-# Check that the Wazuh installation runs on the expected path
-$wazuhDir = get_wazuh_installation_directory
-$normalizedWazuhDir = $wazuhDir.TrimEnd('\')
+# Check that the GuardSarm installation runs on the expected path
+$guardsarmDir = get_guardsarm_installation_directory
+$normalizedGuardSarmDir = $guardsarmDir.TrimEnd('\')
 $currentDir = (Get-Location).Path.TrimEnd('\')
 
-if ($normalizedWazuhDir -ne $currentDir) {
-    Write-Output "$(Get-Date -format u) - Current working directory is not the Wazuh installation directory. Aborting." >> .\upgrade\upgrade.log
+if ($normalizedGuardSarmDir -ne $currentDir) {
+    Write-Output "$(Get-Date -format u) - Current working directory is not the GuardSarm installation directory. Aborting." >> .\upgrade\upgrade.log
     Write-output "2" | out-file ".\upgrade\upgrade_result" -encoding ascii
     remove_upgrade_files
     exit 1
@@ -263,14 +263,14 @@ if ($msi_new_version -ne $null) {
             write-output "$(Get-Date -format u) - Upgrade failed: direct upgrade to v5.0.0 is not supported from version $($current_version). Please upgrade to v4.14.x first." >> .\upgrade\upgrade.log
             write-output "1" | out-file ".\upgrade\upgrade_result" -encoding ascii
             remove_upgrade_files
-            Restart-Service -Name "Wazuh" -Force -ErrorAction SilentlyContinue
+            Restart-Service -Name "GuardSarm" -Force -ErrorAction SilentlyContinue
             exit 1
         }
     } catch {
         write-output "$(Get-Date -format u) - Could not compare versions for compatibility check: $($_.Exception.Message)" >> .\upgrade\upgrade.log
         write-output "2" | out-file ".\upgrade\upgrade_result" -encoding ascii
         remove_upgrade_files
-        Restart-Service -Name "Wazuh" -Force -ErrorAction SilentlyContinue
+        Restart-Service -Name "GuardSarm" -Force -ErrorAction SilentlyContinue
         exit 1
     }
 }
@@ -285,7 +285,7 @@ try {
 }
 
 # Install with explicit INSTALLDIR
-install -installDir $wazuhDir
+install -installDir $guardsarmDir
 check-installation
 
 write-output "$(Get-Date -format u) - Installation finished." >> .\upgrade\upgrade.log
@@ -297,7 +297,7 @@ Start-Sleep 10
 
 # Check status file
 function Get-AgentStatus {
-    Select-String -Path '.\wazuh-agent.state' -Pattern "^status='(.+)'" | %{$_.Matches[0].Groups[1].value}
+    Select-String -Path '.\guardsarm-agent.state' -Pattern "^status='(.+)'" | %{$_.Matches[0].Groups[1].value}
 }
 
 $status = Get-AgentStatus

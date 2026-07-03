@@ -10,18 +10,18 @@ on:
       - "src/Makefile"
       - ".github/actions/**"
       - ".github/workflows/5_testcomponent_rtr-router.yml"
-      - "src/wazuh_modules/sca/**"
+      - "src/guardsarm_modules/sca/**"
       - "src/config/src/wmodules-sca.c"
       - "src/syscheckd/**"
       - "src/config/src/syscheck-config.c"
       - "src/shared_modules/sync_protocol/**"
       - "src/shared_modules/file_helper/**"
-      - "src/wazuh_modules/syscollector/**"
+      - "src/guardsarm_modules/syscollector/**"
       - "src/shared_modules/dbsync/**"
       - "src/data_provider/**"
       - "src/config/src/wmodules-syscollector.c"
       - "src/shared_modules/agent_metadata/**"
-      - "src/wazuh_modules/agent_info/**"
+      - "src/guardsarm_modules/agent_info/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
@@ -45,7 +45,7 @@ jobs:
         with:
           filters: |
             sca:
-              - "src/wazuh_modules/sca/**"
+              - "src/guardsarm_modules/sca/**"
               - "src/config/src/wmodules-sca.c"
             syscheck:
               - "src/syscheckd/**"
@@ -55,14 +55,14 @@ jobs:
             file_helper:
               - "src/shared_modules/file_helper/**"
             syscollector:
-              - "src/wazuh_modules/syscollector/**"
+              - "src/guardsarm_modules/syscollector/**"
               - "src/shared_modules/dbsync/**"
               - "src/data_provider/**"
               - "src/config/src/wmodules-syscollector.c"
             agent_metadata:
               - "src/shared_modules/agent_metadata/**"
             agent_info:
-              - "src/wazuh_modules/agent_info/**"
+              - "src/guardsarm_modules/agent_info/**"
             global_deps:
               - "src/ci/**"
               - "src/build.py"
@@ -83,21 +83,21 @@ jobs:
           }
 
           if [[ "${{ steps.filter.outputs.global_deps }}" == "true" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            add_module '"wazuh_modules/sca"'
+            add_module '"guardsarm_modules/sca"'
             add_module '"syscheckd"'
             add_module '"shared_modules/sync_protocol"'
             add_module '"shared_modules/file_helper"'
-            add_module '"wazuh_modules/syscollector"'
+            add_module '"guardsarm_modules/syscollector"'
             add_module '"shared_modules/agent_metadata"'
-            add_module '"wazuh_modules/agent_info"'
+            add_module '"guardsarm_modules/agent_info"'
           else
-            [[ "${{ steps.filter.outputs.sca }}" == "true" ]] && add_module '"wazuh_modules/sca"'
+            [[ "${{ steps.filter.outputs.sca }}" == "true" ]] && add_module '"guardsarm_modules/sca"'
             [[ "${{ steps.filter.outputs.syscheck }}" == "true" ]] && add_module '"syscheckd"'
             [[ "${{ steps.filter.outputs.sync_protocol }}" == "true" ]] && add_module '"shared_modules/sync_protocol"'
             [[ "${{ steps.filter.outputs.file_helper }}" == "true" ]] && add_module '"shared_modules/file_helper"'
-            [[ "${{ steps.filter.outputs.syscollector }}" == "true" ]] && add_module '"wazuh_modules/syscollector"'
+            [[ "${{ steps.filter.outputs.syscollector }}" == "true" ]] && add_module '"guardsarm_modules/syscollector"'
             [[ "${{ steps.filter.outputs.agent_metadata }}" == "true" ]] && add_module '"shared_modules/agent_metadata"'
-            [[ "${{ steps.filter.outputs.agent_info }}" == "true" ]] && add_module '"wazuh_modules/agent_info"'
+            [[ "${{ steps.filter.outputs.agent_info }}" == "true" ]] && add_module '"guardsarm_modules/agent_info"'
           fi
 
           echo "modules=$(echo "$MODULES" | jq -c 'unique')" >> $GITHUB_OUTPUT

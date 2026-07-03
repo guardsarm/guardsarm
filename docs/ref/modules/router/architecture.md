@@ -33,7 +33,7 @@ graph TD
 
 ### Initialization
 
-The initialization sequence shows how the router is set up from the `wazuh-modulesd` daemon perspective. The `RouterFacade` creates a subscription socket server for cross-process provider registration.
+The initialization sequence shows how the router is set up from the `guardsarm-modulesd` daemon perspective. The `RouterFacade` creates a subscription socket server for cross-process provider registration.
 
 ```mermaid
 sequenceDiagram

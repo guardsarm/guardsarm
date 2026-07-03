@@ -44,9 +44,9 @@ def test_aws_guardduty_bucket_initialization_ko(mock_custom_bucket, mock_error):
 
 @pytest.mark.parametrize('object_list, result', [(utils.LIST_OBJECT_V2, True),
                                                  (utils.LIST_OBJECT_V2_NO_PREFIXES, False)])
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
-@patch('wazuh_integration.WazuhAWSDatabase.__init__')
-def test_aws_guardduty_bucket_check_guardduty_type(mock_wazuh_aws_integration, mock_sts,
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.__init__')
+def test_aws_guardduty_bucket_check_guardduty_type(mock_guardsarm_aws_integration, mock_sts,
                                                    object_list: dict, result: bool):
     """Test 'check_guardduty_type' method defines if the bucket contains GuardDuty Native logs or not.
 
@@ -66,9 +66,9 @@ def test_aws_guardduty_bucket_check_guardduty_type(mock_wazuh_aws_integration, m
     assert result == instance.check_guardduty_type()
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
-@patch('wazuh_integration.WazuhAWSDatabase.__init__')
-def test_aws_guardduty_bucket_check_guardduty_type_handles_exceptions(mock_wazuh_aws_integration, mock_sts):
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.__init__')
+def test_aws_guardduty_bucket_check_guardduty_type_handles_exceptions(mock_guardsarm_aws_integration, mock_sts):
     """Test 'check_guardduty_type' handles exceptions raised and exits with the expected exit code."""
     with patch('guardduty.AWSGuardDutyBucket.check_guardduty_type'):
         instance = utils.get_mocked_bucket(class_=guardduty.AWSGuardDutyBucket)
@@ -80,9 +80,9 @@ def test_aws_guardduty_bucket_check_guardduty_type_handles_exceptions(mock_wazuh
     assert e.value.code == utils.UNEXPECTED_ERROR_WORKING_WITH_S3
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
-@patch('wazuh_integration.WazuhAWSDatabase.__init__')
-def test_aws_guardduty_bucket_check_guardduty_type_handles_exception_with_message_attr(mock_wazuh_aws_integration, mock_sts):
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.__init__')
+def test_aws_guardduty_bucket_check_guardduty_type_handles_exception_with_message_attr(mock_guardsarm_aws_integration, mock_sts):
     """Test 'check_guardduty_type' logs err.message when the exception has a message attribute."""
     with patch('guardduty.AWSGuardDutyBucket.check_guardduty_type'):
         instance = utils.get_mocked_bucket(class_=guardduty.AWSGuardDutyBucket)
@@ -112,9 +112,9 @@ def test_aws_guardduty_bucket_get_service_prefix(mock_custom_bucket, mock_type, 
 
 
 @patch('aws_bucket.AWSLogsBucket.get_service_prefix', return_value='service_prefix/')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
-@patch('wazuh_integration.WazuhAWSDatabase.__init__')
-def test_aws_guardduty_bucket_get_full_prefix(mock_wazuh_aws_integration, mock_sts, mock_service_prefix):
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.__init__')
+def test_aws_guardduty_bucket_get_full_prefix(mock_guardsarm_aws_integration, mock_sts, mock_service_prefix):
     """Test 'get_full_prefix' returns the native GuardDuty prefix."""
     with patch('guardduty.AWSGuardDutyBucket.check_guardduty_type', return_value=True):
         instance = utils.get_mocked_bucket(class_=guardduty.AWSGuardDutyBucket, prefix='prefix/')
@@ -123,9 +123,9 @@ def test_aws_guardduty_bucket_get_full_prefix(mock_wazuh_aws_integration, mock_s
            instance.get_full_prefix(utils.TEST_ACCOUNT_ID, utils.TEST_REGION)
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
-@patch('wazuh_integration.WazuhAWSDatabase.__init__')
-def test_aws_guardduty_bucket_get_base_prefix(mock_wazuh_aws_integration, mock_sts):
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.__init__')
+def test_aws_guardduty_bucket_get_base_prefix(mock_guardsarm_aws_integration, mock_sts):
     """Test 'get_base_prefix' returns the native GuardDuty base prefix."""
     with patch('guardduty.AWSGuardDutyBucket.check_guardduty_type', return_value=True):
         instance = utils.get_mocked_bucket(class_=guardduty.AWSGuardDutyBucket, prefix='prefix/')
@@ -133,9 +133,9 @@ def test_aws_guardduty_bucket_get_base_prefix(mock_wazuh_aws_integration, mock_s
     assert instance.get_base_prefix() == os.path.join(instance.prefix, 'AWSLogs', '')
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
-@patch('wazuh_integration.WazuhAWSDatabase.__init__')
-def test_aws_guardduty_bucket_iter_regions_and_accounts(mock_wazuh_aws_integration, mock_sts):
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.__init__')
+def test_aws_guardduty_bucket_iter_regions_and_accounts(mock_guardsarm_aws_integration, mock_sts):
     """Test 'iter_regions_and_accounts' processes only the native GuardDuty bucket format."""
     account_ids = [utils.TEST_ACCOUNT_ID]
     regions = [utils.TEST_REGION]

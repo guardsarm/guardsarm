@@ -16,7 +16,7 @@ targets:
     - agent
 
 daemons:
-    - wazuh-modulesd
+    - guardsarm-modulesd
 
 os_platform:
     - linux
@@ -29,7 +29,7 @@ os_version:
     - Windows Server 2016
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/capabilities/sec-config-assessment/index.html
+    - https://documentation.guardsarm.com/current/user-manual/capabilities/sec-config-assessment/index.html
 
 tags:
     - sca
@@ -42,13 +42,13 @@ import stat
 import subprocess
 from pathlib import Path
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.utils import callbacks, configuration
-from wazuh_testing.tools.monitors import file_monitor
-from wazuh_testing.modules.modulesd.sca import patterns
-from wazuh_testing.modules.modulesd.configuration import MODULESD_DEBUG
-from wazuh_testing.modules.agentd.configuration import AGENTD_WINDOWS_DEBUG
-from wazuh_testing.constants.platforms import WINDOWS
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.utils import callbacks, configuration
+from guardsarm_testing.tools.monitors import file_monitor
+from guardsarm_testing.modules.modulesd.sca import patterns
+from guardsarm_testing.modules.modulesd.configuration import MODULESD_DEBUG
+from guardsarm_testing.modules.agentd.configuration import AGENTD_WINDOWS_DEBUG
+from guardsarm_testing.constants.platforms import WINDOWS
 
 from . import CONFIGURATIONS_FOLDER_PATH, TEST_CASES_FOLDER_PATH
 
@@ -110,7 +110,7 @@ def _callback_scan_result_for_check(check_id: int,
 # Tests
 @pytest.mark.parametrize('test_configuration, test_metadata', zip(configurations, configuration_metadata), ids=case_ids)
 def test_validate_remediation_results(test_configuration, test_metadata, prepare_cis_policies_file, truncate_monitored_files,
-                                      prepare_remediation_test, set_wazuh_configuration,
+                                      prepare_remediation_test, set_guardsarm_configuration,
                                       configure_local_internal_options, clean_sca_db, daemons_handler, wait_for_sca_enabled):
     '''
     description: This test will check that a SCA scan results, with the  expected initial results (passed/failed) for a
@@ -121,22 +121,22 @@ def test_validate_remediation_results(test_configuration, test_metadata, prepare
     test_phases:
         - Copy cis_sca ruleset file into agent
         - Create a folder that will be checked by the SCA rules (Linux)
-        - Restart wazuh
+        - Restart guardsarm
         - Validate the result for a given SCA check are as expected
         - Change the folder's permissions / Modifies the user lockout duration (Windows)
         - Validate the result for a given SCA check change as expected
 
-    wazuh_min_version: 4.6.0
+    guardsarm_min_version: 4.6.0
 
     tier: 0
 
     parameters:
         - configuration:
             type: dict
-            brief: Wazuh configuration data. Needed for set_wazuh_configuration fixture.
+            brief: GuardSarm configuration data. Needed for set_guardsarm_configuration fixture.
         - metadata:
             type: dict
-            brief: Wazuh configuration metadata.
+            brief: GuardSarm configuration metadata.
         - prepare_cis_policies_file:
             type: fixture
             brief: copy test sca policy file. Delete it after test.
@@ -144,9 +144,9 @@ def test_validate_remediation_results(test_configuration, test_metadata, prepare
             type: fixture
             brief: Create a folder with a given set of permissions or modifies the user
                 lockout duration in Windows. Delete it/Restores the value after test.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
-            brief: Set the wazuh configuration according to the configuration data.
+            brief: Set the guardsarm configuration according to the configuration data.
         - configure_local_internal_options:
             type: fixture
             brief: Configure the local_internal_options_file.
@@ -155,7 +155,7 @@ def test_validate_remediation_results(test_configuration, test_metadata, prepare
             brief: Truncate all the log files and json alerts files before and after the test execution.
         - restart_modulesd_function:
             type: fixture
-            brief: Restart the wazuh-modulesd daemon.
+            brief: Restart the guardsarm-modulesd daemon.
         - wait_for_sca_enabled:
             type: fixture
             brief: Wait for the sca Module to start before starting the test.
@@ -174,7 +174,7 @@ def test_validate_remediation_results(test_configuration, test_metadata, prepare
     expected_output:
         - r".*sca.*DEBUG: Policy check \"(\d+)\" evaluation completed for policy \"(.*?)\", result: (Passed|Failed)"
     '''
-    log_monitor = file_monitor.FileMonitor(WAZUH_LOG_PATH)
+    log_monitor = file_monitor.FileMonitor(GUARDSARM_LOG_PATH)
     scan_timeout = 180 if sys.platform == WINDOWS else 60
 
     expected_policy = Path(test_metadata['policy_file']).stem

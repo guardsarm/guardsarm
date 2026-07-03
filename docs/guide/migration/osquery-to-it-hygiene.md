@@ -1,6 +1,6 @@
 # Migrating from OSquery to IT Hygiene
 
-In Wazuh 4.x, the **OSquery wodle** managed the **OSquery daemon** (`osqueryd`)
+In GuardSarm 4.x, the **OSquery wodle** managed the **OSquery daemon** (`osqueryd`)
 from the agent. OSquery is an open-source tool that had to be installed
 separately on each endpoint; it exposes the operating system as a relational
 database and lets you write SQL queries against OS tables (`users`, `processes`,
@@ -8,12 +8,12 @@ database and lets you write SQL queries against OS tables (`users`, `processes`,
 
 The wodle could start `osqueryd` as a child process or attach to an already
 running instance. It read the results log written by the daemon and forwarded
-each result to the Wazuh manager, where the output was processed by the
-**rules engine**. Wazuh ships a dedicated ruleset for OSquery (rule group
+each result to the GuardSarm manager, where the output was processed by the
+**rules engine**. GuardSarm ships a dedicated ruleset for OSquery (rule group
 `osquery`), and you could write additional custom rules that match on specific
 query names or column values to generate targeted alerts.
 
-All OSquery-originated events landed in `wazuh-alerts-*` (or in the archives
+All OSquery-originated events landed in `guardsarm-alerts-*` (or in the archives
 if they did not trigger any rule). Each event carried the following fields:
 
 - `data.osquery.name` — the scheduled query or pack query name
@@ -23,14 +23,14 @@ if they did not trigger any rule). Each event carried the following fields:
 - `location` — always `osquery`
 
 Users defined their queries in an `osquery.conf` schedule or in pack files,
-and then used Wazuh rules and dashboards to act on the resulting alerts.
+and then used GuardSarm rules and dashboards to act on the resulting alerts.
 
-Starting with Wazuh 4.14, the **Syscollector** module (IT Hygiene) was
+Starting with GuardSarm 4.14, the **Syscollector** module (IT Hygiene) was
 progressively extended to cover the same data OSquery provided — natively,
 without requiring an external binary. Users, Groups, Services, and Browser
 Extensions were all added to Syscollector during the 4.14 release cycle.
 
-Starting with Wazuh 5.0, the OSquery wodle has been fully removed. If you are
+Starting with GuardSarm 5.0, the OSquery wodle has been fully removed. If you are
 still running the OSquery wodle in 4.x and have not yet migrated to
 Syscollector, this guide will help you make that transition.
 
@@ -42,16 +42,16 @@ Syscollector, this guide will help you make that transition.
 
 A technical feasibility evaluation concluded that embedding the OSquery library
 as a runtime dependency was not viable across all supported platforms. Instead,
-Wazuh replicated the OSquery state tables most relevant to enterprise security
+GuardSarm replicated the OSquery state tables most relevant to enterprise security
 and IT hygiene natively inside `syscollector`, normalizing field names to the
-Wazuh Common Schema (WCS) and Elastic Common Schema (ECS) conventions used
+GuardSarm Common Schema (WCS) and Elastic Common Schema (ECS) conventions used
 across the rest of the platform.
 
 ## OSquery table coverage
 
 The table below maps the most commonly used OSquery state tables to the
 Syscollector inventory category that covers the same data. The "Since" column
-indicates the Wazuh version in which that category was introduced.
+indicates the GuardSarm version in which that category was introduced.
 
 | IT Hygiene category | OSquery source tables | Since | Platform notes |
 |---|---|---|---|
@@ -72,14 +72,14 @@ indicates the Wazuh version in which that category was introduced.
 
 ## Configuration mapping
 
-### Wazuh 4.x OSquery wodle
+### GuardSarm 4.x OSquery wodle
 
-In Wazuh 4.x, OSquery had to be installed separately on each endpoint. Once
+In GuardSarm 4.x, OSquery had to be installed separately on each endpoint. Once
 installed, you enabled the wodle by adding a `<wodle name="osquery">` block to
 the agent's `ossec.conf`:
 
 ```xml
-<!-- Wazuh 4.x: ossec.conf (agent) -->
+<!-- GuardSarm 4.x: ossec.conf (agent) -->
 <wodle name="osquery">
     <disabled>no</disabled>
     <run_daemon>yes</run_daemon>
@@ -137,7 +137,7 @@ with references to OSquery's built-in pack files:
 }
 ```
 
-OSquery results reached the Wazuh manager as **alerts**. Each alert stored all OSquery fields nested under `data.osquery`,
+OSquery results reached the GuardSarm manager as **alerts**. Each alert stored all OSquery fields nested under `data.osquery`,
 with query results under `data.osquery.columns.*` and metadata fields
 `data.osquery.name` (query name), `data.osquery.action` (`added`/`removed`),
 `data.osquery.hostIdentifier`, `data.osquery.calendarTime`, and
@@ -145,7 +145,7 @@ with query results under `data.osquery.columns.*` and metadata fields
 
 ```json
 {
-  "_index": "wazuh-alerts-4.x-2026.06.03",
+  "_index": "guardsarm-alerts-4.x-2026.06.03",
   "_id": "LUAtjp4BCf0Lqs7QkDzK",
   "_version": 1,
   "_score": null,
@@ -159,7 +159,7 @@ with query results under `data.osquery.columns.*` and metadata fields
       "id": "009"
     },
     "manager": {
-      "name": "wazuh-server"
+      "name": "guardsarm-server"
     },
     "data": {
       "osquery": {
@@ -214,9 +214,9 @@ with query results under `data.osquery.columns.*` and metadata fields
 }
 ```
 
-### Wazuh 5.0 Syscollector (IT Hygiene)
+### GuardSarm 5.0 Syscollector (IT Hygiene)
 
-All inventory categories that cover OSquery data are available from Wazuh 4.14
+All inventory categories that cover OSquery data are available from GuardSarm 4.14
 onwards. Enable them in the agent's `ossec.conf`:
 
 > **Note:** All categories shown below are enabled by default in new
@@ -255,19 +255,19 @@ onwards. Enable them in the agent's `ossec.conf`:
 ## Field mapping examples
 
 The following subsections show how to translate some of the most common OSquery queries
-into the equivalent data available through the Wazuh 5.0 IT Hygiene index.
+into the equivalent data available through the GuardSarm 5.0 IT Hygiene index.
 
 ### Processes
 
-**OSquery 4.x** (`data.osquery.columns.*` in `wazuh-alerts-*`, query name `processes_query`):
+**OSquery 4.x** (`data.osquery.columns.*` in `guardsarm-alerts-*`, query name `processes_query`):
 
 ```sql
 SELECT pid, name, path, cmdline, state, ppid, start_time, uid, gid FROM processes;
 ```
 
-**Wazuh 5.0 index** (`wazuh-states-inventory-processes-*`):
+**GuardSarm 5.0 index** (`guardsarm-states-inventory-processes-*`):
 
-| OSquery field (`data.osquery.columns.*`) | Wazuh 5.0 field | Notes |
+| OSquery field (`data.osquery.columns.*`) | GuardSarm 5.0 field | Notes |
 |---|---|---|
 | `pid` | `process.pid` | |
 | `name` | `process.name` | |
@@ -276,18 +276,18 @@ SELECT pid, name, path, cmdline, state, ppid, start_time, uid, gid FROM processe
 | — | `process.args_count` | Count of arguments; no OSquery equivalent |
 | `state` | `process.state` | Single character: `S` (sleeping), `R` (running), `Z` (zombie), etc. |
 | `ppid` | `process.parent.pid` | Parent process PID |
-| `start_time` | `process.start` | OSquery: integer epoch; Wazuh 5.0: ISO 8601 timestamp |
+| `start_time` | `process.start` | OSquery: integer epoch; GuardSarm 5.0: ISO 8601 timestamp |
 | — | `process.utime` | CPU time in user mode (clock ticks); no direct OSquery equivalent |
 | — | `process.stime` | CPU time in kernel mode (clock ticks); no direct OSquery equivalent |
 | `path` | — | Binary path not collected separately; use `process.command_line` |
-| `uid` | — | Not collected in Wazuh 5.0 |
-| `gid` | — | Not collected in Wazuh 5.0 |
+| `uid` | — | Not collected in GuardSarm 5.0 |
+| `gid` | — | Not collected in GuardSarm 5.0 |
 
 **Example alert 4.x:**
 
 ```json
 {
-  "_index": "wazuh-alerts-4.x-2026.06.04",
+  "_index": "guardsarm-alerts-4.x-2026.06.04",
   "_id": "HIOIk54BLovIbi415BOF",
   "_version": 1,
   "_score": null,
@@ -301,7 +301,7 @@ SELECT pid, name, path, cmdline, state, ppid, start_time, uid, gid FROM processe
       "id": "009"
     },
     "manager": {
-      "name": "wazuh-server"
+      "name": "guardsarm-server"
     },
     "data": {
       "osquery": {
@@ -361,11 +361,11 @@ SELECT pid, name, path, cmdline, state, ppid, start_time, uid, gid FROM processe
 
 ```json
 {
-  "_index": "wazuh-states-inventory-processes",
-  "_id": "wazuh_015_189af860b2350094e0262ba2d9c3b693a1fefa0b",
+  "_index": "guardsarm-states-inventory-processes",
+  "_id": "guardsarm_015_189af860b2350094e0262ba2d9c3b693a1fefa0b",
   "_score": 0,
   "_source": {
-    "wazuh": {
+    "guardsarm": {
       "agent": {
         "groups": [
           "default"
@@ -385,7 +385,7 @@ SELECT pid, name, path, cmdline, state, ppid, start_time, uid, gid FROM processe
         "version": "v5.0.0"
       },
       "cluster": {
-        "name": "wazuh"
+        "name": "guardsarm"
       }
     },
     "checksum": {
@@ -425,7 +425,7 @@ SELECT pid, name, path, cmdline, state, ppid, start_time, uid, gid FROM processe
 
 ### Users
 
-In OSquery 4.x, user-related data was spread across multiple tables. In Wazuh
+In OSquery 4.x, user-related data was spread across multiple tables. In GuardSarm
 5.0, the `states-inventory-users-*` index consolidates all of them into a
 single document per user.
 
@@ -449,9 +449,9 @@ SELECT uid, gid FROM user_groups;
 SELECT header FROM sudoers;
 ```
 
-**Wazuh 5.0 index** (`wazuh-states-inventory-users-*`):
+**GuardSarm 5.0 index** (`guardsarm-states-inventory-users-*`):
 
-| OSquery source table | OSquery field | Wazuh 5.0 field | Notes |
+| OSquery source table | OSquery field | GuardSarm 5.0 field | Notes |
 |---|---|---|---|
 | `users` | `username` | `user.name` | |
 | `users` | `uid` | `user.id` | String in both versions |
@@ -478,7 +478,7 @@ SELECT header FROM sudoers;
 
 ```json
 {
-  "_index": "wazuh-alerts-4.x-2026.06.04",
+  "_index": "guardsarm-alerts-4.x-2026.06.04",
   "_id": "lIM9k54BLovIbi419hAW",
   "_version": 1,
   "_score": null,
@@ -492,7 +492,7 @@ SELECT header FROM sudoers;
       "id": "009"
     },
     "manager": {
-      "name": "wazuh-server"
+      "name": "guardsarm-server"
     },
     "data": {
       "osquery": {
@@ -553,11 +553,11 @@ SELECT header FROM sudoers;
 
 ```json
 {
-  "_index": "wazuh-states-inventory-users",
-  "_id": "wazuh_015_ffb2eb2fe05b15856640e45d37f8d1fb2618af9a",
+  "_index": "guardsarm-states-inventory-users",
+  "_id": "guardsarm_015_ffb2eb2fe05b15856640e45d37f8d1fb2618af9a",
   "_score": 0,
   "_source": {
-    "wazuh": {
+    "guardsarm": {
       "agent": {
         "groups": [
           "default"
@@ -577,7 +577,7 @@ SELECT header FROM sudoers;
         "version": "v5.0.0"
       },
       "cluster": {
-        "name": "wazuh"
+        "name": "guardsarm"
       }
     },
     "checksum": {
@@ -655,7 +655,7 @@ SELECT header FROM sudoers;
 
 ### Groups
 
-Similar to Users, Wazuh 5.0 consolidates data from two OSquery tables into each
+Similar to Users, GuardSarm 5.0 consolidates data from two OSquery tables into each
 `states-inventory-groups-*` document: `groups` (group definitions from
 `/etc/group`) and `user_groups` (membership relationships).
 
@@ -669,9 +669,9 @@ SELECT gid, gid_signed, groupname FROM groups;
 SELECT uid, gid FROM user_groups;
 ```
 
-**Wazuh 5.0 index** (`wazuh-states-inventory-groups-*`):
+**GuardSarm 5.0 index** (`guardsarm-states-inventory-groups-*`):
 
-| OSquery source table | OSquery field | Wazuh 5.0 field | Notes |
+| OSquery source table | OSquery field | GuardSarm 5.0 field | Notes |
 |---|---|---|---|
 | `groups` | `gid` | `group.id` | |
 | `groups` | `gid_signed` | `group.id_signed` | Signed representation of the GID |
@@ -683,7 +683,7 @@ SELECT uid, gid FROM user_groups;
 
 ```json
 {
-  "_index": "wazuh-alerts-4.x-2026.06.04",
+  "_index": "guardsarm-alerts-4.x-2026.06.04",
   "_id": "rIOJk54BLovIbi41IxMO",
   "_version": 1,
   "_score": null,
@@ -697,7 +697,7 @@ SELECT uid, gid FROM user_groups;
       "id": "009"
     },
     "manager": {
-      "name": "wazuh-server"
+      "name": "guardsarm-server"
     },
     "data": {
       "osquery": {
@@ -706,7 +706,7 @@ SELECT uid, gid FROM user_groups;
         "unixTime": "1780591689",
         "columns": {
           "gid": "123",
-          "groupname": "wazuh"
+          "groupname": "guardsarm"
         },
         "name": "groups_query",
         "numerics": "false",
@@ -752,11 +752,11 @@ SELECT uid, gid FROM user_groups;
 
 ```json
 {
-  "_index": "wazuh-states-inventory-groups",
-  "_id": "wazuh_015_c72cf90ee6d864a8759f7b4367215224782bb49d",
+  "_index": "guardsarm-states-inventory-groups",
+  "_id": "guardsarm_015_c72cf90ee6d864a8759f7b4367215224782bb49d",
   "_score": 0,
   "_source": {
-    "wazuh": {
+    "guardsarm": {
       "agent": {
         "groups": [
           "default"
@@ -776,7 +776,7 @@ SELECT uid, gid FROM user_groups;
         "version": "v5.0.0"
       },
       "cluster": {
-        "name": "wazuh"
+        "name": "guardsarm"
       }
     },
     "checksum": {
@@ -789,9 +789,9 @@ SELECT uid, gid FROM user_groups;
       "id": 997,
       "id_signed": 997,
       "is_hidden": false,
-      "name": "wazuh",
+      "name": "guardsarm",
       "users": [
-        "wazuh"
+        "guardsarm"
       ],
       "uuid": null
     },
@@ -810,22 +810,22 @@ SELECT uid, gid FROM user_groups;
 
 ### Services
 
-**OSquery 4.x — Windows** (`data.osquery.columns.*` in `wazuh-alerts-*`):
+**OSquery 4.x — Windows** (`data.osquery.columns.*` in `guardsarm-alerts-*`):
 
 ```sql
 SELECT name, display_name, status, start_type, pid, user_account, path FROM services;
 ```
 
-**OSquery 4.x — Linux** (`data.osquery.columns.*` in `wazuh-alerts-*`):
+**OSquery 4.x — Linux** (`data.osquery.columns.*` in `guardsarm-alerts-*`):
 
 ```sql
 SELECT id, description, sub_state, load_state, active_state, unit_file_state,
        fragment_path, source_path, user FROM systemd_units;
 ```
 
-**Wazuh 5.0 index** (`wazuh-states-inventory-services-*`):
+**GuardSarm 5.0 index** (`guardsarm-states-inventory-services-*`):
 
-| OSquery field (Windows `services`) | OSquery field (Linux `systemd_units`) | Wazuh 5.0 field | Notes |
+| OSquery field (Windows `services`) | OSquery field (Linux `systemd_units`) | GuardSarm 5.0 field | Notes |
 |---|---|---|---|
 | `name` | `id` | `service.id` | Linux: `.service` suffix is stripped by the collector |
 | `display_name` | `id` | `service.name` | Linux: same value as `service.id` |
@@ -845,14 +845,14 @@ SELECT id, description, sub_state, load_state, active_state, unit_file_state,
 | — | `job_path` | `service.target.address` | Associated systemd job path (Linux) |
 
 > **Note:** The `load_state` column present in the OSquery `systemd_units` table is not
-> captured by Wazuh 5.0. Services in a non-`loaded` load state are generally not reported.
+> captured by GuardSarm 5.0. Services in a non-`loaded` load state are generally not reported.
 
 
 **Example alert 4.x:**
 
 ```json
 {
-  "_index": "wazuh-alerts-4.x-2026.06.04",
+  "_index": "guardsarm-alerts-4.x-2026.06.04",
   "_id": "eYNtk54BLovIbi41BhLD",
   "_version": 1,
   "_score": null,
@@ -866,7 +866,7 @@ SELECT id, description, sub_state, load_state, active_state, unit_file_state,
       "id": "009"
     },
     "manager": {
-      "name": "wazuh-server"
+      "name": "guardsarm-server"
     },
     "data": {
       "osquery": {
@@ -877,9 +877,9 @@ SELECT id, description, sub_state, load_state, active_state, unit_file_state,
           "sub_state": "running",
           "active_state": "active",
           "load_state": "loaded",
-          "description": "Wazuh agent",
-          "fragment_path": "/lib/systemd/system/wazuh-agent.service",
-          "id": "wazuh-agent.service"
+          "description": "GuardSarm agent",
+          "fragment_path": "/lib/systemd/system/guardsarm-agent.service",
+          "id": "guardsarm-agent.service"
         },
         "name": "services_query",
         "numerics": "false",
@@ -925,11 +925,11 @@ SELECT id, description, sub_state, load_state, active_state, unit_file_state,
 
 ```json
 {
-  "_index": "wazuh-states-inventory-services",
-  "_id": "wazuh_015_5eec650d7ac046425786139dd84a0206bd5f4e48",
+  "_index": "guardsarm-states-inventory-services",
+  "_id": "guardsarm_015_5eec650d7ac046425786139dd84a0206bd5f4e48",
   "_score": 0,
   "_source": {
-    "wazuh": {
+    "guardsarm": {
       "agent": {
         "groups": [
           "default"
@@ -949,7 +949,7 @@ SELECT id, description, sub_state, load_state, active_state, unit_file_state,
         "version": "v5.0.0"
       },
       "cluster": {
-        "name": "wazuh"
+        "name": "guardsarm"
       }
     },
     "checksum": {
@@ -974,7 +974,7 @@ SELECT id, description, sub_state, load_state, active_state, unit_file_state,
     },
     "process": {
       "args": null,
-      "executable": "/lib/systemd/system/wazuh-agent.service",
+      "executable": "/lib/systemd/system/guardsarm-agent.service",
       "group": {
         "name": null
       },
@@ -987,15 +987,15 @@ SELECT id, description, sub_state, load_state, active_state, unit_file_state,
     },
     "service": {
       "address": null,
-      "description": "Wazuh agent",
+      "description": "GuardSarm agent",
       "enabled": "enabled",
       "exit_code": 0,
       "following": null,
       "frequency": 0,
-      "id": "wazuh-agent",
+      "id": "guardsarm-agent",
       "inetd_compatibility": false,
-      "name": "wazuh-agent",
-      "object_path": "/org/freedesktop/systemd1/unit/wazuh_2dagent_2eservice",
+      "name": "guardsarm-agent",
+      "object_path": "/org/freedesktop/systemd1/unit/guardsarm_2dagent_2eservice",
       "restart": null,
       "start_type": null,
       "starts": {
@@ -1028,25 +1028,25 @@ SELECT id, description, sub_state, load_state, active_state, unit_file_state,
 
 ## Migration procedure
 
-Follow these steps to migrate from OSquery to IT Hygiene in Wazuh 5.0.
+Follow these steps to migrate from OSquery to IT Hygiene in GuardSarm 5.0.
 
 ### Prerequisites
 
-- Wazuh 4.x central components still accessible.
-- Wazuh 5.0 central components (server, indexer, and dashboard) deployed and
+- GuardSarm 4.x central components still accessible.
+- GuardSarm 5.0 central components (server, indexer, and dashboard) deployed and
   running as a **new installation** (in-place upgrade from 4.x is not supported).
-- Wazuh 5.0 agents deployed and running.
-- Access to both the 4.x and 5.0 Wazuh dashboards as an administrator.
+- GuardSarm 5.0 agents deployed and running.
+- Access to both the 4.x and 5.0 GuardSarm dashboards as an administrator.
 
 ### Step 1 – Catalog and export OSquery-based saved objects from 4.x
 
 > **Do this step before decommissioning your 4.x installation.** Because
-> Wazuh 5.0 is a fresh install, saved objects from 4.x are not carried over
+> GuardSarm 5.0 is a fresh install, saved objects from 4.x are not carried over
 > automatically.
 
-In the **4.x** Wazuh dashboard, identify every saved search, visualization,
+In the **4.x** GuardSarm dashboard, identify every saved search, visualization,
 dashboard, index pattern, and Alerting monitor that references OSquery data.
-OSquery results were stored in `wazuh-alerts-*` as regular alerts. Look for:
+OSquery results were stored in `guardsarm-alerts-*` as regular alerts. Look for:
 
 - Rule group `osquery`.
 - Field `data.osquery.name` containing a query or pack name.
@@ -1101,13 +1101,13 @@ After saving, restart the agent:
 
 ```bash
 # Linux
-sudo systemctl restart wazuh-agent
+sudo systemctl restart guardsarm-agent
 
 # Windows (PowerShell)
-Restart-Service -Name wazuh
+Restart-Service -Name guardsarm
 
 # macOS
-/Library/Ossec/bin/wazuh-control restart
+/Library/Ossec/bin/guardsarm-control restart
 ```
 
 ### Step 3 – Wait for Syscollector to complete its first sync
@@ -1125,12 +1125,12 @@ On **Windows**, check the equivalent log at
 A successful sync produces output similar to:
 
 ```
-wazuh-modulesd:syscollector: INFO: Started (pid: 11156).
-wazuh-modulesd:syscollector: INFO: Starting evaluation.
-wazuh-modulesd:syscollector: INFO: Evaluation finished.
-wazuh-modulesd:syscollector: INFO: Starting inventory synchronization.
-wazuh-modulesd:syscollector: INFO: VD first sync completed, metadata marker persisted.
-wazuh-modulesd:syscollector: INFO: Syscollector synchronization process finished successfully.
+guardsarm-modulesd:syscollector: INFO: Started (pid: 11156).
+guardsarm-modulesd:syscollector: INFO: Starting evaluation.
+guardsarm-modulesd:syscollector: INFO: Evaluation finished.
+guardsarm-modulesd:syscollector: INFO: Starting inventory synchronization.
+guardsarm-modulesd:syscollector: INFO: VD first sync completed, metadata marker persisted.
+guardsarm-modulesd:syscollector: INFO: Syscollector synchronization process finished successfully.
 ```
 
 Wait until you see **"Syscollector synchronization process finished
@@ -1140,16 +1140,16 @@ of items in the inventory.
 
 ### Step 4 – Verify inventory data in the dashboard
 
-1. Open the Wazuh dashboard and navigate to **Security operations > IT Hygiene**.
+1. Open the GuardSarm dashboard and navigate to **Security operations > IT Hygiene**.
 2. Select the agent and confirm that all the enabled categories are populated.
 3. Spot-check a few records against what you would have expected from
    the equivalent OSquery query.
 
 ### Step 5 – Recreate visualizations and dashboards in 5.0
 
-In Wazuh 5.0 the inventory index patterns (`wazuh-states-inventory-*`) are
+In GuardSarm 5.0 the inventory index patterns (`guardsarm-states-inventory-*`) are
 created automatically by the server — you do not need to create them manually.
-If you had custom index patterns over `wazuh-alerts-*` scoped to OSquery data
+If you had custom index patterns over `guardsarm-alerts-*` scoped to OSquery data
 (for example, a pattern filtered to rule group `osquery`), those need to be
 recreated only if you still need to query historical OSquery alerts from the
 4.x period.
@@ -1159,23 +1159,23 @@ Rebuild any visualizations or dashboards using the field mapping tables in
 
 | Old index (4.x) | Old field path | New index (5.0) | New field |
 |---|---|---|---|
-| `wazuh-alerts-*` (rule group `osquery`) | `data.osquery.columns.username` | `wazuh-states-inventory-users-*` | `user.name` |
-| `wazuh-alerts-*` (rule group `osquery`) | `data.osquery.columns.uid` | `wazuh-states-inventory-users-*` | `user.id` |
-| `wazuh-alerts-*` (rule group `osquery`) | `data.osquery.columns.name` (processes) | `wazuh-states-inventory-processes-*` | `process.name` |
-| `wazuh-alerts-*` (rule group `osquery`) | `data.osquery.columns.pid` | `wazuh-states-inventory-processes-*` | `process.pid` |
-| `wazuh-alerts-*` (rule group `osquery`) | `data.osquery.columns.groupname` | `wazuh-states-inventory-groups-*` | `group.name` |
-| `wazuh-alerts-*` (rule group `osquery`) | `data.osquery.columns.gid` | `wazuh-states-inventory-groups-*` | `group.id` |
-| `wazuh-alerts-*` (rule group `osquery`) | `data.osquery.columns.name` (chrome_extensions) | `wazuh-states-inventory-browser-extensions-*` | `package.name` |
-| `wazuh-alerts-*` (rule group `osquery`) | `data.osquery.columns.identifier` | `wazuh-states-inventory-browser-extensions-*` | `package.id` |
-| `wazuh-alerts-*` (rule group `osquery`) | `data.osquery.columns.id` (services) | `wazuh-states-inventory-services-*` | `service.id` |
-| `wazuh-alerts-*` (rule group `osquery`) | `data.osquery.columns.active_state` | `wazuh-states-inventory-services-*` | `service.state` |
+| `guardsarm-alerts-*` (rule group `osquery`) | `data.osquery.columns.username` | `guardsarm-states-inventory-users-*` | `user.name` |
+| `guardsarm-alerts-*` (rule group `osquery`) | `data.osquery.columns.uid` | `guardsarm-states-inventory-users-*` | `user.id` |
+| `guardsarm-alerts-*` (rule group `osquery`) | `data.osquery.columns.name` (processes) | `guardsarm-states-inventory-processes-*` | `process.name` |
+| `guardsarm-alerts-*` (rule group `osquery`) | `data.osquery.columns.pid` | `guardsarm-states-inventory-processes-*` | `process.pid` |
+| `guardsarm-alerts-*` (rule group `osquery`) | `data.osquery.columns.groupname` | `guardsarm-states-inventory-groups-*` | `group.name` |
+| `guardsarm-alerts-*` (rule group `osquery`) | `data.osquery.columns.gid` | `guardsarm-states-inventory-groups-*` | `group.id` |
+| `guardsarm-alerts-*` (rule group `osquery`) | `data.osquery.columns.name` (chrome_extensions) | `guardsarm-states-inventory-browser-extensions-*` | `package.name` |
+| `guardsarm-alerts-*` (rule group `osquery`) | `data.osquery.columns.identifier` | `guardsarm-states-inventory-browser-extensions-*` | `package.id` |
+| `guardsarm-alerts-*` (rule group `osquery`) | `data.osquery.columns.id` (services) | `guardsarm-states-inventory-services-*` | `service.id` |
+| `guardsarm-alerts-*` (rule group `osquery`) | `data.osquery.columns.active_state` | `guardsarm-states-inventory-services-*` | `service.state` |
 
 ### Step 6 – Recreate alerting monitors in 5.0
 
 
 Recreate each Alerting monitor noted in Step 1 in the 5.0 installation,
-targeting the appropriate `wazuh-states-inventory-*` index instead of
-`wazuh-alerts-*`. Translate all field references using the mapping tables
+targeting the appropriate `guardsarm-states-inventory-*` index instead of
+`guardsarm-alerts-*`. Translate all field references using the mapping tables
 above and in [Field mapping examples](#field-mapping-examples). Because
 inventory indices are stateful (one document per item, updated in place)
 rather than event-based, monitor queries should use a **document-level
@@ -1186,7 +1186,7 @@ alerts.
 
 Once you have verified that all data is flowing correctly through Syscollector,
 remove the `<wodle name="osquery">` block from the agent configuration.
-The OSquery wodle has been fully removed in Wazuh 5.0: a leftover block is ignored and the agent logs `INFO: The 'osquery' module is deprecated. Use the Syscollector module instead.` It does not prevent the agent from starting, but it no longer provides any functionality, so delete it:
+The OSquery wodle has been fully removed in GuardSarm 5.0: a leftover block is ignored and the agent logs `INFO: The 'osquery' module is deprecated. Use the Syscollector module instead.` It does not prevent the agent from starting, but it no longer provides any functionality, so delete it:
 
 ```xml
 <!-- Remove this block entirely from ossec.conf -->
@@ -1197,10 +1197,10 @@ The OSquery wodle has been fully removed in Wazuh 5.0: a leftover block is ignor
 
 ## Limitations and known differences
 
-| Area | OSquery 4.x behavior | Wazuh 4.14+ / 5.0 IT Hygiene behavior |
+| Area | OSquery 4.x behavior | GuardSarm 4.14+ / 5.0 IT Hygiene behavior |
 |---|---|---|
-| **Installation** | External binary (`osqueryd`) required on each endpoint | Built into the Wazuh agent; no extra install |
-| **Data destination** | Alerts in `wazuh-alerts-*` (rules 24000-24811, group `osquery`); fields under `data.osquery.*` | Stateful inventory indices (`states-inventory-*`) |
+| **Installation** | External binary (`osqueryd`) required on each endpoint | Built into the GuardSarm agent; no extra install |
+| **Data destination** | Alerts in `guardsarm-alerts-*` (rules 24000-24811, group `osquery`); fields under `data.osquery.*` | Stateful inventory indices (`states-inventory-*`) |
 | **Query granularity** | Per-field SQL SELECT at query time | All fields for a category collected on each scan |
 | **On-demand queries** | `osqueryi` interactive shell | Not available; use `scan_on_start` or reduce the interval |
 | **Event-based tables** | Supported (e.g., `process_events`, `file_events`, `socket_events`) | Out of scope; use FIM for file events, Audit/Syscall monitoring for process and socket events |

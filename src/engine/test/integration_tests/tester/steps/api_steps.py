@@ -30,8 +30,8 @@ POLICY_NS = "testing"
 DECODER_TEST_UUID = "2faeea8b-672b-4b42-8f91-657d7810d636"
 DECODER_OTHER_UUID = "594ea807-a037-408d-95b8-9a124ea333df"
 
-INTEG_WAZUH_CORE_UUID = "9b1a1ef2-1a70-4a8b-a89b-38b34174c2d1"
-INTEG_OTHER_WAZUH_CORE_UUID = "a15bbd77-8cb0-488f-94cd-4783d689a72f"
+INTEG_GUARDSARM_CORE_UUID = "9b1a1ef2-1a70-4a8b-a89b-38b34174c2d1"
+INTEG_OTHER_GUARDSARM_CORE_UUID = "a15bbd77-8cb0-488f-94cd-4783d689a72f"
 
 LOGTEST_DECODER_UUID = "a1f330f4-8012-48ab-9949-c5d76edaf9b1"
 LOGTEST_INTEG_UUID = "a1f330f4-8012-48ab-9949-c5d76edaf9b2"
@@ -144,7 +144,7 @@ def add_integration_to_policy(integration_name: str, policy_name: str):
     """
     assert policy_name == POLICY_NS, "This step is intended for policy 'testing'"
 
-    integ_list = [INTEG_WAZUH_CORE_UUID, INTEG_OTHER_WAZUH_CORE_UUID]
+    integ_list = [INTEG_GUARDSARM_CORE_UUID, INTEG_OTHER_GUARDSARM_CORE_UUID]
     policy_json = build_policy_json(
         default_parent=DECODER_TEST_UUID,
         root_decoder=DECODER_TEST_UUID,
@@ -204,7 +204,7 @@ def session_tear_down():
 def step_impl(context, policy_name: str, integration_name: str):
     """
     - policy_name must be 'testing' (namespace/policy in CM)
-    - integration_name: 'wazuh-core-test' or 'other-wazuh-core-test'
+    - integration_name: 'guardsarm-core-test' or 'other-guardsarm-core-test'
     Here we DO NOT create decoders or integrations (that is done by init.py),
     we only upsert the policy in CM with the corresponding integration.
     """
@@ -215,12 +215,12 @@ def step_impl(context, policy_name: str, integration_name: str):
     # Session cleanup so each scenario starts clean
     session_tear_down()
 
-    if integration_name == "wazuh-core-test":
-        integ_list = [INTEG_WAZUH_CORE_UUID]
+    if integration_name == "guardsarm-core-test":
+        integ_list = [INTEG_GUARDSARM_CORE_UUID]
         default_parent = DECODER_TEST_UUID
         root_decoder = DECODER_TEST_UUID
-    elif integration_name == "other-wazuh-core-test":
-        integ_list = [INTEG_OTHER_WAZUH_CORE_UUID]
+    elif integration_name == "other-guardsarm-core-test":
+        integ_list = [INTEG_OTHER_GUARDSARM_CORE_UUID]
         default_parent = DECODER_OTHER_UUID
         root_decoder = DECODER_OTHER_UUID
     else:
@@ -354,7 +354,7 @@ def step_send_event_with_extended_metadata(context, message: str, session_name: 
         "trace_level": debug_level,
         "event": f"{QUEUE}:{LOCATION}:{message}",
         "agent_metadata": {
-            "wazuh": {
+            "guardsarm": {
                 "agent": {
                     "id": agent_id,
                     "name": agent_name,
@@ -378,7 +378,7 @@ def step_send_event_with_basic_metadata(context, message: str, session_name: str
         "trace_level": debug_level,
         "event": f"{QUEUE}:{LOCATION}:{message}",
         "agent_metadata": {
-            "wazuh": {
+            "guardsarm": {
                 "agent": {
                     "id": agent_id,
                     "name": agent_name,
@@ -517,12 +517,12 @@ def step_impl(context, response: str):
     expected_output.get('agent', {}).pop('manager_name', None)
     actual_output.get('agent', {}).pop('manager_name', None)
 
-    # 4b. Remove dynamic fields stamped by TesterWorker (@timestamp, wazuh.event.id)
+    # 4b. Remove dynamic fields stamped by TesterWorker (@timestamp, guardsarm.event.id)
     actual_output.pop('@timestamp', None)
-    if 'wazuh' in actual_output and 'event' in actual_output['wazuh']:
-        actual_output['wazuh']['event'].pop('id', None)
-        if not actual_output['wazuh']['event']:
-            del actual_output['wazuh']['event']
+    if 'guardsarm' in actual_output and 'event' in actual_output['guardsarm']:
+        actual_output['guardsarm']['event'].pop('id', None)
+        if not actual_output['guardsarm']['event']:
+            del actual_output['guardsarm']['event']
 
     # 5. Re-serialize with sorted keys
     def normalize(obj): return json.dumps(obj, sort_keys=True, separators=(",", ":"))

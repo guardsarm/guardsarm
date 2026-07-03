@@ -57,7 +57,7 @@ protected:
 
         defaultConfig = {
             tmpDir,                              // basePath
-            "wazuh-${name}-${YYYY}-${MM}-${DD}", // pattern (extension added by constructor)
+            "guardsarm-${name}-${YYYY}-${MM}-${DD}", // pattern (extension added by constructor)
             0,                                   // maxSize (no limit)
             fastqueue::MIN_QUEUE_CAPACITY,       // bufferSize
         };
@@ -285,7 +285,7 @@ INSTANTIATE_TEST_SUITE_P(ChannelNames,
                                            "withNumbers123",
                                            "MixedCase",
                                            "very-long-channel-name-with-many-characters",
-                                           "standard-wazuh-events-v5",
+                                           "standard-guardsarm-events-v5",
                                            "events",
                                            "audit"));
 

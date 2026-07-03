@@ -8,7 +8,7 @@ For the full per-option reference see [Wodle: Docker Listener Configuration](../
 
 ## How it works
 
-1. `wazuh-modulesd` (manager) or `wazuh-agentd` (agent) loads the `<wodle name="docker-listener">` block.
+1. `guardsarm-modulesd` (manager) or `guardsarm-agentd` (agent) loads the `<wodle name="docker-listener">` block.
 2. On the first scheduled run (or immediately if `run_on_start` is set to `yes`), the module connects to the local Docker daemon socket.
 3. If the connection fails, it retries up to `attempts` times (default 5) before giving up for that cycle.
 4. Docker events are collected and forwarded to the analysis engine as structured events.

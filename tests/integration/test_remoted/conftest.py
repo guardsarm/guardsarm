@@ -6,13 +6,13 @@ This program is free software; you can redistribute it and/or modify it under th
 
 import pytest
 
-from wazuh_testing.utils import services
-from wazuh_testing.utils.services import check_all_daemon_status
+from guardsarm_testing.utils import services
+from guardsarm_testing.utils.services import check_all_daemon_status
 from time import sleep
 
 
 @pytest.fixture
-def restart_wazuh_expect_error() -> None:
+def restart_guardsarm_expect_error() -> None:
     try:
         sleep(1)
         if any(v for _, v in check_all_daemon_status().items()):

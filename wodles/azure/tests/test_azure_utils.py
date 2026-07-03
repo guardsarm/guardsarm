@@ -211,7 +211,7 @@ def test_get_token_ko(mock_post, mock_logging, exception, error_msg, error_codes
 @patch('azure_utils.socket.send')
 @patch('azure_utils.socket.connect')
 def test_send_message(mock_connect, mock_send, mock_close):
-    """Test send_message sends the messages to the Wazuh queue socket."""
+    """Test send_message sends the messages to the GuardSarm queue socket."""
     message = 'msg'
     send_message(message)
     mock_connect.assert_called_with(ANALYSISD)

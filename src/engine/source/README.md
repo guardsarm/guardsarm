@@ -1,8 +1,8 @@
-# Wazuh Engine — Source Tree Architecture
+# GuardSarm Engine — Source Tree Architecture
 
-`wazuh-engine` is the decoding, enrichment and routing engine of the Wazuh manager (it ships as the `wazuh-manager-analysisd` daemon). It receives raw security events from `remoted` and external producers, parses them into the **Wazuh Common Schema (WCS)** using user-defined **decoders**, enriches them (GeoIP, IOC, KVDB lookups), runs them through one or more **policies**, and forwards the resulting normalized JSON documents to the Wazuh Indexer (and optional file outputs).
+`guardsarm-engine` is the decoding, enrichment and routing engine of the GuardSarm manager (it ships as the `guardsarm-manager-analysisd` daemon). It receives raw security events from `remoted` and external producers, parses them into the **GuardSarm Common Schema (WCS)** using user-defined **decoders**, enriches them (GeoIP, IOC, KVDB lookups), runs them through one or more **policies**, and forwards the resulting normalized JSON documents to the GuardSarm Indexer (and optional file outputs).
 
-The engine can also run standalone (`WAZUH_ENGINE_STANDALONE=true`) for development, testing or if run inside wazuh-indexer as a standalone content processor/validator.
+The engine can also run standalone (`GUARDSARM_ENGINE_STANDALONE=true`) for development, testing or if run inside guardsarm-indexer as a standalone content processor/validator.
 
 This README is the **developer / source-tree** view: what each directory does, how modules depend on each other, and how the process is wired together at startup. For operator-facing documentation (configuration, ruleset authoring, CLI usage), see the [user manual](../../../docs/ref/modules/engine/README.md).
 
@@ -35,7 +35,7 @@ This README is the **developer / source-tree** view: what each directory does, h
         └────────────────────┬───────────────────────────┘
                              │
                              ▼
-              wazuh-indexer  /  file outputs (streamlog)
+              guardsarm-indexer  /  file outputs (streamlog)
 ```
 
 - One incoming event ⇒ one independent traversal **per active policy**.
@@ -83,7 +83,7 @@ Used by virtually every other module.
 - [streamlog/](streamlog/README.md) — Async rotating log channels (size+time, gzip, retention) used by file outputs and `dumper`.
 - [dumper/](dumper/README.md) — Toggleable raw-event dumper that writes via `streamlog` when active.
 - [scheduler/](scheduler/README.md) — Priority thread-pool task scheduler for periodic syncs and metric flushes.
-- [wiconnector/](wiconnector/README.md) — Thread-safe client for the Wazuh Indexer: events, policy resources, IOCs and remote config. Sole egress to the indexer.
+- [wiconnector/](wiconnector/README.md) — Thread-safe client for the GuardSarm Indexer: events, policy resources, IOCs and remote config. Sole egress to the indexer.
 
 ### Synchronization & remote configuration
 
@@ -143,7 +143,7 @@ Used by virtually every other module.
         └────────┘
 
                   ┌────────────────┐
-                  │  wiconnector   │ ──► wazuh-indexer    (sole egress)
+                  │  wiconnector   │ ──► guardsarm-indexer    (sole egress)
                   └────────────────┘
                           ▲
               cmsync, iocsync, confremote,
@@ -163,10 +163,10 @@ Key relationships:
 
 Modules are wired together in [main.cpp](main.cpp) using `std::shared_ptr` and a `StackExecutor` that records teardown callbacks for LIFO shutdown. Construction is staged so each phase only depends on phases above it. Some phases are gated by `conf::key::SERVER_ENABLE_EVENT_PROCESSING`.
 
-1. **Process bootstrap** — option parsing, logging (standalone vs `libwazuhshared`), signal handlers (`SIGINT`, `SIGTERM`, `SIGPIPE` → ignore), optional `goDaemon()`.
+1. **Process bootstrap** — option parsing, logging (standalone vs `libguardsarmshared`), signal handlers (`SIGINT`, `SIGTERM`, `SIGPIPE` → ignore), optional `goDaemon()`.
 2. **Configuration** — `conf::Conf` loads from ini file; every later module reads it via `confManager.get<T>(key::…)`.
 3. **Core data layer** — `store::Store` (with `FileDriver`) → `cmstore::CMStore` → `kvdbstore::KVDBManager` → `iockvdb::KVDBManager(store)` → `geo::Manager(store, downloader)` → `fastmetrics::registerManager()` → `schemf::Schema` (loads `schema/engine-schema/0` from `store`).
-4. **Parsing** — `hlp::initTZDB(...)` then `logpar::Logpar` (uses `schema/wazuh-logpar-overrides/0` from `store` and the schema validator); `hlp::registerParsers(logpar)`.
+4. **Parsing** — `hlp::initTZDB(...)` then `logpar::Logpar` (uses `schema/guardsarm-logpar-overrides/0` from `store` and the schema validator); `hlp::registerParsers(logpar)`.
 5. **Scheduler & I/O** (always, but most consumers gated on `enableProcessing`) — `scheduler::Scheduler` (registered for early shutdown). When `enableProcessing` is on: `wiconnector::WIndexerConnector` (queue metrics registered as pull callbacks) and `streamlog::LogManager(store, scheduler)`.
 6. **Compilation hub** — `builder::Builder(cmStore, schemaValidator, defs, allowedFields, builderDeps, store)` where `BuilderDeps` carries `logpar`, `kvdbManager`, `IOCkvdb`, `geoManager`, `streamLogger`, `indexerConnector` and the file-output rotation config. Then `cmcrud::CrudService(cmStore, builder)`.
 7. **Background services** (gated) — `confremote::ConfRemoteManager`, `rawevtindexer::RawEventIndexer`, `router::Orchestrator(...)` (started immediately and registered for shutdown), `cmsync::CMSync`, `iocsync::IocSync` (scheduled via `scheduler`), `dumper::Dumper(streamLogger)`.
@@ -181,14 +181,14 @@ Shutdown is the exact reverse: `StackExecutor` drains callbacks in LIFO. The API
 The engine uses a small but specific vocabulary, mirrored across the codebase, the API and the user manual.
 
 - **Event** — JSON document representing a security log line, carrying agent/cluster metadata. The unit of work flowing through the engine.
-- **Wazuh Common Schema (WCS)** — Authoritative typed field schema all output events must conform to. Owned by the indexer; the engine fetches `schema/engine-schema/0` from `store` at startup.
+- **GuardSarm Common Schema (WCS)** — Authoritative typed field schema all output events must conform to. Owned by the indexer; the engine fetches `schema/engine-schema/0` from `store` at startup.
 - **Asset** — Smallest content unit (decoder, filter, output, integration, KVDB, schema). Addressed as `<type>/<name>/<version>` (e.g. `decoder/aws-cloudtrail/0`).
 - **Decoder** — Asset that parses and normalizes events into WCS fields. Decoders are arranged hierarchically (root → children) and grouped into integrations.
 - **Integration** — Ordered group of decoders + KVDBs that belong to one product or log source. Every decoder lives in exactly one integration.
 - **Filter** — Boolean predicate over an event. Pre-filters drop events before decoding; post-filters drop events before they reach outputs.
-- **Output** — Destination for processed events (Wazuh Indexer, file). Bundled with the manager, not synced from content.
+- **Output** — Destination for processed events (GuardSarm Indexer, file). Bundled with the manager, not synced from content.
 - **Policy** — Named pipeline `pre-filter → decoders → pre-enrichment → enrichment → post-filter → outputs`. Multiple policies run concurrently.
-- **Namespace / Space** — Logical content partition. Two spaces ship: **standard** (Wazuh-maintained) and **custom** (user). The indexer is the source of truth; the engine mirrors it locally.
+- **Namespace / Space** — Logical content partition. Two spaces ship: **standard** (GuardSarm-maintained) and **custom** (user). The indexer is the source of truth; the engine mirrors it locally.
 - **KVDB** — Lightweight key-value store consulted by decoders/filters during processing. Regular KVDBs are per-space; IOC and Geo databases are global.
 - **Helper** — Reusable function callable from decoder/filter stages: condition helpers (in `check`) and mapping helpers (in `map`).
 - **Stage** — Operation block inside a decoder: `check` (boolean), `parse|<field>` (extraction), `normalize` (with nested `map`).

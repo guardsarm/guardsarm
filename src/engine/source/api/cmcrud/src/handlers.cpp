@@ -16,8 +16,8 @@
 namespace api::cmcrud::handlers
 {
 
-namespace eContent = ::com::wazuh::api::engine::content;
-namespace eEngine = ::com::wazuh::api::engine;
+namespace eContent = ::com::guardsarm::api::engine::content;
+namespace eEngine = ::com::guardsarm::api::engine;
 
 // Error messages
 constexpr auto MESSAGE_SPACE_REQUIRED = "Field /space cannot be empty";
@@ -453,7 +453,7 @@ adapter::RouteHandler policyValidate(std::shared_ptr<cm::crud::ICrudService> cru
             {
                 const int lifetime = 0;
                 ::router::test::EntryPost entryPost(tmpSessionName, tmpNsId, lifetime);
-                entryPost.description("wazuh-indexer auto created session");
+                entryPost.description("guardsarm-indexer auto created session");
 
                 auto err = testerLocked->postTestEntry(entryPost);
                 if (base::isError(err))

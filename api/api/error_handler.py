@@ -11,7 +11,7 @@ from api import configuration
 from api.middlewares import ip_block, ip_stats, ip_lock, LOGIN_ENDPOINT, RUN_AS_LOGIN_ENDPOINT
 from api.api_exception import ExpectFailedException
 from api.controllers.util import json_response, build_recursion_error_response, ERROR_CONTENT_TYPE
-from wazuh.core.utils import get_utc_now
+from guardsarm.core.utils import get_utc_now
 
 
 async def prevent_bruteforce_attack(request: ConnexionRequest, attempts: int = 5):

@@ -167,7 +167,7 @@ target_include_directories(ext_zlib INTERFACE ${EXTERNAL_DIR}/zlib)
 # The agent never links minizip — only the server does (engine,
 # content_manager). It is still built for the agent target because
 # libminizip.a lives inside the zlib tree (zlib/contrib/minizip/) and the
-# precompiled zlib dependency published on packages.wazuh.com already
+# precompiled zlib dependency published on packages.guardsarm.com already
 # includes it. Building it here too keeps the agent's external tree aligned
 # with that shared zlib tarball instead of diverging from it. Windows
 # genuinely never needs it.
@@ -252,7 +252,7 @@ add_dependencies(ext_libyaml libyaml_external)
 
 if(IS_WINDOWS)
   # _WIN32_WINNT=0x0600 (Vista) is the rest of the project's target — see
-  # src/syscheckd/CMakeLists.txt, src/wazuh_modules/CMakeLists.txt, etc.
+  # src/syscheckd/CMakeLists.txt, src/guardsarm_modules/CMakeLists.txt, etc.
   # Curl ≥ 8.x's configure refuses to build for anything older. MinGW 12+
   # already defaults to 0x0A00 (Win10) and would pass the configure check
   # implicitly, but the compile_windows_agent image (ubuntu:22.04) ships
@@ -1051,7 +1051,7 @@ endif()
 # GoogleTest (test builds only)
 # ------------------------------------------------------------------------------
 
-if(UNIT_TEST OR WAZUH_ENGINE_TEST)
+if(UNIT_TEST OR GUARDSARM_ENGINE_TEST)
   if(IS_WINDOWS)
     find_program(FULL_RANLIB ${CMAKE_RANLIB} REQUIRED)
     set(GTEST_CMAKE_ARGS
@@ -1128,7 +1128,7 @@ endif()
 # Google Benchmark (test builds only; server/manager targets)
 # ------------------------------------------------------------------------------
 
-if((UNIT_TEST OR WAZUH_ENGINE_TEST) AND NOT IS_AGENT)
+if((UNIT_TEST OR GUARDSARM_ENGINE_TEST) AND NOT IS_AGENT)
   if(EXISTS ${EXTERNAL_DIR}/benchmark/build/src/libbenchmark.a)
     message(STATUS "Using precompiled benchmark library")
     add_custom_target(benchmark_external)
@@ -1300,18 +1300,18 @@ if(NOT IS_AGENT)
 endif()
 
 # ==============================================================================
-# Section 5: libwazuhext — shared library bundling all core external deps
+# Section 5: libguardsarmext — shared library bundling all core external deps
 # ==============================================================================
 
 # Create an empty source file so CMake accepts the shared library target. Only
 # write if it doesn't exist to avoid triggering rebuilds
-if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/wazuhext_empty.c)
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/wazuhext_empty.c "/* empty */\n")
+if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/guardsarmext_empty.c)
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/guardsarmext_empty.c "/* empty */\n")
 endif()
-add_library(wazuhext SHARED ${CMAKE_CURRENT_BINARY_DIR}/wazuhext_empty.c)
+add_library(guardsarmext SHARED ${CMAKE_CURRENT_BINARY_DIR}/guardsarmext_empty.c)
 
-# Collect all static libraries that go into libwazuhext (whole-archive)
-set(WAZUHEXT_WHOLE_LIBS
+# Collect all static libraries that go into libguardsarmext (whole-archive)
+set(GUARDSARMEXT_WHOLE_LIBS
     ext_cjson
     ext_zlib
     openssl_ssl
@@ -1324,16 +1324,16 @@ set(WAZUHEXT_WHOLE_LIBS
 if(IS_LINUX
    OR IS_DARWIN
    OR IS_WINDOWS)
-  list(APPEND WAZUHEXT_WHOLE_LIBS ext_curl)
+  list(APPEND GUARDSARMEXT_WHOLE_LIBS ext_curl)
 endif()
 
 # Non-Windows additions
 if(NOT IS_WINDOWS)
   # bzip2 is shared: the agent links it via shared/src/bzip2_op.c and the server
   # additionally builds rocksdb WITH_BZ2, so it stays in every non-Windows leg.
-  list(APPEND WAZUHEXT_WHOLE_LIBS ext_bzip2)
+  list(APPEND GUARDSARMEXT_WHOLE_LIBS ext_bzip2)
   if(NOT IS_AGENT)
-    list(APPEND WAZUHEXT_WHOLE_LIBS ext_libffi)
+    list(APPEND GUARDSARMEXT_WHOLE_LIBS ext_libffi)
   endif()
   # Linux agent-only libraries. Their only consumers (data_provider/sysinfo,
   # syscheckd, rootcheck) are agent-only subdirectories, so the server build
@@ -1341,7 +1341,7 @@ if(NOT IS_WINDOWS)
   if(IS_LINUX AND IS_AGENT)
     list(
       APPEND
-      WAZUHEXT_WHOLE_LIBS
+      GUARDSARMEXT_WHOLE_LIBS
       ext_dbus
       ext_lua
       ext_rpm
@@ -1353,12 +1353,12 @@ endif()
 
 # macOS-only
 if(IS_DARWIN)
-  list(APPEND WAZUHEXT_WHOLE_LIBS ext_libplist)
+  list(APPEND GUARDSARMEXT_WHOLE_LIBS ext_libplist)
 endif()
 
 # Server-only additions to whole-archive
 if(NOT IS_AGENT AND NOT IS_WINDOWS)
-  list(APPEND WAZUHEXT_WHOLE_LIBS ext_minizip)
+  list(APPEND GUARDSARMEXT_WHOLE_LIBS ext_minizip)
 endif()
 
 # --- Platform-specific linking ---
@@ -1366,29 +1366,29 @@ endif()
 if(IS_DARWIN)
   # macOS: -all_load + install name
   set_target_properties(
-    wazuhext
+    guardsarmext
     PROPERTIES INSTALL_RPATH "@rpath"
                BUILD_WITH_INSTALL_RPATH TRUE
                INSTALL_NAME_DIR "@rpath"
                MACOSX_RPATH TRUE)
   target_link_libraries(
-    wazuhext
-    PRIVATE "-Wl,-all_load" ${WAZUHEXT_WHOLE_LIBS} "-framework Security"
+    guardsarmext
+    PRIVATE "-Wl,-all_load" ${GUARDSARMEXT_WHOLE_LIBS} "-framework Security"
             "-framework CoreFoundation" "-framework SystemConfiguration")
 
 elseif(IS_WINDOWS)
   # Windows (MinGW cross-compile): DLL + delay-import lib
-  target_sources(wazuhext PRIVATE ${RESOURCE_OBJ_DLL})
-  add_dependencies(wazuhext winpthreadpatched)
+  target_sources(guardsarmext PRIVATE ${RESOURCE_OBJ_DLL})
+  add_dependencies(guardsarmext winpthreadpatched)
   target_link_libraries(
-    wazuhext
+    guardsarmext
     PRIVATE -static-libgcc
             "-Wl,--export-all-symbols"
             "-Wl,--add-stdcall-alias"
             "-Wl,-L,${SRC_FOLDER}/build/lib"
             "-Wl,-Bstatic,--whole-archive"
             -lwinpthreadpatched
-            ${WAZUHEXT_WHOLE_LIBS}
+            ${GUARDSARMEXT_WHOLE_LIBS}
             "-Wl,--no-whole-archive"
             "-Wl,-Bdynamic"
             -ldelayimp
@@ -1401,26 +1401,26 @@ elseif(IS_WINDOWS)
 
   # Output .def for delay-import lib creation
   set_target_properties(
-    wazuhext
+    guardsarmext
     PROPERTIES LINK_FLAGS
-               "-Wl,--output-def,${CMAKE_CURRENT_BINARY_DIR}/libwazuhext.def")
+               "-Wl,--output-def,${CMAKE_CURRENT_BINARY_DIR}/libguardsarmext.def")
 
   # Create delay-import library after DLL is built
   add_custom_command(
-    TARGET wazuhext
+    TARGET guardsarmext
     POST_BUILD
     COMMAND
-      i686-w64-mingw32-dlltool -D $<TARGET_FILE:wazuhext> --def
-      ${CMAKE_CURRENT_BINARY_DIR}/libwazuhext.def --output-delaylib
-      ${SRC_FOLDER}/build/lib/libwazuhext.lib
-    COMMENT "Creating delay-import library libwazuhext.lib")
+      i686-w64-mingw32-dlltool -D $<TARGET_FILE:guardsarmext> --def
+      ${CMAKE_CURRENT_BINARY_DIR}/libguardsarmext.def --output-delaylib
+      ${SRC_FOLDER}/build/lib/libguardsarmext.lib
+    COMMENT "Creating delay-import library libguardsarmext.lib")
 
 else()
   # Linux: --whole-archive + system libs
   target_link_libraries(
-    wazuhext
+    guardsarmext
     PRIVATE "-Wl,--whole-archive"
-            ${WAZUHEXT_WHOLE_LIBS}
+            ${GUARDSARMEXT_WHOLE_LIBS}
             "-Wl,--no-whole-archive"
             rt
             dl
@@ -1430,14 +1430,14 @@ endif()
 
 # Output to src/build/lib
 set_target_properties(
-  wazuhext
-  PROPERTIES OUTPUT_NAME "wazuhext"
+  guardsarmext
+  PROPERTIES OUTPUT_NAME "guardsarmext"
              PREFIX "lib"
              LIBRARY_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/lib
              RUNTIME_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/bin
              POSITION_INDEPENDENT_CODE ON)
 
-# Provide include dirs to consumers of wazuhext
+# Provide include dirs to consumers of guardsarmext
 target_include_directories(
-  wazuhext PUBLIC ${EXTERNAL_DIR}/cJSON ${EXTERNAL_DIR}/openssl/include
+  guardsarmext PUBLIC ${EXTERNAL_DIR}/cJSON ${EXTERNAL_DIR}/openssl/include
                   ${EXTERNAL_DIR}/zlib ${EXTERNAL_DIR}/zlib/contrib)

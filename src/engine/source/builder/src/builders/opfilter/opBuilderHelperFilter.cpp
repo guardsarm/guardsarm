@@ -1904,7 +1904,7 @@ FilterOp opBuilderHelperIndexUnclassifiedEvents(const Reference& targetField,
     if (targetField.jsonPath() != syntax::asset::CATEGORY_PATH)
     {
         throw std::runtime_error(
-            fmt::format("index_unclassified_events: target field must be 'wazuh.integration.category', got '{}'",
+            fmt::format("index_unclassified_events: target field must be 'guardsarm.integration.category', got '{}'",
                         targetField.dotPath()));
     }
 

@@ -2,23 +2,23 @@
 
 ## Introduction
 
-The Wazuh Azure module retrieves logs from Microsoft Azure services and forwards them for analysis. The module supports three data sources:
+The GuardSarm Azure module retrieves logs from Microsoft Azure services and forwards them for analysis. The module supports three data sources:
 
 - **Log Analytics**: Queries Azure Log Analytics workspaces using Kusto Query Language (KQL).
 - **Microsoft Graph**: Retrieves directory and security data from the Microsoft Graph API.
 - **Azure Storage**: Reads logs from Azure Blob Storage containers.
 
-The module runs as a Wazuh wodle on the Wazuh agent. It invokes the `wodles/azure/azure-logs` Python script to connect to Azure services.
+The module runs as a GuardSarm wodle on the GuardSarm agent. It invokes the `wodles/azure/azure-logs` Python script to connect to Azure services.
 
 ## Prerequisites
 
 - An Azure subscription with the required services enabled.
 - An Azure AD application registered with appropriate API permissions.
-- Python 3 and the required Azure Python libraries installed on the Wazuh agent.
+- Python 3 and the required Azure Python libraries installed on the GuardSarm agent.
 
 ## Configuration
 
-The Azure module is configured inside the `<ossec_config>` block of the Wazuh agent configuration file (`ossec.conf`).
+The Azure module is configured inside the `<ossec_config>` block of the GuardSarm agent configuration file (`ossec.conf`).
 
 ### Log Analytics configuration
 
@@ -154,10 +154,10 @@ For Storage:
 
 ## Verify the integration
 
-Restart the Wazuh agent after applying the configuration:
+Restart the GuardSarm agent after applying the configuration:
 
 ```bash
-systemctl restart wazuh-agent
+systemctl restart guardsarm-agent
 ```
 
 Check the module logs:

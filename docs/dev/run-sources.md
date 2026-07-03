@@ -1,6 +1,6 @@
 # Run from Sources
 
-This guide describes how to install and run Wazuh components built from source code.
+This guide describes how to install and run GuardSarm components built from source code.
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ Alternatively, configure environment variables as described in `etc/preloaded-va
 ```bash
 USER_LANGUAGE="en" \
 USER_INSTALL_TYPE="manager" \
-USER_DIR="/var/wazuh-manager" \
+USER_DIR="/var/guardsarm-manager" \
 USER_ENABLE_AUTHD="y" \
 USER_UPDATE="y" \
 USER_AUTO_START="n" \
@@ -39,13 +39,13 @@ USER_AUTO_START="n" \
 After installation, start the manager:
 
 ```bash
-/var/wazuh-manager/bin/wazuh-manager-control start
+/var/guardsarm-manager/bin/guardsarm-manager-control start
 ```
 
 To verify the server is running:
 
 ```bash
-/var/wazuh-manager/bin/wazuh-manager-control status
+/var/guardsarm-manager/bin/guardsarm-manager-control status
 ```
 
 ## Agent for UNIX
@@ -80,13 +80,13 @@ USER_UPDATE="y" \
 After installation, start the agent:
 
 ```bash
-/var/ossec/bin/wazuh-control start
+/var/ossec/bin/guardsarm-control start
 ```
 
 To verify the agent is running:
 
 ```bash
-/var/ossec/bin/wazuh-control status
+/var/ossec/bin/guardsarm-control status
 ```
 
 ## Agent for Windows
@@ -113,7 +113,7 @@ Copy all files to a Windows machine.
 Navigate to the `src/win32` directory and execute:
 
 ```batch
-wazuh-installer-build-msi.bat
+guardsarm-installer-build-msi.bat
 ```
 
 This will generate the MSI installer package.
@@ -123,7 +123,7 @@ This will generate the MSI installer package.
 Once the package is generated, install it using the command line with the server address:
 
 ```batch
-wazuh-agent-*.msi /q WAZUH_MANAGER="10.0.0.2"
+guardsarm-agent-*.msi /q GUARDSARM_MANAGER="10.0.0.2"
 ```
 
 **Important**: Replace `10.0.0.2` with the correct server IP address.
@@ -132,16 +132,16 @@ For more installation options, see the [Installation](../ref/getting-started/ins
 
 ### Starting the Agent
 
-Start the Wazuh service on Windows:
+Start the GuardSarm service on Windows:
 
 ```powershell
-Start-Service -Name wazuh
+Start-Service -Name guardsarm
 ```
 
 To verify the service is running:
 
 ```powershell
-Get-Service -Name wazuh
+Get-Service -Name guardsarm
 ```
 
 ## Configuration
@@ -151,13 +151,13 @@ Get-Service -Name wazuh
 The main server configuration file is located at:
 
 ```
-/var/wazuh-manager/etc/wazuh-manager.conf
+/var/guardsarm-manager/etc/guardsarm-manager.conf
 ```
 
 After modifying the configuration, restart the server:
 
 ```bash
-/var/wazuh-manager/bin/wazuh-manager-control restart
+/var/guardsarm-manager/bin/guardsarm-manager-control restart
 ```
 
 ### Agent Configuration
@@ -171,12 +171,12 @@ After modifying the configuration, restart the agent:
 
 **UNIX**:
 ```bash
-/var/ossec/bin/wazuh-control restart
+/var/ossec/bin/guardsarm-control restart
 ```
 
 **Windows**:
 ```powershell
-Restart-Service -Name wazuh
+Restart-Service -Name guardsarm
 ```
 
 ## Stopping Services
@@ -184,43 +184,43 @@ Restart-Service -Name wazuh
 ### Server on UNIX
 
 ```bash
-/var/wazuh-manager/bin/wazuh-manager-control stop
+/var/guardsarm-manager/bin/guardsarm-manager-control stop
 ```
 
 ### Agent on UNIX
 
 ```bash
-/var/ossec/bin/wazuh-control stop
+/var/ossec/bin/guardsarm-control stop
 ```
 
 ### Agent on Windows
 
 ```powershell
-Stop-Service -Name wazuh
+Stop-Service -Name guardsarm
 ```
 
 ## Logs
 
 ### Server Logs on UNIX
 
-Logs are located in `/var/wazuh-manager/logs/`:
+Logs are located in `/var/guardsarm-manager/logs/`:
 
-- `wazuh-manager.log` - Main Wazuh log
-- `wazuh-manager.json` - Structured Wazuh log
-- Individual component logs in `/var/wazuh-manager/logs/`
+- `guardsarm-manager.log` - Main GuardSarm log
+- `guardsarm-manager.json` - Structured GuardSarm log
+- Individual component logs in `/var/guardsarm-manager/logs/`
 
 To monitor logs in real-time:
 
 ```bash
-tail -f /var/wazuh-manager/logs/wazuh-manager.log
+tail -f /var/guardsarm-manager/logs/guardsarm-manager.log
 ```
 
 ### Agent Logs on UNIX
 
 Logs are located in `/var/ossec/logs/`:
 
-- `ossec.log` - Main Wazuh log
-- `ossec.json` - Structured Wazuh log
+- `ossec.log` - Main GuardSarm log
+- `ossec.json` - Structured GuardSarm log
 - Individual component logs in `/var/ossec/logs/`
 
 To monitor logs in real-time:
@@ -248,7 +248,7 @@ cat /var/ossec/logs/ossec.log
 Verify the configuration file syntax:
 
 ```bash
-/var/ossec/bin/wazuh-control configtest
+/var/ossec/bin/guardsarm-control configtest
 ```
 
 ### Agent Not Connecting to Server
@@ -270,10 +270,10 @@ Verify the configuration file syntax:
 
 ### Permission Errors
 
-Ensure Wazuh is running with appropriate permissions:
+Ensure GuardSarm is running with appropriate permissions:
 
 ```bash
 ls -l /var/ossec/
 ```
 
-Wazuh typically runs as the `ossec` user.
+GuardSarm typically runs as the `ossec` user.

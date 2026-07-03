@@ -1,4 +1,4 @@
-name: 5.X - Wazuh - Legacy Unit tests
+name: 5.X - GuardSarm - Legacy Unit tests
 
 on:
   pull_request:
@@ -42,15 +42,15 @@ jobs:
         uses: ./.github/actions/reinstall_cmake
       - name: Install GCC 14.3
         uses: ./.github/actions/install_gcc_14
-      - name: Build wazuh
+      - name: Build guardsarm
         uses: ./.github/actions/build_test_flags
         with:
           target: ${{ matrix.target }}
-      - name: Build wazuh legacy unit tests
+      - name: Build guardsarm legacy unit tests
         uses: ./.github/actions/legacy_unit_tests_build
         with:
           target: ${{ matrix.target }}
-      - name: Run wazuh legacy unit tests
+      - name: Run guardsarm legacy unit tests
         uses: ./.github/actions/legacy_unit_tests_run
         with:
           target: ${{ matrix.target }}

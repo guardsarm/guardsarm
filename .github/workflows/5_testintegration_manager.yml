@@ -38,7 +38,7 @@ on:
         required: false
         default: ''
       modules:
-        description: 'Comma-separated module names. Example: "api,wazuh_db" or "all".'
+        description: 'Comma-separated module names. Example: "api,guardsarm_db" or "all".'
         required: false
         default: 'all'
       base_branch:
@@ -133,7 +133,7 @@ jobs:
     env:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
       BRANCH_BASE: ${{ github.base_ref || inputs.base_branch }}
-      INSTALLATION_DIR: /var/wazuh-manager
+      INSTALLATION_DIR: /var/guardsarm-manager
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -148,24 +148,24 @@ jobs:
           run_id: ${{ inputs.build_run_id }}
           workflow_conclusion: success
           name_is_regexp: true
-          name: wazuh-manager.*amd64.*\.deb
+          name: guardsarm-manager.*amd64.*\.deb
           path: /tmp/packages
           if_no_artifact_found: fail
           check_artifacts: true
           search_artifacts: true
 
-      - name: Install wazuh-manager from artifact
+      - name: Install guardsarm-manager from artifact
         if: inputs.build_run_id != ''
         run: |
-          PACKAGE_PATH=$(find /tmp/packages -maxdepth 2 -type f -name "wazuh-manager*amd64*.deb" \
-            | grep -v "wazuh-manager-dbg" | head -n 1)
+          PACKAGE_PATH=$(find /tmp/packages -maxdepth 2 -type f -name "guardsarm-manager*amd64*.deb" \
+            | grep -v "guardsarm-manager-dbg" | head -n 1)
           if [ -z "$PACKAGE_PATH" ]; then
             echo "No manager package found in /tmp/packages"
             exit 1
           fi
           sudo dpkg -i "${PACKAGE_PATH}" || sudo apt-get install -f -y
-          if ! dpkg -l wazuh-manager | grep -q '^ii'; then
-            echo "wazuh-manager package installation failed"
+          if ! dpkg -l guardsarm-manager | grep -q '^ii'; then
+            echo "guardsarm-manager package installation failed"
             exit 1
           fi
 
@@ -179,19 +179,19 @@ jobs:
         if: inputs.build_run_id == ''
         uses: ./.github/actions/reinstall_cmake
 
-      - name: Build wazuh-manager
+      - name: Build guardsarm-manager
         if: inputs.build_run_id == ''
         run: |
           make deps -C src TARGET=manager -j$(nproc)
           make -C src TARGET=manager -j$(nproc)
 
-      - name: Install wazuh-manager from source
+      - name: Install guardsarm-manager from source
         if: inputs.build_run_id == ''
         run: |
           cat > ./etc/preloaded-vars.conf << 'EOF'
           USER_LANGUAGE="en"
           USER_INSTALL_TYPE="manager"
-          USER_DIR="/var/wazuh-manager"
+          USER_DIR="/var/guardsarm-manager"
           USER_ENABLE_AUTHD="n"
           USER_AUTO_START="n"
           EOF
@@ -202,7 +202,7 @@ jobs:
 
       - name: Generate SSL certificates
         run: |
-          sudo systemctl stop wazuh-manager 2>/dev/null || true
+          sudo systemctl stop guardsarm-manager 2>/dev/null || true
           sudo mkdir -p "$INSTALLATION_DIR/etc/certs"
           sudo openssl req -x509 -new -nodes -newkey rsa:2048 \
             -keyout "$INSTALLATION_DIR/etc/certs/root-ca.pem" \
@@ -213,12 +213,12 @@ jobs:
             -out "$INSTALLATION_DIR/etc/certs/manager.pem" \
             -days 1 -subj "/CN=test" 2>/dev/null
 
-      - name: Start wazuh-manager and verify
+      - name: Start guardsarm-manager and verify
         run: |
-          sudo systemctl start wazuh-manager
+          sudo systemctl start guardsarm-manager
           sleep 10
-          if ! systemctl is-active --quiet wazuh-manager; then
-            sudo systemctl status wazuh-manager --no-pager
+          if ! systemctl is-active --quiet guardsarm-manager; then
+            sudo systemctl status guardsarm-manager --no-pager
             exit 1
           fi
 
@@ -230,7 +230,7 @@ jobs:
 
       - name: Download and install integration tests framework
         run: |
-          QA_REPO="https://github.com/wazuh/qa-integration-framework.git"
+          QA_REPO="https://github.com/guardsarm/qa-integration-framework.git"
           VERSION="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' VERSION.json)"
           if git ls-remote --exit-code "${QA_REPO}" "${BRANCH_NAME}" >/dev/null 2>&1; then
             QA_BRANCH="${BRANCH_NAME}"
@@ -251,13 +251,13 @@ jobs:
           PYTEST_TIER_ARGS:  ${{ matrix.pytest_tier_args }}
           PYTEST_TARGET:     ${{ matrix.pytest_target }}
         run: |
-          mkdir -p /tmp/wazuh-logs
-          sudo tail -F "$INSTALLATION_DIR/logs/api.log" >> /tmp/wazuh-logs/api.log 2>/dev/null &
-          sudo tail -F "$INSTALLATION_DIR/logs/wazuh-manager.log" >> /tmp/wazuh-logs/wazuh-manager.log 2>/dev/null &
-          sudo tail -F "$INSTALLATION_DIR/logs/cluster.log" >> /tmp/wazuh-logs/cluster.log 2>/dev/null &
+          mkdir -p /tmp/guardsarm-logs
+          sudo tail -F "$INSTALLATION_DIR/logs/api.log" >> /tmp/guardsarm-logs/api.log 2>/dev/null &
+          sudo tail -F "$INSTALLATION_DIR/logs/guardsarm-manager.log" >> /tmp/guardsarm-logs/guardsarm-manager.log 2>/dev/null &
+          sudo tail -F "$INSTALLATION_DIR/logs/cluster.log" >> /tmp/guardsarm-logs/cluster.log 2>/dev/null &
           cd tests/integration
           set +e
-          sudo WAZUH_PATH="$INSTALLATION_DIR" GITHUB_SHA="${{ github.sha }}" GITHUB_REF_NAME="${BRANCH_NAME}" \
+          sudo GUARDSARM_PATH="$INSTALLATION_DIR" GITHUB_SHA="${{ github.sha }}" GITHUB_REF_NAME="${BRANCH_NAME}" \
             python -m pytest ${PYTEST_EXTRA_ARGS} ${PYTEST_TIER_ARGS} ${PYTEST_TARGET} \
             --html=results.html --self-contained-html
           EXIT_CODE=$?
@@ -271,8 +271,8 @@ jobs:
       - name: Collect logs on failure
         if: failure()
         run: |
-          sudo journalctl -u wazuh-manager > /tmp/wazuh-logs/wazuh-manager.service.log || true
-          sudo chown -R "$(whoami):$(whoami)" /tmp/wazuh-logs || true
+          sudo journalctl -u guardsarm-manager > /tmp/guardsarm-logs/guardsarm-manager.service.log || true
+          sudo chown -R "$(whoami):$(whoami)" /tmp/guardsarm-logs || true
 
       - name: Upload test results
         if: failure()
@@ -282,11 +282,11 @@ jobs:
           path: ./tests/integration/results.html
           retention-days: 7
 
-      - name: Upload wazuh logs
+      - name: Upload guardsarm logs
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: wazuh-logs-${{ matrix.name }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: /tmp/wazuh-logs
+          name: guardsarm-logs-${{ matrix.name }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/guardsarm-logs
           retention-days: 7
           if-no-files-found: warn

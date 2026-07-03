@@ -1,6 +1,6 @@
 #!/usr/bin/env /bin/bash
 #
-# Wazuh restore permissions script generator (ver 0.1)
+# GuardSarm restore permissions script generator (ver 0.1)
 # Copyright (C) 2019 Wazuh Inc.
 #
 # This program is a free software; you can redistribute it

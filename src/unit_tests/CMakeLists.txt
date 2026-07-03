@@ -48,48 +48,48 @@ include_directories(${SRC_FOLDER}/shared_modules/router/include/)
 include_directories(${SRC_FOLDER}/shared_modules/sync_protocol/include/)
 include_directories(${SRC_FOLDER}/shared_modules/agent_metadata/include/)
 include_directories(${SRC_FOLDER}/shared_modules/dbsync/include/)
-include_directories(${SRC_FOLDER}/wazuh_modules/include/)
-include_directories(${SRC_FOLDER}/wazuh_modules/src/)
-include_directories(${SRC_FOLDER}/wazuh_modules/src/agent_upgrade/)
-include_directories(${SRC_FOLDER}/wazuh_modules/src/agent_upgrade/agent/)
-include_directories(${SRC_FOLDER}/wazuh_modules/src/agent_upgrade/manager/)
-include_directories(${SRC_FOLDER}/wazuh_modules/src/task_manager/)
-include_directories(${SRC_FOLDER}/wazuh_db/include/)
-add_definitions(-DWAZUH_UNIT_TESTING)
+include_directories(${SRC_FOLDER}/guardsarm_modules/include/)
+include_directories(${SRC_FOLDER}/guardsarm_modules/src/)
+include_directories(${SRC_FOLDER}/guardsarm_modules/src/agent_upgrade/)
+include_directories(${SRC_FOLDER}/guardsarm_modules/src/agent_upgrade/agent/)
+include_directories(${SRC_FOLDER}/guardsarm_modules/src/agent_upgrade/manager/)
+include_directories(${SRC_FOLDER}/guardsarm_modules/src/task_manager/)
+include_directories(${SRC_FOLDER}/guardsarm_db/include/)
+add_definitions(-DGUARDSARM_UNIT_TESTING)
 
-# Find libwazuh_test (contains test wrappers for unit testing)
+# Find libguardsarm_test (contains test wrappers for unit testing)
 find_library(
-  WAZUHLIB_WAZUH
-  NAMES wazuh_test libwazuh_test.a
+  GUARDSARMLIB_GUARDSARM
+  NAMES guardsarm_test libguardsarm_test.a
   HINTS "${SRC_FOLDER}/build/lib")
-if(NOT WAZUHLIB_WAZUH)
+if(NOT GUARDSARMLIB_GUARDSARM)
   message(
     FATAL_ERROR
-      "libwazuh_test.a not found in ${SRC_FOLDER}/build/lib. Aborting...")
+      "libguardsarm_test.a not found in ${SRC_FOLDER}/build/lib. Aborting...")
 endif()
 
 # Find libconfig
 find_library(
-  WAZUHLIB_CONFIG
+  GUARDSARMLIB_CONFIG
   NAMES config libconfig.a
   HINTS "${SRC_FOLDER}/build/lib")
-if(NOT WAZUHLIB_CONFIG)
+if(NOT GUARDSARMLIB_CONFIG)
   message(FATAL_ERROR "libconfig.a not found in ${SRC_FOLDER}. Aborting...")
 endif()
 
-# Find libwazuh_modules
+# Find libguardsarm_modules
 find_library(
-  WAZUHLIB_WM
-  NAMES wazuh_modulesd_lib libwazuh_modulesd_lib.a
+  GUARDSARMLIB_WM
+  NAMES guardsarm_modulesd_lib libguardsarm_modulesd_lib.a
   HINTS "${SRC_FOLDER}/build/lib")
-if(NOT WAZUHLIB_WM)
+if(NOT GUARDSARMLIB_WM)
   message(
     FATAL_ERROR
-      "libwazuh_modulesd_lib.a not found in ${SRC_FOLDER}. Aborting...")
+      "libguardsarm_modulesd_lib.a not found in ${SRC_FOLDER}. Aborting...")
 endif()
 
-# Store both in WAZUHLIB (list)
-set(WAZUHLIB ${WAZUHLIB_CONFIG} ${WAZUHLIB_WAZUH} ${WAZUHLIB_WM})
+# Store both in GUARDSARMLIB (list)
+set(GUARDSARMLIB ${GUARDSARMLIB_CONFIG} ${GUARDSARMLIB_GUARDSARM} ${GUARDSARMLIB_WM})
 
 # Enable testing
 enable_testing()
@@ -101,19 +101,19 @@ elseif(${TARGET} STREQUAL "manager")
   include("./server.cmake")
   configure_file(
     "config_files/test_vulnerability_detection_multiple_configuration.conf"
-    "wazuh_modules/vulnerability_detection/test_vulnerability_detection_multiple_configuration.conf"
+    "guardsarm_modules/vulnerability_detection/test_vulnerability_detection_multiple_configuration.conf"
     COPYONLY)
   configure_file(
     "config_files/test_vulnerability_detection_duplicate_configuration.conf"
-    "wazuh_modules/vulnerability_detection/test_vulnerability_detection_duplicate_configuration.conf"
+    "guardsarm_modules/vulnerability_detection/test_vulnerability_detection_duplicate_configuration.conf"
     COPYONLY)
   configure_file(
     "config_files/test_vulnerability_detection.conf"
-    "wazuh_modules/vulnerability_detection/test_vulnerability_detection.conf"
+    "guardsarm_modules/vulnerability_detection/test_vulnerability_detection.conf"
     COPYONLY)
   configure_file(
     "config_files/test_vulnerability_detection_invalid_index_status_setting.conf"
-    "wazuh_modules/vulnerability_detection/test_vulnerability_detection_invalid_index_status_setting.conf"
+    "guardsarm_modules/vulnerability_detection/test_vulnerability_detection_invalid_index_status_setting.conf"
     COPYONLY)
 elseif(${TARGET} STREQUAL "agent")
   include("./agent.cmake")
@@ -129,8 +129,8 @@ else()
   message(FATAL_ERROR "Invalid TARGET '${TARGET}'. Aborting...")
 endif()
 
-if(NOT WAZUHEXT)
-  message(FATAL_ERROR "libwazuhext not found! Aborting...")
+if(NOT GUARDSARMEXT)
+  message(FATAL_ERROR "libguardsarmext not found! Aborting...")
 endif()
 
 if((CMAKE_SYSTEM_NAME STREQUAL "Linux") OR (CMAKE_SYSTEM_NAME STREQUAL "Windows"
@@ -219,23 +219,23 @@ endif()
 # These paths exist in the source tree of every target but only matter to the
 # manager/server flow, so we drop them only from the agent report. The manager
 # report keeps measuring them as before.
-#   - wazuh_modules/src/wm_database.c: server-only module bridge. Has a cmocka
+#   - guardsarm_modules/src/wm_database.c: server-only module bridge. Has a cmocka
 #     test in manager (test_wm_database) so it stays in the manager report.
-#   - config/src/{authd-config,remote-config,wazuh_db-config}.c: server-only config
+#   - config/src/{authd-config,remote-config,guardsarm_db-config}.c: server-only config
 #     parsers. Compiled in the agent binary because they are not in config/CMakeLists.txt
 #     REMOVE_ITEM list, but never exercised because the corresponding subsystems
-#     (authd, remoted, wazuh-db) are not part of the agent runtime. Manager has
+#     (authd, remoted, guardsarm-db) are not part of the agent runtime. Manager has
 #     cmocka tests for all three (test_authd-config, test_remote-config,
-#     test_wazuh_db-config).
+#     test_guardsarm_db-config).
 #   - shared/os_crypto/shared/: msgs.c has #ifdef CLIENT branches that diverge from
 #     the manager flow the tests were written against; tests stay manager-only.
 set(TARGET_LCOV_EXTRA_REMOVE)
 if(${TARGET} STREQUAL "agent")
   list(APPEND TARGET_LCOV_EXTRA_REMOVE
-       --remove coverage.total "*wazuh_modules/src/wm_database.c"
+       --remove coverage.total "*guardsarm_modules/src/wm_database.c"
        --remove coverage.total "*config/src/authd-config.c"
        --remove coverage.total "*config/src/remote-config.c"
-       --remove coverage.total "*config/src/wazuh_db-config.c"
+       --remove coverage.total "*config/src/guardsarm_db-config.c"
        --remove coverage.total "*shared/os_crypto/shared/*")
 endif()
 
@@ -266,13 +266,13 @@ add_custom_target(
   #     glibc and mingw-w64 system headers (template instantiations and inline
   #     definitions inflate the function/branch denominator without representing
   #     project code).
-  #   - engine/: wazuh-engine has its own coverage workflow (5_testunit_engine.yml);
+  #   - engine/: guardsarm-engine has its own coverage workflow (5_testunit_engine.yml);
   #     legacy UT cmocka does not exercise any of its sources.
-  #   - wazuh_modules/{agent_info,sca,vulnerability_scanner,router,inventory_sync,
+  #   - guardsarm_modules/{agent_info,sca,vulnerability_scanner,router,inventory_sync,
   #     content_manager,indexer_connector}/: C++ modules with their own coverage
   #     workflow (5_testunit_<module>.yml + coverage_cpp action); legacy UT cmocka
   #     does not exercise them in any target.
-  #   - wazuh_modules/src/wm_{router,content_manager,inventory_sync,
+  #   - guardsarm_modules/src/wm_{router,content_manager,inventory_sync,
   #     vulnerability_scanner}.c: C bridge files for the above C++ modules. Their
   #     wm_*_read() entry points are registered only under #ifndef CLIENT, but no
   #     cmocka test exercises them in either target — the logic is covered by each
@@ -287,23 +287,23 @@ add_custom_target(
     --remove coverage.total "*/include/c++/*" --remove coverage.total
     "/usr/include/*" --remove coverage.total "*usr/share/mingw-w64/*"
     --remove coverage.total "*engine/*"
-    --remove coverage.total "*wazuh_modules/agent_info/*" --remove coverage.total
-    "*wazuh_modules/sca/*" --remove coverage.total
-    "*wazuh_modules/vulnerability_scanner/*" --remove coverage.total
-    "*wazuh_modules/router/*" --remove coverage.total
-    "*wazuh_modules/inventory_sync/*" --remove coverage.total
-    "*wazuh_modules/content_manager/*" --remove coverage.total
-    "*wazuh_modules/indexer_connector/*" --remove coverage.total
-    "*wazuh_modules/src/wm_router.c" --remove coverage.total
-    "*wazuh_modules/src/wm_content_manager.c" --remove coverage.total
-    "*wazuh_modules/src/wm_inventory_sync.c" --remove coverage.total
-    "*wazuh_modules/src/wm_vulnerability_scanner.c"
+    --remove coverage.total "*guardsarm_modules/agent_info/*" --remove coverage.total
+    "*guardsarm_modules/sca/*" --remove coverage.total
+    "*guardsarm_modules/vulnerability_scanner/*" --remove coverage.total
+    "*guardsarm_modules/router/*" --remove coverage.total
+    "*guardsarm_modules/inventory_sync/*" --remove coverage.total
+    "*guardsarm_modules/content_manager/*" --remove coverage.total
+    "*guardsarm_modules/indexer_connector/*" --remove coverage.total
+    "*guardsarm_modules/src/wm_router.c" --remove coverage.total
+    "*guardsarm_modules/src/wm_content_manager.c" --remove coverage.total
+    "*guardsarm_modules/src/wm_inventory_sync.c" --remove coverage.total
+    "*guardsarm_modules/src/wm_vulnerability_scanner.c"
     ${TARGET_LCOV_EXTRA_REMOVE} --rc branch_coverage=1
     --ignore-errors mismatch,mismatch,unused,unused --output-file coverage.info.cleaned
   # Generate HTML report
   COMMAND
     ${GENHTML_PATH} -q --output-directory coverage-report --title
-    "WAZUH unit-tests coverage" --rc branch_coverage=1 --ignore-errors
+    "GUARDSARM unit-tests coverage" --rc branch_coverage=1 --ignore-errors
     mismatch,mismatch --legend coverage.info.cleaned
   # Clean counters
   COMMAND ${CMAKE_COMMAND} -E remove coverage.base coverage.total

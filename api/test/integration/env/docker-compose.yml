@@ -1,178 +1,178 @@
 services:
-  wazuh-master:
+  guardsarm-master:
     build:
       context: .
       dockerfile: base/manager/manager.Dockerfile
-    image: integration_test_wazuh-manager
-    hostname: wazuh-master
+    image: integration_test_guardsarm-manager
+    hostname: guardsarm-master
     ports:
       - "55000:55000"
     volumes:
-      - api_security:/var/wazuh-manager/api/configuration/security
-      - api_ssl:/var/wazuh-manager/api/configuration/ssl
+      - api_security:/var/guardsarm-manager/api/configuration/security
+      - api_ssl:/var/guardsarm-manager/api/configuration/ssl
       - ./configurations/tmp/manager:/tmp_volume
       - ./tools/:/tools
     entrypoint:
       - /scripts/entrypoint.sh
-      - wazuh-master
+      - guardsarm-master
       - master-node
       - master
 
-  wazuh-worker1:
-    image: integration_test_wazuh-manager
-    hostname: wazuh-worker1
+  guardsarm-worker1:
+    image: integration_test_guardsarm-manager
+    hostname: guardsarm-worker1
     ports:
       - "55001:55000"
     volumes:
-      - api_security:/var/wazuh-manager/api/configuration/security
-      - api_ssl:/var/wazuh-manager/api/configuration/ssl
+      - api_security:/var/guardsarm-manager/api/configuration/security
+      - api_ssl:/var/guardsarm-manager/api/configuration/ssl
       - ./configurations/tmp/manager:/tmp_volume
       - ./tools/:/tools
     entrypoint:
       - /scripts/entrypoint.sh
-      - wazuh-master
+      - guardsarm-master
       - worker1
       - worker
     depends_on:
-      - wazuh-master
+      - guardsarm-master
 
-  wazuh-worker2:
-    image: integration_test_wazuh-manager
-    hostname: wazuh-worker2
+  guardsarm-worker2:
+    image: integration_test_guardsarm-manager
+    hostname: guardsarm-worker2
     ports:
       - "55002:55000"
     volumes:
-      - api_security:/var/wazuh-manager/api/configuration/security
-      - api_ssl:/var/wazuh-manager/api/configuration/ssl
+      - api_security:/var/guardsarm-manager/api/configuration/security
+      - api_ssl:/var/guardsarm-manager/api/configuration/ssl
       - ./configurations/tmp/manager:/tmp_volume
       - ./tools/:/tools
     entrypoint:
       - /scripts/entrypoint.sh
-      - wazuh-master
+      - guardsarm-master
       - worker2
       - worker
     depends_on:
-      - wazuh-master
+      - guardsarm-master
 
-  wazuh-agent1:
+  guardsarm-agent1:
     build:
       context: .
       dockerfile: base/agent/new.Dockerfile
-    image: integration_test_wazuh-agent
-    hostname: wazuh-agent1
+    image: integration_test_guardsarm-agent
+    hostname: guardsarm-agent1
     volumes:
       - ./configurations/tmp/agent:/tmp_volume
       - ./tools/:/tools
     entrypoint:
       - /scripts/entrypoint.sh
       - haproxy-lb
-      - wazuh-agent1
+      - guardsarm-agent1
     depends_on:
       - haproxy-lb
 
-  wazuh-agent2:
-    image: integration_test_wazuh-agent
-    hostname: wazuh-agent2
+  guardsarm-agent2:
+    image: integration_test_guardsarm-agent
+    hostname: guardsarm-agent2
     volumes:
       - ./configurations/tmp/agent:/tmp_volume
       - ./tools/:/tools
     entrypoint:
       - /scripts/entrypoint.sh
       - haproxy-lb
-      - wazuh-agent2
+      - guardsarm-agent2
     depends_on:
-      - wazuh-agent1
+      - guardsarm-agent1
       - haproxy-lb
 
-  wazuh-agent3:
-    image: integration_test_wazuh-agent
-    hostname: wazuh-agent3
+  guardsarm-agent3:
+    image: integration_test_guardsarm-agent
+    hostname: guardsarm-agent3
     volumes:
       - ./configurations/tmp/agent:/tmp_volume
       - ./tools/:/tools
     entrypoint:
       - /scripts/entrypoint.sh
       - haproxy-lb
-      - wazuh-agent3
+      - guardsarm-agent3
     depends_on:
-      - wazuh-agent2
+      - guardsarm-agent2
       - haproxy-lb
 
-  wazuh-agent4:
-    image: integration_test_wazuh-agent
-    hostname: wazuh-agent4
+  guardsarm-agent4:
+    image: integration_test_guardsarm-agent
+    hostname: guardsarm-agent4
     volumes:
       - ./configurations/tmp/agent:/tmp_volume
       - ./tools/:/tools
     entrypoint:
       - /scripts/entrypoint.sh
       - haproxy-lb
-      - wazuh-agent4
+      - guardsarm-agent4
     depends_on:
-      - wazuh-agent3
+      - guardsarm-agent3
       - haproxy-lb
 
-  wazuh-agent5:
+  guardsarm-agent5:
     build:
       context: .
       dockerfile: base/agent/old.Dockerfile
-    image: integration_test_wazuh-agent_old
-    hostname: wazuh-agent5
+    image: integration_test_guardsarm-agent_old
+    hostname: guardsarm-agent5
     volumes:
       - ./configurations/tmp/agent:/tmp_volume
       - ./tools/:/tools
     entrypoint:
       - /scripts/entrypoint.sh
       - haproxy-lb
-      - wazuh-agent5
+      - guardsarm-agent5
       - agent_old
     depends_on:
-      - wazuh-agent4
+      - guardsarm-agent4
       - haproxy-lb
 
-  wazuh-agent6:
-    image: integration_test_wazuh-agent_old
-    hostname: wazuh-agent6
+  guardsarm-agent6:
+    image: integration_test_guardsarm-agent_old
+    hostname: guardsarm-agent6
     volumes:
       - ./configurations/tmp/agent:/tmp_volume
       - ./tools/:/tools
     entrypoint:
       - /scripts/entrypoint.sh
       - haproxy-lb
-      - wazuh-agent6
+      - guardsarm-agent6
       - agent_old
     depends_on:
-      - wazuh-agent5
+      - guardsarm-agent5
       - haproxy-lb
 
-  wazuh-agent7:
-    image: integration_test_wazuh-agent_old
-    hostname: wazuh-agent7
+  guardsarm-agent7:
+    image: integration_test_guardsarm-agent_old
+    hostname: guardsarm-agent7
     volumes:
       - ./configurations/tmp/agent:/tmp_volume
       - ./tools/:/tools
     entrypoint:
       - /scripts/entrypoint.sh
       - haproxy-lb
-      - wazuh-agent7
+      - guardsarm-agent7
       - agent_old
     depends_on:
-      - wazuh-agent6
+      - guardsarm-agent6
       - haproxy-lb
 
-  wazuh-agent8:
-    image: integration_test_wazuh-agent_old
-    hostname: wazuh-agent8
+  guardsarm-agent8:
+    image: integration_test_guardsarm-agent_old
+    hostname: guardsarm-agent8
     volumes:
       - ./configurations/tmp/agent:/tmp_volume
       - ./tools/:/tools
     entrypoint:
       - /scripts/entrypoint.sh
       - haproxy-lb
-      - wazuh-agent8
+      - guardsarm-agent8
       - agent_old
     depends_on:
-      - wazuh-agent7
+      - guardsarm-agent7
       - haproxy-lb
 
   haproxy-lb:
@@ -186,9 +186,9 @@ services:
     entrypoint:
       - /scripts/entrypoint.sh
     depends_on:
-      - wazuh-master
-      - wazuh-worker1
-      - wazuh-worker2
+      - guardsarm-master
+      - guardsarm-worker1
+      - guardsarm-worker2
 
 volumes:
   api_ssl:

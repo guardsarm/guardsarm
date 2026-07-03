@@ -12,20 +12,20 @@ SCRIPT_NAME="$(basename ${SCRIPT_PATH_NAME})"
 
 case ${DIR_NAME} in
     */active-response/bin | */wodles*)
-        if [ -z "${WAZUH_PATH}" ]; then
-            WAZUH_PATH="$(cd ${DIR_NAME}/../..; pwd)"
+        if [ -z "${GUARDSARM_PATH}" ]; then
+            GUARDSARM_PATH="$(cd ${DIR_NAME}/../..; pwd)"
         fi
 
         PYTHON_SCRIPT="${DIR_NAME}/${SCRIPT_NAME}.py"
     ;;
     */bin)
-        if [ -z "${WAZUH_PATH}" ]; then
-            WAZUH_PATH="$(cd ${DIR_NAME}/..; pwd)"
+        if [ -z "${GUARDSARM_PATH}" ]; then
+            GUARDSARM_PATH="$(cd ${DIR_NAME}/..; pwd)"
         fi
 
-        PYTHON_SCRIPT="${WAZUH_PATH}/api/scripts/$(echo ${SCRIPT_NAME} | sed 's/\-/_/g').py"
+        PYTHON_SCRIPT="${GUARDSARM_PATH}/api/scripts/$(echo ${SCRIPT_NAME} | sed 's/\-/_/g').py"
     ;;
 esac
 
 
-${WAZUH_PATH}/${WPYTHON_BIN} ${PYTHON_SCRIPT} $@
+${GUARDSARM_PATH}/${WPYTHON_BIN} ${PYTHON_SCRIPT} $@

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.12.4)
 
-project(wazuh-active-response C)
+project(guardsarm-active-response C)
 
-if(NOT DEFINED WAZUH_MAIN_PROJECT)
+if(NOT DEFINED GUARDSARM_MAIN_PROJECT)
   get_filename_component(SRC_FOLDER ${CMAKE_SOURCE_DIR}/../ ABSOLUTE)
 endif()
 
@@ -44,8 +44,8 @@ function(add_active_response_executable name source)
   set_target_properties(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
                                            ${SRC_FOLDER}/build/bin OUTPUT_NAME ${name})
 
-  # Link with libwazuh.a
-  target_link_libraries(${name} PRIVATE wazuh)
+  # Link with libguardsarm.a
+  target_link_libraries(${name} PRIVATE guardsarm)
 
   # Platform-specific linker flags
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -139,5 +139,5 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   set_target_properties(
     block-ip PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/bin
                        OUTPUT_NAME block-ip)
-  target_link_libraries(block-ip PRIVATE wazuh ${WAZUH_WINDOWS_LIBS})
+  target_link_libraries(block-ip PRIVATE guardsarm ${GUARDSARM_WINDOWS_LIBS})
 endif()

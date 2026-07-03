@@ -21,7 +21,7 @@ namespace _pb = ::PROTOBUF_NAMESPACE_ID;
 namespace _pbi = _pb::internal;
 
 namespace com {
-namespace wazuh {
+namespace guardsarm {
 namespace api {
 namespace engine {
 namespace event_dumper {
@@ -77,7 +77,7 @@ PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORIT
 }  // namespace event_dumper
 }  // namespace engine
 }  // namespace api
-}  // namespace wazuh
+}  // namespace guardsarm
 }  // namespace com
 static ::_pb::Metadata file_level_metadata_event_5fdumper_2eproto[4];
 static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_event_5fdumper_2eproto = nullptr;
@@ -85,57 +85,57 @@ static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors
 
 const uint32_t TableStruct_event_5fdumper_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::event_dumper::EventDumperActivate_Request, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::event_dumper::EventDumperActivate_Request, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::event_dumper::EventDumperDeactivate_Request, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::event_dumper::EventDumperDeactivate_Request, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::event_dumper::EventDumperStatus_Request, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Request, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::event_dumper::EventDumperStatus_Response, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::event_dumper::EventDumperStatus_Response, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Response, _impl_._has_bits_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Response, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::event_dumper::EventDumperStatus_Response, _impl_.status_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::event_dumper::EventDumperStatus_Response, _impl_.error_),
-  PROTOBUF_FIELD_OFFSET(::com::wazuh::api::engine::event_dumper::EventDumperStatus_Response, _impl_.active_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Response, _impl_.status_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Response, _impl_.error_),
+  PROTOBUF_FIELD_OFFSET(::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Response, _impl_.active_),
   ~0u,
   0,
   ~0u,
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, -1, sizeof(::com::wazuh::api::engine::event_dumper::EventDumperActivate_Request)},
-  { 6, -1, -1, sizeof(::com::wazuh::api::engine::event_dumper::EventDumperDeactivate_Request)},
-  { 12, -1, -1, sizeof(::com::wazuh::api::engine::event_dumper::EventDumperStatus_Request)},
-  { 18, 27, -1, sizeof(::com::wazuh::api::engine::event_dumper::EventDumperStatus_Response)},
+  { 0, -1, -1, sizeof(::com::guardsarm::api::engine::event_dumper::EventDumperActivate_Request)},
+  { 6, -1, -1, sizeof(::com::guardsarm::api::engine::event_dumper::EventDumperDeactivate_Request)},
+  { 12, -1, -1, sizeof(::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Request)},
+  { 18, 27, -1, sizeof(::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Response)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
-  &::com::wazuh::api::engine::event_dumper::_EventDumperActivate_Request_default_instance_._instance,
-  &::com::wazuh::api::engine::event_dumper::_EventDumperDeactivate_Request_default_instance_._instance,
-  &::com::wazuh::api::engine::event_dumper::_EventDumperStatus_Request_default_instance_._instance,
-  &::com::wazuh::api::engine::event_dumper::_EventDumperStatus_Response_default_instance_._instance,
+  &::com::guardsarm::api::engine::event_dumper::_EventDumperActivate_Request_default_instance_._instance,
+  &::com::guardsarm::api::engine::event_dumper::_EventDumperDeactivate_Request_default_instance_._instance,
+  &::com::guardsarm::api::engine::event_dumper::_EventDumperStatus_Request_default_instance_._instance,
+  &::com::guardsarm::api::engine::event_dumper::_EventDumperStatus_Response_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_event_5fdumper_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\022event_dumper.proto\022!com.wazuh.api.engi"
+  "\n\022event_dumper.proto\022!com.guardsarm.api.engi"
   "ne.event_dumper\032\014engine.proto\"\035\n\033EventDu"
   "mperActivate_Request\"\037\n\035EventDumperDeact"
   "ivate_Request\"\033\n\031EventDumperStatus_Reque"
   "st\"~\n\032EventDumperStatus_Response\0222\n\006stat"
-  "us\030\001 \001(\0162\".com.wazuh.api.engine.ReturnSt"
+  "us\030\001 \001(\0162\".com.guardsarm.api.engine.ReturnSt"
   "atus\022\022\n\005error\030\002 \001(\tH\000\210\001\001\022\016\n\006active\030\003 \001(\010"
   "B\010\n\006_errorb\006proto3"
   ;
@@ -158,7 +158,7 @@ PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_event_5f
 // Force running AddDescriptors() at dynamic initialization time.
 PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_event_5fdumper_2eproto(&descriptor_table_event_5fdumper_2eproto);
 namespace com {
-namespace wazuh {
+namespace guardsarm {
 namespace api {
 namespace engine {
 namespace event_dumper {
@@ -172,13 +172,13 @@ class EventDumperActivate_Request::_Internal {
 EventDumperActivate_Request::EventDumperActivate_Request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase(arena, is_message_owned) {
-  // @@protoc_insertion_point(arena_constructor:com.wazuh.api.engine.event_dumper.EventDumperActivate_Request)
+  // @@protoc_insertion_point(arena_constructor:com.guardsarm.api.engine.event_dumper.EventDumperActivate_Request)
 }
 EventDumperActivate_Request::EventDumperActivate_Request(const EventDumperActivate_Request& from)
   : ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase() {
   EventDumperActivate_Request* const _this = this; (void)_this;
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:com.wazuh.api.engine.event_dumper.EventDumperActivate_Request)
+  // @@protoc_insertion_point(copy_constructor:com.guardsarm.api.engine.event_dumper.EventDumperActivate_Request)
 }
 
 
@@ -212,13 +212,13 @@ class EventDumperDeactivate_Request::_Internal {
 EventDumperDeactivate_Request::EventDumperDeactivate_Request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase(arena, is_message_owned) {
-  // @@protoc_insertion_point(arena_constructor:com.wazuh.api.engine.event_dumper.EventDumperDeactivate_Request)
+  // @@protoc_insertion_point(arena_constructor:com.guardsarm.api.engine.event_dumper.EventDumperDeactivate_Request)
 }
 EventDumperDeactivate_Request::EventDumperDeactivate_Request(const EventDumperDeactivate_Request& from)
   : ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase() {
   EventDumperDeactivate_Request* const _this = this; (void)_this;
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:com.wazuh.api.engine.event_dumper.EventDumperDeactivate_Request)
+  // @@protoc_insertion_point(copy_constructor:com.guardsarm.api.engine.event_dumper.EventDumperDeactivate_Request)
 }
 
 
@@ -252,13 +252,13 @@ class EventDumperStatus_Request::_Internal {
 EventDumperStatus_Request::EventDumperStatus_Request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase(arena, is_message_owned) {
-  // @@protoc_insertion_point(arena_constructor:com.wazuh.api.engine.event_dumper.EventDumperStatus_Request)
+  // @@protoc_insertion_point(arena_constructor:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Request)
 }
 EventDumperStatus_Request::EventDumperStatus_Request(const EventDumperStatus_Request& from)
   : ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase() {
   EventDumperStatus_Request* const _this = this; (void)_this;
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:com.wazuh.api.engine.event_dumper.EventDumperStatus_Request)
+  // @@protoc_insertion_point(copy_constructor:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Request)
 }
 
 
@@ -297,7 +297,7 @@ EventDumperStatus_Response::EventDumperStatus_Response(::PROTOBUF_NAMESPACE_ID::
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
   SharedCtor(arena, is_message_owned);
-  // @@protoc_insertion_point(arena_constructor:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response)
+  // @@protoc_insertion_point(arena_constructor:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response)
 }
 EventDumperStatus_Response::EventDumperStatus_Response(const EventDumperStatus_Response& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
@@ -321,7 +321,7 @@ EventDumperStatus_Response::EventDumperStatus_Response(const EventDumperStatus_R
   ::memcpy(&_impl_.status_, &from._impl_.status_,
     static_cast<size_t>(reinterpret_cast<char*>(&_impl_.active_) -
     reinterpret_cast<char*>(&_impl_.status_)) + sizeof(_impl_.active_));
-  // @@protoc_insertion_point(copy_constructor:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response)
+  // @@protoc_insertion_point(copy_constructor:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response)
 }
 
 inline void EventDumperStatus_Response::SharedCtor(
@@ -342,7 +342,7 @@ inline void EventDumperStatus_Response::SharedCtor(
 }
 
 EventDumperStatus_Response::~EventDumperStatus_Response() {
-  // @@protoc_insertion_point(destructor:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response)
+  // @@protoc_insertion_point(destructor:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response)
   if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
   (void)arena;
     return;
@@ -360,7 +360,7 @@ void EventDumperStatus_Response::SetCachedSize(int size) const {
 }
 
 void EventDumperStatus_Response::Clear() {
-// @@protoc_insertion_point(message_clear_start:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response)
+// @@protoc_insertion_point(message_clear_start:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response)
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -383,12 +383,12 @@ const char* EventDumperStatus_Response::_InternalParse(const char* ptr, ::_pbi::
     uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // .com.wazuh.api.engine.ReturnStatus status = 1;
+      // .com.guardsarm.api.engine.ReturnStatus status = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
-          _internal_set_status(static_cast<::com::wazuh::api::engine::ReturnStatus>(val));
+          _internal_set_status(static_cast<::com::guardsarm::api::engine::ReturnStatus>(val));
         } else
           goto handle_unusual;
         continue;
@@ -398,7 +398,7 @@ const char* EventDumperStatus_Response::_InternalParse(const char* ptr, ::_pbi::
           auto str = _internal_mutable_error();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "com.wazuh.api.engine.event_dumper.EventDumperStatus_Response.error"));
+          CHK_(::_pbi::VerifyUTF8(str, "com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response.error"));
         } else
           goto handle_unusual;
         continue;
@@ -436,11 +436,11 @@ failure:
 
 uint8_t* EventDumperStatus_Response::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response)
+  // @@protoc_insertion_point(serialize_to_array_start:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response)
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .com.wazuh.api.engine.ReturnStatus status = 1;
+  // .com.guardsarm.api.engine.ReturnStatus status = 1;
   if (this->_internal_status() != 0) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteEnumToArray(
@@ -452,7 +452,7 @@ uint8_t* EventDumperStatus_Response::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_error().data(), static_cast<int>(this->_internal_error().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "com.wazuh.api.engine.event_dumper.EventDumperStatus_Response.error");
+      "com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response.error");
     target = stream->WriteStringMaybeAliased(
         2, this->_internal_error(), target);
   }
@@ -467,12 +467,12 @@ uint8_t* EventDumperStatus_Response::_InternalSerialize(
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response)
+  // @@protoc_insertion_point(serialize_to_array_end:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response)
   return target;
 }
 
 size_t EventDumperStatus_Response::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response)
+// @@protoc_insertion_point(message_byte_size_start:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response)
   size_t total_size = 0;
 
   uint32_t cached_has_bits = 0;
@@ -487,7 +487,7 @@ size_t EventDumperStatus_Response::ByteSizeLong() const {
         this->_internal_error());
   }
 
-  // .com.wazuh.api.engine.ReturnStatus status = 1;
+  // .com.guardsarm.api.engine.ReturnStatus status = 1;
   if (this->_internal_status() != 0) {
     total_size += 1 +
       ::_pbi::WireFormatLite::EnumSize(this->_internal_status());
@@ -511,7 +511,7 @@ const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*EventDumperStatus_Response::Ge
 void EventDumperStatus_Response::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
   auto* const _this = static_cast<EventDumperStatus_Response*>(&to_msg);
   auto& from = static_cast<const EventDumperStatus_Response&>(from_msg);
-  // @@protoc_insertion_point(class_specific_merge_from_start:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response)
+  // @@protoc_insertion_point(class_specific_merge_from_start:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response)
   GOOGLE_DCHECK_NE(&from, _this);
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
@@ -529,7 +529,7 @@ void EventDumperStatus_Response::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_
 }
 
 void EventDumperStatus_Response::CopyFrom(const EventDumperStatus_Response& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:com.wazuh.api.engine.event_dumper.EventDumperStatus_Response)
+// @@protoc_insertion_point(class_specific_copy_from_start:com.guardsarm.api.engine.event_dumper.EventDumperStatus_Response)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -567,24 +567,24 @@ void EventDumperStatus_Response::InternalSwap(EventDumperStatus_Response* other)
 }  // namespace event_dumper
 }  // namespace engine
 }  // namespace api
-}  // namespace wazuh
+}  // namespace guardsarm
 }  // namespace com
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::com::wazuh::api::engine::event_dumper::EventDumperActivate_Request*
-Arena::CreateMaybeMessage< ::com::wazuh::api::engine::event_dumper::EventDumperActivate_Request >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::com::wazuh::api::engine::event_dumper::EventDumperActivate_Request >(arena);
+template<> PROTOBUF_NOINLINE ::com::guardsarm::api::engine::event_dumper::EventDumperActivate_Request*
+Arena::CreateMaybeMessage< ::com::guardsarm::api::engine::event_dumper::EventDumperActivate_Request >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::com::guardsarm::api::engine::event_dumper::EventDumperActivate_Request >(arena);
 }
-template<> PROTOBUF_NOINLINE ::com::wazuh::api::engine::event_dumper::EventDumperDeactivate_Request*
-Arena::CreateMaybeMessage< ::com::wazuh::api::engine::event_dumper::EventDumperDeactivate_Request >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::com::wazuh::api::engine::event_dumper::EventDumperDeactivate_Request >(arena);
+template<> PROTOBUF_NOINLINE ::com::guardsarm::api::engine::event_dumper::EventDumperDeactivate_Request*
+Arena::CreateMaybeMessage< ::com::guardsarm::api::engine::event_dumper::EventDumperDeactivate_Request >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::com::guardsarm::api::engine::event_dumper::EventDumperDeactivate_Request >(arena);
 }
-template<> PROTOBUF_NOINLINE ::com::wazuh::api::engine::event_dumper::EventDumperStatus_Request*
-Arena::CreateMaybeMessage< ::com::wazuh::api::engine::event_dumper::EventDumperStatus_Request >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::com::wazuh::api::engine::event_dumper::EventDumperStatus_Request >(arena);
+template<> PROTOBUF_NOINLINE ::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Request*
+Arena::CreateMaybeMessage< ::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Request >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Request >(arena);
 }
-template<> PROTOBUF_NOINLINE ::com::wazuh::api::engine::event_dumper::EventDumperStatus_Response*
-Arena::CreateMaybeMessage< ::com::wazuh::api::engine::event_dumper::EventDumperStatus_Response >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::com::wazuh::api::engine::event_dumper::EventDumperStatus_Response >(arena);
+template<> PROTOBUF_NOINLINE ::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Response*
+Arena::CreateMaybeMessage< ::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Response >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::com::guardsarm::api::engine::event_dumper::EventDumperStatus_Response >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

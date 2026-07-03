@@ -1,5 +1,5 @@
 Feature: Engine status / readiness endpoint
-    As an operator of the Wazuh engine
+    As an operator of the GuardSarm engine
     I want to query GET /status
     So that I can know whether the engine is ready to process events
 

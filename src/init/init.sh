@@ -1,27 +1,27 @@
 #!/bin/sh
 
-# Init functions for Wazuh
+# Init functions for GuardSarm
 # Copyright (C) 2015, Wazuh Inc.
 # Author: Daniel B. Cid <daniel.cid@gmail.com>
 
 UN=${NUNAME};
-service="wazuh";
-file_permissions="wazuh-manager";
+service="guardsarm";
+file_permissions="guardsarm-manager";
 
 runInit()
 {
     echo ""
     echo ""
-    control_script="wazuh-control"
+    control_script="guardsarm-control"
 
     if [ -n "$1" ]; then
         if [ "X$1" = "Xmanager" ]; then
             service="$service-manager"
-            file_permissions="wazuh-manager"
-            control_script="wazuh-manager-control"
+            file_permissions="guardsarm-manager"
+            control_script="guardsarm-manager-control"
         else
             service="$service-$1"
-            file_permissions="wazuh"
+            file_permissions="guardsarm"
         fi
     fi
 
@@ -36,12 +36,12 @@ runInit()
         fi
         # RHEL 8 services must to be installed in /usr/lib/systemd/system/
         if [ "${DIST_NAME}" = "rhel" -a "${DIST_VER}" -ge "7" ] || [ "${DIST_NAME}" = "centos" -a "${DIST_VER}" -ge "7" ]; then
-            SERVICE_UNIT_PATH=/usr/lib/systemd/system/wazuh-$type.service
-            rm -f /etc/systemd/system/wazuh-$type.service
+            SERVICE_UNIT_PATH=/usr/lib/systemd/system/guardsarm-$type.service
+            rm -f /etc/systemd/system/guardsarm-$type.service
         else
-            SERVICE_UNIT_PATH=/etc/systemd/system/wazuh-$type.service
+            SERVICE_UNIT_PATH=/etc/systemd/system/guardsarm-$type.service
         fi
-        GenerateService wazuh-$type.service > ${SERVICE_UNIT_PATH}
+        GenerateService guardsarm-$type.service > ${SERVICE_UNIT_PATH}
         chown root:$file_permissions ${SERVICE_UNIT_PATH}
         systemctl daemon-reload
 
@@ -49,7 +49,7 @@ runInit()
 
         if [ "X${update_only}" = "X" ]
         then
-            systemctl enable "wazuh-"$type
+            systemctl enable "guardsarm-"$type
         fi
 
         return 0;
@@ -60,7 +60,7 @@ runInit()
         if [ -d /etc/rc.d/init.d ]; then
             echo " - ${systemis} Redhat Linux."
             echo " - ${modifiedinit}"
-            GenerateService wazuh-rh.init > /etc/rc.d/init.d/${service}
+            GenerateService guardsarm-rh.init > /etc/rc.d/init.d/${service}
             chmod 755 /etc/rc.d/init.d/${service}
             chown root:$file_permissions /etc/rc.d/init.d/${service}
 
@@ -76,7 +76,7 @@ runInit()
     if [ -r "/etc/gentoo-release" ]; then
         echo " - ${systemis} Gentoo Linux."
         echo " - ${modifiedinit}"
-        GenerateService wazuh-gentoo.init > /etc/init.d/${service}
+        GenerateService guardsarm-gentoo.init > /etc/init.d/${service}
         chmod 755 /etc/init.d/${service}
         chown root:$file_permissions /etc/init.d/${service}
 
@@ -92,7 +92,7 @@ runInit()
     if [ -r "/etc/SuSE-release" ]; then
         echo " - ${systemis} Suse Linux."
         echo " - ${modifiedinit}"
-        GenerateService wazuh-suse.init > /etc/init.d/${service}
+        GenerateService guardsarm-suse.init > /etc/init.d/${service}
         chmod 755 /etc/init.d/${service}
         chown root:$file_permissions /etc/init.d/${service}
 
@@ -108,7 +108,7 @@ runInit()
     if [ -r "/etc/slackware-version" ]; then
         echo " - ${systemis} Slackware Linux."
         echo " - ${modifiedinit}"
-        GenerateService wazuh.init > /etc/rc.d/rc.${service}
+        GenerateService guardsarm.init > /etc/rc.d/rc.${service}
         chmod 755 /etc/rc.d/rc.${service}
         chown root:$file_permissions /etc/rc.d/rc.${service}
 
@@ -156,7 +156,7 @@ runInit()
         elif [ -d "/etc/rc.d/init.d" ]; then
             echo " - ${systemis} Linux (SysV)."
             echo " - ${modifiedinit}"
-            GenerateService wazuh.init > /etc/rc.d/init.d/${service}
+            GenerateService guardsarm.init > /etc/rc.d/init.d/${service}
             chmod 755 /etc/rc.d/init.d/${service}
             chown root:$file_permissions /etc/rc.d/init.d/${service}
             return 0;
@@ -164,7 +164,7 @@ runInit()
         elif [ -d "/etc/init.d" -a -f "/usr/sbin/update-rc.d" ]; then
             echo " - ${systemis} Debian (Ubuntu or derivative)."
             echo " - ${modifiedinit}"
-            GenerateService wazuh-debian.init > /etc/init.d/${service}
+            GenerateService guardsarm-debian.init > /etc/init.d/${service}
             chmod +x /etc/init.d/${service}
             chmod go-w /etc/init.d/${service}
             chown root:$file_permissions /etc/init.d/${service}

@@ -17,8 +17,8 @@
 
 #include "shared.h"
 #include "../wrappers/common.h"
-#include "../wrappers/wazuh/client-agent/notify_wrappers.h"
-#include "../wrappers/wazuh/shared/agent_op_wrappers.h"
+#include "../wrappers/guardsarm/client-agent/notify_wrappers.h"
+#include "../wrappers/guardsarm/shared/agent_op_wrappers.h"
 
 extern int g_ip_update_interval;
 int log_builder_update_host_ip(log_builder_t * builder);

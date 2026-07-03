@@ -117,7 +117,7 @@ protected:
 
         defaultConfig = {
             tmpDir,                              // basePath
-            "wazuh-${name}-${YYYY}-${MM}-${DD}", // pattern (extension added by constructor)
+            "guardsarm-${name}-${YYYY}-${MM}-${DD}", // pattern (extension added by constructor)
             0,                                   // maxSize (no limit)
             fastqueue::MIN_QUEUE_CAPACITY,       // bufferSize
         };
@@ -762,7 +762,7 @@ TEST_F(ChannelHandlerComponentTest, ExistingFileResumption)
         std::time_t now = std::time(nullptr);
         std::tm* tm = std::localtime(&now);
         char buffer[100];
-        std::strftime(buffer, sizeof(buffer), "wazuh-resume-test-%Y-%m-%d.log", tm);
+        std::strftime(buffer, sizeof(buffer), "guardsarm-resume-test-%Y-%m-%d.log", tm);
         return std::string(buffer);
     }();
 
@@ -874,7 +874,7 @@ TEST_F(ChannelHandlerComponentTest, FileSizeTrackingAccuracy)
         std::time_t now = std::time(nullptr);
         std::tm* tm = std::localtime(&now);
         char buffer[100];
-        std::strftime(buffer, sizeof(buffer), "wazuh-size-accuracy-%Y-%m-%d.log", tm);
+        std::strftime(buffer, sizeof(buffer), "guardsarm-size-accuracy-%Y-%m-%d.log", tm);
         return std::string(buffer);
     }();
 
@@ -939,7 +939,7 @@ TEST_F(ChannelHandlerComponentTest, EmptyExistingFileResumption)
         std::time_t now = std::time(nullptr);
         std::tm* tm = std::localtime(&now);
         char buffer[100];
-        std::strftime(buffer, sizeof(buffer), "wazuh-empty-resume-%Y-%m-%d.log", tm);
+        std::strftime(buffer, sizeof(buffer), "guardsarm-empty-resume-%Y-%m-%d.log", tm);
         return std::string(buffer);
     }();
     auto filePath = tmpDir / fileName;
@@ -973,7 +973,7 @@ TEST_F(ChannelHandlerComponentTest, ConcurrentWritesToExistingFile)
         std::time_t now = std::time(nullptr);
         std::tm* tm = std::localtime(&now);
         char buffer[100];
-        std::strftime(buffer, sizeof(buffer), "wazuh-concurrent-existing-%Y-%m-%d.log", tm);
+        std::strftime(buffer, sizeof(buffer), "guardsarm-concurrent-existing-%Y-%m-%d.log", tm);
         return std::string(buffer);
     }();
 
@@ -1037,7 +1037,7 @@ TEST_F(ChannelHandlerComponentTest, LargeExistingFileResumption)
         std::time_t now = std::time(nullptr);
         std::tm* tm = std::localtime(&now);
         char buffer[100];
-        std::strftime(buffer, sizeof(buffer), "wazuh-large-resume-%Y-%m-%d.log", tm);
+        std::strftime(buffer, sizeof(buffer), "guardsarm-large-resume-%Y-%m-%d.log", tm);
         return std::string(buffer);
     }();
     auto filePath = tmpDir / fileName;
@@ -1078,7 +1078,7 @@ TEST_F(ChannelHandlerComponentTest, FileAppendPositioning)
         std::time_t now = std::time(nullptr);
         std::tm* tm = std::localtime(&now);
         char buffer[100];
-        std::strftime(buffer, sizeof(buffer), "wazuh-append-position-%Y-%m-%d.log", tm);
+        std::strftime(buffer, sizeof(buffer), "guardsarm-append-position-%Y-%m-%d.log", tm);
         return std::string(buffer);
     }();
     auto filePath = tmpDir / fileName;

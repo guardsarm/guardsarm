@@ -2,7 +2,7 @@
 
 The `<global>` section sets manager-wide timing parameters for agent disconnection detection and alerting.
 
-Configuration file: `/var/wazuh-manager/etc/wazuh-manager.conf`
+Configuration file: `/var/guardsarm-manager/etc/guardsarm-manager.conf`
 
 Parser: `src/config/src/global-config.c`
 

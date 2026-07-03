@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.12.4)
 
-project(wazuh-syscheckd C CXX)
+project(guardsarm-syscheckd C CXX)
 
-if(NOT DEFINED WAZUH_MAIN_PROJECT)
+if(NOT DEFINED GUARDSARM_MAIN_PROJECT)
   get_filename_component(SRC_FOLDER ${CMAKE_SOURCE_DIR}/../ ABSOLUTE)
   list(APPEND CMAKE_MODULE_PATH "${SRC_FOLDER}/cmake")
-  include(WazuhRpath)
+  include(GuardSarmRpath)
 endif()
 
 include_directories(${SRC_FOLDER}/shared/include/)
@@ -36,10 +36,10 @@ include_directories(${SRC_FOLDER}/shared/os_net)
 include_directories(${SRC_FOLDER}/shared/os_regex)
 include_directories(${SRC_FOLDER}/shared/os_xml)
 include_directories(${SRC_FOLDER}/shared_modules/dbsync/include)
-include_directories(${SRC_FOLDER}/wazuh_modules/include)
-include_directories(${SRC_FOLDER}/wazuh_modules/src)
-include_directories(${SRC_FOLDER}/wazuh_modules/src/agent_upgrade)
-include_directories(${SRC_FOLDER}/wazuh_modules/src/task_manager)
+include_directories(${SRC_FOLDER}/guardsarm_modules/include)
+include_directories(${SRC_FOLDER}/guardsarm_modules/src)
+include_directories(${SRC_FOLDER}/guardsarm_modules/src/agent_upgrade)
+include_directories(${SRC_FOLDER}/guardsarm_modules/src/task_manager)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/db/include/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/ebpf/include/)
@@ -50,8 +50,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/registry/)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_definitions(-DARGV0="wazuh-syscheckd")
-add_definitions(-DGROUPGLOBAL=wazuh)
+add_definitions(-DARGV0="guardsarm-syscheckd")
+add_definitions(-DGROUPGLOBAL=guardsarm)
 
 if(INOTIFY_ENABLED)
   add_definitions(-DINOTIFY_ENABLED)
@@ -93,9 +93,9 @@ list(REMOVE_ITEM SYSCHECKD_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c")
 add_library(syscheckd_lib STATIC ${SYSCHECKD_SRC})
 set_target_properties(syscheckd_lib PROPERTIES LINKER_LANGUAGE CXX)
 
-# Enable WAZUH_UNIT_TESTING to export static functions for unit tests
+# Enable GUARDSARM_UNIT_TESTING to export static functions for unit tests
 if(UNIT_TEST)
-  target_compile_definitions(syscheckd_lib PRIVATE WAZUH_UNIT_TESTING)
+  target_compile_definitions(syscheckd_lib PRIVATE GUARDSARM_UNIT_TESTING)
   target_compile_definitions(syscheckd_lib PRIVATE _FORTIFY_SOURCE=0)
 endif()
 
@@ -108,10 +108,10 @@ endif()
 target_link_libraries(
   syscheckd_lib
   PUBLIC fimdb
-         wazuhext
+         guardsarmext
          pthread
          config
-         wazuh
+         guardsarm
          rootcheck
          agent_sync_protocol
          dbsync
@@ -130,46 +130,46 @@ endif(UNIX)
 
 # Build Windows libraries always (needed by Makefile for final executables)
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  add_library(wazuh-syscheckd STATIC ${SYSCHECKD_SRC})
-  add_library(wazuh-syscheckd-event STATIC ${SYSCHECKD_SRC})
-  target_compile_definitions(wazuh-syscheckd PUBLIC -D_WIN32_WINNT=0x600)
+  add_library(guardsarm-syscheckd STATIC ${SYSCHECKD_SRC})
+  add_library(guardsarm-syscheckd-event STATIC ${SYSCHECKD_SRC})
+  target_compile_definitions(guardsarm-syscheckd PUBLIC -D_WIN32_WINNT=0x600)
   if(UNIT_TEST)
-    target_compile_definitions(wazuh-syscheckd PRIVATE WAZUH_UNIT_TESTING)
+    target_compile_definitions(guardsarm-syscheckd PRIVATE GUARDSARM_UNIT_TESTING)
   endif()
-  target_compile_definitions(wazuh-syscheckd-event
+  target_compile_definitions(guardsarm-syscheckd-event
                              PUBLIC -D_WIN32_WINNT=0x600 -DEVENTCHANNEL_SUPPORT)
   if(UNIT_TEST)
-    target_compile_definitions(wazuh-syscheckd-event PRIVATE WAZUH_UNIT_TESTING)
+    target_compile_definitions(guardsarm-syscheckd-event PRIVATE GUARDSARM_UNIT_TESTING)
   endif()
   target_link_libraries(
-    wazuh-syscheckd
+    guardsarm-syscheckd
     PRIVATE fimdb
-            wazuhext
+            guardsarmext
             pthread
             config
-            wazuh
+            guardsarm
             rootcheck
             agent_sync_protocol
             dbsync
             schema_validator)
   target_link_libraries(
-    wazuh-syscheckd-event
+    guardsarm-syscheckd-event
     PRIVATE fimdb
-            wazuhext
+            guardsarmext
             pthread
             config
-            wazuh
+            guardsarm
             rootcheck
             agent_sync_protocol
             dbsync
             schema_validator)
   # Only build Linux executable when not running unit tests
 elseif(NOT UNIT_TEST)
-  add_executable(wazuh-syscheckd "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c")
+  add_executable(guardsarm-syscheckd "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c")
   set_target_properties(
-    wazuh-syscheckd PROPERTIES LINKER_LANGUAGE CXX RUNTIME_OUTPUT_DIRECTORY
+    guardsarm-syscheckd PROPERTIES LINKER_LANGUAGE CXX RUNTIME_OUTPUT_DIRECTORY
                                                    ${SRC_FOLDER}/build/bin)
-  target_link_libraries(wazuh-syscheckd PRIVATE syscheckd_lib)
+  target_link_libraries(guardsarm-syscheckd PRIVATE syscheckd_lib)
 
-  wazuh_set_runtime_rpath(wazuh-syscheckd)
+  guardsarm_set_runtime_rpath(guardsarm-syscheckd)
 endif()

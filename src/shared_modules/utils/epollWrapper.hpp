@@ -1,5 +1,5 @@
 /*
- * Wazuh Utils - Singleton template
+ * GuardSarm Utils - Singleton template
  * Copyright (C) 2015, Wazuh Inc.
  * Apr 03, 2023.
  *

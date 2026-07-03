@@ -17,7 +17,7 @@
 #include "shared.h"
 #include "auth.h"
 
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
+#include "../wrappers/guardsarm/shared/debug_op_wrappers.h"
 
 //Expected log messages to be checked on mocked log functions
 typedef struct _mocked_log {

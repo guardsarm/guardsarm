@@ -1,10 +1,10 @@
 #!/bin/sh
-# postinst script for wazuh-internal-tools
+# postinst script for guardsarm-internal-tools
 # Wazuh, Inc.
 
 set -eu
 
-PREFIX="/opt/wazuh-internal-tools"
+PREFIX="/opt/guardsarm-internal-tools"
 VENV="$PREFIX/venv"
 BIN="$VENV/bin"
 PY="$BIN/python"

@@ -1,6 +1,6 @@
 #!/bin/bash
-# Program to build OSX wazuh-agent
-# Wazuh package generator
+# Program to build OSX guardsarm-agent
+# GuardSarm package generator
 # Copyright (C) 2015, Wazuh Inc.
 #
 # This program is a free software; you can redistribute it
@@ -37,7 +37,7 @@ function build() {
     if [ "${MAKE_COMPILATION}" == "yes" ]; then
     make -C ${SOURCES_PATH}/src deps TARGET=agent
 
-    echo "Generating Wazuh executables"
+    echo "Generating GuardSarm executables"
     make -j $BUILD_JOBS -C ${SOURCES_PATH}/src DYLD_FORCE_FLAT_NAMESPACE=1 DEBUG=$DEBUG TARGET=agent build
     fi
 

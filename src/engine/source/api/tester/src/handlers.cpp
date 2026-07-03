@@ -14,8 +14,8 @@
 
 namespace api::tester::handlers
 {
-namespace eTester = ::com::wazuh::api::engine::tester;
-namespace eEngine = ::com::wazuh::api::engine;
+namespace eTester = ::com::guardsarm::api::engine::tester;
+namespace eEngine = ::com::guardsarm::api::engine;
 using namespace adapter::helpers;
 
 template<typename RequestType>
@@ -96,16 +96,16 @@ std::variant<std::string, json::Json> validatePublicMetadata(const json::Json& m
 
     if (metadataObj.size() > 1)
     {
-        return "If not empty metadata must contain only 'wazuh' as the top-level key";
+        return "If not empty metadata must contain only 'guardsarm' as the top-level key";
     }
 
-    auto wazuhMetadataObject = metadataObj.getJson("/wazuh");
-    if (!wazuhMetadataObject.has_value() || !wazuhMetadataObject->isObject())
+    auto guardsarmMetadataObject = metadataObj.getJson("/guardsarm");
+    if (!guardsarmMetadataObject.has_value() || !guardsarmMetadataObject->isObject())
     {
-        return "Metadata should contain 'wazuh' as root";
+        return "Metadata should contain 'guardsarm' as root";
     }
 
-    return wazuhMetadataObject.value();
+    return guardsarmMetadataObject.value();
 }
 
 bool validateMetadataLeaves(const json::Json& node,
@@ -846,7 +846,7 @@ adapter::RouteHandler publicRunPost(const std::shared_ptr<::router::ITesterAPI>&
             }
 
             std::string badFieldMsg {};
-            std::string metadataPath {"wazuh"};
+            std::string metadataPath {"guardsarm"};
             auto metadataObj = std::get<json::Json>(errorOrMetadata);
             if (!validateMetadataLeaves(metadataObj, schemaValidatorLocked, metadataPath, badFieldMsg))
             {

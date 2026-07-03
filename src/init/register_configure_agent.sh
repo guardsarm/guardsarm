@@ -12,14 +12,14 @@ INSTALLDIR=${1}
 CONF_FILE="${INSTALLDIR}/etc/ossec.conf"
 TMP_ENROLLMENT="${INSTALLDIR}/tmp/enrollment-configuration"
 TMP_SERVER="${INSTALLDIR}/tmp/server-configuration"
-WAZUH_REGISTRATION_PASSWORD_PATH="etc/authd.pass"
-WAZUH_MACOS_AGENT_DEPLOYMENT_VARS="/tmp/wazuh_envs"
+GUARDSARM_REGISTRATION_PASSWORD_PATH="etc/authd.pass"
+GUARDSARM_MACOS_AGENT_DEPLOYMENT_VARS="/tmp/guardsarm_envs"
 
 
 # Set default sed alias
 sed="sed -ri"
 
-# Update the value of a XML tag inside the wazuh configuration file
+# Update the value of a XML tag inside the guardsarm configuration file
 edit_value_tag() {
 
     file=""
@@ -64,7 +64,7 @@ delete_auto_enrollment_tag() {
 
 }
 
-# Change address block of the wazuh configuration file
+# Change address block of the guardsarm configuration file
 add_adress_block() {
 
     # Remove both manager and legacy server configuration blocks
@@ -98,77 +98,77 @@ add_parameter () {
 
 get_deprecated_vars () {
 
-    if [ -n "${WAZUH_MANAGER_IP}" ] && [ -z "${WAZUH_MANAGER}" ]; then
-        WAZUH_MANAGER=${WAZUH_MANAGER_IP}
+    if [ -n "${GUARDSARM_MANAGER_IP}" ] && [ -z "${GUARDSARM_MANAGER}" ]; then
+        GUARDSARM_MANAGER=${GUARDSARM_MANAGER_IP}
     fi
-    if [ -n "${WAZUH_AUTHD_SERVER}" ] && [ -z "${WAZUH_REGISTRATION_SERVER}" ]; then
-        WAZUH_REGISTRATION_SERVER=${WAZUH_AUTHD_SERVER}
+    if [ -n "${GUARDSARM_AUTHD_SERVER}" ] && [ -z "${GUARDSARM_REGISTRATION_SERVER}" ]; then
+        GUARDSARM_REGISTRATION_SERVER=${GUARDSARM_AUTHD_SERVER}
     fi
-    if [ -n "${WAZUH_AUTHD_PORT}" ] && [ -z "${WAZUH_REGISTRATION_PORT}" ]; then
-        WAZUH_REGISTRATION_PORT=${WAZUH_AUTHD_PORT}
+    if [ -n "${GUARDSARM_AUTHD_PORT}" ] && [ -z "${GUARDSARM_REGISTRATION_PORT}" ]; then
+        GUARDSARM_REGISTRATION_PORT=${GUARDSARM_AUTHD_PORT}
     fi
-    if [ -n "${WAZUH_PASSWORD}" ] && [ -z "${WAZUH_REGISTRATION_PASSWORD}" ]; then
-        WAZUH_REGISTRATION_PASSWORD=${WAZUH_PASSWORD}
+    if [ -n "${GUARDSARM_PASSWORD}" ] && [ -z "${GUARDSARM_REGISTRATION_PASSWORD}" ]; then
+        GUARDSARM_REGISTRATION_PASSWORD=${GUARDSARM_PASSWORD}
     fi
-    if [ -n "${WAZUH_NOTIFY_TIME}" ] && [ -z "${WAZUH_KEEP_ALIVE_INTERVAL}" ]; then
-        WAZUH_KEEP_ALIVE_INTERVAL=${WAZUH_NOTIFY_TIME}
+    if [ -n "${GUARDSARM_NOTIFY_TIME}" ] && [ -z "${GUARDSARM_KEEP_ALIVE_INTERVAL}" ]; then
+        GUARDSARM_KEEP_ALIVE_INTERVAL=${GUARDSARM_NOTIFY_TIME}
     fi
-    if [ -n "${WAZUH_CERTIFICATE}" ] && [ -z "${WAZUH_REGISTRATION_CA}" ]; then
-        WAZUH_REGISTRATION_CA=${WAZUH_CERTIFICATE}
+    if [ -n "${GUARDSARM_CERTIFICATE}" ] && [ -z "${GUARDSARM_REGISTRATION_CA}" ]; then
+        GUARDSARM_REGISTRATION_CA=${GUARDSARM_CERTIFICATE}
     fi
-    if [ -n "${WAZUH_PEM}" ] && [ -z "${WAZUH_REGISTRATION_CERTIFICATE}" ]; then
-        WAZUH_REGISTRATION_CERTIFICATE=${WAZUH_PEM}
+    if [ -n "${GUARDSARM_PEM}" ] && [ -z "${GUARDSARM_REGISTRATION_CERTIFICATE}" ]; then
+        GUARDSARM_REGISTRATION_CERTIFICATE=${GUARDSARM_PEM}
     fi
-    if [ -n "${WAZUH_KEY}" ] && [ -z "${WAZUH_REGISTRATION_KEY}" ]; then
-        WAZUH_REGISTRATION_KEY=${WAZUH_KEY}
+    if [ -n "${GUARDSARM_KEY}" ] && [ -z "${GUARDSARM_REGISTRATION_KEY}" ]; then
+        GUARDSARM_REGISTRATION_KEY=${GUARDSARM_KEY}
     fi
-    if [ -n "${WAZUH_GROUP}" ] && [ -z "${WAZUH_AGENT_GROUP}" ]; then
-        WAZUH_AGENT_GROUP=${WAZUH_GROUP}
+    if [ -n "${GUARDSARM_GROUP}" ] && [ -z "${GUARDSARM_AGENT_GROUP}" ]; then
+        GUARDSARM_AGENT_GROUP=${GUARDSARM_GROUP}
     fi
 
 }
 
 set_vars () {
 
-    export WAZUH_MANAGER
-    export WAZUH_MANAGER_PORT
-    export WAZUH_REGISTRATION_SERVER
-    export WAZUH_REGISTRATION_PORT
-    export WAZUH_REGISTRATION_PASSWORD
-    export WAZUH_KEEP_ALIVE_INTERVAL
-    export WAZUH_TIME_RECONNECT
-    export WAZUH_REGISTRATION_CA
-    export WAZUH_REGISTRATION_CERTIFICATE
-    export WAZUH_REGISTRATION_KEY
-    export WAZUH_AGENT_NAME
-    export WAZUH_AGENT_GROUP
+    export GUARDSARM_MANAGER
+    export GUARDSARM_MANAGER_PORT
+    export GUARDSARM_REGISTRATION_SERVER
+    export GUARDSARM_REGISTRATION_PORT
+    export GUARDSARM_REGISTRATION_PASSWORD
+    export GUARDSARM_KEEP_ALIVE_INTERVAL
+    export GUARDSARM_TIME_RECONNECT
+    export GUARDSARM_REGISTRATION_CA
+    export GUARDSARM_REGISTRATION_CERTIFICATE
+    export GUARDSARM_REGISTRATION_KEY
+    export GUARDSARM_AGENT_NAME
+    export GUARDSARM_AGENT_GROUP
     export ENROLLMENT_DELAY
     # The following variables are yet supported but all of them are deprecated
-    export WAZUH_MANAGER_IP
-    export WAZUH_NOTIFY_TIME
-    export WAZUH_AUTHD_SERVER
-    export WAZUH_AUTHD_PORT
-    export WAZUH_PASSWORD
-    export WAZUH_GROUP
-    export WAZUH_CERTIFICATE
-    export WAZUH_KEY
-    export WAZUH_PEM
+    export GUARDSARM_MANAGER_IP
+    export GUARDSARM_NOTIFY_TIME
+    export GUARDSARM_AUTHD_SERVER
+    export GUARDSARM_AUTHD_PORT
+    export GUARDSARM_PASSWORD
+    export GUARDSARM_GROUP
+    export GUARDSARM_CERTIFICATE
+    export GUARDSARM_KEY
+    export GUARDSARM_PEM
 
-    if [ -r "${WAZUH_MACOS_AGENT_DEPLOYMENT_VARS}" ]; then
-        . ${WAZUH_MACOS_AGENT_DEPLOYMENT_VARS}
-        rm -rf "${WAZUH_MACOS_AGENT_DEPLOYMENT_VARS}"
+    if [ -r "${GUARDSARM_MACOS_AGENT_DEPLOYMENT_VARS}" ]; then
+        . ${GUARDSARM_MACOS_AGENT_DEPLOYMENT_VARS}
+        rm -rf "${GUARDSARM_MACOS_AGENT_DEPLOYMENT_VARS}"
     fi
 
 }
 
 unset_vars() {
 
-    vars=(WAZUH_MANAGER_IP WAZUH_MANAGER_PORT WAZUH_NOTIFY_TIME \
-          WAZUH_TIME_RECONNECT WAZUH_AUTHD_SERVER WAZUH_AUTHD_PORT WAZUH_PASSWORD \
-          WAZUH_AGENT_NAME WAZUH_GROUP WAZUH_CERTIFICATE WAZUH_KEY WAZUH_PEM \
-          WAZUH_MANAGER WAZUH_REGISTRATION_SERVER WAZUH_REGISTRATION_PORT \
-          WAZUH_REGISTRATION_PASSWORD WAZUH_KEEP_ALIVE_INTERVAL WAZUH_REGISTRATION_CA \
-          WAZUH_REGISTRATION_CERTIFICATE WAZUH_REGISTRATION_KEY WAZUH_AGENT_GROUP \
+    vars=(GUARDSARM_MANAGER_IP GUARDSARM_MANAGER_PORT GUARDSARM_NOTIFY_TIME \
+          GUARDSARM_TIME_RECONNECT GUARDSARM_AUTHD_SERVER GUARDSARM_AUTHD_PORT GUARDSARM_PASSWORD \
+          GUARDSARM_AGENT_NAME GUARDSARM_GROUP GUARDSARM_CERTIFICATE GUARDSARM_KEY GUARDSARM_PEM \
+          GUARDSARM_MANAGER GUARDSARM_REGISTRATION_SERVER GUARDSARM_REGISTRATION_PORT \
+          GUARDSARM_REGISTRATION_PASSWORD GUARDSARM_KEEP_ALIVE_INTERVAL GUARDSARM_REGISTRATION_CA \
+          GUARDSARM_REGISTRATION_CERTIFICATE GUARDSARM_REGISTRATION_KEY GUARDSARM_AGENT_GROUP \
           ENROLLMENT_DELAY)
 
     for var in "${vars[@]}"; do
@@ -250,46 +250,46 @@ main () {
 
     get_deprecated_vars
 
-    if [ -n "${WAZUH_MANAGER}" ]; then
+    if [ -n "${GUARDSARM_MANAGER}" ]; then
         if [ ! -f "${INSTALLDIR}/logs/ossec.log" ]; then
             touch -f "${INSTALLDIR}/logs/ossec.log"
             chmod 660 "${INSTALLDIR}/logs/ossec.log"
-            chown root:wazuh "${INSTALLDIR}/logs/ossec.log"
+            chown root:guardsarm "${INSTALLDIR}/logs/ossec.log"
         fi
 
-        # Check if multiples IPs are defined in variable WAZUH_MANAGER
-        ADDRESSES=( ${WAZUH_MANAGER//,/ } )
+        # Check if multiples IPs are defined in variable GUARDSARM_MANAGER
+        ADDRESSES=( ${GUARDSARM_MANAGER//,/ } )
 
         add_adress_block
     fi
 
-    edit_value_tag "port" "${WAZUH_MANAGER_PORT}"
+    edit_value_tag "port" "${GUARDSARM_MANAGER_PORT}"
 
-    if [ -n "${WAZUH_REGISTRATION_SERVER}" ] || [ -n "${WAZUH_REGISTRATION_PORT}" ] || [ -n "${WAZUH_REGISTRATION_CA}" ] || [ -n "${WAZUH_REGISTRATION_CERTIFICATE}" ] || [ -n "${WAZUH_REGISTRATION_KEY}" ] || [ -n "${WAZUH_AGENT_NAME}" ] || [ -n "${WAZUH_AGENT_GROUP}" ] || [ -n "${ENROLLMENT_DELAY}" ] || [ -n "${WAZUH_REGISTRATION_PASSWORD}" ]; then
+    if [ -n "${GUARDSARM_REGISTRATION_SERVER}" ] || [ -n "${GUARDSARM_REGISTRATION_PORT}" ] || [ -n "${GUARDSARM_REGISTRATION_CA}" ] || [ -n "${GUARDSARM_REGISTRATION_CERTIFICATE}" ] || [ -n "${GUARDSARM_REGISTRATION_KEY}" ] || [ -n "${GUARDSARM_AGENT_NAME}" ] || [ -n "${GUARDSARM_AGENT_GROUP}" ] || [ -n "${ENROLLMENT_DELAY}" ] || [ -n "${GUARDSARM_REGISTRATION_PASSWORD}" ]; then
         add_auto_enrollment
-        set_auto_enrollment_tag_value "manager_address" "${WAZUH_REGISTRATION_SERVER}"
-        set_auto_enrollment_tag_value "port" "${WAZUH_REGISTRATION_PORT}"
-        set_auto_enrollment_tag_value "server_ca_path" "${WAZUH_REGISTRATION_CA}"
-        set_auto_enrollment_tag_value "agent_certificate_path" "${WAZUH_REGISTRATION_CERTIFICATE}"
-        set_auto_enrollment_tag_value "agent_key_path" "${WAZUH_REGISTRATION_KEY}"
-        set_auto_enrollment_tag_value "authorization_pass_path" "${WAZUH_REGISTRATION_PASSWORD_PATH}"
-        set_auto_enrollment_tag_value "agent_name" "${WAZUH_AGENT_NAME}"
-        set_auto_enrollment_tag_value "groups" "${WAZUH_AGENT_GROUP}"
+        set_auto_enrollment_tag_value "manager_address" "${GUARDSARM_REGISTRATION_SERVER}"
+        set_auto_enrollment_tag_value "port" "${GUARDSARM_REGISTRATION_PORT}"
+        set_auto_enrollment_tag_value "server_ca_path" "${GUARDSARM_REGISTRATION_CA}"
+        set_auto_enrollment_tag_value "agent_certificate_path" "${GUARDSARM_REGISTRATION_CERTIFICATE}"
+        set_auto_enrollment_tag_value "agent_key_path" "${GUARDSARM_REGISTRATION_KEY}"
+        set_auto_enrollment_tag_value "authorization_pass_path" "${GUARDSARM_REGISTRATION_PASSWORD_PATH}"
+        set_auto_enrollment_tag_value "agent_name" "${GUARDSARM_AGENT_NAME}"
+        set_auto_enrollment_tag_value "groups" "${GUARDSARM_AGENT_GROUP}"
         set_auto_enrollment_tag_value "delay_after_enrollment" "${ENROLLMENT_DELAY}"
         delete_blank_lines "${TMP_ENROLLMENT}"
         concat_conf
     fi
 
 
-    if [ -n "${WAZUH_REGISTRATION_PASSWORD}" ]; then
-        echo "${WAZUH_REGISTRATION_PASSWORD}" > "${INSTALLDIR}/${WAZUH_REGISTRATION_PASSWORD_PATH}"
-        chmod 640 "${INSTALLDIR}"/"${WAZUH_REGISTRATION_PASSWORD_PATH}"
-        chown root:wazuh "${INSTALLDIR}"/"${WAZUH_REGISTRATION_PASSWORD_PATH}"
+    if [ -n "${GUARDSARM_REGISTRATION_PASSWORD}" ]; then
+        echo "${GUARDSARM_REGISTRATION_PASSWORD}" > "${INSTALLDIR}/${GUARDSARM_REGISTRATION_PASSWORD_PATH}"
+        chmod 640 "${INSTALLDIR}"/"${GUARDSARM_REGISTRATION_PASSWORD_PATH}"
+        chown root:guardsarm "${INSTALLDIR}"/"${GUARDSARM_REGISTRATION_PASSWORD_PATH}"
     fi
 
-    # Options to be modified in wazuh configuration file
-    edit_value_tag "notify_time" "${WAZUH_KEEP_ALIVE_INTERVAL}"
-    edit_value_tag "time-reconnect" "${WAZUH_TIME_RECONNECT}"
+    # Options to be modified in guardsarm configuration file
+    edit_value_tag "notify_time" "${GUARDSARM_KEEP_ALIVE_INTERVAL}"
+    edit_value_tag "time-reconnect" "${GUARDSARM_TIME_RECONNECT}"
 
     unset_vars
 

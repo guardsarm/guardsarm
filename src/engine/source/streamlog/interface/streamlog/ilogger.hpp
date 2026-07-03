@@ -82,7 +82,7 @@ public:
  * ### Typical Usage
  * @code
  * // Ensure the channel exists and obtain a writer in one call
- * auto writer = logManager->ensureAndGetWriter("mySpace-wazuh-events-v5", cfg, "json");
+ * auto writer = logManager->ensureAndGetWriter("mySpace-guardsarm-events-v5", cfg, "json");
  *
  * // Write log entries from any thread
  * (*writer)(R"({"level":"warning","msg":"disk usage 90%"})");

@@ -1,5 +1,5 @@
 /*
- * Wazuh router - Router Subscriber C Interface tests
+ * GuardSarm router - Router Subscriber C Interface tests
  * Copyright (C) 2015, Wazuh Inc.
  * September 11, 2025.
  *

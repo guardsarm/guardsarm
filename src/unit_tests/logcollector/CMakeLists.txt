@@ -19,7 +19,7 @@ else()
       PROPERTIES
       LINKER_LANGUAGE C
   )
-  target_link_libraries(LOGCOLLECTOR_O ${WAZUHLIB} ${WAZUHEXT} -lpthread)
+  target_link_libraries(LOGCOLLECTOR_O ${GUARDSARMLIB} ${GUARDSARMEXT} -lpthread)
 endif()
 
 if(${TARGET} STREQUAL "winagent")
@@ -27,7 +27,7 @@ if(${TARGET} STREQUAL "winagent")
 endif(${TARGET} STREQUAL "winagent")
 
 #include wrappers
-include(${SRC_FOLDER}/unit_tests/wrappers/wazuh/shared/shared.cmake)
+include(${SRC_FOLDER}/unit_tests/wrappers/guardsarm/shared/shared.cmake)
 
 # Generate logcollector tests
 if(${TARGET} STREQUAL "winagent")
@@ -175,16 +175,16 @@ foreach(counter RANGE ${count})
         # On winagent, logcollector objects come from DEPENDENCIES_O (in TEST_DEPS)
         target_link_libraries(
             ${logcollector_test_name}
-            ${WAZUHLIB}
-            ${WAZUHEXT}
+            ${GUARDSARMLIB}
+            ${GUARDSARMEXT}
             ${TEST_DEPS}
         )
         target_link_libraries(${logcollector_test_name} fimdb)
     else()
         target_link_libraries(
             ${logcollector_test_name}
-            ${WAZUHLIB}
-            ${WAZUHEXT}
+            ${GUARDSARMLIB}
+            ${GUARDSARMEXT}
             LOGCOLLECTOR_O
             ${TEST_DEPS}
         )

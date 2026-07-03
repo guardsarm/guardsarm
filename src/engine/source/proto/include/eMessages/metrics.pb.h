@@ -47,7 +47,7 @@ struct TableStruct_metrics_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_metrics_2eproto;
 namespace com {
-namespace wazuh {
+namespace guardsarm {
 namespace api {
 namespace engine {
 namespace metrics {
@@ -84,22 +84,22 @@ extern SpaceMetricsDefaultTypeInternal _SpaceMetrics_default_instance_;
 }  // namespace metrics
 }  // namespace engine
 }  // namespace api
-}  // namespace wazuh
+}  // namespace guardsarm
 }  // namespace com
 PROTOBUF_NAMESPACE_OPEN
-template<> ::com::wazuh::api::engine::metrics::Dump_Request* Arena::CreateMaybeMessage<::com::wazuh::api::engine::metrics::Dump_Request>(Arena*);
-template<> ::com::wazuh::api::engine::metrics::Dump_Response* Arena::CreateMaybeMessage<::com::wazuh::api::engine::metrics::Dump_Response>(Arena*);
-template<> ::com::wazuh::api::engine::metrics::Enable_Request* Arena::CreateMaybeMessage<::com::wazuh::api::engine::metrics::Enable_Request>(Arena*);
-template<> ::com::wazuh::api::engine::metrics::Enable_Response* Arena::CreateMaybeMessage<::com::wazuh::api::engine::metrics::Enable_Response>(Arena*);
-template<> ::com::wazuh::api::engine::metrics::Get_Request* Arena::CreateMaybeMessage<::com::wazuh::api::engine::metrics::Get_Request>(Arena*);
-template<> ::com::wazuh::api::engine::metrics::Get_Response* Arena::CreateMaybeMessage<::com::wazuh::api::engine::metrics::Get_Response>(Arena*);
-template<> ::com::wazuh::api::engine::metrics::List_Request* Arena::CreateMaybeMessage<::com::wazuh::api::engine::metrics::List_Request>(Arena*);
-template<> ::com::wazuh::api::engine::metrics::List_Response* Arena::CreateMaybeMessage<::com::wazuh::api::engine::metrics::List_Response>(Arena*);
-template<> ::com::wazuh::api::engine::metrics::MetricEntry* Arena::CreateMaybeMessage<::com::wazuh::api::engine::metrics::MetricEntry>(Arena*);
-template<> ::com::wazuh::api::engine::metrics::SpaceMetrics* Arena::CreateMaybeMessage<::com::wazuh::api::engine::metrics::SpaceMetrics>(Arena*);
+template<> ::com::guardsarm::api::engine::metrics::Dump_Request* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::metrics::Dump_Request>(Arena*);
+template<> ::com::guardsarm::api::engine::metrics::Dump_Response* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::metrics::Dump_Response>(Arena*);
+template<> ::com::guardsarm::api::engine::metrics::Enable_Request* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::metrics::Enable_Request>(Arena*);
+template<> ::com::guardsarm::api::engine::metrics::Enable_Response* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::metrics::Enable_Response>(Arena*);
+template<> ::com::guardsarm::api::engine::metrics::Get_Request* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::metrics::Get_Request>(Arena*);
+template<> ::com::guardsarm::api::engine::metrics::Get_Response* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::metrics::Get_Response>(Arena*);
+template<> ::com::guardsarm::api::engine::metrics::List_Request* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::metrics::List_Request>(Arena*);
+template<> ::com::guardsarm::api::engine::metrics::List_Response* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::metrics::List_Response>(Arena*);
+template<> ::com::guardsarm::api::engine::metrics::MetricEntry* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::metrics::MetricEntry>(Arena*);
+template<> ::com::guardsarm::api::engine::metrics::SpaceMetrics* Arena::CreateMaybeMessage<::com::guardsarm::api::engine::metrics::SpaceMetrics>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace com {
-namespace wazuh {
+namespace guardsarm {
 namespace api {
 namespace engine {
 namespace metrics {
@@ -107,7 +107,7 @@ namespace metrics {
 // ===================================================================
 
 class Enable_Request final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.metrics.Enable_Request) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.metrics.Enable_Request) */ {
  public:
   inline Enable_Request() : Enable_Request(nullptr) {}
   ~Enable_Request() override;
@@ -210,7 +210,7 @@ class Enable_Request final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.metrics.Enable_Request";
+    return "com.guardsarm.api.engine.metrics.Enable_Request";
   }
   protected:
   explicit Enable_Request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -280,7 +280,7 @@ class Enable_Request final :
   void _internal_set_status(bool value);
   public:
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.metrics.Enable_Request)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.metrics.Enable_Request)
  private:
   class _Internal;
 
@@ -300,7 +300,7 @@ class Enable_Request final :
 // -------------------------------------------------------------------
 
 class Enable_Response final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.metrics.Enable_Response) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.metrics.Enable_Response) */ {
  public:
   inline Enable_Response() : Enable_Response(nullptr) {}
   ~Enable_Response() override;
@@ -403,7 +403,7 @@ class Enable_Response final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.metrics.Enable_Response";
+    return "com.guardsarm.api.engine.metrics.Enable_Response";
   }
   protected:
   explicit Enable_Response(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -460,16 +460,16 @@ class Enable_Response final :
   std::string* _internal_mutable_content();
   public:
 
-  // .com.wazuh.api.engine.ReturnStatus status = 1;
+  // .com.guardsarm.api.engine.ReturnStatus status = 1;
   void clear_status();
-  ::com::wazuh::api::engine::ReturnStatus status() const;
-  void set_status(::com::wazuh::api::engine::ReturnStatus value);
+  ::com::guardsarm::api::engine::ReturnStatus status() const;
+  void set_status(::com::guardsarm::api::engine::ReturnStatus value);
   private:
-  ::com::wazuh::api::engine::ReturnStatus _internal_status() const;
-  void _internal_set_status(::com::wazuh::api::engine::ReturnStatus value);
+  ::com::guardsarm::api::engine::ReturnStatus _internal_status() const;
+  void _internal_set_status(::com::guardsarm::api::engine::ReturnStatus value);
   public:
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.metrics.Enable_Response)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.metrics.Enable_Response)
  private:
   class _Internal;
 
@@ -489,7 +489,7 @@ class Enable_Response final :
 // -------------------------------------------------------------------
 
 class Get_Request final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.metrics.Get_Request) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.metrics.Get_Request) */ {
  public:
   inline Get_Request() : Get_Request(nullptr) {}
   ~Get_Request() override;
@@ -592,7 +592,7 @@ class Get_Request final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.metrics.Get_Request";
+    return "com.guardsarm.api.engine.metrics.Get_Request";
   }
   protected:
   explicit Get_Request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -648,7 +648,7 @@ class Get_Request final :
   std::string* _internal_mutable_space();
   public:
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.metrics.Get_Request)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.metrics.Get_Request)
  private:
   class _Internal;
 
@@ -667,7 +667,7 @@ class Get_Request final :
 // -------------------------------------------------------------------
 
 class Get_Response final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.metrics.Get_Response) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.metrics.Get_Response) */ {
  public:
   inline Get_Response() : Get_Response(nullptr) {}
   ~Get_Response() override;
@@ -770,7 +770,7 @@ class Get_Response final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.metrics.Get_Response";
+    return "com.guardsarm.api.engine.metrics.Get_Response";
   }
   protected:
   explicit Get_Response(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -848,13 +848,13 @@ class Get_Response final :
   std::string* _internal_mutable_type();
   public:
 
-  // .com.wazuh.api.engine.ReturnStatus status = 1;
+  // .com.guardsarm.api.engine.ReturnStatus status = 1;
   void clear_status();
-  ::com::wazuh::api::engine::ReturnStatus status() const;
-  void set_status(::com::wazuh::api::engine::ReturnStatus value);
+  ::com::guardsarm::api::engine::ReturnStatus status() const;
+  void set_status(::com::guardsarm::api::engine::ReturnStatus value);
   private:
-  ::com::wazuh::api::engine::ReturnStatus _internal_status() const;
-  void _internal_set_status(::com::wazuh::api::engine::ReturnStatus value);
+  ::com::guardsarm::api::engine::ReturnStatus _internal_status() const;
+  void _internal_set_status(::com::guardsarm::api::engine::ReturnStatus value);
   public:
 
   // optional bool enabled = 5;
@@ -883,7 +883,7 @@ class Get_Response final :
   void _internal_set_value(double value);
   public:
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.metrics.Get_Response)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.metrics.Get_Response)
  private:
   class _Internal;
 
@@ -906,7 +906,7 @@ class Get_Response final :
 // -------------------------------------------------------------------
 
 class List_Request final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.metrics.List_Request) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.metrics.List_Request) */ {
  public:
   inline List_Request() : List_Request(nullptr) {}
   ~List_Request() override;
@@ -1009,7 +1009,7 @@ class List_Request final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.metrics.List_Request";
+    return "com.guardsarm.api.engine.metrics.List_Request";
   }
   protected:
   explicit List_Request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -1046,7 +1046,7 @@ class List_Request final :
   std::string* _internal_mutable_space();
   public:
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.metrics.List_Request)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.metrics.List_Request)
  private:
   class _Internal;
 
@@ -1064,7 +1064,7 @@ class List_Request final :
 // -------------------------------------------------------------------
 
 class List_Response final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.metrics.List_Response) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.metrics.List_Response) */ {
  public:
   inline List_Response() : List_Response(nullptr) {}
   ~List_Response() override;
@@ -1167,7 +1167,7 @@ class List_Response final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.metrics.List_Response";
+    return "com.guardsarm.api.engine.metrics.List_Response";
   }
   protected:
   explicit List_Response(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -1230,16 +1230,16 @@ class List_Response final :
   std::string* _internal_mutable_error();
   public:
 
-  // .com.wazuh.api.engine.ReturnStatus status = 1;
+  // .com.guardsarm.api.engine.ReturnStatus status = 1;
   void clear_status();
-  ::com::wazuh::api::engine::ReturnStatus status() const;
-  void set_status(::com::wazuh::api::engine::ReturnStatus value);
+  ::com::guardsarm::api::engine::ReturnStatus status() const;
+  void set_status(::com::guardsarm::api::engine::ReturnStatus value);
   private:
-  ::com::wazuh::api::engine::ReturnStatus _internal_status() const;
-  void _internal_set_status(::com::wazuh::api::engine::ReturnStatus value);
+  ::com::guardsarm::api::engine::ReturnStatus _internal_status() const;
+  void _internal_set_status(::com::guardsarm::api::engine::ReturnStatus value);
   public:
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.metrics.List_Response)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.metrics.List_Response)
  private:
   class _Internal;
 
@@ -1259,7 +1259,7 @@ class List_Response final :
 // -------------------------------------------------------------------
 
 class Dump_Request final :
-    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.metrics.Dump_Request) */ {
+    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.metrics.Dump_Request) */ {
  public:
   inline Dump_Request() : Dump_Request(nullptr) {}
   explicit PROTOBUF_CONSTEXPR Dump_Request(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
@@ -1347,7 +1347,7 @@ class Dump_Request final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.metrics.Dump_Request";
+    return "com.guardsarm.api.engine.metrics.Dump_Request";
   }
   protected:
   explicit Dump_Request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -1363,7 +1363,7 @@ class Dump_Request final :
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.metrics.Dump_Request)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.metrics.Dump_Request)
  private:
   class _Internal;
 
@@ -1377,7 +1377,7 @@ class Dump_Request final :
 // -------------------------------------------------------------------
 
 class MetricEntry final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.metrics.MetricEntry) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.metrics.MetricEntry) */ {
  public:
   inline MetricEntry() : MetricEntry(nullptr) {}
   ~MetricEntry() override;
@@ -1480,7 +1480,7 @@ class MetricEntry final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.metrics.MetricEntry";
+    return "com.guardsarm.api.engine.metrics.MetricEntry";
   }
   protected:
   explicit MetricEntry(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -1564,7 +1564,7 @@ class MetricEntry final :
   void _internal_set_enabled(bool value);
   public:
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.metrics.MetricEntry)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.metrics.MetricEntry)
  private:
   class _Internal;
 
@@ -1585,7 +1585,7 @@ class MetricEntry final :
 // -------------------------------------------------------------------
 
 class SpaceMetrics final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.metrics.SpaceMetrics) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.metrics.SpaceMetrics) */ {
  public:
   inline SpaceMetrics() : SpaceMetrics(nullptr) {}
   ~SpaceMetrics() override;
@@ -1688,7 +1688,7 @@ class SpaceMetrics final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.metrics.SpaceMetrics";
+    return "com.guardsarm.api.engine.metrics.SpaceMetrics";
   }
   protected:
   explicit SpaceMetrics(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -1708,22 +1708,22 @@ class SpaceMetrics final :
     kMetricsFieldNumber = 2,
     kNameFieldNumber = 1,
   };
-  // repeated .com.wazuh.api.engine.metrics.MetricEntry metrics = 2;
+  // repeated .com.guardsarm.api.engine.metrics.MetricEntry metrics = 2;
   int metrics_size() const;
   private:
   int _internal_metrics_size() const;
   public:
   void clear_metrics();
-  ::com::wazuh::api::engine::metrics::MetricEntry* mutable_metrics(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::MetricEntry >*
+  ::com::guardsarm::api::engine::metrics::MetricEntry* mutable_metrics(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::MetricEntry >*
       mutable_metrics();
   private:
-  const ::com::wazuh::api::engine::metrics::MetricEntry& _internal_metrics(int index) const;
-  ::com::wazuh::api::engine::metrics::MetricEntry* _internal_add_metrics();
+  const ::com::guardsarm::api::engine::metrics::MetricEntry& _internal_metrics(int index) const;
+  ::com::guardsarm::api::engine::metrics::MetricEntry* _internal_add_metrics();
   public:
-  const ::com::wazuh::api::engine::metrics::MetricEntry& metrics(int index) const;
-  ::com::wazuh::api::engine::metrics::MetricEntry* add_metrics();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::MetricEntry >&
+  const ::com::guardsarm::api::engine::metrics::MetricEntry& metrics(int index) const;
+  ::com::guardsarm::api::engine::metrics::MetricEntry* add_metrics();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::MetricEntry >&
       metrics() const;
 
   // string name = 1;
@@ -1740,7 +1740,7 @@ class SpaceMetrics final :
   std::string* _internal_mutable_name();
   public:
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.metrics.SpaceMetrics)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.metrics.SpaceMetrics)
  private:
   class _Internal;
 
@@ -1748,7 +1748,7 @@ class SpaceMetrics final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
-    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::MetricEntry > metrics_;
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::MetricEntry > metrics_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
@@ -1758,7 +1758,7 @@ class SpaceMetrics final :
 // -------------------------------------------------------------------
 
 class Dump_Response final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.wazuh.api.engine.metrics.Dump_Response) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:com.guardsarm.api.engine.metrics.Dump_Response) */ {
  public:
   inline Dump_Response() : Dump_Response(nullptr) {}
   ~Dump_Response() override;
@@ -1861,7 +1861,7 @@ class Dump_Response final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "com.wazuh.api.engine.metrics.Dump_Response";
+    return "com.guardsarm.api.engine.metrics.Dump_Response";
   }
   protected:
   explicit Dump_Response(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -1886,40 +1886,40 @@ class Dump_Response final :
     kTimestampFieldNumber = 5,
     kStatusFieldNumber = 1,
   };
-  // repeated .com.wazuh.api.engine.metrics.MetricEntry global = 6;
+  // repeated .com.guardsarm.api.engine.metrics.MetricEntry global = 6;
   int global_size() const;
   private:
   int _internal_global_size() const;
   public:
   void clear_global();
-  ::com::wazuh::api::engine::metrics::MetricEntry* mutable_global(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::MetricEntry >*
+  ::com::guardsarm::api::engine::metrics::MetricEntry* mutable_global(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::MetricEntry >*
       mutable_global();
   private:
-  const ::com::wazuh::api::engine::metrics::MetricEntry& _internal_global(int index) const;
-  ::com::wazuh::api::engine::metrics::MetricEntry* _internal_add_global();
+  const ::com::guardsarm::api::engine::metrics::MetricEntry& _internal_global(int index) const;
+  ::com::guardsarm::api::engine::metrics::MetricEntry* _internal_add_global();
   public:
-  const ::com::wazuh::api::engine::metrics::MetricEntry& global(int index) const;
-  ::com::wazuh::api::engine::metrics::MetricEntry* add_global();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::MetricEntry >&
+  const ::com::guardsarm::api::engine::metrics::MetricEntry& global(int index) const;
+  ::com::guardsarm::api::engine::metrics::MetricEntry* add_global();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::MetricEntry >&
       global() const;
 
-  // repeated .com.wazuh.api.engine.metrics.SpaceMetrics spaces = 7;
+  // repeated .com.guardsarm.api.engine.metrics.SpaceMetrics spaces = 7;
   int spaces_size() const;
   private:
   int _internal_spaces_size() const;
   public:
   void clear_spaces();
-  ::com::wazuh::api::engine::metrics::SpaceMetrics* mutable_spaces(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::SpaceMetrics >*
+  ::com::guardsarm::api::engine::metrics::SpaceMetrics* mutable_spaces(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::SpaceMetrics >*
       mutable_spaces();
   private:
-  const ::com::wazuh::api::engine::metrics::SpaceMetrics& _internal_spaces(int index) const;
-  ::com::wazuh::api::engine::metrics::SpaceMetrics* _internal_add_spaces();
+  const ::com::guardsarm::api::engine::metrics::SpaceMetrics& _internal_spaces(int index) const;
+  ::com::guardsarm::api::engine::metrics::SpaceMetrics* _internal_add_spaces();
   public:
-  const ::com::wazuh::api::engine::metrics::SpaceMetrics& spaces(int index) const;
-  ::com::wazuh::api::engine::metrics::SpaceMetrics* add_spaces();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::SpaceMetrics >&
+  const ::com::guardsarm::api::engine::metrics::SpaceMetrics& spaces(int index) const;
+  ::com::guardsarm::api::engine::metrics::SpaceMetrics* add_spaces();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::SpaceMetrics >&
       spaces() const;
 
   // optional string error = 2;
@@ -1994,16 +1994,16 @@ class Dump_Response final :
   std::string* _internal_mutable_timestamp();
   public:
 
-  // .com.wazuh.api.engine.ReturnStatus status = 1;
+  // .com.guardsarm.api.engine.ReturnStatus status = 1;
   void clear_status();
-  ::com::wazuh::api::engine::ReturnStatus status() const;
-  void set_status(::com::wazuh::api::engine::ReturnStatus value);
+  ::com::guardsarm::api::engine::ReturnStatus status() const;
+  void set_status(::com::guardsarm::api::engine::ReturnStatus value);
   private:
-  ::com::wazuh::api::engine::ReturnStatus _internal_status() const;
-  void _internal_set_status(::com::wazuh::api::engine::ReturnStatus value);
+  ::com::guardsarm::api::engine::ReturnStatus _internal_status() const;
+  void _internal_set_status(::com::guardsarm::api::engine::ReturnStatus value);
   public:
 
-  // @@protoc_insertion_point(class_scope:com.wazuh.api.engine.metrics.Dump_Response)
+  // @@protoc_insertion_point(class_scope:com.guardsarm.api.engine.metrics.Dump_Response)
  private:
   class _Internal;
 
@@ -2013,8 +2013,8 @@ class Dump_Response final :
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::MetricEntry > global_;
-    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::SpaceMetrics > spaces_;
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::MetricEntry > global_;
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::SpaceMetrics > spaces_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr error_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr uptime_;
@@ -2048,7 +2048,7 @@ inline void Enable_Request::clear_instrumentname() {
   _impl_._has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& Enable_Request::instrumentname() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Enable_Request.instrumentName)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Enable_Request.instrumentName)
   return _internal_instrumentname();
 }
 template <typename ArgT0, typename... ArgT>
@@ -2056,11 +2056,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Enable_Request::set_instrumentname(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000001u;
  _impl_.instrumentname_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Enable_Request.instrumentName)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Enable_Request.instrumentName)
 }
 inline std::string* Enable_Request::mutable_instrumentname() {
   std::string* _s = _internal_mutable_instrumentname();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Enable_Request.instrumentName)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Enable_Request.instrumentName)
   return _s;
 }
 inline const std::string& Enable_Request::_internal_instrumentname() const {
@@ -2075,7 +2075,7 @@ inline std::string* Enable_Request::_internal_mutable_instrumentname() {
   return _impl_.instrumentname_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Enable_Request::release_instrumentname() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.Enable_Request.instrumentName)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.Enable_Request.instrumentName)
   if (!_internal_has_instrumentname()) {
     return nullptr;
   }
@@ -2100,7 +2100,7 @@ inline void Enable_Request::set_allocated_instrumentname(std::string* instrument
     _impl_.instrumentname_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.Enable_Request.instrumentName)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.Enable_Request.instrumentName)
 }
 
 // optional bool status = 2;
@@ -2119,7 +2119,7 @@ inline bool Enable_Request::_internal_status() const {
   return _impl_.status_;
 }
 inline bool Enable_Request::status() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Enable_Request.status)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Enable_Request.status)
   return _internal_status();
 }
 inline void Enable_Request::_internal_set_status(bool value) {
@@ -2128,7 +2128,7 @@ inline void Enable_Request::_internal_set_status(bool value) {
 }
 inline void Enable_Request::set_status(bool value) {
   _internal_set_status(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Enable_Request.status)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Enable_Request.status)
 }
 
 // optional string space = 3;
@@ -2144,7 +2144,7 @@ inline void Enable_Request::clear_space() {
   _impl_._has_bits_[0] &= ~0x00000002u;
 }
 inline const std::string& Enable_Request::space() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Enable_Request.space)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Enable_Request.space)
   return _internal_space();
 }
 template <typename ArgT0, typename... ArgT>
@@ -2152,11 +2152,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Enable_Request::set_space(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000002u;
  _impl_.space_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Enable_Request.space)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Enable_Request.space)
 }
 inline std::string* Enable_Request::mutable_space() {
   std::string* _s = _internal_mutable_space();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Enable_Request.space)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Enable_Request.space)
   return _s;
 }
 inline const std::string& Enable_Request::_internal_space() const {
@@ -2171,7 +2171,7 @@ inline std::string* Enable_Request::_internal_mutable_space() {
   return _impl_.space_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Enable_Request::release_space() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.Enable_Request.space)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.Enable_Request.space)
   if (!_internal_has_space()) {
     return nullptr;
   }
@@ -2196,31 +2196,31 @@ inline void Enable_Request::set_allocated_space(std::string* space) {
     _impl_.space_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.Enable_Request.space)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.Enable_Request.space)
 }
 
 // -------------------------------------------------------------------
 
 // Enable_Response
 
-// .com.wazuh.api.engine.ReturnStatus status = 1;
+// .com.guardsarm.api.engine.ReturnStatus status = 1;
 inline void Enable_Response::clear_status() {
   _impl_.status_ = 0;
 }
-inline ::com::wazuh::api::engine::ReturnStatus Enable_Response::_internal_status() const {
-  return static_cast< ::com::wazuh::api::engine::ReturnStatus >(_impl_.status_);
+inline ::com::guardsarm::api::engine::ReturnStatus Enable_Response::_internal_status() const {
+  return static_cast< ::com::guardsarm::api::engine::ReturnStatus >(_impl_.status_);
 }
-inline ::com::wazuh::api::engine::ReturnStatus Enable_Response::status() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Enable_Response.status)
+inline ::com::guardsarm::api::engine::ReturnStatus Enable_Response::status() const {
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Enable_Response.status)
   return _internal_status();
 }
-inline void Enable_Response::_internal_set_status(::com::wazuh::api::engine::ReturnStatus value) {
+inline void Enable_Response::_internal_set_status(::com::guardsarm::api::engine::ReturnStatus value) {
   
   _impl_.status_ = value;
 }
-inline void Enable_Response::set_status(::com::wazuh::api::engine::ReturnStatus value) {
+inline void Enable_Response::set_status(::com::guardsarm::api::engine::ReturnStatus value) {
   _internal_set_status(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Enable_Response.status)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Enable_Response.status)
 }
 
 // optional string error = 2;
@@ -2236,7 +2236,7 @@ inline void Enable_Response::clear_error() {
   _impl_._has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& Enable_Response::error() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Enable_Response.error)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Enable_Response.error)
   return _internal_error();
 }
 template <typename ArgT0, typename... ArgT>
@@ -2244,11 +2244,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Enable_Response::set_error(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000001u;
  _impl_.error_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Enable_Response.error)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Enable_Response.error)
 }
 inline std::string* Enable_Response::mutable_error() {
   std::string* _s = _internal_mutable_error();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Enable_Response.error)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Enable_Response.error)
   return _s;
 }
 inline const std::string& Enable_Response::_internal_error() const {
@@ -2263,7 +2263,7 @@ inline std::string* Enable_Response::_internal_mutable_error() {
   return _impl_.error_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Enable_Response::release_error() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.Enable_Response.error)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.Enable_Response.error)
   if (!_internal_has_error()) {
     return nullptr;
   }
@@ -2288,7 +2288,7 @@ inline void Enable_Response::set_allocated_error(std::string* error) {
     _impl_.error_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.Enable_Response.error)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.Enable_Response.error)
 }
 
 // optional string content = 3;
@@ -2304,7 +2304,7 @@ inline void Enable_Response::clear_content() {
   _impl_._has_bits_[0] &= ~0x00000002u;
 }
 inline const std::string& Enable_Response::content() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Enable_Response.content)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Enable_Response.content)
   return _internal_content();
 }
 template <typename ArgT0, typename... ArgT>
@@ -2312,11 +2312,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Enable_Response::set_content(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000002u;
  _impl_.content_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Enable_Response.content)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Enable_Response.content)
 }
 inline std::string* Enable_Response::mutable_content() {
   std::string* _s = _internal_mutable_content();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Enable_Response.content)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Enable_Response.content)
   return _s;
 }
 inline const std::string& Enable_Response::_internal_content() const {
@@ -2331,7 +2331,7 @@ inline std::string* Enable_Response::_internal_mutable_content() {
   return _impl_.content_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Enable_Response::release_content() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.Enable_Response.content)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.Enable_Response.content)
   if (!_internal_has_content()) {
     return nullptr;
   }
@@ -2356,7 +2356,7 @@ inline void Enable_Response::set_allocated_content(std::string* content) {
     _impl_.content_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.Enable_Response.content)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.Enable_Response.content)
 }
 
 // -------------------------------------------------------------------
@@ -2376,7 +2376,7 @@ inline void Get_Request::clear_instrumentname() {
   _impl_._has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& Get_Request::instrumentname() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Get_Request.instrumentName)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Get_Request.instrumentName)
   return _internal_instrumentname();
 }
 template <typename ArgT0, typename... ArgT>
@@ -2384,11 +2384,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Get_Request::set_instrumentname(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000001u;
  _impl_.instrumentname_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Get_Request.instrumentName)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Get_Request.instrumentName)
 }
 inline std::string* Get_Request::mutable_instrumentname() {
   std::string* _s = _internal_mutable_instrumentname();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Get_Request.instrumentName)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Get_Request.instrumentName)
   return _s;
 }
 inline const std::string& Get_Request::_internal_instrumentname() const {
@@ -2403,7 +2403,7 @@ inline std::string* Get_Request::_internal_mutable_instrumentname() {
   return _impl_.instrumentname_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Get_Request::release_instrumentname() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.Get_Request.instrumentName)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.Get_Request.instrumentName)
   if (!_internal_has_instrumentname()) {
     return nullptr;
   }
@@ -2428,7 +2428,7 @@ inline void Get_Request::set_allocated_instrumentname(std::string* instrumentnam
     _impl_.instrumentname_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.Get_Request.instrumentName)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.Get_Request.instrumentName)
 }
 
 // optional string space = 2;
@@ -2444,7 +2444,7 @@ inline void Get_Request::clear_space() {
   _impl_._has_bits_[0] &= ~0x00000002u;
 }
 inline const std::string& Get_Request::space() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Get_Request.space)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Get_Request.space)
   return _internal_space();
 }
 template <typename ArgT0, typename... ArgT>
@@ -2452,11 +2452,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Get_Request::set_space(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000002u;
  _impl_.space_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Get_Request.space)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Get_Request.space)
 }
 inline std::string* Get_Request::mutable_space() {
   std::string* _s = _internal_mutable_space();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Get_Request.space)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Get_Request.space)
   return _s;
 }
 inline const std::string& Get_Request::_internal_space() const {
@@ -2471,7 +2471,7 @@ inline std::string* Get_Request::_internal_mutable_space() {
   return _impl_.space_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Get_Request::release_space() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.Get_Request.space)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.Get_Request.space)
   if (!_internal_has_space()) {
     return nullptr;
   }
@@ -2496,31 +2496,31 @@ inline void Get_Request::set_allocated_space(std::string* space) {
     _impl_.space_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.Get_Request.space)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.Get_Request.space)
 }
 
 // -------------------------------------------------------------------
 
 // Get_Response
 
-// .com.wazuh.api.engine.ReturnStatus status = 1;
+// .com.guardsarm.api.engine.ReturnStatus status = 1;
 inline void Get_Response::clear_status() {
   _impl_.status_ = 0;
 }
-inline ::com::wazuh::api::engine::ReturnStatus Get_Response::_internal_status() const {
-  return static_cast< ::com::wazuh::api::engine::ReturnStatus >(_impl_.status_);
+inline ::com::guardsarm::api::engine::ReturnStatus Get_Response::_internal_status() const {
+  return static_cast< ::com::guardsarm::api::engine::ReturnStatus >(_impl_.status_);
 }
-inline ::com::wazuh::api::engine::ReturnStatus Get_Response::status() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Get_Response.status)
+inline ::com::guardsarm::api::engine::ReturnStatus Get_Response::status() const {
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Get_Response.status)
   return _internal_status();
 }
-inline void Get_Response::_internal_set_status(::com::wazuh::api::engine::ReturnStatus value) {
+inline void Get_Response::_internal_set_status(::com::guardsarm::api::engine::ReturnStatus value) {
   
   _impl_.status_ = value;
 }
-inline void Get_Response::set_status(::com::wazuh::api::engine::ReturnStatus value) {
+inline void Get_Response::set_status(::com::guardsarm::api::engine::ReturnStatus value) {
   _internal_set_status(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Get_Response.status)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Get_Response.status)
 }
 
 // optional string error = 2;
@@ -2536,7 +2536,7 @@ inline void Get_Response::clear_error() {
   _impl_._has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& Get_Response::error() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Get_Response.error)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Get_Response.error)
   return _internal_error();
 }
 template <typename ArgT0, typename... ArgT>
@@ -2544,11 +2544,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Get_Response::set_error(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000001u;
  _impl_.error_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Get_Response.error)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Get_Response.error)
 }
 inline std::string* Get_Response::mutable_error() {
   std::string* _s = _internal_mutable_error();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Get_Response.error)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Get_Response.error)
   return _s;
 }
 inline const std::string& Get_Response::_internal_error() const {
@@ -2563,7 +2563,7 @@ inline std::string* Get_Response::_internal_mutable_error() {
   return _impl_.error_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Get_Response::release_error() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.Get_Response.error)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.Get_Response.error)
   if (!_internal_has_error()) {
     return nullptr;
   }
@@ -2588,7 +2588,7 @@ inline void Get_Response::set_allocated_error(std::string* error) {
     _impl_.error_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.Get_Response.error)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.Get_Response.error)
 }
 
 // optional string name = 3;
@@ -2604,7 +2604,7 @@ inline void Get_Response::clear_name() {
   _impl_._has_bits_[0] &= ~0x00000002u;
 }
 inline const std::string& Get_Response::name() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Get_Response.name)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Get_Response.name)
   return _internal_name();
 }
 template <typename ArgT0, typename... ArgT>
@@ -2612,11 +2612,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Get_Response::set_name(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000002u;
  _impl_.name_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Get_Response.name)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Get_Response.name)
 }
 inline std::string* Get_Response::mutable_name() {
   std::string* _s = _internal_mutable_name();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Get_Response.name)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Get_Response.name)
   return _s;
 }
 inline const std::string& Get_Response::_internal_name() const {
@@ -2631,7 +2631,7 @@ inline std::string* Get_Response::_internal_mutable_name() {
   return _impl_.name_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Get_Response::release_name() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.Get_Response.name)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.Get_Response.name)
   if (!_internal_has_name()) {
     return nullptr;
   }
@@ -2656,7 +2656,7 @@ inline void Get_Response::set_allocated_name(std::string* name) {
     _impl_.name_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.Get_Response.name)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.Get_Response.name)
 }
 
 // optional string type = 4;
@@ -2672,7 +2672,7 @@ inline void Get_Response::clear_type() {
   _impl_._has_bits_[0] &= ~0x00000004u;
 }
 inline const std::string& Get_Response::type() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Get_Response.type)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Get_Response.type)
   return _internal_type();
 }
 template <typename ArgT0, typename... ArgT>
@@ -2680,11 +2680,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Get_Response::set_type(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000004u;
  _impl_.type_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Get_Response.type)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Get_Response.type)
 }
 inline std::string* Get_Response::mutable_type() {
   std::string* _s = _internal_mutable_type();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Get_Response.type)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Get_Response.type)
   return _s;
 }
 inline const std::string& Get_Response::_internal_type() const {
@@ -2699,7 +2699,7 @@ inline std::string* Get_Response::_internal_mutable_type() {
   return _impl_.type_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Get_Response::release_type() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.Get_Response.type)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.Get_Response.type)
   if (!_internal_has_type()) {
     return nullptr;
   }
@@ -2724,7 +2724,7 @@ inline void Get_Response::set_allocated_type(std::string* type) {
     _impl_.type_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.Get_Response.type)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.Get_Response.type)
 }
 
 // optional bool enabled = 5;
@@ -2743,7 +2743,7 @@ inline bool Get_Response::_internal_enabled() const {
   return _impl_.enabled_;
 }
 inline bool Get_Response::enabled() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Get_Response.enabled)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Get_Response.enabled)
   return _internal_enabled();
 }
 inline void Get_Response::_internal_set_enabled(bool value) {
@@ -2752,7 +2752,7 @@ inline void Get_Response::_internal_set_enabled(bool value) {
 }
 inline void Get_Response::set_enabled(bool value) {
   _internal_set_enabled(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Get_Response.enabled)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Get_Response.enabled)
 }
 
 // optional double value = 6;
@@ -2771,7 +2771,7 @@ inline double Get_Response::_internal_value() const {
   return _impl_.value_;
 }
 inline double Get_Response::value() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Get_Response.value)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Get_Response.value)
   return _internal_value();
 }
 inline void Get_Response::_internal_set_value(double value) {
@@ -2780,7 +2780,7 @@ inline void Get_Response::_internal_set_value(double value) {
 }
 inline void Get_Response::set_value(double value) {
   _internal_set_value(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Get_Response.value)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Get_Response.value)
 }
 
 // -------------------------------------------------------------------
@@ -2800,7 +2800,7 @@ inline void List_Request::clear_space() {
   _impl_._has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& List_Request::space() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.List_Request.space)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.List_Request.space)
   return _internal_space();
 }
 template <typename ArgT0, typename... ArgT>
@@ -2808,11 +2808,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void List_Request::set_space(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000001u;
  _impl_.space_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.List_Request.space)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.List_Request.space)
 }
 inline std::string* List_Request::mutable_space() {
   std::string* _s = _internal_mutable_space();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.List_Request.space)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.List_Request.space)
   return _s;
 }
 inline const std::string& List_Request::_internal_space() const {
@@ -2827,7 +2827,7 @@ inline std::string* List_Request::_internal_mutable_space() {
   return _impl_.space_.Mutable(GetArenaForAllocation());
 }
 inline std::string* List_Request::release_space() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.List_Request.space)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.List_Request.space)
   if (!_internal_has_space()) {
     return nullptr;
   }
@@ -2852,31 +2852,31 @@ inline void List_Request::set_allocated_space(std::string* space) {
     _impl_.space_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.List_Request.space)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.List_Request.space)
 }
 
 // -------------------------------------------------------------------
 
 // List_Response
 
-// .com.wazuh.api.engine.ReturnStatus status = 1;
+// .com.guardsarm.api.engine.ReturnStatus status = 1;
 inline void List_Response::clear_status() {
   _impl_.status_ = 0;
 }
-inline ::com::wazuh::api::engine::ReturnStatus List_Response::_internal_status() const {
-  return static_cast< ::com::wazuh::api::engine::ReturnStatus >(_impl_.status_);
+inline ::com::guardsarm::api::engine::ReturnStatus List_Response::_internal_status() const {
+  return static_cast< ::com::guardsarm::api::engine::ReturnStatus >(_impl_.status_);
 }
-inline ::com::wazuh::api::engine::ReturnStatus List_Response::status() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.List_Response.status)
+inline ::com::guardsarm::api::engine::ReturnStatus List_Response::status() const {
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.List_Response.status)
   return _internal_status();
 }
-inline void List_Response::_internal_set_status(::com::wazuh::api::engine::ReturnStatus value) {
+inline void List_Response::_internal_set_status(::com::guardsarm::api::engine::ReturnStatus value) {
   
   _impl_.status_ = value;
 }
-inline void List_Response::set_status(::com::wazuh::api::engine::ReturnStatus value) {
+inline void List_Response::set_status(::com::guardsarm::api::engine::ReturnStatus value) {
   _internal_set_status(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.List_Response.status)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.List_Response.status)
 }
 
 // optional string error = 2;
@@ -2892,7 +2892,7 @@ inline void List_Response::clear_error() {
   _impl_._has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& List_Response::error() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.List_Response.error)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.List_Response.error)
   return _internal_error();
 }
 template <typename ArgT0, typename... ArgT>
@@ -2900,11 +2900,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void List_Response::set_error(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000001u;
  _impl_.error_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.List_Response.error)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.List_Response.error)
 }
 inline std::string* List_Response::mutable_error() {
   std::string* _s = _internal_mutable_error();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.List_Response.error)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.List_Response.error)
   return _s;
 }
 inline const std::string& List_Response::_internal_error() const {
@@ -2919,7 +2919,7 @@ inline std::string* List_Response::_internal_mutable_error() {
   return _impl_.error_.Mutable(GetArenaForAllocation());
 }
 inline std::string* List_Response::release_error() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.List_Response.error)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.List_Response.error)
   if (!_internal_has_error()) {
     return nullptr;
   }
@@ -2944,7 +2944,7 @@ inline void List_Response::set_allocated_error(std::string* error) {
     _impl_.error_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.List_Response.error)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.List_Response.error)
 }
 
 // repeated string names = 3;
@@ -2959,66 +2959,66 @@ inline void List_Response::clear_names() {
 }
 inline std::string* List_Response::add_names() {
   std::string* _s = _internal_add_names();
-  // @@protoc_insertion_point(field_add_mutable:com.wazuh.api.engine.metrics.List_Response.names)
+  // @@protoc_insertion_point(field_add_mutable:com.guardsarm.api.engine.metrics.List_Response.names)
   return _s;
 }
 inline const std::string& List_Response::_internal_names(int index) const {
   return _impl_.names_.Get(index);
 }
 inline const std::string& List_Response::names(int index) const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.List_Response.names)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.List_Response.names)
   return _internal_names(index);
 }
 inline std::string* List_Response::mutable_names(int index) {
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.List_Response.names)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.List_Response.names)
   return _impl_.names_.Mutable(index);
 }
 inline void List_Response::set_names(int index, const std::string& value) {
   _impl_.names_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.List_Response.names)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.List_Response.names)
 }
 inline void List_Response::set_names(int index, std::string&& value) {
   _impl_.names_.Mutable(index)->assign(std::move(value));
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.List_Response.names)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.List_Response.names)
 }
 inline void List_Response::set_names(int index, const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   _impl_.names_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:com.wazuh.api.engine.metrics.List_Response.names)
+  // @@protoc_insertion_point(field_set_char:com.guardsarm.api.engine.metrics.List_Response.names)
 }
 inline void List_Response::set_names(int index, const char* value, size_t size) {
   _impl_.names_.Mutable(index)->assign(
     reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:com.wazuh.api.engine.metrics.List_Response.names)
+  // @@protoc_insertion_point(field_set_pointer:com.guardsarm.api.engine.metrics.List_Response.names)
 }
 inline std::string* List_Response::_internal_add_names() {
   return _impl_.names_.Add();
 }
 inline void List_Response::add_names(const std::string& value) {
   _impl_.names_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:com.wazuh.api.engine.metrics.List_Response.names)
+  // @@protoc_insertion_point(field_add:com.guardsarm.api.engine.metrics.List_Response.names)
 }
 inline void List_Response::add_names(std::string&& value) {
   _impl_.names_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:com.wazuh.api.engine.metrics.List_Response.names)
+  // @@protoc_insertion_point(field_add:com.guardsarm.api.engine.metrics.List_Response.names)
 }
 inline void List_Response::add_names(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   _impl_.names_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:com.wazuh.api.engine.metrics.List_Response.names)
+  // @@protoc_insertion_point(field_add_char:com.guardsarm.api.engine.metrics.List_Response.names)
 }
 inline void List_Response::add_names(const char* value, size_t size) {
   _impl_.names_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:com.wazuh.api.engine.metrics.List_Response.names)
+  // @@protoc_insertion_point(field_add_pointer:com.guardsarm.api.engine.metrics.List_Response.names)
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
 List_Response::names() const {
-  // @@protoc_insertion_point(field_list:com.wazuh.api.engine.metrics.List_Response.names)
+  // @@protoc_insertion_point(field_list:com.guardsarm.api.engine.metrics.List_Response.names)
   return _impl_.names_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
 List_Response::mutable_names() {
-  // @@protoc_insertion_point(field_mutable_list:com.wazuh.api.engine.metrics.List_Response.names)
+  // @@protoc_insertion_point(field_mutable_list:com.guardsarm.api.engine.metrics.List_Response.names)
   return &_impl_.names_;
 }
 
@@ -3043,7 +3043,7 @@ inline void MetricEntry::clear_name() {
   _impl_._has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& MetricEntry::name() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.MetricEntry.name)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.MetricEntry.name)
   return _internal_name();
 }
 template <typename ArgT0, typename... ArgT>
@@ -3051,11 +3051,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void MetricEntry::set_name(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000001u;
  _impl_.name_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.MetricEntry.name)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.MetricEntry.name)
 }
 inline std::string* MetricEntry::mutable_name() {
   std::string* _s = _internal_mutable_name();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.MetricEntry.name)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.MetricEntry.name)
   return _s;
 }
 inline const std::string& MetricEntry::_internal_name() const {
@@ -3070,7 +3070,7 @@ inline std::string* MetricEntry::_internal_mutable_name() {
   return _impl_.name_.Mutable(GetArenaForAllocation());
 }
 inline std::string* MetricEntry::release_name() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.MetricEntry.name)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.MetricEntry.name)
   if (!_internal_has_name()) {
     return nullptr;
   }
@@ -3095,7 +3095,7 @@ inline void MetricEntry::set_allocated_name(std::string* name) {
     _impl_.name_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.MetricEntry.name)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.MetricEntry.name)
 }
 
 // optional string type = 2;
@@ -3111,7 +3111,7 @@ inline void MetricEntry::clear_type() {
   _impl_._has_bits_[0] &= ~0x00000002u;
 }
 inline const std::string& MetricEntry::type() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.MetricEntry.type)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.MetricEntry.type)
   return _internal_type();
 }
 template <typename ArgT0, typename... ArgT>
@@ -3119,11 +3119,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void MetricEntry::set_type(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000002u;
  _impl_.type_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.MetricEntry.type)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.MetricEntry.type)
 }
 inline std::string* MetricEntry::mutable_type() {
   std::string* _s = _internal_mutable_type();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.MetricEntry.type)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.MetricEntry.type)
   return _s;
 }
 inline const std::string& MetricEntry::_internal_type() const {
@@ -3138,7 +3138,7 @@ inline std::string* MetricEntry::_internal_mutable_type() {
   return _impl_.type_.Mutable(GetArenaForAllocation());
 }
 inline std::string* MetricEntry::release_type() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.MetricEntry.type)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.MetricEntry.type)
   if (!_internal_has_type()) {
     return nullptr;
   }
@@ -3163,7 +3163,7 @@ inline void MetricEntry::set_allocated_type(std::string* type) {
     _impl_.type_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.MetricEntry.type)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.MetricEntry.type)
 }
 
 // optional bool enabled = 3;
@@ -3182,7 +3182,7 @@ inline bool MetricEntry::_internal_enabled() const {
   return _impl_.enabled_;
 }
 inline bool MetricEntry::enabled() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.MetricEntry.enabled)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.MetricEntry.enabled)
   return _internal_enabled();
 }
 inline void MetricEntry::_internal_set_enabled(bool value) {
@@ -3191,7 +3191,7 @@ inline void MetricEntry::_internal_set_enabled(bool value) {
 }
 inline void MetricEntry::set_enabled(bool value) {
   _internal_set_enabled(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.MetricEntry.enabled)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.MetricEntry.enabled)
 }
 
 // optional double value = 4;
@@ -3210,7 +3210,7 @@ inline double MetricEntry::_internal_value() const {
   return _impl_.value_;
 }
 inline double MetricEntry::value() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.MetricEntry.value)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.MetricEntry.value)
   return _internal_value();
 }
 inline void MetricEntry::_internal_set_value(double value) {
@@ -3219,7 +3219,7 @@ inline void MetricEntry::_internal_set_value(double value) {
 }
 inline void MetricEntry::set_value(double value) {
   _internal_set_value(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.MetricEntry.value)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.MetricEntry.value)
 }
 
 // -------------------------------------------------------------------
@@ -3231,7 +3231,7 @@ inline void SpaceMetrics::clear_name() {
   _impl_.name_.ClearToEmpty();
 }
 inline const std::string& SpaceMetrics::name() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.SpaceMetrics.name)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.SpaceMetrics.name)
   return _internal_name();
 }
 template <typename ArgT0, typename... ArgT>
@@ -3239,11 +3239,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void SpaceMetrics::set_name(ArgT0&& arg0, ArgT... args) {
  
  _impl_.name_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.SpaceMetrics.name)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.SpaceMetrics.name)
 }
 inline std::string* SpaceMetrics::mutable_name() {
   std::string* _s = _internal_mutable_name();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.SpaceMetrics.name)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.SpaceMetrics.name)
   return _s;
 }
 inline const std::string& SpaceMetrics::_internal_name() const {
@@ -3258,7 +3258,7 @@ inline std::string* SpaceMetrics::_internal_mutable_name() {
   return _impl_.name_.Mutable(GetArenaForAllocation());
 }
 inline std::string* SpaceMetrics::release_name() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.SpaceMetrics.name)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.SpaceMetrics.name)
   return _impl_.name_.Release();
 }
 inline void SpaceMetrics::set_allocated_name(std::string* name) {
@@ -3273,10 +3273,10 @@ inline void SpaceMetrics::set_allocated_name(std::string* name) {
     _impl_.name_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.SpaceMetrics.name)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.SpaceMetrics.name)
 }
 
-// repeated .com.wazuh.api.engine.metrics.MetricEntry metrics = 2;
+// repeated .com.guardsarm.api.engine.metrics.MetricEntry metrics = 2;
 inline int SpaceMetrics::_internal_metrics_size() const {
   return _impl_.metrics_.size();
 }
@@ -3286,33 +3286,33 @@ inline int SpaceMetrics::metrics_size() const {
 inline void SpaceMetrics::clear_metrics() {
   _impl_.metrics_.Clear();
 }
-inline ::com::wazuh::api::engine::metrics::MetricEntry* SpaceMetrics::mutable_metrics(int index) {
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.SpaceMetrics.metrics)
+inline ::com::guardsarm::api::engine::metrics::MetricEntry* SpaceMetrics::mutable_metrics(int index) {
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.SpaceMetrics.metrics)
   return _impl_.metrics_.Mutable(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::MetricEntry >*
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::MetricEntry >*
 SpaceMetrics::mutable_metrics() {
-  // @@protoc_insertion_point(field_mutable_list:com.wazuh.api.engine.metrics.SpaceMetrics.metrics)
+  // @@protoc_insertion_point(field_mutable_list:com.guardsarm.api.engine.metrics.SpaceMetrics.metrics)
   return &_impl_.metrics_;
 }
-inline const ::com::wazuh::api::engine::metrics::MetricEntry& SpaceMetrics::_internal_metrics(int index) const {
+inline const ::com::guardsarm::api::engine::metrics::MetricEntry& SpaceMetrics::_internal_metrics(int index) const {
   return _impl_.metrics_.Get(index);
 }
-inline const ::com::wazuh::api::engine::metrics::MetricEntry& SpaceMetrics::metrics(int index) const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.SpaceMetrics.metrics)
+inline const ::com::guardsarm::api::engine::metrics::MetricEntry& SpaceMetrics::metrics(int index) const {
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.SpaceMetrics.metrics)
   return _internal_metrics(index);
 }
-inline ::com::wazuh::api::engine::metrics::MetricEntry* SpaceMetrics::_internal_add_metrics() {
+inline ::com::guardsarm::api::engine::metrics::MetricEntry* SpaceMetrics::_internal_add_metrics() {
   return _impl_.metrics_.Add();
 }
-inline ::com::wazuh::api::engine::metrics::MetricEntry* SpaceMetrics::add_metrics() {
-  ::com::wazuh::api::engine::metrics::MetricEntry* _add = _internal_add_metrics();
-  // @@protoc_insertion_point(field_add:com.wazuh.api.engine.metrics.SpaceMetrics.metrics)
+inline ::com::guardsarm::api::engine::metrics::MetricEntry* SpaceMetrics::add_metrics() {
+  ::com::guardsarm::api::engine::metrics::MetricEntry* _add = _internal_add_metrics();
+  // @@protoc_insertion_point(field_add:com.guardsarm.api.engine.metrics.SpaceMetrics.metrics)
   return _add;
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::MetricEntry >&
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::MetricEntry >&
 SpaceMetrics::metrics() const {
-  // @@protoc_insertion_point(field_list:com.wazuh.api.engine.metrics.SpaceMetrics.metrics)
+  // @@protoc_insertion_point(field_list:com.guardsarm.api.engine.metrics.SpaceMetrics.metrics)
   return _impl_.metrics_;
 }
 
@@ -3320,24 +3320,24 @@ SpaceMetrics::metrics() const {
 
 // Dump_Response
 
-// .com.wazuh.api.engine.ReturnStatus status = 1;
+// .com.guardsarm.api.engine.ReturnStatus status = 1;
 inline void Dump_Response::clear_status() {
   _impl_.status_ = 0;
 }
-inline ::com::wazuh::api::engine::ReturnStatus Dump_Response::_internal_status() const {
-  return static_cast< ::com::wazuh::api::engine::ReturnStatus >(_impl_.status_);
+inline ::com::guardsarm::api::engine::ReturnStatus Dump_Response::_internal_status() const {
+  return static_cast< ::com::guardsarm::api::engine::ReturnStatus >(_impl_.status_);
 }
-inline ::com::wazuh::api::engine::ReturnStatus Dump_Response::status() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Dump_Response.status)
+inline ::com::guardsarm::api::engine::ReturnStatus Dump_Response::status() const {
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Dump_Response.status)
   return _internal_status();
 }
-inline void Dump_Response::_internal_set_status(::com::wazuh::api::engine::ReturnStatus value) {
+inline void Dump_Response::_internal_set_status(::com::guardsarm::api::engine::ReturnStatus value) {
   
   _impl_.status_ = value;
 }
-inline void Dump_Response::set_status(::com::wazuh::api::engine::ReturnStatus value) {
+inline void Dump_Response::set_status(::com::guardsarm::api::engine::ReturnStatus value) {
   _internal_set_status(value);
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Dump_Response.status)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Dump_Response.status)
 }
 
 // optional string error = 2;
@@ -3353,7 +3353,7 @@ inline void Dump_Response::clear_error() {
   _impl_._has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& Dump_Response::error() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Dump_Response.error)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Dump_Response.error)
   return _internal_error();
 }
 template <typename ArgT0, typename... ArgT>
@@ -3361,11 +3361,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Dump_Response::set_error(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000001u;
  _impl_.error_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Dump_Response.error)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Dump_Response.error)
 }
 inline std::string* Dump_Response::mutable_error() {
   std::string* _s = _internal_mutable_error();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Dump_Response.error)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Dump_Response.error)
   return _s;
 }
 inline const std::string& Dump_Response::_internal_error() const {
@@ -3380,7 +3380,7 @@ inline std::string* Dump_Response::_internal_mutable_error() {
   return _impl_.error_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Dump_Response::release_error() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.Dump_Response.error)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.Dump_Response.error)
   if (!_internal_has_error()) {
     return nullptr;
   }
@@ -3405,7 +3405,7 @@ inline void Dump_Response::set_allocated_error(std::string* error) {
     _impl_.error_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.Dump_Response.error)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.Dump_Response.error)
 }
 
 // optional string name = 3;
@@ -3421,7 +3421,7 @@ inline void Dump_Response::clear_name() {
   _impl_._has_bits_[0] &= ~0x00000002u;
 }
 inline const std::string& Dump_Response::name() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Dump_Response.name)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Dump_Response.name)
   return _internal_name();
 }
 template <typename ArgT0, typename... ArgT>
@@ -3429,11 +3429,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Dump_Response::set_name(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000002u;
  _impl_.name_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Dump_Response.name)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Dump_Response.name)
 }
 inline std::string* Dump_Response::mutable_name() {
   std::string* _s = _internal_mutable_name();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Dump_Response.name)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Dump_Response.name)
   return _s;
 }
 inline const std::string& Dump_Response::_internal_name() const {
@@ -3448,7 +3448,7 @@ inline std::string* Dump_Response::_internal_mutable_name() {
   return _impl_.name_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Dump_Response::release_name() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.Dump_Response.name)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.Dump_Response.name)
   if (!_internal_has_name()) {
     return nullptr;
   }
@@ -3473,7 +3473,7 @@ inline void Dump_Response::set_allocated_name(std::string* name) {
     _impl_.name_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.Dump_Response.name)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.Dump_Response.name)
 }
 
 // optional string uptime = 4;
@@ -3489,7 +3489,7 @@ inline void Dump_Response::clear_uptime() {
   _impl_._has_bits_[0] &= ~0x00000004u;
 }
 inline const std::string& Dump_Response::uptime() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Dump_Response.uptime)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Dump_Response.uptime)
   return _internal_uptime();
 }
 template <typename ArgT0, typename... ArgT>
@@ -3497,11 +3497,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Dump_Response::set_uptime(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000004u;
  _impl_.uptime_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Dump_Response.uptime)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Dump_Response.uptime)
 }
 inline std::string* Dump_Response::mutable_uptime() {
   std::string* _s = _internal_mutable_uptime();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Dump_Response.uptime)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Dump_Response.uptime)
   return _s;
 }
 inline const std::string& Dump_Response::_internal_uptime() const {
@@ -3516,7 +3516,7 @@ inline std::string* Dump_Response::_internal_mutable_uptime() {
   return _impl_.uptime_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Dump_Response::release_uptime() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.Dump_Response.uptime)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.Dump_Response.uptime)
   if (!_internal_has_uptime()) {
     return nullptr;
   }
@@ -3541,7 +3541,7 @@ inline void Dump_Response::set_allocated_uptime(std::string* uptime) {
     _impl_.uptime_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.Dump_Response.uptime)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.Dump_Response.uptime)
 }
 
 // optional string timestamp = 5;
@@ -3557,7 +3557,7 @@ inline void Dump_Response::clear_timestamp() {
   _impl_._has_bits_[0] &= ~0x00000008u;
 }
 inline const std::string& Dump_Response::timestamp() const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Dump_Response.timestamp)
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Dump_Response.timestamp)
   return _internal_timestamp();
 }
 template <typename ArgT0, typename... ArgT>
@@ -3565,11 +3565,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Dump_Response::set_timestamp(ArgT0&& arg0, ArgT... args) {
  _impl_._has_bits_[0] |= 0x00000008u;
  _impl_.timestamp_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:com.wazuh.api.engine.metrics.Dump_Response.timestamp)
+  // @@protoc_insertion_point(field_set:com.guardsarm.api.engine.metrics.Dump_Response.timestamp)
 }
 inline std::string* Dump_Response::mutable_timestamp() {
   std::string* _s = _internal_mutable_timestamp();
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Dump_Response.timestamp)
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Dump_Response.timestamp)
   return _s;
 }
 inline const std::string& Dump_Response::_internal_timestamp() const {
@@ -3584,7 +3584,7 @@ inline std::string* Dump_Response::_internal_mutable_timestamp() {
   return _impl_.timestamp_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Dump_Response::release_timestamp() {
-  // @@protoc_insertion_point(field_release:com.wazuh.api.engine.metrics.Dump_Response.timestamp)
+  // @@protoc_insertion_point(field_release:com.guardsarm.api.engine.metrics.Dump_Response.timestamp)
   if (!_internal_has_timestamp()) {
     return nullptr;
   }
@@ -3609,10 +3609,10 @@ inline void Dump_Response::set_allocated_timestamp(std::string* timestamp) {
     _impl_.timestamp_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:com.wazuh.api.engine.metrics.Dump_Response.timestamp)
+  // @@protoc_insertion_point(field_set_allocated:com.guardsarm.api.engine.metrics.Dump_Response.timestamp)
 }
 
-// repeated .com.wazuh.api.engine.metrics.MetricEntry global = 6;
+// repeated .com.guardsarm.api.engine.metrics.MetricEntry global = 6;
 inline int Dump_Response::_internal_global_size() const {
   return _impl_.global_.size();
 }
@@ -3622,37 +3622,37 @@ inline int Dump_Response::global_size() const {
 inline void Dump_Response::clear_global() {
   _impl_.global_.Clear();
 }
-inline ::com::wazuh::api::engine::metrics::MetricEntry* Dump_Response::mutable_global(int index) {
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Dump_Response.global)
+inline ::com::guardsarm::api::engine::metrics::MetricEntry* Dump_Response::mutable_global(int index) {
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Dump_Response.global)
   return _impl_.global_.Mutable(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::MetricEntry >*
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::MetricEntry >*
 Dump_Response::mutable_global() {
-  // @@protoc_insertion_point(field_mutable_list:com.wazuh.api.engine.metrics.Dump_Response.global)
+  // @@protoc_insertion_point(field_mutable_list:com.guardsarm.api.engine.metrics.Dump_Response.global)
   return &_impl_.global_;
 }
-inline const ::com::wazuh::api::engine::metrics::MetricEntry& Dump_Response::_internal_global(int index) const {
+inline const ::com::guardsarm::api::engine::metrics::MetricEntry& Dump_Response::_internal_global(int index) const {
   return _impl_.global_.Get(index);
 }
-inline const ::com::wazuh::api::engine::metrics::MetricEntry& Dump_Response::global(int index) const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Dump_Response.global)
+inline const ::com::guardsarm::api::engine::metrics::MetricEntry& Dump_Response::global(int index) const {
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Dump_Response.global)
   return _internal_global(index);
 }
-inline ::com::wazuh::api::engine::metrics::MetricEntry* Dump_Response::_internal_add_global() {
+inline ::com::guardsarm::api::engine::metrics::MetricEntry* Dump_Response::_internal_add_global() {
   return _impl_.global_.Add();
 }
-inline ::com::wazuh::api::engine::metrics::MetricEntry* Dump_Response::add_global() {
-  ::com::wazuh::api::engine::metrics::MetricEntry* _add = _internal_add_global();
-  // @@protoc_insertion_point(field_add:com.wazuh.api.engine.metrics.Dump_Response.global)
+inline ::com::guardsarm::api::engine::metrics::MetricEntry* Dump_Response::add_global() {
+  ::com::guardsarm::api::engine::metrics::MetricEntry* _add = _internal_add_global();
+  // @@protoc_insertion_point(field_add:com.guardsarm.api.engine.metrics.Dump_Response.global)
   return _add;
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::MetricEntry >&
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::MetricEntry >&
 Dump_Response::global() const {
-  // @@protoc_insertion_point(field_list:com.wazuh.api.engine.metrics.Dump_Response.global)
+  // @@protoc_insertion_point(field_list:com.guardsarm.api.engine.metrics.Dump_Response.global)
   return _impl_.global_;
 }
 
-// repeated .com.wazuh.api.engine.metrics.SpaceMetrics spaces = 7;
+// repeated .com.guardsarm.api.engine.metrics.SpaceMetrics spaces = 7;
 inline int Dump_Response::_internal_spaces_size() const {
   return _impl_.spaces_.size();
 }
@@ -3662,33 +3662,33 @@ inline int Dump_Response::spaces_size() const {
 inline void Dump_Response::clear_spaces() {
   _impl_.spaces_.Clear();
 }
-inline ::com::wazuh::api::engine::metrics::SpaceMetrics* Dump_Response::mutable_spaces(int index) {
-  // @@protoc_insertion_point(field_mutable:com.wazuh.api.engine.metrics.Dump_Response.spaces)
+inline ::com::guardsarm::api::engine::metrics::SpaceMetrics* Dump_Response::mutable_spaces(int index) {
+  // @@protoc_insertion_point(field_mutable:com.guardsarm.api.engine.metrics.Dump_Response.spaces)
   return _impl_.spaces_.Mutable(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::SpaceMetrics >*
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::SpaceMetrics >*
 Dump_Response::mutable_spaces() {
-  // @@protoc_insertion_point(field_mutable_list:com.wazuh.api.engine.metrics.Dump_Response.spaces)
+  // @@protoc_insertion_point(field_mutable_list:com.guardsarm.api.engine.metrics.Dump_Response.spaces)
   return &_impl_.spaces_;
 }
-inline const ::com::wazuh::api::engine::metrics::SpaceMetrics& Dump_Response::_internal_spaces(int index) const {
+inline const ::com::guardsarm::api::engine::metrics::SpaceMetrics& Dump_Response::_internal_spaces(int index) const {
   return _impl_.spaces_.Get(index);
 }
-inline const ::com::wazuh::api::engine::metrics::SpaceMetrics& Dump_Response::spaces(int index) const {
-  // @@protoc_insertion_point(field_get:com.wazuh.api.engine.metrics.Dump_Response.spaces)
+inline const ::com::guardsarm::api::engine::metrics::SpaceMetrics& Dump_Response::spaces(int index) const {
+  // @@protoc_insertion_point(field_get:com.guardsarm.api.engine.metrics.Dump_Response.spaces)
   return _internal_spaces(index);
 }
-inline ::com::wazuh::api::engine::metrics::SpaceMetrics* Dump_Response::_internal_add_spaces() {
+inline ::com::guardsarm::api::engine::metrics::SpaceMetrics* Dump_Response::_internal_add_spaces() {
   return _impl_.spaces_.Add();
 }
-inline ::com::wazuh::api::engine::metrics::SpaceMetrics* Dump_Response::add_spaces() {
-  ::com::wazuh::api::engine::metrics::SpaceMetrics* _add = _internal_add_spaces();
-  // @@protoc_insertion_point(field_add:com.wazuh.api.engine.metrics.Dump_Response.spaces)
+inline ::com::guardsarm::api::engine::metrics::SpaceMetrics* Dump_Response::add_spaces() {
+  ::com::guardsarm::api::engine::metrics::SpaceMetrics* _add = _internal_add_spaces();
+  // @@protoc_insertion_point(field_add:com.guardsarm.api.engine.metrics.Dump_Response.spaces)
   return _add;
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::wazuh::api::engine::metrics::SpaceMetrics >&
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::com::guardsarm::api::engine::metrics::SpaceMetrics >&
 Dump_Response::spaces() const {
-  // @@protoc_insertion_point(field_list:com.wazuh.api.engine.metrics.Dump_Response.spaces)
+  // @@protoc_insertion_point(field_list:com.guardsarm.api.engine.metrics.Dump_Response.spaces)
   return _impl_.spaces_;
 }
 
@@ -3719,7 +3719,7 @@ Dump_Response::spaces() const {
 }  // namespace metrics
 }  // namespace engine
 }  // namespace api
-}  // namespace wazuh
+}  // namespace guardsarm
 }  // namespace com
 
 // @@protoc_insertion_point(global_scope)

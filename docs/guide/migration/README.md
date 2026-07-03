@@ -1,8 +1,8 @@
 # Migration
 
-This section contains migration guides for changes that require manual review when moving between major Wazuh versions.
+This section contains migration guides for changes that require manual review when moving between major GuardSarm versions.
 
-## Wazuh 4.x → 5.0
+## GuardSarm 4.x → 5.0
 
 | Guide | Description |
 |-------|-------------|

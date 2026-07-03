@@ -1,5 +1,5 @@
 /*
- * Wazuh Indexer Connector - Component tests
+ * GuardSarm Indexer Connector - Component tests
  * Copyright (C) 2015, Wazuh Inc.
  * January 09, 2024.
  *
@@ -291,7 +291,7 @@ TEST_F(IndexerConnectorTest, SyncDeleteByQueryAndFlush)
     ASSERT_TRUE(callbackCalled);
 
     const auto body = nlohmann::json::parse(receivedBody);
-    ASSERT_EQ(body["query"]["bool"]["filter"]["terms"]["wazuh.agent.id"], nlohmann::json::array({agentId}));
+    ASSERT_EQ(body["query"]["bool"]["filter"]["terms"]["guardsarm.agent.id"], nlohmann::json::array({agentId}));
 }
 
 /**

@@ -886,7 +886,7 @@ def runner(input_path: Path, env_dir: Path, show_failure: bool):
     success = True
 
     print("Validating parameters...")
-    bin_path = (env_dir / "wazuh-engine").resolve()
+    bin_path = (env_dir / "guardsarm-engine").resolve()
     if not bin_path.is_file():
         raise FileNotFoundError(f"Binary file not found: {bin_path}")
 

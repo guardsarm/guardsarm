@@ -14,16 +14,16 @@ class Arguments:
         self.func = func
 
 
-with patch('wazuh.core.common.wazuh_uid'):
-    with patch('wazuh.core.common.wazuh_gid'):
-        sys.modules['wazuh.rbac.orm'] = MagicMock()
-        import wazuh.rbac.decorators
-        from wazuh.tests.util import RBAC_bypasser
+with patch('guardsarm.core.common.guardsarm_uid'):
+    with patch('guardsarm.core.common.guardsarm_gid'):
+        sys.modules['guardsarm.rbac.orm'] = MagicMock()
+        import guardsarm.rbac.decorators
+        from guardsarm.tests.util import RBAC_bypasser
 
-        del sys.modules['wazuh.rbac.orm']
-        wazuh.rbac.decorators.expose_resources = RBAC_bypasser
+        del sys.modules['guardsarm.rbac.orm']
+        guardsarm.rbac.decorators.expose_resources = RBAC_bypasser
         from scripts import rbac_control
-        from wazuh.tests.test_security import db_setup # noqa
+        from guardsarm.tests.test_security import db_setup # noqa
 
 
 @patch('scripts.rbac_control.sys.exit')

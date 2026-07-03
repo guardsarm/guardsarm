@@ -2,19 +2,19 @@
 
 ## Introduction
 
-The Wazuh AWS module can retrieve logs from AWS CloudWatch log groups. CloudWatch Logs centralizes logs from AWS services and applications, making it possible to monitor and analyze them in one place.
+The GuardSarm AWS module can retrieve logs from AWS CloudWatch log groups. CloudWatch Logs centralizes logs from AWS services and applications, making it possible to monitor and analyze them in one place.
 
-Wazuh connects to the CloudWatch Logs API to pull log events from specified log groups, processes them through the Wazuh rule engine, and generates alerts for relevant security events.
+GuardSarm connects to the CloudWatch Logs API to pull log events from specified log groups, processes them through the GuardSarm rule engine, and generates alerts for relevant security events.
 
 ## Prerequisites
 
 - An AWS account with CloudWatch Logs enabled and log groups configured.
 - AWS credentials (access key and secret key) or an IAM role with permissions to read CloudWatch log groups.
-- Python 3 and the `boto3` library installed on the Wazuh agent.
+- Python 3 and the `boto3` library installed on the GuardSarm agent.
 
 ## Configuration
 
-Configure the AWS module in the Wazuh agent `ossec.conf` file using the `service` element with `type="cloudwatchlogs"`:
+Configure the AWS module in the GuardSarm agent `ossec.conf` file using the `service` element with `type="cloudwatchlogs"`:
 
 ```xml
   <wodle name="aws-s3">
@@ -63,7 +63,7 @@ Configure the AWS module in the Wazuh agent `ossec.conf` file using the `service
 ```xml
 <service type="cloudwatchlogs">
   <aws_profile>default</aws_profile>
-  <iam_role_arn>arn:aws:iam::123456789012:role/WazuhRole</iam_role_arn>
+  <iam_role_arn>arn:aws:iam::123456789012:role/GuardSarmRole</iam_role_arn>
   <regions>us-east-1</regions>
   <aws_log_groups>my-log-group-1,my-log-group-2</aws_log_groups>
 </service>
@@ -95,10 +95,10 @@ If using `remove_log_streams`, add the `logs:DeleteLogStream` permission.
 
 ## Verify the integration
 
-Restart the Wazuh agent after applying the configuration:
+Restart the GuardSarm agent after applying the configuration:
 
 ```bash
-systemctl restart wazuh-agent
+systemctl restart guardsarm-agent
 ```
 
 Check the module logs:

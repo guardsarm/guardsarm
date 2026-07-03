@@ -7,7 +7,7 @@ copyright: Copyright (C) 2015-2024, Wazuh Inc.
 
 type: integration
 
-brief: These tests will check if the 'wazuh-manager-authd' daemon correctly handles the enrollment requests
+brief: These tests will check if the 'guardsarm-manager-authd' daemon correctly handles the enrollment requests
        from the API.
 
 tier: 0
@@ -20,8 +20,8 @@ components:
     - manager
 
 daemons:
-    - wazuh-manager-authd
-    - wazuh-api
+    - guardsarm-manager-authd
+    - guardsarm-api
 
 os_platform:
     - linux
@@ -46,7 +46,7 @@ os_version:
     - Red Hat 6
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/registering/restful-api-registration.html
+    - https://documentation.guardsarm.com/current/user-manual/registering/restful-api-registration.html
 
 tags:
     - authd
@@ -59,9 +59,9 @@ import pytest
 import time
 from pathlib import Path
 
-from wazuh_testing.utils.client_keys import get_client_keys
-from wazuh_testing.modules.api.utils import get_base_url, login
-from wazuh_testing.utils.configuration import get_test_cases_data
+from guardsarm_testing.utils.client_keys import get_client_keys
+from guardsarm_testing.modules.api.utils import get_base_url, login
+from guardsarm_testing.utils.configuration import get_test_cases_data
 
 from . import TEST_CASES_FOLDER_PATH
 
@@ -122,10 +122,10 @@ def test_agentd_server_configuration(test_metadata, configure_for_api_test, trun
                                      daemons_handler_module, wait_for_api_startup_module):
     '''
     description:
-        Checks `wazuh-api` responds correctly to agent registration requests. Also, ensure client.keys is update
+        Checks `guardsarm-api` responds correctly to agent registration requests. Also, ensure client.keys is update
         accordingly to the new agents parameters.
 
-    wazuh_min_version:
+    guardsarm_min_version:
         5.0.0
 
     parameters:
@@ -143,7 +143,7 @@ def test_agentd_server_configuration(test_metadata, configure_for_api_test, trun
             brief: Wait for api starts.
         - daemons_handler_module:
             type: fixture
-            brief: Handler of Wazuh daemons.
+            brief: Handler of GuardSarm daemons.
 
     assertions:
         - Verify that agents IPV4 agents can be registered

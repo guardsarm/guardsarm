@@ -8,10 +8,10 @@ import stat
 import sys
 import fnmatch
 
-wazuh_gid = -1
-wazuh_uid = -1
-wazuh_group_name = 'wazuh'
-wazuh_user_name = 'wazuh'
+guardsarm_gid = -1
+guardsarm_uid = -1
+guardsarm_group_name = 'guardsarm'
+guardsarm_user_name = 'guardsarm'
 
 HEADERS = ['full_filename', 'owner_name', 'group_name', 'mode',
            'type', 'prot_permissions', 'size_bytes', 'size_error']
@@ -75,24 +75,24 @@ class helper:
 
 
 def translate_uid(id):
-    # If wazuh_uid was not set, preserve the OS account names (e.g. root/admin/wazuh).
+    # If guardsarm_uid was not set, preserve the OS account names (e.g. root/admin/guardsarm).
     import pwd
-    if wazuh_uid == -1:
+    if guardsarm_uid == -1:
         return pwd.getpwuid(id)[0]
-    if id == wazuh_uid:
-        return wazuh_user_name
+    if id == guardsarm_uid:
+        return guardsarm_user_name
     if id == 0:
         return "root"
     return pwd.getpwuid(id)[0]
 
 
 def translate_gid(id):
-    # If wazuh_gid was not set, preserve the OS group names (e.g. wheel on macOS).
+    # If guardsarm_gid was not set, preserve the OS group names (e.g. wheel on macOS).
     import grp
-    if wazuh_gid == -1:
+    if guardsarm_gid == -1:
         return grp.getgrgid(id)[0]
-    if id == wazuh_gid:
-        return wazuh_group_name
+    if id == guardsarm_gid:
+        return guardsarm_group_name
     if id == 0:
         return "root"
     return grp.getgrgid(id)[0]
@@ -199,7 +199,7 @@ def handle_special_cases(result, item):
     """
     Handle special cases, such as specific files requiring different metadata.
     """
-    if item == '/var/wazuh-manager/api/configuration/auth/htpasswd':
+    if item == '/var/guardsarm-manager/api/configuration/auth/htpasswd':
         result['group_name'] = 'root'
         result['mode'] = '0777'
         result['type'] = 'link'
@@ -207,11 +207,11 @@ def handle_special_cases(result, item):
         result['prot_permissions'] = 'lrwxrwxrwx'
 
 
-def get_current_items(scan_path='/var/wazuh-manager', size_check=False, ignore_names=None, include_directories=True):
+def get_current_items(scan_path='/var/guardsarm-manager', size_check=False, ignore_names=None, include_directories=True):
     """ Get all the files in the specified directory and its subdirectories.
 
     Args:
-        scan_path (str, optional): Directory to be scanned. Defaults to '/var/wazuh-manager'.
+        scan_path (str, optional): Directory to be scanned. Defaults to '/var/guardsarm-manager'.
         ignore_names (list, optional): List of files to be ignored. Defaults to [].
 
     Returns:
@@ -397,25 +397,25 @@ def printReport(expected_items, not_listed, not_fully_match, current_items, matc
 
 if __name__ == "__main__":
 
-    print("Wazuh File Integrity Check")
+    print("GuardSarm File Integrity Check")
 
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("-r", "--report", type=str, default="",
                             help="Path where to save report.md, default stdout")
     arg_parser.add_argument("-f", "--file_csv_path", type=str,
                             default="", help="Path of the csv file to be used for checking")
-    arg_parser.add_argument("-d", "--directory", type=str, default="/var/wazuh-manager",
-                            help="Directory to scan and check, '/var/wazuh-manager' by default")
+    arg_parser.add_argument("-d", "--directory", type=str, default="/var/guardsarm-manager",
+                            help="Directory to scan and check, '/var/guardsarm-manager' by default")
     arg_parser.add_argument("-b", "--base_file", type=str, default="",
                             help="Creates a base csv in path, not to be used with --report")
-    arg_parser.add_argument("-wg", "--wazuh_gid", type=int,
-                            help="The group id for wazuh", default=-1)
-    arg_parser.add_argument("-wu", "--wazuh_uid", type=int,
-                            help="The user id for wazuh", default=-1)
-    arg_parser.add_argument("--wazuh_group_name", type=str,
-                            help="Wazuh group name label used in reports", default='wazuh')
-    arg_parser.add_argument("--wazuh_user_name", type=str,
-                            help="Wazuh user name label used in reports", default='wazuh')
+    arg_parser.add_argument("-wg", "--guardsarm_gid", type=int,
+                            help="The group id for guardsarm", default=-1)
+    arg_parser.add_argument("-wu", "--guardsarm_uid", type=int,
+                            help="The user id for guardsarm", default=-1)
+    arg_parser.add_argument("--guardsarm_group_name", type=str,
+                            help="GuardSarm group name label used in reports", default='guardsarm')
+    arg_parser.add_argument("--guardsarm_user_name", type=str,
+                            help="GuardSarm user name label used in reports", default='guardsarm')
     arg_parser.add_argument("-s", "--size_check", action="store_true",
                             help="Enable size validation", default=False)
     arg_parser.add_argument("-i", "--ignore", type=str,
@@ -424,10 +424,10 @@ if __name__ == "__main__":
                             help="Exclude directories from base csv generation", default=False)
 
     args = arg_parser.parse_args()
-    wazuh_gid = args.wazuh_gid
-    wazuh_uid = args.wazuh_uid
-    wazuh_group_name = args.wazuh_group_name
-    wazuh_user_name = args.wazuh_user_name
+    guardsarm_gid = args.guardsarm_gid
+    guardsarm_uid = args.guardsarm_uid
+    guardsarm_group_name = args.guardsarm_group_name
+    guardsarm_user_name = args.guardsarm_user_name
     installed_dir = args.directory
     size_check = args.size_check
     base_file_path = args.base_file

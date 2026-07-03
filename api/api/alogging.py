@@ -11,7 +11,7 @@ from pythonjsonlogger import jsonlogger
 from api.configuration import api_conf
 from api.api_exception import APIError
 
-logger = logging.getLogger('wazuh-api')
+logger = logging.getLogger('guardsarm-api')
 
 
 class APILoggerSize:
@@ -34,7 +34,7 @@ class APILoggerSize:
             raise APIError(2011, details=f"Minimum value for size is 1M. Current: {size_string}")
 
 
-class WazuhJsonFormatter(jsonlogger.JsonFormatter):
+class GuardSarmJsonFormatter(jsonlogger.JsonFormatter):
     """
     Define the custom JSON log formatter used by wlogging.
     """
@@ -79,7 +79,7 @@ class WazuhJsonFormatter(jsonlogger.JsonFormatter):
 def set_logging(log_filepath, log_level='INFO', foreground_mode=False) -> dict:
     """Set up logging for API.
 
-    This function creates a logging configuration dictionary, configure the wazuh-api logger
+    This function creates a logging configuration dictionary, configure the guardsarm-api logger
     and returns the logging configuration dictionary that will be used in uvicorn logging
     configuration.
 
@@ -146,15 +146,15 @@ def set_logging(log_filepath, log_level='INFO', foreground_mode=False) -> dict:
                 "use_colors": None,
             },
             "json" : {
-                '()': 'api.alogging.WazuhJsonFormatter',
+                '()': 'api.alogging.GuardSarmJsonFormatter',
                 'style': '%',
                 'datefmt': "%Y/%m/%d %H:%M:%S"
             }
         },
         "filters": {
-            'plain-filter': {'()': 'wazuh.core.wlogging.CustomFilter',
+            'plain-filter': {'()': 'guardsarm.core.wlogging.CustomFilter',
                              'log_type': 'log' },
-            'json-filter': {'()': 'wazuh.core.wlogging.CustomFilter',
+            'json-filter': {'()': 'guardsarm.core.wlogging.CustomFilter',
                              'log_type': 'json' }
         },
         "handlers": {
@@ -176,7 +176,7 @@ def set_logging(log_filepath, log_level='INFO', foreground_mode=False) -> dict:
             },
         },
         "loggers": {
-            "wazuh-api": {"handlers": hdls, "level": log_level, "propagate": False},
+            "guardsarm-api": {"handlers": hdls, "level": log_level, "propagate": False},
             "start-stop-api": {"handlers": hdls, "level": 'INFO', "propagate": False}
         }
     }
@@ -187,13 +187,13 @@ def set_logging(log_filepath, log_level='INFO', foreground_mode=False) -> dict:
             if api_conf['logs']['max_size']['enabled']:
                 max_size = APILoggerSize(api_conf['logs']['max_size']['size']).size
                 d.update({
-                    'class':'wazuh.core.wlogging.SizeBasedFileRotatingHandler',
+                    'class':'guardsarm.core.wlogging.SizeBasedFileRotatingHandler',
                     'maxBytes': max_size,
                     'backupCount': 1
                 })
             else:
                 d.update({
-                    'class': 'wazuh.core.wlogging.TimeBasedFileRotatingHandler',
+                    'class': 'guardsarm.core.wlogging.TimeBasedFileRotatingHandler',
                     'when': 'midnight'
                 })
             log_config_dict['handlers'][handler] = d

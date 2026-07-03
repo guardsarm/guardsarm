@@ -240,11 +240,11 @@ TEST_F(IndexerConnectorAsyncTest, ConstructorWithAbsoluteBasePath)
 
     EXPECT_NO_THROW({
         IndexerConnectorAsyncImplTest connector(
-            config, nullptr, "test-instance", &mockHttpRequest, nullptr, "/tmp/wazuh-test-indexer/");
-        EXPECT_TRUE(std::filesystem::exists("/tmp/wazuh-test-indexer/test-instance"));
+            config, nullptr, "test-instance", &mockHttpRequest, nullptr, "/tmp/guardsarm-test-indexer/");
+        EXPECT_TRUE(std::filesystem::exists("/tmp/guardsarm-test-indexer/test-instance"));
     });
 
-    std::filesystem::remove_all("/tmp/wazuh-test-indexer");
+    std::filesystem::remove_all("/tmp/guardsarm-test-indexer");
 }
 
 TEST_F(IndexerConnectorAsyncTest, ConstructorWithoutDbPathUsesDefault)
@@ -269,15 +269,15 @@ TEST_F(IndexerConnectorAsyncTest, MultipleInstancesWithDifferentQueuePaths)
 
     EXPECT_NO_THROW({
         IndexerConnectorAsyncImplTest connector1(
-            config, nullptr, "instance-1", &mockHttpRequest, nullptr, "/tmp/wazuh-test-multi/");
+            config, nullptr, "instance-1", &mockHttpRequest, nullptr, "/tmp/guardsarm-test-multi/");
         IndexerConnectorAsyncImplTest connector2(
-            config, nullptr, "instance-2", &mockHttpRequest, nullptr, "/tmp/wazuh-test-multi/");
+            config, nullptr, "instance-2", &mockHttpRequest, nullptr, "/tmp/guardsarm-test-multi/");
 
-        EXPECT_TRUE(std::filesystem::exists("/tmp/wazuh-test-multi/instance-1"));
-        EXPECT_TRUE(std::filesystem::exists("/tmp/wazuh-test-multi/instance-2"));
+        EXPECT_TRUE(std::filesystem::exists("/tmp/guardsarm-test-multi/instance-1"));
+        EXPECT_TRUE(std::filesystem::exists("/tmp/guardsarm-test-multi/instance-2"));
     });
 
-    std::filesystem::remove_all("/tmp/wazuh-test-multi");
+    std::filesystem::remove_all("/tmp/guardsarm-test-multi");
 }
 
 // Queue size limit tests
@@ -1458,7 +1458,7 @@ TEST_F(IndexerConnectorAsyncTest, ErrorProcessingWithCreateOperation)
                     "items": [
                         {
                             "create": {
-                                "_index": ".ds-wazuh-events-v5-security-000001",
+                                "_index": ".ds-guardsarm-events-v5-security-000001",
                                 "_id": "test_id",
                                 "status": 400,
                                 "error": {
@@ -1933,7 +1933,7 @@ TEST_F(IndexerConnectorAsyncTest, CreatePointInTimeSuccess)
     IndexerConnectorAsyncImplTest connector(
         config, nullptr, "test-pit-queue", &mockHttpRequest, std::move(mockSelector));
 
-    auto pit = connector.createPointInTime(std::vector<std::string> {"wazuh-states-*"}, "5m", true);
+    auto pit = connector.createPointInTime(std::vector<std::string> {"guardsarm-states-*"}, "5m", true);
     EXPECT_EQ(pit.getPitId(), "async_pit_123");
     EXPECT_EQ(pit.getCreationTime(), 1700000000000ULL);
     EXPECT_EQ(pit.getKeepAlive(), "5m");
@@ -2285,9 +2285,9 @@ TEST_F(IndexerConnectorAsyncTest, SearchByIndexSuccess)
     nlohmann::json query = {{"bool", {{"filter", nlohmann::json::array({{{"term", {{"space.name", "free"}}}}})}}}};
     nlohmann::json source = {{"includes", nlohmann::json::array({"hash"})}};
 
-    auto hits = connector.search("wazuh-threatintel-policies", 10, query, source);
+    auto hits = connector.search("guardsarm-threatintel-policies", 10, query, source);
 
-    EXPECT_THAT(capturedUrl, ::testing::HasSubstr("/wazuh-threatintel-policies/_search"));
+    EXPECT_THAT(capturedUrl, ::testing::HasSubstr("/guardsarm-threatintel-policies/_search"));
     auto body = nlohmann::json::parse(capturedBody);
     EXPECT_EQ(body["size"], 10);
     EXPECT_TRUE(body.contains("track_total_hits"));
@@ -2405,14 +2405,14 @@ TEST_F(IndexerConnectorAsyncTest, BulkIndexDataStreamSuccess)
     for (int i = 0; i < 5; ++i)
     {
         std::string data = R"({"@timestamp":"2026-01-01T00:00:00Z","msg":"event)" + std::to_string(i) + R"("})";
-        connector.bulkIndexDataStream("wazuh-alerts-ds", data);
+        connector.bulkIndexDataStream("guardsarm-alerts-ds", data);
     }
 
     auto status = processingFuture.wait_for(std::chrono::seconds(5));
     EXPECT_EQ(status, std::future_status::ready);
 
     // Verify create action (not index) is used for data streams
-    EXPECT_THAT(capturedBulkData, ::testing::HasSubstr(R"({"create":{"_index":"wazuh-alerts-ds"}})"));
+    EXPECT_THAT(capturedBulkData, ::testing::HasSubstr(R"({"create":{"_index":"guardsarm-alerts-ds"}})"));
     EXPECT_THAT(capturedBulkData, ::testing::Not(::testing::HasSubstr(R"("index")")));
 }
 
@@ -2431,7 +2431,7 @@ TEST_F(IndexerConnectorAsyncTest, BulkIndexDataStreamEmptyDataThrows)
     IndexerConnectorAsyncImplSmallBulk connector(
         config, nullptr, "test-ds-nodata", &mockHttpRequest, std::move(mockSelector));
 
-    EXPECT_THROW(connector.bulkIndexDataStream("wazuh-alerts", ""), IndexerConnectorException);
+    EXPECT_THROW(connector.bulkIndexDataStream("guardsarm-alerts", ""), IndexerConnectorException);
 }
 
 // =============================================================================

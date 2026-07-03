@@ -1,11 +1,11 @@
-# Migrating rules from Wazuh 4.x (XML) to Wazuh 5.x (YAML)
+# Migrating rules from GuardSarm 4.x (XML) to GuardSarm 5.x (YAML)
 
 ## Overview
 
-Wazuh 5.0 introduces a fundamentally different architecture for log analysis and threat detection. The legacy XML-based analysis daemon is replaced by a pipeline that separates **event processing** from **threat detection**:
+GuardSarm 5.0 introduces a fundamentally different architecture for log analysis and threat detection. The legacy XML-based analysis daemon is replaced by a pipeline that separates **event processing** from **threat detection**:
 
-1. **Wazuh Engine** — Receives raw logs, decodes them using the new decoder format, normalizes fields to the [Wazuh Common Schema (WCS)](https://github.com/wazuh/wazuh-indexer-plugins/tree/main/wcs/stateless/events/main/docs/README.md), and indexes the resulting events into `wazuh-events-v5-*` indices.
-2. **Security Analytics detectors** — Use a percolator to evaluate indexed events against Sigma-based (YAML) rules stored in the `wazuh-threatintel-rules` index. When an event matches a rule, the detector creates a **finding**, an enriched copy of the event, indexed into `wazuh-findings-v5-*`.
+1. **GuardSarm Engine** — Receives raw logs, decodes them using the new decoder format, normalizes fields to the [GuardSarm Common Schema (WCS)](https://github.com/guardsarm/guardsarm-indexer-plugins/tree/main/wcs/stateless/events/main/docs/README.md), and indexes the resulting events into `guardsarm-events-v5-*` indices.
+2. **Security Analytics detectors** — Use a percolator to evaluate indexed events against Sigma-based (YAML) rules stored in the `guardsarm-threatintel-rules` index. When an event matches a rule, the detector creates a **finding**, an enriched copy of the event, indexed into `guardsarm-findings-v5-*`.
 
 There is no automatic conversion tool. Rules must be manually rewritten following this guide.
 
@@ -13,11 +13,11 @@ There is no automatic conversion tool. Rules must be manually rewritten followin
 
 | 4.x term | 5.x term | Description |
 |---|---|---|
-| **Event** | **Event** | The base log entry after decoding. In 4.x the events are the base logs before matching any rule. In 5.x, the Wazuh Engine produces normalized events. |
+| **Event** | **Event** | The base log entry after decoding. In 4.x the events are the base logs before matching any rule. In 5.x, the GuardSarm Engine produces normalized events. |
 | **Alert** | **Finding** | In 5.x, when an event matches a detection rule, a finding is generated and the event is enriched. |
-| **Rule (XML)** | **Rule (YAML)** | Detection rules are now written in the Sigma format with Wazuh extensions. |
-| **Decoder (XML)** | **Decoder (Engine format)** | Decoders still exist but use a new format adapted to the Wazuh Engine. |
-| **Ruleset files on disk** | **Threat intelligence indices** | Rules, KVDBs, decoders, integrations, and enrichments are stored in Wazuh indices (`wazuh-threatintel-*`). |
+| **Rule (XML)** | **Rule (YAML)** | Detection rules are now written in the Sigma format with GuardSarm extensions. |
+| **Decoder (XML)** | **Decoder (Engine format)** | Decoders still exist but use a new format adapted to the GuardSarm Engine. |
+| **Ruleset files on disk** | **Threat intelligence indices** | Rules, KVDBs, decoders, integrations, and enrichments are stored in GuardSarm indices (`guardsarm-threatintel-*`). |
 
 ### Content architecture
 
@@ -28,21 +28,21 @@ Integration (e.g., "o365")
 ├── Decoders — Parse raw logs into WCS-normalized events
 ├── Rules — YAML detection rules
 ├── KVDBs — Key-Value Databases used as lookup tables during decoding
-└── Category — Determines the event index (e.g., "cloud-services" → wazuh-events-v5-cloud-services-*)
+└── Category — Determines the event index (e.g., "cloud-services" → guardsarm-events-v5-cloud-services-*)
 ```
 
-Integrations are stored in the `wazuh-threatintel-integrations` index. Each integration has a `category` field that maps to a specific event index:
+Integrations are stored in the `guardsarm-threatintel-integrations` index. Each integration has a `category` field that maps to a specific event index:
 
 | Integration category | Event index | Findings index |
 |---|---|---|
-| `security` | `wazuh-events-v5-security-*` | `wazuh-findings-v5-security-*` |
-| `system-activity` | `wazuh-events-v5-system-activity-*` | `wazuh-findings-v5-system-activity-*` |
-| `cloud-services` | `wazuh-events-v5-cloud-services-*` | `wazuh-findings-v5-cloud-services-*` |
-| `applications` | `wazuh-events-v5-applications-*` | `wazuh-findings-v5-applications-*` |
-| `network-activity` | `wazuh-events-v5-network-activity-*` | `wazuh-findings-v5-network-activity-*` |
-| `access-management` | `wazuh-events-v5-access-management-*` | `wazuh-findings-v5-access-management-*` |
-| `other` | `wazuh-events-v5-other-*` | `wazuh-findings-v5-other-*` |
-| `unclassified` | `wazuh-events-v5-unclassified-*` | `wazuh-findings-v5-unclassified-*` |
+| `security` | `guardsarm-events-v5-security-*` | `guardsarm-findings-v5-security-*` |
+| `system-activity` | `guardsarm-events-v5-system-activity-*` | `guardsarm-findings-v5-system-activity-*` |
+| `cloud-services` | `guardsarm-events-v5-cloud-services-*` | `guardsarm-findings-v5-cloud-services-*` |
+| `applications` | `guardsarm-events-v5-applications-*` | `guardsarm-findings-v5-applications-*` |
+| `network-activity` | `guardsarm-events-v5-network-activity-*` | `guardsarm-findings-v5-network-activity-*` |
+| `access-management` | `guardsarm-events-v5-access-management-*` | `guardsarm-findings-v5-access-management-*` |
+| `other` | `guardsarm-events-v5-other-*` | `guardsarm-findings-v5-other-*` |
+| `unclassified` | `guardsarm-events-v5-unclassified-*` | `guardsarm-findings-v5-unclassified-*` |
 
 ### Spaces and content lifecycle
 
@@ -50,7 +50,7 @@ All content (rules, decoders, integrations, KVDBs) exists within a **space** tha
 
 | Space | Type | Description |
 |---|---|---|
-| **Standard** | Default | Out-of-the-box content provided by Wazuh. Users can disable items but cannot modify them. |
+| **Standard** | Default | Out-of-the-box content provided by GuardSarm. Users can disable items but cannot modify them. |
 | **Draft** | User | Initial workspace for creating new content. Rules in draft are not evaluated. |
 | **Test** | User | Content is loaded into the Engine so it can be validated using logtest. Rules are not yet active in production detectors. |
 | **Custom** | User | Production-ready user content. Rules in this space can be assigned to detectors for active threat detection. |
@@ -61,15 +61,15 @@ The promotion path for user-created content is: **Draft → Test → Custom**.
 
 | Aspect | 4.x (XML) | 5.x (YAML) |
 |---|---|---|
-| **Format** | XML files on disk (`/var/ossec/ruleset/rules/`) | JSON documents in Wazuh indices (`wazuh-threatintel-rules`) |
-| **Processing** | Single analysis daemon handles decoding + rule matching | Wazuh Engine decodes and indexes events; Security Analytics detectors match rules via percolator queries |
+| **Format** | XML files on disk (`/var/ossec/ruleset/rules/`) | JSON documents in GuardSarm indices (`guardsarm-threatintel-rules`) |
+| **Processing** | Single analysis daemon handles decoding + rule matching | GuardSarm Engine decodes and indexes events; Security Analytics detectors match rules via percolator queries |
 | **Output** | Alerts | Events (all decoded logs) + Findings (events that matched a rule) |
 | **Rule identification** | Numeric ID (1–999999) | UUID, auto-assigned by the system on creation |
 | **Severity** | Numeric level 0–16 | Keyword: `informational`, `low`, `medium`, `high`, `critical` |
 | **Detection logic** | Decoder fields + regex matching + parent rule chaining | Sigma detection blocks with selections, conditions, and value modifiers |
 | **Rule chaining** | `if_sid`, `if_group`, `if_level`, `if_matched_sid` | Not supported — each rule is self-contained |
 | **Correlation** | `frequency`, `timeframe`, `same_*`, `different_*` | Not natively supported in the rule format |
-| **Field schema** | Custom decoder-extracted fields — open-ended, no validation | Wazuh Common Schema (WCS) fields — validated closed set; unknown fields are rejected at creation |
+| **Field schema** | Custom decoder-extracted fields — open-ended, no validation | GuardSarm Common Schema (WCS) fields — validated closed set; unknown fields are rejected at creation |
 | **Compliance mapping** | Embedded in `<group>` tag as CSV | Dedicated `compliance` object with structured fields |
 | **MITRE mapping** | `<mitre><id>` tags inside rule | Dedicated `mitre` object with arrays of tactic, technique, and subtechnique IDs |
 | **Management** | File edits + manager restart | API / index operations, no restart required |
@@ -115,7 +115,7 @@ metadata:
   modified: "2026-04-14"
   description: "Detects SSH authentication attempts using usernames that do not exist on the system."
   references:
-    - "https://documentation.wazuh.com/current/..."
+    - "https://documentation.guardsarm.com/current/..."
 
 logsource:
   product: "sshd"
@@ -161,7 +161,7 @@ Rules are linked to an **integration** at creation time (see [Step 5](#step-5-as
 List all custom rules you need to migrate:
 
 ```bash
-# On the 4.x Wazuh manager
+# On the 4.x GuardSarm manager
 find /var/ossec/etc/rules/ -name "*.xml" -exec grep -l '<rule ' {} \;
 # Also check default rules you may have overridden
 grep -r 'overwrite="yes"' /var/ossec/etc/rules/
@@ -216,14 +216,14 @@ This is the most significant change in the migration.
 
 In 4.x, a rule's `<field name="X">` references whatever the decoder named field `X`. If `X` doesn't exist in the event, the rule never fires — there is no error, no warning, no indication that the rule is broken.
 
-In 5.x, **every field name in a `detection` block is validated against the Wazuh Common Schema (WCS) at rule creation time**. A rule that references an unknown field is rejected with a structured error identifying the offending field names. The WCS defines a fixed, normalized set of field paths (e.g., `event.action`, `source.ip`, `user.name`) that all integrations write to.
+In 5.x, **every field name in a `detection` block is validated against the GuardSarm Common Schema (WCS) at rule creation time**. A rule that references an unknown field is rejected with a structured error identifying the offending field names. The WCS defines a fixed, normalized set of field paths (e.g., `event.action`, `source.ip`, `user.name`) that all integrations write to.
 
 This has two practical consequences:
 
 1. **You cannot carry over 4.x decoder field names directly.** Fields like `office365.Operation`, `audit.key`, or `sysmon.image` do not exist in WCS and will cause rule creation to fail. You must find the WCS equivalent.
 2. **A rule that passes validation is guaranteed to match on the fields you specified.** There are no silent mismatches from typos or renamed fields.
 
-The complete WCS field list is at the [WCS field reference (CSV)](https://github.com/wazuh/wazuh-indexer-plugins/blob/main/wcs/stateless/events/main/docs/fields.csv).
+The complete WCS field list is at the [WCS field reference (CSV)](https://github.com/guardsarm/guardsarm-indexer-plugins/blob/main/wcs/stateless/events/main/docs/fields.csv).
 
 #### Finding the right WCS field
 
@@ -253,7 +253,7 @@ The `normalization.output` section of the response is the fully decoded WCS docu
 | **Log source matching** | | |
 | `<decoded_as>` | `logsource.product` | Log source binding replaces decoder-based matching. The rule is linked to an integration. |
 | `<category>` | `logsource.category` | The decoder type category maps to the logsource object. |
-| `<location>` | `logsource` or `wazuh.integration.name` | Depends on source type. The 4.x location (e.g., `EventChannel`, `syscheck`) is now implicit in the integration. |
+| `<location>` | `logsource` or `guardsarm.integration.name` | Depends on source type. The 4.x location (e.g., `EventChannel`, `syscheck`) is now implicit in the integration. |
 | `<program_name>` | `process.name: "..."` in detection | |
 | **Pattern matching** | | |
 | `<match>` | See [Translating `<match>` and `<regex>`](#translating-match-and-regex) below | The approach depends on whether the value was decoded into a WCS field. |
@@ -467,7 +467,7 @@ curl -sk -u admin:admin -X POST \
         "title": "My custom rule",
         "description": "Migrated from 4.x rule 91560.",
         "author": "Security Team",
-        "references": ["https://documentation.wazuh.com/"]
+        "references": ["https://documentation.guardsarm.com/"]
       },
       "enabled": true,
       "status": "experimental",
@@ -477,7 +477,7 @@ curl -sk -u admin:admin -X POST \
         "condition": "selection",
         "selection": {
           "event.code|contains": ["ComplianceDLPSharePoint", "ComplianceDLPExchange"],
-          "wazuh.integration.name": "o365"
+          "guardsarm.integration.name": "o365"
         }
       },
       "mitre": { "tactic": ["TA0010"], "technique": ["T1567"], "subtechnique": [] },
@@ -507,13 +507,13 @@ The response returns the assigned rule UUID:
 
 ```yaml
 metadata:
-  title: "SSH failed login on agent {{ wazuh.agent.id }}"
+  title: "SSH failed login on agent {{ guardsarm.agent.id }}"
 tags:
   - "attack.credential-access"
-  - "{{ wazuh.agent.host.name }}"   # expands to the agent hostname in each finding
+  - "{{ guardsarm.agent.host.name }}"   # expands to the agent hostname in each finding
 ```
 
-Unresolved placeholders (absent or null fields) are silently dropped. See the [rules reference](../../../wazuh-indexer-plugins/docs/ref/modules/security-analytics/rules.md#dynamic-event-field-referencing) for the full specification.
+Unresolved placeholders (absent or null fields) are silently dropped. See the [rules reference](../../../guardsarm-indexer-plugins/docs/ref/modules/security-analytics/rules.md#dynamic-event-field-referencing) for the full specification.
 
 ### Step 7: Migrate MITRE ATT&CK mappings
 
@@ -694,7 +694,7 @@ logsource:
 detection:
   condition: "selection"
   selection:
-    wazuh.integration.name: "sshd"
+    guardsarm.integration.name: "sshd"
     event.action: "authentication-failed"
     user.name|exists: false   # non-existent user: field absent after normalization
 
@@ -750,22 +750,22 @@ status: "stable"
 level: "medium"
 
 metadata:
-  title: "Wazuh VD - Vulnerability detected"
+  title: "GuardSarm VD - Vulnerability detected"
   author: "Wazuh, Inc."
   date: "2026-03-24"
-  description: "Detects when the Wazuh vulnerability scanner identifies a new or updated vulnerability on an endpoint."
+  description: "Detects when the GuardSarm vulnerability scanner identifies a new or updated vulnerability on an endpoint."
   references:
-    - "https://documentation.wazuh.com/current/user-manual/capabilities/vulnerability-detection/index.html"
+    - "https://documentation.guardsarm.com/current/user-manual/capabilities/vulnerability-detection/index.html"
 
 logsource:
-  product: "wazuh-vd"
-  service: "wazuh-vd"
+  product: "guardsarm-vd"
+  service: "guardsarm-vd"
 
 detection:
   condition: "selection"
   selection:
     event.action: "vulnerability-detected"
-    wazuh.integration.name: "wazuh-vd"
+    guardsarm.integration.name: "guardsarm-vd"
 
 mitre:
   tactic:
@@ -834,7 +834,7 @@ falsepositives:
   - "Legitimate software with known vulnerabilities that have been accepted as a risk"
 ```
 
-The 4.x decoder field `integration` maps to `wazuh.integration.name` in WCS, and `action` maps to `event.action`. Both were verified via logtest. This rule belongs to the **wazuh-vd** integration (category: `security`), so events are indexed into `wazuh-events-v5-security-*` and findings into `wazuh-findings-v5-security-*`.
+The 4.x decoder field `integration` maps to `guardsarm.integration.name` in WCS, and `action` maps to `event.action`. Both were verified via logtest. This rule belongs to the **guardsarm-vd** integration (category: `security`), so events are indexed into `guardsarm-events-v5-security-*` and findings into `guardsarm-findings-v5-security-*`.
 
 ### Example 2: Rule with `|contains` replacing a PCRE2 alternation
 
@@ -875,7 +875,7 @@ detection:
       - "ComplianceDLPSharePoint"
       - "ComplianceDLPExchange"
     event.kind: "alert"
-    wazuh.integration.name: "o365"
+    guardsarm.integration.name: "o365"
 
 mitre:
   tactic:
@@ -1015,14 +1015,14 @@ status: "stable"
 level: "informational"
 
 metadata:
-  title: "Wazuh IT Hygiene - Item created"
+  title: "GuardSarm IT Hygiene - Item created"
   author: "Wazuh, Inc."
   date: "2026-03-24"
   description: "Detects creation of new system items such as packages, services, users, or groups."
 
 logsource:
-  product: "wazuh-it-hygiene"
-  service: "wazuh-it-hygiene"
+  product: "guardsarm-it-hygiene"
+  service: "guardsarm-it-hygiene"
 
 detection:
   condition: "selection"
@@ -1036,7 +1036,7 @@ detection:
       - "user-created"
       - "group-created"
       - "os-info-collected"
-    wazuh.integration.name: "wazuh-it-hygiene"
+    guardsarm.integration.name: "guardsarm-it-hygiene"
 
 mitre:
   tactic:
@@ -1053,13 +1053,13 @@ falsepositives:
   - "Normal software installation and system asset changes"
 ```
 
-The 4.x `<match>` regex alternation (`inserted|added|started|...`) becomes a list of values under `event.action`. A list field matches if any value in the list is present (OR logic). The 4.x decoder field `integration` maps to `wazuh.integration.name` in WCS.
+The 4.x `<match>` regex alternation (`inserted|added|started|...`) becomes a list of values under `event.action`. A list field matches if any value in the list is present (OR logic). The 4.x decoder field `integration` maps to `guardsarm.integration.name` in WCS.
 
 ---
 
 ## WCS field mapping reference
 
-When migrating, 4.x decoder-extracted fields must be mapped to WCS fields. Always verify the mapping with logtest — the `normalization.output` in the response shows the exact field paths produced by your integration's decoder. For the complete field list, see the [WCS field reference (CSV)](https://github.com/wazuh/wazuh-indexer-plugins/blob/main/wcs/stateless/events/main/docs/fields.csv).
+When migrating, 4.x decoder-extracted fields must be mapped to WCS fields. Always verify the mapping with logtest — the `normalization.output` in the response shows the exact field paths produced by your integration's decoder. For the complete field list, see the [WCS field reference (CSV)](https://github.com/guardsarm/guardsarm-indexer-plugins/blob/main/wcs/stateless/events/main/docs/fields.csv).
 
 Common mappings:
 
@@ -1080,13 +1080,13 @@ Common mappings:
 | `system_name` | `host.name` |
 | `program_name` | `process.name` |
 | `hostname` | `observer.hostname` |
-| `location` | `wazuh.protocol.location` |
-| Integration name (from decoder) | `wazuh.integration.name` |
-| Agent ID | `wazuh.agent.id` |
-| Agent name | `wazuh.agent.name` |
-| Agent groups | `wazuh.agent.groups` |
-| Cluster name | `wazuh.cluster.name` |
-| Cluster node | `wazuh.cluster.node` |
+| `location` | `guardsarm.protocol.location` |
+| Integration name (from decoder) | `guardsarm.integration.name` |
+| Agent ID | `guardsarm.agent.id` |
+| Agent name | `guardsarm.agent.name` |
+| Agent groups | `guardsarm.agent.groups` |
+| Cluster name | `guardsarm.cluster.name` |
+| Cluster node | `guardsarm.cluster.node` |
 | Windows Event ID | `event.code` |
 | Log severity level | `log.level` |
 | Process PID | `process.pid` |
@@ -1099,11 +1099,11 @@ Common mappings:
 
 ## Additional resources
 
-- [Wazuh 4.x Rules Syntax Reference](https://documentation.wazuh.com/4.9/user-manual/ruleset/ruleset-xml-syntax/rules.html)
+- [GuardSarm 4.x Rules Syntax Reference](https://documentation.guardsarm.com/4.9/user-manual/ruleset/ruleset-xml-syntax/rules.html)
 - [Sigma Rule Specification](https://sigmahq.io/docs/basics/rules.html)
 - [Sigma Conditions](https://sigmahq.io/docs/basics/conditions.html)
 - [Sigma Modifiers](https://sigmahq.io/docs/basics/modifiers.html)
-- [Wazuh Common Schema (WCS) Documentation](https://github.com/wazuh/wazuh-indexer-plugins/tree/main/wcs/stateless/events/main/docs/README.md)
-- [WCS Field Reference (CSV)](https://github.com/wazuh/wazuh-indexer-plugins/blob/main/wcs/stateless/events/main/docs/fields.csv)
-- [Wazuh 5.x Rules Reference](../wazuh-indexer-plugins/docs/ref/modules/security-analytics/rules.md)
-- [Content Manager Rule Testing Guide](../wazuh-indexer-plugins/docs/ref/modules/content-manager/rule-testing.md)
+- [GuardSarm Common Schema (WCS) Documentation](https://github.com/guardsarm/guardsarm-indexer-plugins/tree/main/wcs/stateless/events/main/docs/README.md)
+- [WCS Field Reference (CSV)](https://github.com/guardsarm/guardsarm-indexer-plugins/blob/main/wcs/stateless/events/main/docs/fields.csv)
+- [GuardSarm 5.x Rules Reference](../guardsarm-indexer-plugins/docs/ref/modules/security-analytics/rules.md)
+- [Content Manager Rule Testing Guide](../guardsarm-indexer-plugins/docs/ref/modules/content-manager/rule-testing.md)

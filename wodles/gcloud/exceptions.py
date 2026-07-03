@@ -13,8 +13,8 @@ import tools
 UNKNOWN_ERROR_ERRCODE = 999
 
 
-class WazuhIntegrationException(Exception):
-    """Class that represents an exception for the Wazuh external integrations.
+class GuardSarmIntegrationException(Exception):
+    """Class that represents an exception for the GuardSarm external integrations.
 
     Parameters
     ----------
@@ -44,13 +44,13 @@ class WazuhIntegrationException(Exception):
         return self._message
 
 
-class WazuhIntegrationInternalError(WazuhIntegrationException):
-    """Class that represents a critical exception for the Wazuh external integrations."""
+class GuardSarmIntegrationInternalError(GuardSarmIntegrationException):
+    """Class that represents a critical exception for the GuardSarm external integrations."""
     ERRORS = {
         # 1-99 -> Internal errors
         1: {
-            'key': 'GCloudWazuhNotRunning',
-            'message': 'Wazuh must be running'
+            'key': 'GCloudGuardSarmNotRunning',
+            'message': 'GuardSarm must be running'
         },
         2: {
             'key': 'GCloudSocketError',
@@ -58,11 +58,11 @@ class WazuhIntegrationInternalError(WazuhIntegrationException):
         },
         3: {
             'key': 'GCloudSocketSendError',
-            'message': 'Error sending event to Wazuh'
+            'message': 'Error sending event to GuardSarm'
         },
     }
 
-class GCloudError(WazuhIntegrationException):
+class GCloudError(GuardSarmIntegrationException):
     """Class that represents an error of the GCloud package."""
     ERRORS = {
         # 1000-1099 General errors

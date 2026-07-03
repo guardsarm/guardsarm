@@ -170,7 +170,7 @@ bool check_uninstall_permission(const char *token, const char *host, bool ssl_ve
 char* authenticate_and_get_token(const char *userpass, const char *host, bool ssl_verify);
 
 /**
- * Function with all the necessary functionality to process the uninstallation validation of the Wazuh agent package.
+ * Function with all the necessary functionality to process the uninstallation validation of the GuardSarm agent package.
  * @param uninstall_auth_token API token used for the request
  * @param uninstall_auth_login API user and password separated by colon
  * @param uninstall_auth_host host and port used for the request
@@ -285,6 +285,6 @@ extern char agent_cluster_name[256];
 extern char agent_cluster_node[256];
 extern char agent_agent_groups[OS_SIZE_65536];
 
-static const char AG_IN_UNMERGE[] = "wazuh: Could not unmerge shared file.";
+static const char AG_IN_UNMERGE[] = "guardsarm: Could not unmerge shared file.";
 
 #endif /* AGENTD_H */

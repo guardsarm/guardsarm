@@ -6,8 +6,8 @@ on:
     paths:
       - ".github/workflows/5_testintegration_msgraph-tier-0-1-lin.yml"
       - "src/config/src/wmodules-ms-graph.c"
-      - "src/wazuh_modules/src/wm_ms_graph.h"
-      - "src/wazuh_modules/src/wm_ms_graph.c"
+      - "src/guardsarm_modules/src/wm_ms_graph.h"
+      - "src/guardsarm_modules/src/wm_ms_graph.c"
       - "src/Makefile"
       - "tests/integration/conftest.py"
       - "tests/integration/test_msgraph/**"
@@ -41,17 +41,17 @@ jobs:
           architecture: x64
       - name: Download m365proxy and config http for msgraph module
         run: |
-          sed -i 's/https:\/\/%s\/%s/http:\/\/%s\/%s/g' src/wazuh_modules/src/wm_ms_graph.h
-          curl -L http://packages.wazuh.com/utils/m365proxy/m365proxy.tar.gz | \
+          sed -i 's/https:\/\/%s\/%s/http:\/\/%s\/%s/g' src/guardsarm_modules/src/wm_ms_graph.h
+          curl -L http://packages.guardsarm.com/utils/m365proxy/m365proxy.tar.gz | \
           tar zvx -C /tmp/
       - name: Install a compatible CMake
         uses: ./.github/actions/reinstall_cmake
-      - name: Build wazuh agent
-        uses: ./.github/actions/build_wazuh
+      - name: Build guardsarm agent
+        uses: ./.github/actions/build_guardsarm
         with:
           target: agent
-      - name: Install wazuh agent for linux
-        uses: ./.github/actions/install_wazuh_agent
+      - name: Install guardsarm agent for linux
+        uses: ./.github/actions/install_guardsarm_agent
         with:
           disable_sca_syscollector: "true"
       - name: Install QA integration framework
@@ -59,16 +59,16 @@ jobs:
         with:
           branch_name: ${{ env.BRANCH_NAME }}
           branch_base: ${{ env.BRANCH_BASE }}
-      - name: Set http_proxy for Wazuh ms-graph module
+      - name: Set http_proxy for GuardSarm ms-graph module
         # TODO(codebuild-temp): Remove once CodeBuild runners run systemd as PID 1.
-        # proxy_setup calls `systemctl set-environment http_proxy=...` to route Wazuh's
+        # proxy_setup calls `systemctl set-environment http_proxy=...` to route GuardSarm's
         # ms-graph module through m365proxy. Without systemd, that call fails silently.
         # Ubuntu's `service` command uses `env -i` when falling through to init.d, stripping
         # ALL inherited env vars — so GITHUB_ENV and sudo -E cannot propagate http_proxy to
-        # Wazuh daemons. Patching wazuh-control directly ensures the export survives restarts.
+        # GuardSarm daemons. Patching guardsarm-control directly ensures the export survives restarts.
         # 127.0.0.1 is explicit to avoid localhost→::1 resolution ambiguity.
         run: |
-          sudo sed -i '/^#!/a export http_proxy=http://127.0.0.1:8000' /var/ossec/bin/wazuh-control
+          sudo sed -i '/^#!/a export http_proxy=http://127.0.0.1:8000' /var/ossec/bin/guardsarm-control
           echo "http_proxy=http://127.0.0.1:8000" >> $GITHUB_ENV
       - name: Run msgraph integration tests
         run: |

@@ -8,33 +8,33 @@ The Server API and Framework use `pytest` as the test runner. Tests are organize
 
 | Location | Scope |
 |----------|-------|
-| `framework/wazuh/tests/` | Interface layer unit tests |
-| `framework/wazuh/core/tests/` | Core logic unit tests |
+| `framework/guardsarm/tests/` | Interface layer unit tests |
+| `framework/guardsarm/core/tests/` | Core logic unit tests |
 | `api/api/test/` | API layer unit tests |
 | `api/api/controllers/test/` | Controller tests |
-| `framework/wazuh/rbac/tests/` | RBAC unit tests |
-| `framework/wazuh/core/indexer/tests/` | Indexer integration tests |
+| `framework/guardsarm/rbac/tests/` | RBAC unit tests |
+| `framework/guardsarm/core/indexer/tests/` | Indexer integration tests |
 
 ---
 
 ## Running Tests
 
 ```bash
-export WAZUH_REPO=<your_path>
-PYTHONPATH=$WAZUH_REPO/framework:$WAZUH_REPO/api pytest framework --disable-warnings
+export GUARDSARM_REPO=<your_path>
+PYTHONPATH=$GUARDSARM_REPO/framework:$GUARDSARM_REPO/api pytest framework --disable-warnings
 ```
 
 ### Running specific test modules
 
 ```bash
 # Interface layer tests
-PYTHONPATH=$WAZUH_REPO/framework:$WAZUH_REPO/api pytest framework/wazuh/tests/ --disable-warnings
+PYTHONPATH=$GUARDSARM_REPO/framework:$GUARDSARM_REPO/api pytest framework/guardsarm/tests/ --disable-warnings
 
 # Core logic tests
-PYTHONPATH=$WAZUH_REPO/framework:$WAZUH_REPO/api pytest framework/wazuh/core/tests/ --disable-warnings
+PYTHONPATH=$GUARDSARM_REPO/framework:$GUARDSARM_REPO/api pytest framework/guardsarm/core/tests/ --disable-warnings
 
 # API layer tests
-PYTHONPATH=$WAZUH_REPO/framework:$WAZUH_REPO/api pytest api/api/test/ --disable-warnings
+PYTHONPATH=$GUARDSARM_REPO/framework:$GUARDSARM_REPO/api pytest api/api/test/ --disable-warnings
 ```
 
 ---

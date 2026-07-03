@@ -1,5 +1,5 @@
 /*
- * Wazuh keystore
+ * GuardSarm keystore
  * Copyright (C) 2015, Wazuh Inc.
  * January 24, 2024.
  *

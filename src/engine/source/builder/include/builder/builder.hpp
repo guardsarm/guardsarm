@@ -34,7 +34,7 @@ struct BuilderDeps
     std::shared_ptr<geo::IManager> geoManager;                 ///< Geo-location manager.
     std::shared_ptr<streamlog::ILogManager> logManager;        ///< Stream log manager.
     streamlog::RotationConfig fileOutputConfig {};             ///< Base config for file output channels.
-    std::weak_ptr<wiconnector::IWIndexerConnector> iConnector; ///< Wazuh-Indexer connector.
+    std::weak_ptr<wiconnector::IWIndexerConnector> iConnector; ///< GuardSarm-Indexer connector.
 };
 
 /**

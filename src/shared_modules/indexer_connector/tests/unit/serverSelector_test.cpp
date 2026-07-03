@@ -1,5 +1,5 @@
 /*
- * Wazuh Indexer Connector - ServerSelector tests
+ * GuardSarm Indexer Connector - ServerSelector tests
  * Copyright (C) 2015, Wazuh Inc.
  * September 08, 2023.
  *

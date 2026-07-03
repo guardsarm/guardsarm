@@ -6,7 +6,7 @@ This program is free software; you can redistribute it and/or modify it under th
 import pytest
 import os
 
-from wazuh_testing.tools.certificate_controller import CertificateController
+from guardsarm_testing.tools.certificate_controller import CertificateController
 
 
 @pytest.fixture()
@@ -14,7 +14,7 @@ def generate_ca_certificate(test_metadata):
     """
     Generate custom CA certificate.
     """
-    SSL_AGENT_CA = os.path.join(os.environ.get('INSTALLDIR', '/var/wazuh-manager'), 'etc', 'test_rootCA.pem')
+    SSL_AGENT_CA = os.path.join(os.environ.get('INSTALLDIR', '/var/guardsarm-manager'), 'etc', 'test_rootCA.pem')
     SSL_AGENT_CERT = '/tmp/test_sslagent.cert'
     SSL_AGENT_PRIVATE_KEY = '/tmp/test_sslagent.key'
     AGENT_IP = '127.0.0.1'

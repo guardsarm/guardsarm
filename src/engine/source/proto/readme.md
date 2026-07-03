@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **proto** module is the schema definition layer for the Wazuh engine's internal API. It uses **Protocol Buffers (proto3)** as the single source of truth for all request/response message types, then generates both C++ and Python code from those definitions.
+The **proto** module is the schema definition layer for the GuardSarm engine's internal API. It uses **Protocol Buffers (proto3)** as the single source of truth for all request/response message types, then generates both C++ and Python code from those definitions.
 
 Despite using protobuf for schema definition and validation, the **wire format is JSON** — not binary protobuf. The proto layer provides:
 
@@ -119,16 +119,16 @@ proto/
 
 | File | Package | Domain |
 |------|---------|--------|
-| `engine.proto` | `com.wazuh.api.engine` | Base types: `ReturnStatus`, `GenericStatus_Response` |
-| `router.proto` | `com.wazuh.api.engine.router` | Route CRUD, table queries, event queue ingestion |
-| `tester.proto` | `com.wazuh.api.engine.tester` | Session management, test runs, logtest |
-| `geo.proto` | `com.wazuh.api.engine.geo` | GeoIP database queries |
-| `event_dumper.proto` | `com.wazuh.api.engine.event_dumper` | Event dumper activate/deactivate/status |
-| `rawevtindexer.proto` | `com.wazuh.api.engine.rawevtindexer` | Raw event indexer status |
-| `crud.proto` | `com.wazuh.api.engine.content` | Namespace, policy, and resource CRUD |
-| `ioc.proto` | `com.wazuh.api.engine.ioc` | IOC sync: update and state |
-| `metrics.proto` | `com.wazuh.api.engine.metrics` | Metrics dump/get/enable/list (internal only) |
-| `request_response.proto` | `com.wazuh.api.engine.test` | Generic test request/response |
+| `engine.proto` | `com.guardsarm.api.engine` | Base types: `ReturnStatus`, `GenericStatus_Response` |
+| `router.proto` | `com.guardsarm.api.engine.router` | Route CRUD, table queries, event queue ingestion |
+| `tester.proto` | `com.guardsarm.api.engine.tester` | Session management, test runs, logtest |
+| `geo.proto` | `com.guardsarm.api.engine.geo` | GeoIP database queries |
+| `event_dumper.proto` | `com.guardsarm.api.engine.event_dumper` | Event dumper activate/deactivate/status |
+| `rawevtindexer.proto` | `com.guardsarm.api.engine.rawevtindexer` | Raw event indexer status |
+| `crud.proto` | `com.guardsarm.api.engine.content` | Namespace, policy, and resource CRUD |
+| `ioc.proto` | `com.guardsarm.api.engine.ioc` | IOC sync: update and state |
+| `metrics.proto` | `com.guardsarm.api.engine.metrics` | Metrics dump/get/enable/list (internal only) |
+| `request_response.proto` | `com.guardsarm.api.engine.test` | Generic test request/response |
 
 ## C++ Helpers (`eMessage.h`)
 

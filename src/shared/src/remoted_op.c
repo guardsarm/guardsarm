@@ -216,7 +216,7 @@ int parse_agent_update_msg (char *msg,
             }
             break;
         default:
-            // uname - wazuh version / config sum
+            // uname - guardsarm version / config sum
             if (str_tmp = strstr(line, " - "), str_tmp)
             {
                 *str_tmp = '\0';
@@ -230,9 +230,14 @@ int parse_agent_update_msg (char *msg,
                     *str_tmp = '\0';
                     os_strdup(line, agent_data->version);
                 }
-                else if (str_tmp = strstr(line, __wazuh_name), str_tmp) {
-                    // If for some reason the separator between Wazuh version and config sum is
-                    // not found, we look for the Wazuh version in the second part of the line.
+                // FROZEN (GuardSarm rebrand): __guardsarm_name MUST stay "GuardSarm" here.
+                // This locates the version token in the keepalive line sent by
+                // existing GuardSarm agents; rebranding the literal would fail to match
+                // legacy agents and drop their reported version. Do NOT use
+                // PRODUCT_NAME. See src/shared/include/branding.h.
+                else if (str_tmp = strstr(line, __guardsarm_name), str_tmp) {
+                    // If for some reason the separator between GuardSarm version and config sum is
+                    // not found, we look for the GuardSarm version in the second part of the line.
                     os_strdup(str_tmp, agent_data->version);
                 }
             }

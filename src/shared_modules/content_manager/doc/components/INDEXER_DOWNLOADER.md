@@ -2,7 +2,7 @@
 
 ## Details
 
-The [Indexer Downloader](../../src/components/IndexerDownloader.hpp) stage is part of the Content Manager orchestration and downloads content directly from the Wazuh Indexer using Point-In-Time (PIT) pagination. It is used by the Vulnerability Detection module to fetch CVE data from the `.wazuh-threatintel-vulnerabilities` index, replacing the CTI API as the CVE data source.
+The [Indexer Downloader](../../src/components/IndexerDownloader.hpp) stage is part of the Content Manager orchestration and downloads content directly from the GuardSarm Indexer using Point-In-Time (PIT) pagination. It is used by the Vulnerability Detection module to fetch CVE data from the `.guardsarm-threatintel-vulnerabilities` index, replacing the CTI API as the CVE data source.
 
 Content is delivered synchronously to the `fileProcessingCallback` as structured `nlohmann::json` objects page by page.
 
@@ -103,7 +103,7 @@ The `indexer` sub-object must be present under `configData` when `contentSource`
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `index` | string | Target index name (e.g. `.wazuh-threatintel-vulnerabilities`) |
+| `index` | string | Target index name (e.g. `.guardsarm-threatintel-vulnerabilities`) |
 | `consumerStatusIndex` | string | Index containing the consumer status document to poll before downloading (optional) |
 | `consumerStatusId` | string | Consumer status document id to poll before downloading (optional) |
 | `pageSize` | integer | Documents per page. Default: `250` |
@@ -123,7 +123,7 @@ Example:
     "interval": 3600,
     "ondemand": true,
     "configData": {
-        "consumerName": "Wazuh VulnerabilityDetector",
+        "consumerName": "GuardSarm VulnerabilityDetector",
         "contentSource": "indexer",
         "databasePath": "queue/vd/vd_updater/rocksdb",
         "offset": 0,
@@ -132,12 +132,12 @@ Example:
             "username": "admin",
             "password": "admin",
             "ssl": {
-                "certificate_authorities": ["/etc/wazuh-indexer/certs/root-ca.pem"],
+                "certificate_authorities": ["/etc/guardsarm-indexer/certs/root-ca.pem"],
                 "certificate": "",
                 "key": ""
             },
-            "index": ".wazuh-threatintel-vulnerabilities",
-            "consumerStatusIndex": ".wazuh-cti-consumers",
+            "index": ".guardsarm-threatintel-vulnerabilities",
+            "consumerStatusIndex": ".guardsarm-cti-consumers",
             "consumerStatusId": "cti:catalog:consumer:vulnerabilities",
             "pageSize": 250,
             "numSlices": 2
@@ -151,7 +151,7 @@ Example:
 The context fields related to this stage are:
 
 - `configData`
-  + `indexer`: Wazuh Indexer connection and index configuration (required).
+  + `indexer`: GuardSarm Indexer connection and index configuration (required).
 - `spRocksDB`: Used to read and persist the cursor (`CURRENT_OFFSET` column).
 - `spStopCondition`: Checked during the initial-load retry loop to abort cleanly on shutdown.
 - `data["cursor"]`: Set to the highest offset seen after each cycle. Read by `UpdateIndexerCursor` to persist the final cursor value.

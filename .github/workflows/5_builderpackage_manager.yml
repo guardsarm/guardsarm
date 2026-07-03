@@ -1,5 +1,5 @@
-run-name: Package - Build ${{ inputs.system }} wazuh-manager on ${{ inputs.architecture }} ${{ inputs.is_stage && '- is stage' || '' }} ${{ inputs.checksum && '- checksum' || '' }} ${{ inputs.debug && '- debug' || '' }} ${{ inputs.id }}
-name: 5.X - Package - Build Wazuh manager
+run-name: Package - Build ${{ inputs.system }} guardsarm-manager on ${{ inputs.architecture }} ${{ inputs.is_stage && '- is stage' || '' }} ${{ inputs.checksum && '- checksum' || '' }} ${{ inputs.debug && '- debug' || '' }} ${{ inputs.id }}
+name: 5.X - Package - Build GuardSarm manager
 
 on:
   workflow_dispatch:
@@ -119,7 +119,7 @@ jobs:
 
     runs-on: ${{ (inputs.architecture == 'arm64' || inputs.architecture == 'aarch64') && format('codebuild-github-actions-codebuild-runner-server-arm-{0}-{1}', github.run_id, github.run_attempt) || format('codebuild-github-actions-codebuild-runner-server-amd-{0}-{1}', github.run_id, github.run_attempt) }}
     timeout-minutes: 90
-    name: Build ${{ inputs.system }} wazuh-manager on ${{ inputs.architecture }}
+    name: Build ${{ inputs.system }} guardsarm-manager on ${{ inputs.architecture }}
 
     steps:
       - uses: actions/checkout@v6
@@ -196,8 +196,8 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.CI_WAZUHCI_DOCKERHUB_USER }} 
-          password: ${{ secrets.CI_WAZUHCI_DOCKERHUB_TOKEN }}
+          username: ${{ secrets.CI_GUARDSARMCI_DOCKERHUB_USER }} 
+          password: ${{ secrets.CI_GUARDSARMCI_DOCKERHUB_TOKEN }}
 
       - name: Download docker image for package building
         timeout-minutes: 20
@@ -212,7 +212,7 @@ jobs:
           sed -i '/"stage":/s/$/,/; /"stage":/a \    "commit": "'"$SHORT_COMMIT"'"' VERSION.json || exit 1
           cat VERSION.json
 
-      - name: Build ${{ inputs.system }} wazuh-manager on ${{ inputs.architecture }}
+      - name: Build ${{ inputs.system }} guardsarm-manager on ${{ inputs.architecture }}
         timeout-minutes: 45
         working-directory: packages
         env:
@@ -238,8 +238,8 @@ jobs:
           else
             SYMBOLS_TAG="debuginfo"
           fi
-          # Find all files starting with 'wazuh-manager' and ending with '.rpm or .deb'
-          for file in $(find /tmp -maxdepth 1 -type f -name "wazuh-manager*.$INPUT_SYSTEM" -exec basename {} 2>/dev/null \;); do
+          # Find all files starting with 'guardsarm-manager' and ending with '.rpm or .deb'
+          for file in $(find /tmp -maxdepth 1 -type f -name "guardsarm-manager*.$INPUT_SYSTEM" -exec basename {} 2>/dev/null \;); do
             if [[ "$file" == *"$SYMBOLS_TAG"* ]]; then
               PACKAGE_SYMBOLS_NAME="$file"
             else
@@ -257,13 +257,13 @@ jobs:
           TESTS_PATH=$GITHUB_WORKSPACE/.github/actions/test-install-components/
           if [ -z "$PACKAGE_NAME" ]; then echo "No package found matching the pattern!"; exit 1; fi
 
-          CONTAINER_ID=$(sudo docker run -d -v $TESTS_PATH/:/tests -v /tmp/:/packages -v /var/wazuh-manager:/var/wazuh-manager \
+          CONTAINER_ID=$(sudo docker run -d -v $TESTS_PATH/:/tests -v /tmp/:/packages -v /var/guardsarm-manager:/var/guardsarm-manager \
             --entrypoint '/bin/sh' "$CONTAINER_NAME:$TAG" -c "tail -f /dev/null")
 
           sudo docker exec $CONTAINER_ID /tests/install_component.sh $PACKAGE_NAME manager
 
-          # Check if Wazuh was installed. The /tmp/status.log file was generated in the previous step.
-          if grep -iq " installed.*wazuh-manager" /tmp/status.log ; then
+          # Check if GuardSarm was installed. The /tmp/status.log file was generated in the previous step.
+          if grep -iq " installed.*guardsarm-manager" /tmp/status.log ; then
             echo "Installation successfully."
           else
             echo "The installation could not be completed. The package will not be uploaded.";
@@ -271,24 +271,24 @@ jobs:
           fi
 
           echo "CONTAINER_ID=$CONTAINER_ID" >> $GITHUB_ENV
-          echo "WAZUH_UID=$(cat $TESTS_PATH/wazuh_uid)" | tee -a $GITHUB_ENV
-          echo "WAZUH_GID=$(cat $TESTS_PATH/wazuh_gid)" | tee -a $GITHUB_ENV
+          echo "GUARDSARM_UID=$(cat $TESTS_PATH/guardsarm_uid)" | tee -a $GITHUB_ENV
+          echo "GUARDSARM_GID=$(cat $TESTS_PATH/guardsarm_gid)" | tee -a $GITHUB_ENV
 
       - name: Check installed files
         uses: ./.github/actions/check_files
         with:
           expected_files: manager_base.csv
-          wazuh_uid: ${{ env.WAZUH_UID }}
-          wazuh_gid: ${{ env.WAZUH_GID }}
-          wazuh_user_name: wazuh-manager
-          wazuh_group_name: wazuh-manager
+          guardsarm_uid: ${{ env.GUARDSARM_UID }}
+          guardsarm_gid: ${{ env.GUARDSARM_GID }}
+          guardsarm_user_name: guardsarm-manager
+          guardsarm_group_name: guardsarm-manager
           size_check: "false"
-          ignore: "site-packages,/var/wazuh-manager/framework/python"
-          installation_directory: "/var/wazuh-manager"
+          ignore: "site-packages,/var/guardsarm-manager/framework/python"
+          installation_directory: "/var/guardsarm-manager"
 
       - name: Check embedded Python version
         run: |
-          EMBEDDED_PYTHON_VERSION=$(sudo docker exec $CONTAINER_ID /var/wazuh-manager/framework/python/bin/python3 --version | awk '{print $2}')
+          EMBEDDED_PYTHON_VERSION=$(sudo docker exec $CONTAINER_ID /var/guardsarm-manager/framework/python/bin/python3 --version | awk '{print $2}')
           echo "Embedded Python version: $EMBEDDED_PYTHON_VERSION"
           EXPECTED_PYTHON_VERSION=$(cat $GITHUB_WORKSPACE/framework/.python-version)
           echo "Expected Python version: $EXPECTED_PYTHON_VERSION"
@@ -312,7 +312,7 @@ jobs:
           sudo docker exec $CONTAINER_ID /tests/uninstall_component.sh $PACKAGE_NAME manager
           sudo docker stop $CONTAINER_ID && sudo docker rm $CONTAINER_ID
 
-      - name: Get latest Wazuh release from GitHub
+      - name: Get latest GuardSarm release from GitHub
         timeout-minutes: 10
         run: |
           if ! command -v curl >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1; then
@@ -329,12 +329,12 @@ jobs:
           trap 'rm -f "$RELEASES_FILE"' EXIT
 
           "$RETRY_SCRIPT" --attempts 4 --delay 5 --backoff 2 --max-delay 30 --timeout 180 \
-            --label "Download Wazuh GitHub releases metadata" -- \
+            --label "Download GuardSarm GitHub releases metadata" -- \
             curl -fsSL --connect-timeout 20 --max-time 120 \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
               -o "$RELEASES_FILE" \
-              https://api.github.com/repos/wazuh/wazuh/releases
+              https://api.github.com/repos/guardsarm/guardsarm/releases
 
           PREVIOUS_TAG=$(jq -r '.[].tag_name' "$RELEASES_FILE" | grep -vE 'alpha|beta|rc' | sed 's/^v//' | grep -E '^5\.[0-9]+\.[0-9]+$' | \
           grep -v "^${CURRENT_TAG}$" | sort -V | awk -v current="$CURRENT_TAG" '$0 < current' | tail -n1)
@@ -351,18 +351,18 @@ jobs:
             echo "HAS_PREVIOUS_RELEASE=false" >> $GITHUB_ENV
           fi
 
-      - name: Download latest public wazuh-manager package
+      - name: Download latest public guardsarm-manager package
         if: env.HAS_PREVIOUS_RELEASE == 'true'
         timeout-minutes: 10
         env:
           INPUT_SYSTEM: ${{ inputs.system }}
         run: |
           if [ "$INPUT_SYSTEM" = "deb" ]; then
-            FILE_NAME_PUBLIC="wazuh-manager_${PUBLIC_RELEASE_VERSION}-1_${ARCH}.deb"
-            BASE_URL="https://packages.wazuh.com/5.x/apt/pool/main/w/wazuh-manager"
+            FILE_NAME_PUBLIC="guardsarm-manager_${PUBLIC_RELEASE_VERSION}-1_${ARCH}.deb"
+            BASE_URL="https://packages.guardsarm.com/5.x/apt/pool/main/w/guardsarm-manager"
           elif [ "$INPUT_SYSTEM" = "rpm" ]; then
-            FILE_NAME_PUBLIC="wazuh-manager-${PUBLIC_RELEASE_VERSION}-1.${ARCH}.rpm"
-            BASE_URL="https://packages.wazuh.com/5.x/yum"
+            FILE_NAME_PUBLIC="guardsarm-manager-${PUBLIC_RELEASE_VERSION}-1.${ARCH}.rpm"
+            BASE_URL="https://packages.guardsarm.com/5.x/yum"
           else
             echo "Unsupported system type: $INPUT_SYSTEM"
             exit 1
@@ -391,27 +391,27 @@ jobs:
             BASE_IMAGE="ubuntu:22.04"
             INSTALL_CMD="dpkg -i /packages/$FILE_NAME || apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 -o DPkg::Lock::Timeout=60 -f install -y"
             UPDATE_CMD="apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update"
-            docker run --name wazuh_upgrade_rules -d -v /tmp:/packages $BASE_IMAGE tail -f /dev/null
+            docker run --name guardsarm_upgrade_rules -d -v /tmp:/packages $BASE_IMAGE tail -f /dev/null
             sleep 5
           else
             BASE_IMAGE="centos:8"
             INSTALL_CMD="yum --setopt=retries=5 --setopt=timeout=30 localinstall -y /packages/$FILE_NAME"
             UPDATE_CMD="yum --setopt=retries=5 --setopt=timeout=30 install -y cpio && yum --setopt=retries=5 --setopt=timeout=30 update -y"
-            docker run --name wazuh_upgrade_rules -d -v /tmp:/packages $BASE_IMAGE tail -f /dev/null
+            docker run --name guardsarm_upgrade_rules -d -v /tmp:/packages $BASE_IMAGE tail -f /dev/null
             # Configuring CentOS 8 repositories
-            docker exec wazuh_upgrade_rules bash -c "sed -i.bak 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*"
-            docker exec wazuh_upgrade_rules bash -c "sed -i.bak 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*"
+            docker exec guardsarm_upgrade_rules bash -c "sed -i.bak 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*"
+            docker exec guardsarm_upgrade_rules bash -c "sed -i.bak 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*"
             sleep 5
           fi
 
           "$RETRY_SCRIPT" --attempts 4 --delay 10 --backoff 2 --max-delay 45 --timeout 600 \
             --label "Refresh package repositories in upgrade test container" -- \
-            docker exec wazuh_upgrade_rules bash -lc "$UPDATE_CMD"
+            docker exec guardsarm_upgrade_rules bash -lc "$UPDATE_CMD"
           "$RETRY_SCRIPT" --attempts 3 --delay 15 --backoff 2 --max-delay 45 --timeout 900 \
             --label "Install manager package for upgrade baseline" -- \
-            docker exec wazuh_upgrade_rules bash -lc "$INSTALL_CMD"
-          docker exec wazuh_upgrade_rules bash -c "/var/wazuh-manager/bin/wazuh-manager-control info || echo 'Manager not started yet'"
-          echo "UPGRADE_CONTAINER=wazuh_upgrade_rules" >> $GITHUB_ENV
+            docker exec guardsarm_upgrade_rules bash -lc "$INSTALL_CMD"
+          docker exec guardsarm_upgrade_rules bash -c "/var/guardsarm-manager/bin/guardsarm-manager-control info || echo 'Manager not started yet'"
+          echo "UPGRADE_CONTAINER=guardsarm_upgrade_rules" >> $GITHUB_ENV
 
       - name: Prepare manager upgrade rule checks
         uses: ./.github/actions/5_builderpackage_manager-upgrade-rules-test
@@ -421,7 +421,7 @@ jobs:
           container: ${{ env.UPGRADE_CONTAINER }}
           package_path: /packages/${{ env.PACKAGE_NAME }}
 
-      - name: Upgrade to current Wazuh version
+      - name: Upgrade to current GuardSarm version
         timeout-minutes: 20
         env:
           INPUT_SYSTEM: ${{ inputs.system }}
@@ -442,7 +442,7 @@ jobs:
           "$RETRY_SCRIPT" --attempts 3 --delay 15 --backoff 2 --max-delay 45 --timeout 900 \
             --label "Upgrade manager package in test container" -- \
             docker exec $UPGRADE_CONTAINER bash -lc "$INSTALL_CMD"
-          docker exec $UPGRADE_CONTAINER bash -c "/var/wazuh-manager/bin/wazuh-manager-control info || echo 'Manager not started yet after upgrade'"
+          docker exec $UPGRADE_CONTAINER bash -c "/var/guardsarm-manager/bin/guardsarm-manager-control info || echo 'Manager not started yet after upgrade'"
 
       - name: Validate manager upgrade rule checks
         uses: ./.github/actions/5_builderpackage_manager-upgrade-rules-test
@@ -485,8 +485,8 @@ jobs:
         run: |
           "$RETRY_SCRIPT" --attempts 3 --delay 10 --backoff 2 --max-delay 30 --timeout 600 \
             --label "Upload package to S3" -- \
-            aws s3 cp "/tmp/$PACKAGE_NAME" s3://xdrsiem-packages-dev-internal/development/wazuh/5.x/main/packages/
-          s3uri="s3://xdrsiem-packages-dev-internal/development/wazuh/5.x/main/packages/$PACKAGE_NAME"
+            aws s3 cp "/tmp/$PACKAGE_NAME" s3://xdrsiem-packages-dev-internal/development/guardsarm/5.x/main/packages/
+          s3uri="s3://xdrsiem-packages-dev-internal/development/guardsarm/5.x/main/packages/$PACKAGE_NAME"
           echo "S3 URI: ${s3uri}"
 
       - name: Upload checksum to S3
@@ -495,8 +495,8 @@ jobs:
         run: |
           "$RETRY_SCRIPT" --attempts 3 --delay 10 --backoff 2 --max-delay 30 --timeout 600 \
             --label "Upload package checksum to S3" -- \
-            aws s3 cp "/tmp/$PACKAGE_NAME.sha512" s3://xdrsiem-packages-dev-internal/development/wazuh/5.x/main/packages/
-          s3uri="s3://xdrsiem-packages-dev-internal/development/wazuh/5.x/main/packages/$PACKAGE_NAME.sha512"
+            aws s3 cp "/tmp/$PACKAGE_NAME.sha512" s3://xdrsiem-packages-dev-internal/development/guardsarm/5.x/main/packages/
+          s3uri="s3://xdrsiem-packages-dev-internal/development/guardsarm/5.x/main/packages/$PACKAGE_NAME.sha512"
           echo "S3 sha512 URI: ${s3uri}"
 
       - name: Upload debug symbols to S3
@@ -505,8 +505,8 @@ jobs:
         run: |
           "$RETRY_SCRIPT" --attempts 3 --delay 10 --backoff 2 --max-delay 30 --timeout 600 \
             --label "Upload debug symbols to S3" -- \
-            aws s3 cp "/tmp/$PACKAGE_SYMBOLS_NAME" s3://xdrsiem-packages-dev-internal/development/wazuh/5.x/main/packages/
-          symbols="s3://xdrsiem-packages-dev-internal/development/wazuh/5.x/main/packages/$PACKAGE_SYMBOLS_NAME"
+            aws s3 cp "/tmp/$PACKAGE_SYMBOLS_NAME" s3://xdrsiem-packages-dev-internal/development/guardsarm/5.x/main/packages/
+          symbols="s3://xdrsiem-packages-dev-internal/development/guardsarm/5.x/main/packages/$PACKAGE_SYMBOLS_NAME"
           echo "S3 symbols URI: ${symbols}"
 
       - name: Upload debug symbols checksum to S3
@@ -515,6 +515,6 @@ jobs:
         run: |
           "$RETRY_SCRIPT" --attempts 3 --delay 10 --backoff 2 --max-delay 30 --timeout 600 \
             --label "Upload debug symbols checksum to S3" -- \
-            aws s3 cp "/tmp/$PACKAGE_SYMBOLS_NAME.sha512" s3://xdrsiem-packages-dev-internal/development/wazuh/5.x/main/packages/
-          symbols="s3://xdrsiem-packages-dev-internal/development/wazuh/5.x/main/packages/$PACKAGE_SYMBOLS_NAME.sha512"
+            aws s3 cp "/tmp/$PACKAGE_SYMBOLS_NAME.sha512" s3://xdrsiem-packages-dev-internal/development/guardsarm/5.x/main/packages/
+          symbols="s3://xdrsiem-packages-dev-internal/development/guardsarm/5.x/main/packages/$PACKAGE_SYMBOLS_NAME.sha512"
           echo "S3 symbols sha512 URI: ${symbols}"

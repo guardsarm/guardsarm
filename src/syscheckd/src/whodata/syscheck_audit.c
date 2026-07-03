@@ -18,11 +18,11 @@
 #include "audit_op.h"
 #include "string_op.h"
 
-#define AUDIT_RULES_FILE            "etc/audit_rules_wazuh.rules"
-#define AUDIT_RULES_LINK            "/etc/audit/rules.d/audit_rules_wazuh.rules"
+#define AUDIT_RULES_FILE            "etc/audit_rules_guardsarm.rules"
+#define AUDIT_RULES_LINK            "/etc/audit/rules.d/audit_rules_guardsarm.rules"
 #define PLUGINS_OLD_DIR_AUDISP      "/etc/audisp/plugins.d"
 #define PLUGINS_DIR_AUDIT           "/etc/audit/plugins.d"
-#define AUDIT_CONF_LINK             "af_wazuh.conf"
+#define AUDIT_CONF_LINK             "af_guardsarm.conf"
 #define BUF_SIZE OS_MAXSTR
 #define MAX_CONN_RETRIES 5          // Max retries to reconnect to Audit socket
 
@@ -688,7 +688,7 @@ void audit_read_events(int *audit_sock, atomic_int_t *running) {
             }
             // Send alert
             char msg_alert[512 + 1];
-            snprintf(msg_alert, 512, "wazuh: Audit: Connection closed");
+            snprintf(msg_alert, 512, "guardsarm: Audit: Connection closed");
             SendMSG(syscheck.queue, msg_alert, "syscheck", LOCALFILE_MQ);
             break;
         }

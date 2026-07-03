@@ -1,6 +1,6 @@
 # Development Environment Setup
 
-This guide describes how to set up a development environment for Wazuh.
+This guide describes how to set up a development environment for GuardSarm.
 
 ## Set up the toolchain
 
@@ -74,7 +74,7 @@ rm -r cmocka
 
 ## Set up IDE
 
-We recommend using Visual Studio Code for Wazuh development.
+We recommend using Visual Studio Code for GuardSarm development.
 
 ### Recommended Extensions
 
@@ -90,7 +90,7 @@ Install the following VS Code extensions for optimal development experience:
 
 ### Workspace Settings
 
-The following workspace settings are recommended for consistency with Wazuh coding standards. Create or update `.vscode/settings.json`:
+The following workspace settings are recommended for consistency with GuardSarm coding standards. Create or update `.vscode/settings.json`:
 
 ```json
 {
@@ -102,7 +102,7 @@ The following workspace settings are recommended for consistency with Wazuh codi
     "editor.acceptSuggestionOnEnter": "off",
     "workbench.editor.enablePreview": false,
     "files.associations": {
-        "wazuh-manager.conf": "xml",
+        "guardsarm-manager.conf": "xml",
         "ossec.conf": "xml",
         "agent.conf": "xml"
     },
@@ -185,10 +185,10 @@ Debug configurations enable interactive debugging with GDB. Create or update `.v
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug wazuh-manager-analysisd",
+      "name": "Debug guardsarm-manager-analysisd",
       "type": "cppdbg",
       "request": "launch",
-      "program": "/var/wazuh-manager/bin/wazuh-manager-analysisd",
+      "program": "/var/guardsarm-manager/bin/guardsarm-manager-analysisd",
       "args": ["-f"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
@@ -226,14 +226,14 @@ Debug configurations enable interactive debugging with GDB. Create or update `.v
 
 **Additional debug configurations:**
 
-You can add more configurations for other Wazuh components:
+You can add more configurations for other GuardSarm components:
 
 ```json
 {
-  "name": "Debug wazuh-manager-remoted",
+  "name": "Debug guardsarm-manager-remoted",
   "type": "cppdbg",
   "request": "launch",
-  "program": "/var/wazuh-manager/bin/wazuh-manager-remoted",
+  "program": "/var/guardsarm-manager/bin/guardsarm-manager-remoted",
   "args": ["-f"],
   "preLaunchTask": "build server",
   "MIMode": "gdb"
@@ -246,10 +246,10 @@ After building, you may need to copy binaries to the installation directory. You
 
 ```json
 {
-  "label": "deploy wazuh-manager-analysisd",
+  "label": "deploy guardsarm-manager-analysisd",
   "type": "shell",
   "command": "sudo",
-  "args": ["cp", "wazuh-manager-analysisd", "/var/wazuh-manager/bin/"],
+  "args": ["cp", "guardsarm-manager-analysisd", "/var/guardsarm-manager/bin/"],
   "options": {
     "cwd": "${workspaceFolder}/src"
   },
@@ -263,9 +263,9 @@ Alternatively, link the `preLaunchTask` in your debug configuration to rebuild a
 
 ### Permission Denied When Debugging
 
-If you encounter permission errors when debugging Wazuh binaries:
+If you encounter permission errors when debugging GuardSarm binaries:
 
-- Wazuh components often require root privileges
+- GuardSarm components often require root privileges
 - Run VS Code as root: `sudo code --user-data-dir=/root/.vscode-root --no-sandbox`
 - Or configure sudo to allow debugging without password prompts
 

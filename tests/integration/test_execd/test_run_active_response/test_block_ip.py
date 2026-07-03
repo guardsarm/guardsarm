@@ -9,7 +9,7 @@ type: integration
 
 brief: Active responses execute a script in response to the triggering of specific alerts based
        on the alert level or rule group. These tests will check if the 'active responses',
-       which are executed by the 'wazuh-execd' daemon via scripts, run correctly.
+       which are executed by the 'guardsarm-execd' daemon via scripts, run correctly.
 
 components:
     - execd
@@ -20,8 +20,8 @@ targets:
     - agent
 
 daemons:
-    - wazuh-manager-analysisd
-    - wazuh-execd
+    - guardsarm-manager-analysisd
+    - guardsarm-execd
 
 os_platform:
     - linux
@@ -39,20 +39,20 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/capabilities/active-response/#active-response
+    - https://documentation.guardsarm.com/current/user-manual/capabilities/active-response/#active-response
 '''
 import sys
 import pytest
 
 from pathlib import Path
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH, ACTIVE_RESPONSE_LOG_PATH
-from wazuh_testing.constants.platforms import WINDOWS
-from wazuh_testing.modules.execd import patterns as execd_paterns
-from wazuh_testing.modules.execd.configuration import EXECD_DEBUG
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils.callbacks import generate_callback
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH, ACTIVE_RESPONSE_LOG_PATH
+from guardsarm_testing.constants.platforms import WINDOWS
+from guardsarm_testing.modules.execd import patterns as execd_paterns
+from guardsarm_testing.modules.execd.configuration import EXECD_DEBUG
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.utils.callbacks import generate_callback
+from guardsarm_testing.utils.configuration import get_test_cases_data, load_configuration_template
 
 from . import CONFIGS_PATH, REPO_ROOT, TEST_CASES_PATH
 
@@ -81,7 +81,7 @@ daemons_handler_configuration = {'all_daemons': True}
 # Test function.
 @pytest.mark.parametrize('test_configuration, test_metadata',  zip(test_configuration, test_metadata), ids=cases_ids)
 def test_execd_block_ip(test_configuration, test_metadata, configure_local_internal_options, truncate_monitored_files,
-                        set_wazuh_configuration, remoted_simulator, authd_simulator,
+                        set_guardsarm_configuration, remoted_simulator, authd_simulator,
                         daemons_handler, send_execd_message):
     '''
     description: Check if 'block-ip' command of 'active response' is executed correctly.
@@ -89,7 +89,7 @@ def test_execd_block_ip(test_configuration, test_metadata, configure_local_inter
                  is sent to it. This response includes an IP address that must be blocked
                  using the appropriate firewall method for the system.
 
-    wazuh_min_version: 4.2.0
+    guardsarm_min_version: 4.2.0
 
     tier: 1
 
@@ -102,7 +102,7 @@ def test_execd_block_ip(test_configuration, test_metadata, configure_local_inter
             brief: Truncate all the log files and json alerts files before and after the test execution.
         - configure_local_internal_options:
             type: fixture
-            brief: Configure the Wazuh local internal options.
+            brief: Configure the GuardSarm local internal options.
         - remoted_simulator:
             type: fixture
             brief: Starts an RemotedSimulator instance for the test function.
@@ -111,7 +111,7 @@ def test_execd_block_ip(test_configuration, test_metadata, configure_local_inter
             brief: Starts an AuthdSimulator instance for the test function.
         - daemons_handler:
             type: fixture
-            brief: Handler of Wazuh daemons.
+            brief: Handler of GuardSarm daemons.
         - send_execd_message:
             type: fixture
             brief: Send an execd message to the agent using RemotedSimulator.
@@ -125,7 +125,7 @@ def test_execd_block_ip(test_configuration, test_metadata, configure_local_inter
         - The `cases_execd_block_ip.yaml` file provides the test cases.
     '''
     ar_monitor = FileMonitor(ACTIVE_RESPONSE_LOG_PATH)
-    wazuh_log_monitor = FileMonitor(WAZUH_LOG_PATH)
+    guardsarm_log_monitor = FileMonitor(GUARDSARM_LOG_PATH)
 
     if error_message := test_metadata.get('expected_error'):
         callback = generate_callback(error_message)
@@ -137,12 +137,12 @@ def test_execd_block_ip(test_configuration, test_metadata, configure_local_inter
             assert ar_monitor.callback_result, 'AR `block-ip` did not fail.'
         else:
             # execd format validation error - check ossec.log
-            wazuh_log_monitor.start(callback=callback)
-            assert wazuh_log_monitor.callback_result, 'AR `block-ip` did not fail.'
+            guardsarm_log_monitor.start(callback=callback)
+            assert guardsarm_log_monitor.callback_result, 'AR `block-ip` did not fail.'
         return
 
-    wazuh_log_monitor.start(callback=generate_callback(execd_paterns.EXECD_EXECUTING_COMMAND))
-    assert wazuh_log_monitor.callback_result, 'Execd `executing` command log not raised.'
+    guardsarm_log_monitor.start(callback=generate_callback(execd_paterns.EXECD_EXECUTING_COMMAND))
+    assert guardsarm_log_monitor.callback_result, 'Execd `executing` command log not raised.'
 
     ar_monitor.start(callback=generate_callback(r'.*block-ip.*'))
     assert ar_monitor.callback_result, 'AR `block-ip` program not used.'

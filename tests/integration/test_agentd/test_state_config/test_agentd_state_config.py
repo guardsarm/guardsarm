@@ -7,10 +7,10 @@ copyright: Copyright (C) 2015-2024, Wazuh Inc.
 
 type: integration
 
-brief: The 'wazuh-agentd' program is the client-side daemon that communicates with the server.
+brief: The 'guardsarm-agentd' program is the client-side daemon that communicates with the server.
        These tests will check if the configuration options related to the statistics file of
-       the 'wazuh-agentd' daemon are working properly. The statistics files are documents that
-       show real-time information about the Wazuh environment.
+       the 'guardsarm-agentd' daemon are working properly. The statistics files are documents that
+       show real-time information about the GuardSarm environment.
 
 components:
     - agentd
@@ -19,7 +19,7 @@ targets:
     - agent
 
 daemons:
-    - wazuh-agentd
+    - guardsarm-agentd
 
 os_platform:
     - linux
@@ -40,7 +40,7 @@ os_version:
     - Windows Server 2016
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/reference/statistics-files/wazuh-agentd-state.html
+    - https://documentation.guardsarm.com/current/user-manual/reference/statistics-files/guardsarm-agentd-state.html
 
 tags:
     - stats_file
@@ -51,16 +51,16 @@ from pathlib import Path
 import sys
 import time
 
-from wazuh_testing.constants.daemons import AGENT_DAEMON
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.constants.paths.variables import AGENTD_STATE
-from wazuh_testing.constants.platforms import WINDOWS
-from wazuh_testing.modules.agentd.configuration import AGENTD_DEBUG, AGENTD_WINDOWS_DEBUG
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils.configuration import get_test_cases_data
-from wazuh_testing.utils.configuration import load_configuration_template
-from wazuh_testing.utils import callbacks
-from wazuh_testing.utils.services import check_if_process_is_running
+from guardsarm_testing.constants.daemons import AGENT_DAEMON
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.constants.paths.variables import AGENTD_STATE
+from guardsarm_testing.constants.platforms import WINDOWS
+from guardsarm_testing.modules.agentd.configuration import AGENTD_DEBUG, AGENTD_WINDOWS_DEBUG
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.utils.configuration import get_test_cases_data
+from guardsarm_testing.utils.configuration import load_configuration_template
+from guardsarm_testing.utils import callbacks
+from guardsarm_testing.utils.services import check_if_process_is_running
 
 from . import CONFIGS_PATH, TEST_CASES_PATH
 
@@ -68,8 +68,8 @@ from . import CONFIGS_PATH, TEST_CASES_PATH
 pytestmark = [pytest.mark.agent, pytest.mark.linux, pytest.mark.win32, pytest.mark.tier(level=0)]
 
 # Configuration and cases data.
-configs_path = Path(CONFIGS_PATH, 'wazuh_conf.yaml')
-cases_path = Path(TEST_CASES_PATH, 'wazuh_state_config_tests.yaml')
+configs_path = Path(CONFIGS_PATH, 'guardsarm_conf.yaml')
+cases_path = Path(TEST_CASES_PATH, 'guardsarm_state_config_tests.yaml')
 
 # Test configurations.
 config_parameters, test_metadata, test_cases_ids = get_test_cases_data(cases_path)
@@ -85,14 +85,14 @@ daemons_handler_configuration = {'all_daemons': True, 'ignore_errors': True}
 
 
 @pytest.mark.parametrize('test_configuration, test_metadata', zip(test_configuration, test_metadata), ids=test_cases_ids)
-def test_agentd_state_config(test_configuration, test_metadata, remove_state_file, set_wazuh_configuration, configure_local_internal_options,
+def test_agentd_state_config(test_configuration, test_metadata, remove_state_file, set_guardsarm_configuration, configure_local_internal_options,
                              truncate_monitored_files, daemons_handler):
 
     '''
-    description: Check that the 'wazuh-agentd.state' statistics file is created
+    description: Check that the 'guardsarm-agentd.state' statistics file is created
                  automatically and verify that it is updated at the set intervals.
 
-    wazuh_min_version: 4.2.0
+    guardsarm_min_version: 4.2.0
 
     tier: 0
 
@@ -105,8 +105,8 @@ def test_agentd_state_config(test_configuration, test_metadata, remove_state_fil
             brief: Configuration cases.
         - remove_state_file:
             type: fixture
-            brief: Removes wazuh-agentd.state file.
-        - set_wazuh_configuration:
+            brief: Removes guardsarm-agentd.state file.
+        - set_guardsarm_configuration:
             type: fixture
             brief: Configure a custom environment for testing.
         - configure_local_internal_options:
@@ -117,11 +117,11 @@ def test_agentd_state_config(test_configuration, test_metadata, remove_state_fil
             brief: Reset the 'ossec.log' file and start a new monitor.
 
     assertions:
-        - Verify that the 'wazuh-agentd.state' statistics file has been created.
-        - Verify that the 'wazuh-agentd.state' statistics file is updated at the specified intervals.
+        - Verify that the 'guardsarm-agentd.state' statistics file has been created.
+        - Verify that the 'guardsarm-agentd.state' statistics file is updated at the specified intervals.
 
-    input_description: An external YAML file (wazuh_conf.yaml) includes configuration settings for the agent.
-                       Different test cases that are contained in an external YAML file (wazuh_state_config_tests.yaml)
+    input_description: An external YAML file (guardsarm_conf.yaml) includes configuration settings for the agent.
+                       Different test cases that are contained in an external YAML file (guardsarm_state_config_tests.yaml)
                        that includes the parameters and their expected responses.
 
     expected_output:
@@ -139,7 +139,7 @@ def test_agentd_state_config(test_configuration, test_metadata, remove_state_fil
         time.sleep(int(test_metadata['local_internal_options']['agent.state_interval']))
     assert test_metadata['state_file_exist'] == os.path.exists(AGENTD_STATE)
 
-    # Follow wazuh log file to find desired messages by a callback
-    wazuh_log_monitor = FileMonitor(WAZUH_LOG_PATH)
-    wazuh_log_monitor.start(callback=callbacks.generate_callback(str(test_metadata['event_monitor'])))
-    assert (wazuh_log_monitor.callback_result != None), f'Error invalid configuration event not detected'
+    # Follow guardsarm log file to find desired messages by a callback
+    guardsarm_log_monitor = FileMonitor(GUARDSARM_LOG_PATH)
+    guardsarm_log_monitor.start(callback=callbacks.generate_callback(str(test_metadata['event_monitor'])))
+    assert (guardsarm_log_monitor.callback_result != None), f'Error invalid configuration event not detected'

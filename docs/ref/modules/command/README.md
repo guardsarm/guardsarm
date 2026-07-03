@@ -4,13 +4,13 @@ For the full per-option reference (all options, defaults and allowed values veri
 
 ## Introduction
 
-The Wazuh command module executes configured operating system commands at scheduled intervals and can forward their output for analysis. It runs as the `<wodle name="command">` module inside `wazuh-modulesd` on agents and inside `wazuh-manager-modulesd` on the manager.
+The GuardSarm command module executes configured operating system commands at scheduled intervals and can forward their output for analysis. It runs as the `<wodle name="command">` module inside `guardsarm-modulesd` on agents and inside `guardsarm-manager-modulesd` on the manager.
 
-Use this module for periodic command-based telemetry when a native collector is not available. The module executes the configured command locally on the host where the configuration is applied. On agents the configuration lives in `ossec.conf` (root tag `<ossec_config>`); on the manager it lives in `etc/wazuh-manager.conf` (root tag `<wazuh_config>`), and the log file is `/var/wazuh-manager/logs/wazuh-manager.log` instead of `/var/ossec/logs/ossec.log`.
+Use this module for periodic command-based telemetry when a native collector is not available. The module executes the configured command locally on the host where the configuration is applied. On agents the configuration lives in `ossec.conf` (root tag `<ossec_config>`); on the manager it lives in `etc/guardsarm-manager.conf` (root tag `<guardsarm_config>`), and the log file is `/var/guardsarm-manager/logs/guardsarm-manager.log` instead of `/var/ossec/logs/ossec.log`.
 
 ## How it works
 
-For each configured command wodle, `wazuh-modulesd`:
+For each configured command wodle, `guardsarm-modulesd`:
 
 1. Reads the `<wodle name="command">` configuration from `ossec.conf` or `agent.conf`.
 2. Builds the command schedule from `interval`, `day`, `wday`, and `time`.
@@ -72,7 +72,7 @@ Windows example with checksum verification:
 
 ### Scheduling
 
-The command module uses the shared Wazuh module scheduler:
+The command module uses the shared GuardSarm module scheduler:
 
 - `interval` executes the command periodically.
 - `time` executes the command at a specific time of day; non-day intervals are normalized to `1d` with a warning.
@@ -83,7 +83,7 @@ When `run_on_start` is `yes`, the first execution happens immediately. When it i
 
 ## Centralized configuration
 
-The command module can be configured through `agent.conf`, but remote commands are disabled by default. If a command wodle comes from centralized configuration, the agent only runs it when the `wazuh_command.remote_commands` internal option is enabled.
+The command module can be configured through `agent.conf`, but remote commands are disabled by default. If a command wodle comes from centralized configuration, the agent only runs it when the `guardsarm_command.remote_commands` internal option is enabled.
 
 If remote commands are disabled, the agent logs the command as ignored and exits that module instance.
 
@@ -110,7 +110,7 @@ When `ignore_output` is `no`, the command module sends a JSON event with command
 ```json
 {
   "event": {
-    "module": "wazuh-wodle-cmd",
+    "module": "guardsarm-wodle-cmd",
     "start": "2026-05-11T12:00:00Z"
   },
   "tags": ["periodic-whoami"],
@@ -124,7 +124,7 @@ When `ignore_output` is `no`, the command module sends a JSON event with command
     },
     "exit_code": 0,
     "io": {
-      "text": "wazuh\n"
+      "text": "guardsarm\n"
     }
   }
 }
@@ -134,7 +134,7 @@ When `ignore_output` is `no`, the command module sends a JSON event with command
 
 | Field | Description |
 |-------|-------------|
-| `event.module` | Static module identifier: `wazuh-wodle-cmd`. |
+| `event.module` | Static module identifier: `guardsarm-wodle-cmd`. |
 | `event.start` | UTC timestamp captured before command execution. |
 | `tags` | Array containing the configured command `tag`. If `tag` is omitted, the value is an empty string. |
 | `process.args` | Command arguments, excluding the executable. |
@@ -152,7 +152,7 @@ If the output is too large for a single queue message, the module attempts to tr
 Check the module logs:
 
 ```bash
-grep "wazuh-modulesd:command" /var/ossec/logs/ossec.log
+grep "guardsarm-modulesd:command" /var/ossec/logs/ossec.log
 ```
 
 Common messages:

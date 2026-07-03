@@ -1,0 +1,10 @@
+guardsarm-agent: embedded-library
+guardsarm-agent: embedded-zlib
+guardsarm-agent: possible-gpl-code-linked-with-openssl
+guardsarm-agent: new-package-should-close-itp-bug
+guardsarm-agent: possibly-insecure-handling-of-tmp-files-in-maintainer-script
+guardsarm-agent: non-standard-dir-in-var
+guardsarm-agent: file-in-unusual-dir
+guardsarm-agent: hardening-no-fortify-functions
+guardsarm-agent: hardening-no-relro
+guardsarm-agent: binary-from-other-architecture var/ossec/lib/modern.bpf.o

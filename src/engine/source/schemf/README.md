@@ -2,9 +2,9 @@
 
 ## Overview
 
-The `schemf` module provides the **schema definition and validation system** for the Wazuh engine. It models the structure of indexed events by defining typed fields organized in a hierarchical tree, and validates operations and values against those field types at build time.
+The `schemf` module provides the **schema definition and validation system** for the GuardSarm engine. It models the structure of indexed events by defining typed fields organized in a hierarchical tree, and validates operations and values against those field types at build time.
 
-Its primary purpose is to ensure that decoders and rules only write data that is compatible with the target index mapping. The schema is aligned with the WCS (Wazuh Common Schema), which in turn maps to the underlying indexer field types (OpenSearch/Elasticsearch-compatible).
+Its primary purpose is to ensure that decoders and rules only write data that is compatible with the target index mapping. The schema is aligned with the WCS (GuardSarm Common Schema), which in turn maps to the underlying indexer field types (OpenSearch/Elasticsearch-compatible).
 
 ## Key Concepts
 

@@ -13,17 +13,17 @@
 src/LOCATION
 src/isbigendian.c
 etc/ossec.mc
-etc/wazuh.mc
+etc/guardsarm.mc
 src/Config.OS
 src/selinux/*.mod
 src/selinux/*.pp
-framework/wazuh/core/wazuh.json
+framework/guardsarm/core/guardsarm.json
 src/**/build/*
 tools/**/build/*
 src/generated_headers/*.h
 src/generated_headers/*.hpp
-src/wazuh_modules/sca/build
-src/wazuh_modules/sca/coverage_report
+src/guardsarm_modules/sca/build
+src/guardsarm_modules/sca/coverage_report
 
 # Compiled programs
 src/clear_stats
@@ -41,7 +41,7 @@ src/ossec-maild
 src/ossec-makelists
 src/ossec-monitord
 src/ossec-regex
-src/wazuh-regex
+src/guardsarm-regex
 src/parallel-regex
 src/ossec-remoted
 src/ossec-syscheckd
@@ -50,30 +50,30 @@ src/rootcheck_control
 src/syscheck_control
 src/syscheck_update
 src/verify-agent-conf
-src/wazuh-modulesd
-src/wazuh-auth
-src/wazuh-db
-src/wazuh-agentd
-src/wazuh-agentlessd
-src/wazuh-analysisd
-src/wazuh-authd
-src/wazuh-csyslogd
-src/wazuh-execd
-src/wazuh-logcollector
-src/wazuh-logtest-legacy
-src/wazuh-maild
-src/wazuh-monitord
-src/wazuh-remoted
-src/wazuh-syscheckd
-src/wazuh-integratord
-src/wazuh-keystore
-src/wazuh-keystore-testtool
-src/wazuh-manager-keystore
-src/wazuh-manager-authd
-src/wazuh-manager-db
-src/wazuh-manager-modulesd
-src/wazuh-manager-monitord
-src/wazuh-manager-remoted
+src/guardsarm-modulesd
+src/guardsarm-auth
+src/guardsarm-db
+src/guardsarm-agentd
+src/guardsarm-agentlessd
+src/guardsarm-analysisd
+src/guardsarm-authd
+src/guardsarm-csyslogd
+src/guardsarm-execd
+src/guardsarm-logcollector
+src/guardsarm-logtest-legacy
+src/guardsarm-maild
+src/guardsarm-monitord
+src/guardsarm-remoted
+src/guardsarm-syscheckd
+src/guardsarm-integratord
+src/guardsarm-keystore
+src/guardsarm-keystore-testtool
+src/guardsarm-manager-keystore
+src/guardsarm-manager-authd
+src/guardsarm-manager-db
+src/guardsarm-manager-modulesd
+src/guardsarm-manager-monitord
+src/guardsarm-manager-remoted
 
 # Active responses
 src/firewall-drop
@@ -85,10 +85,10 @@ src/firewalld-drop
 src/disable-account
 src/host-deny
 src/ip-customblock
-src/restart-wazuh
+src/restart-guardsarm
 src/route-null
 src/kaspersky
-src/wazuh-slack
+src/guardsarm-slack
 
 # Windows agent
 src/win32/*.exe
@@ -103,8 +103,8 @@ src/win32/netsh-win-2016.cmd
 src/win32/route-null-2012.cmd
 src/win32/netsh.cmd
 src/win32/VERSION.json
-src/libwazuhshared.*
-src/libwazuhext.*
+src/libguardsarmshared.*
+src/libguardsarmext.*
 
 # Eclipse files
 .cproject
@@ -137,7 +137,7 @@ src/shared_modules/sync_protocol/coverage_report/
 src/shared_modules/utils/coverage_report/
 src/shared_modules/utils/tests/coverage_report
 src/syscheckd/coverage_report/
-src/wazuh_modules/syscollector/coverage_report/
+src/guardsarm_modules/syscollector/coverage_report/
 src/syscheckd/coverage_report
 src/syscheckd/src/db/smokeTests/output
 src/ossec.test
@@ -154,7 +154,7 @@ api/test/integration/_test_results
 src/active-response/firewall-drop.sh
 
 # Databases commits
-framework/wazuh/rbac/migrations/versions/*
+framework/guardsarm/rbac/migrations/versions/*
 
 # Documentation files
 documentation/
@@ -163,14 +163,14 @@ doxygen_errors.txt
 
 # Flatbuffers generated headers.
 src/shared_modules/utils/flatbuffers/include/
-src/wazuh_modules/syscollector/include/*_generated.h
-src/wazuh_modules/vulnerability_scanner/include/*_schema.h
-src/wazuh_modules/vulnerability_scanner/include/*_generated.h
+src/guardsarm_modules/syscollector/include/*_generated.h
+src/guardsarm_modules/vulnerability_scanner/include/*_schema.h
+src/guardsarm_modules/vulnerability_scanner/include/*_generated.h
 
 # Test files
-src/wazuh_modules/vulnerability_scanner/qa/test_data/*/input_*.bin
+src/guardsarm_modules/vulnerability_scanner/qa/test_data/*/input_*.bin
 cov-int
-wazuh.tgz
+guardsarm.tgz
 src/*.log
 src/result-*.txt
 

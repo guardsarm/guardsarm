@@ -7,14 +7,14 @@
 import pytest
 
 from pathlib import Path
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils.callbacks import generate_callback
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.modules.remoted.configuration import REMOTED_DEBUG
-from wazuh_testing.modules.remoted import patterns
-from wazuh_testing.modules.api import utils
-from wazuh_testing.tools.simulators.agent_simulator import send_ping_pong_messages
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.utils.callbacks import generate_callback
+from guardsarm_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.modules.remoted.configuration import REMOTED_DEBUG
+from guardsarm_testing.modules.remoted import patterns
+from guardsarm_testing.modules.api import utils
+from guardsarm_testing.tools.simulators.agent_simulator import send_ping_pong_messages
 
 from . import CONFIGS_PATH, TEST_CASES_PATH
 
@@ -35,10 +35,10 @@ local_internal_options = {REMOTED_DEBUG: '2'}
 # Test function.
 @pytest.mark.parametrize('test_configuration, test_metadata',  zip(test_configuration, test_metadata), ids=cases_ids)
 def test_ping_pong_message(test_configuration, test_metadata, configure_local_internal_options, truncate_monitored_files,
-                            set_wazuh_configuration, restart_wazuh_expect_error, protocols_list_to_str_upper_case):
+                            set_guardsarm_configuration, restart_guardsarm_expect_error, protocols_list_to_str_upper_case):
 
     '''
-    description: Check if 'wazuh-manager-remoted' sends the #pong message
+    description: Check if 'guardsarm-manager-remoted' sends the #pong message
 
     parameters:
         - test_configuration
@@ -52,19 +52,19 @@ def test_ping_pong_message(test_configuration, test_metadata, configure_local_in
             brief: Truncate all the log files and json alerts files before and after the test execution.
         - configure_local_internal_options:
             type: fixture
-            brief: Configure the Wazuh local internal options using the values from `local_internal_options`.
-        - restart_wazuh_expect_error
+            brief: Configure the GuardSarm local internal options using the values from `local_internal_options`.
+        - restart_guardsarm_expect_error
             type: fixture
             brief: Restart service when expected error is None, once the test finishes stops the daemons.
         - protocols_list_to_str_upper_case
             type: fixture
             brief: convert valid_protocol list to comma separated uppercase string
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
     '''
 
-    log_monitor = FileMonitor(WAZUH_LOG_PATH)
+    log_monitor = FileMonitor(GUARDSARM_LOG_PATH)
 
     protocol_valid_upper = protocols_list_to_str_upper_case
     protocol = protocol_valid_upper

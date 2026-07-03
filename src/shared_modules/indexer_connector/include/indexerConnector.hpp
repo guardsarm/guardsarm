@@ -1,5 +1,5 @@
 /*
- * Wazuh - Indexer connector.
+ * GuardSarm - Indexer connector.
  * Copyright (C) 2015, Wazuh Inc.
  * June 2, 2023.
  *
@@ -37,7 +37,7 @@ using LoggingContext =
               std::function<void(const int, const char*, const char*, const int, const char*, const char*, va_list)>>;
 
 /**
- * @brief PointInTime class - Holds wazuh-indexer Point In Time data.
+ * @brief PointInTime class - Holds guardsarm-indexer Point In Time data.
  *
  */
 class EXPORTED PointInTime final
@@ -139,7 +139,7 @@ public:
      *
      * Example updateQuery structure:
      * {
-     *   "query": { "term": { "wazuh.agent.id": "001" } },
+     *   "query": { "term": { "guardsarm.agent.id": "001" } },
      *   "script": {
      *     "source": "ctx._source.field = params.value",
      *     "lang": "painless",
@@ -296,7 +296,7 @@ public:
      * become immediately searchable.
      *
      * @param indexPattern Index name or wildcard pattern (e.g.
-     *                     "wazuh-states-inventory-packages").
+     *                     "guardsarm-states-inventory-packages").
      */
     void refresh(std::string_view indexPattern);
 
@@ -328,7 +328,7 @@ public:
      *                Must be unique per instance to guarantee queue isolation.
      * @param logging Logging context pairing the caller module name and the log callback.
      *                The caller name is used to build the log tag as
-     *                "<callerName> (indexer-connector)" (e.g. "wazuh-manager-analysisd (indexer-connector)").
+     *                "<callerName> (indexer-connector)" (e.g. "guardsarm-manager-analysisd (indexer-connector)").
      *                If the caller name is empty, the tag falls back to "indexer-connector".
      * @param basePath Base directory for the RocksDB queue. Defaults to "queue/indexer/".
      */
@@ -408,7 +408,7 @@ public:
      * @throws IndexerConnectorException if the PIT creation fails.
      *
      * Example:
-     * auto pit = connector.createPointInTime({"wazuh-threatintel-kvdbs", "wazuh-threatintel-decoders"}, "5m", true);
+     * auto pit = connector.createPointInTime({"guardsarm-threatintel-kvdbs", "guardsarm-threatintel-decoders"}, "5m", true);
      * std::string pitId = pit.getPitId(); // Use for subsequent searches
      * // ... perform searches ...
      * connector.deletePointInTime(pit); // Clean up when done
@@ -469,7 +469,7 @@ public:
      * Example:
      * nlohmann::json query = {{"bool", {{"filter", {{{{"term", {{"space.name", "free"}}}}}}}}};
      * nlohmann::json source = {{"includes", {"space.hash.sha256"}}, {"excludes", nlohmann::json::array()}};
-     * auto hits = connector.search("wazuh-threatintel-policies", 10, query, source);
+     * auto hits = connector.search("guardsarm-threatintel-policies", 10, query, source);
      */
     nlohmann::json search(std::string_view index,
                           std::size_t size,

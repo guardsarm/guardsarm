@@ -19,7 +19,7 @@ makeRawIndexPayload(const IngestEvent& queuedEvent, const std::string& timestamp
     json::Json rawDoc(*queuedEvent.first);
     rawDoc.setString(timestamp, "/@timestamp");
     rawDoc.setString(queuedEvent.second, "/event/original");
-    rawDoc.setString(eventId, "/wazuh/event/id");
+    rawDoc.setString(eventId, "/guardsarm/event/id");
     return rawDoc.str();
 }
 } // namespace
@@ -72,7 +72,7 @@ void RouterWorker::start()
                     // Parse + route to pipeline
                     auto event = base::eventParsers::parseLegacyEvent(queuedEvent.second, *queuedEvent.first);
                     event->setString(timestamp, "/@timestamp");
-                    event->setString(eventId, "/wazuh/event/id");
+                    event->setString(eventId, "/guardsarm/event/id");
                     m_router->ingest(std::move(event));
 
                     // Track processed events (hot path: direct atomic access ~3ns)
@@ -130,7 +130,7 @@ void TesterWorker::start()
                     const auto timestamp = base::utils::time::getCurrentISO8601();
                     const auto eventId = base::utils::generators::generateUUIDv4();
                     event->setString(timestamp, "/@timestamp");
-                    event->setString(eventId, "/wazuh/event/id");
+                    event->setString(eventId, "/guardsarm/event/id");
 
                     auto output = m_tester->ingestTest(std::move(event), opt);
                     try

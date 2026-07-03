@@ -13,7 +13,7 @@ from sys import stdin
 from json import dumps, loads
 from json.decoder import JSONDecodeError
 
-WDB_PATH = '/var/wazuh-manager/queue/db/wdb'
+WDB_PATH = '/var/guardsarm-manager/queue/db/wdb'
 DEFAULT_WORKERS = 8
 STDIN_FILENO = stdin.fileno()
 
@@ -79,7 +79,7 @@ class Pool:
 def parse_args():
     parser = argparse.ArgumentParser(
         description=(
-            "Concurrent query to Wazuh DB. "
+            "Concurrent query to GuardSarm DB. "
             "Queries are read from stdin, one per line."
         ),
         usage="wdb-query.py [WORKERS] [-h]"

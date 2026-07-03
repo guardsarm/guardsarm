@@ -20,7 +20,7 @@
 #include "agent_sync_protocol_c_interface.h"
 #include "schemaValidator_c.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 #ifdef WIN32
 #include "../../../unit_tests/wrappers/windows/stat64_wrappers.h"
 #endif

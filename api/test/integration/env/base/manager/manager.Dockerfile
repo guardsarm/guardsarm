@@ -17,18 +17,18 @@ RUN wget http://archive.ubuntu.com/ubuntu/pool/main/r/rtmpdump/librtmp1_2.4+2015
     rm -rf /var/lib/apt/lists/* && ldconfig
 
 # INSTALL MANAGER
-ARG WAZUH_BRANCH
+ARG GUARDSARM_BRANCH
 
 ADD base/manager/supervisord.conf /etc/supervisor/conf.d/
 
-RUN mkdir wazuh && curl -sL https://github.com/wazuh/wazuh/tarball/${WAZUH_BRANCH} | tar zx --strip-components=1 -C wazuh
-COPY base/manager/preloaded-vars.conf /wazuh/etc/preloaded-vars.conf
-RUN /wazuh/install.sh
-RUN mkdir -p /var/wazuh-manager/etc/certs && \
-    touch /var/wazuh-manager/etc/certs/root-ca.pem && \
-    touch /var/wazuh-manager/etc/certs/manager.pem && \
-    touch /var/wazuh-manager/etc/certs/manager-key.pem
+RUN mkdir guardsarm && curl -sL https://github.com/guardsarm/guardsarm/tarball/${GUARDSARM_BRANCH} | tar zx --strip-components=1 -C guardsarm
+COPY base/manager/preloaded-vars.conf /guardsarm/etc/preloaded-vars.conf
+RUN /guardsarm/install.sh
+RUN mkdir -p /var/guardsarm-manager/etc/certs && \
+    touch /var/guardsarm-manager/etc/certs/root-ca.pem && \
+    touch /var/guardsarm-manager/etc/certs/manager.pem && \
+    touch /var/guardsarm-manager/etc/certs/manager-key.pem
 COPY base/manager/entrypoint.sh /scripts/entrypoint.sh
 
 # HEALTHCHECK
-HEALTHCHECK --retries=900 --interval=1s --timeout=30s --start-period=30s CMD /var/wazuh-manager/framework/python/bin/python3 /tmp_volume/healthcheck/healthcheck.py || exit 1
+HEALTHCHECK --retries=900 --interval=1s --timeout=30s --start-period=30s CMD /var/guardsarm-manager/framework/python/bin/python3 /tmp_volume/healthcheck/healthcheck.py || exit 1

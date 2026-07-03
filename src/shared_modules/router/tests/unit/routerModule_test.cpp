@@ -1,5 +1,5 @@
 /*
- * Wazuh router - RouterModule tests
+ * GuardSarm router - RouterModule tests
  * Copyright (C) 2015, Wazuh Inc.
  * June 25, 2025.
  *

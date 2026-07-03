@@ -31,18 +31,20 @@ fi
 NAMESERVERS=`cat /etc/resolv.conf | grep "^nameserver" | cut -d " " -sf 2`
 NAMESERVERS2=`cat /etc/resolv.conf | grep "^nameserver" | cut -sf 2`
 HOST_CMD=`command -v host 2>/dev/null`
-NAME="Wazuh"
+# GuardSarm display name for the installer banner/prompts (see branding.json).
+# Display only -- INSTALLDIR, GUARDSARM_CONF, users/groups etc. below stay frozen.
+NAME="GuardSarm"
 INSTYPE="manager"
 # Default installation directory
-INSTALLDIR="/var/wazuh-manager";
+INSTALLDIR="/var/guardsarm-manager";
 PREINSTALLEDDIR=""
 CEXTRA=""
-WAZUH_CONF="wazuh-manager.conf"
-WAZUH_LOGFILE="wazuh-manager.log"
-WAZUH_LOGJSON="wazuh-manager.json"
+GUARDSARM_CONF="guardsarm-manager.conf"
+GUARDSARM_LOGFILE="guardsarm-manager.log"
+GUARDSARM_LOGJSON="guardsarm-manager.json"
 
 # Internal definitions
-NEWCONFIG="./etc/wazuh.mc"
+NEWCONFIG="./etc/guardsarm.mc"
 PRECONFIG="./etc/PRECONFIG"
 
 ## Templates

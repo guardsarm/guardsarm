@@ -10,13 +10,13 @@ import os
 import hashlib
 
 from pathlib import Path
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils.callbacks import generate_callback
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
-from wazuh_testing.modules.remoted.configuration import REMOTED_DEBUG
-from wazuh_testing.constants.paths.configurations import SHARED_CONFIGURATIONS_PATH
-from wazuh_testing.constants.paths.variables import VAR_MULTIGROUPS_PATH
-from wazuh_testing.utils import file
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.utils.callbacks import generate_callback
+from guardsarm_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from guardsarm_testing.modules.remoted.configuration import REMOTED_DEBUG
+from guardsarm_testing.constants.paths.configurations import SHARED_CONFIGURATIONS_PATH
+from guardsarm_testing.constants.paths.variables import VAR_MULTIGROUPS_PATH
+from guardsarm_testing.utils import file
 
 from . import CONFIGS_PATH, TEST_CASES_PATH
 
@@ -57,10 +57,10 @@ wait_time = 3
 # Test function.
 @pytest.mark.parametrize('test_configuration, test_metadata',  zip(test_configuration, test_metadata), ids=cases_ids)
 def test_merged_mg_file_content(test_configuration, test_metadata, configure_local_internal_options, truncate_monitored_files,
-                            set_wazuh_configuration, daemons_handler, prepare_environment):
+                            set_guardsarm_configuration, daemons_handler, prepare_environment):
 
     '''
-    description: Check the content of the merged.mg file that wazuh-manager-remoted compiles for multi-groups.
+    description: Check the content of the merged.mg file that guardsarm-manager-remoted compiles for multi-groups.
 
     parameters:
         - test_configuration
@@ -74,7 +74,7 @@ def test_merged_mg_file_content(test_configuration, test_metadata, configure_loc
             brief: Truncate all the log files and json alerts files before and after the test execution.
         - configure_local_internal_options:
             type: fixture
-            brief: Configure the Wazuh local internal options using the values from `local_internal_options`.
+            brief: Configure the GuardSarm local internal options using the values from `local_internal_options`.
         - daemons_handler:
             type: fixture
             brief: Starts/Restarts the daemons indicated in `daemons_handler_configuration` before each test,
@@ -82,7 +82,7 @@ def test_merged_mg_file_content(test_configuration, test_metadata, configure_loc
         - simulate_agents
             type: fixture
             brief: create agents
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
 

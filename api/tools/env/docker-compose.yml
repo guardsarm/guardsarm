@@ -1,41 +1,41 @@
 services:
-    wazuh.base:
+    guardsarm.base:
         build:
-            context: ./wazuh-base
+            context: ./guardsarm-base
             args:
-                WAZUH_BRANCH: ${WAZUH_BRANCH}
+                GUARDSARM_BRANCH: ${GUARDSARM_BRANCH}
         pull_policy: never
-        image: wazuh-base
+        image: guardsarm-base
         networks:
-            - wazuh.net
+            - guardsarm.net
 
     certs.generator:
         build:
             context: ./certs-generator
-        image: wazuh-certs-generator
+        image: guardsarm-certs-generator
         pull_policy: never
         volumes:
-            - wazuh-certs:/certificates
-            - ./config/wazuh_dashboard_certs:/export/dashboard
+            - guardsarm-certs:/certificates
+            - ./config/guardsarm_dashboard_certs:/export/dashboard
             - ./certs-generator/config.yml:/tmp/config.yml:ro
         restart: "no"
         networks:
-            - wazuh.net
+            - guardsarm.net
 
-    wazuh.indexer:
-        image: quay.io/wazuh/wazuh-indexer:5.0.0-0
-        container_name: wazuh.indexer
-        hostname: wazuh.indexer
+    guardsarm.indexer:
+        image: quay.io/guardsarm/guardsarm-indexer:5.0.0-0
+        container_name: guardsarm.indexer
+        hostname: guardsarm.indexer
         ports:
             - "9200:9200"
         networks:
-            wazuh.net:
+            guardsarm.net:
                 aliases:
-                    - wazuh.indexer
+                    - guardsarm.indexer
         volumes:
-            - wazuh-indexer-data:/var/lib/wazuh-indexer
-            - wazuh-certs:/etc/wazuh-indexer/certs
-            - ./wazuh-indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/config/opensearch.yml:ro
+            - guardsarm-indexer-data:/var/lib/guardsarm-indexer
+            - guardsarm-certs:/etc/guardsarm-indexer/certs
+            - ./guardsarm-indexer/guardsarm.indexer.yml:/usr/share/guardsarm-indexer/config/opensearch.yml:ro
         environment:
             - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
         depends_on:
@@ -48,87 +48,87 @@ services:
             retries: 20
             start_period: 120s
 
-    wazuh.manager:
+    guardsarm.manager:
         build:
-            context: ./wazuh-manager
+            context: ./guardsarm-manager
             target: server
         pull_policy: never
-        image: wazuh-manager
-        hostname: wazuh.manager
+        image: guardsarm-manager
+        hostname: guardsarm.manager
         networks:
-            - wazuh.net
+            - guardsarm.net
         ports:
             - "55050:55000"
         volumes:
-            - wazuh-certs:/var/wazuh-manager/etc/certs
-            - ${WAZUH_LOCAL_PATH}/framework/scripts:/var/wazuh-manager/framework/scripts
-            - ${WAZUH_LOCAL_PATH}/api/scripts:/var/wazuh-manager/api/scripts
-            - ${WAZUH_LOCAL_PATH}/framework/wazuh:/var/wazuh-manager/framework/python/lib/python${WAZUH_PYTHON_VERSION}/site-packages/wazuh
-            - ${WAZUH_LOCAL_PATH}/api/api:/var/wazuh-manager/framework/python/lib/python${WAZUH_PYTHON_VERSION}/site-packages/api
+            - guardsarm-certs:/var/guardsarm-manager/etc/certs
+            - ${GUARDSARM_LOCAL_PATH}/framework/scripts:/var/guardsarm-manager/framework/scripts
+            - ${GUARDSARM_LOCAL_PATH}/api/scripts:/var/guardsarm-manager/api/scripts
+            - ${GUARDSARM_LOCAL_PATH}/framework/guardsarm:/var/guardsarm-manager/framework/python/lib/python${GUARDSARM_PYTHON_VERSION}/site-packages/guardsarm
+            - ${GUARDSARM_LOCAL_PATH}/api/api:/var/guardsarm-manager/framework/python/lib/python${GUARDSARM_PYTHON_VERSION}/site-packages/api
         environment:
             OPENDISTRO_SECURITY_ENABLED: "false"
-            NODE_NAME: "wazuh.manager"
+            NODE_NAME: "guardsarm.manager"
         entrypoint:
             - /scripts/entrypoint.sh
-            - wazuh.manager
+            - guardsarm.manager
             - master-node
             - master
         depends_on:
-            wazuh.indexer:
+            guardsarm.indexer:
                 condition: service_healthy
-            wazuh.base:
+            guardsarm.base:
                 condition: service_started
 
-    wazuh.worker1:
-        image: wazuh-manager
-        hostname: wazuh.worker1
+    guardsarm.worker1:
+        image: guardsarm-manager
+        hostname: guardsarm.worker1
         pull_policy: never
         networks:
-            wazuh.net:
+            guardsarm.net:
                 aliases:
-                    - wazuh.worker
+                    - guardsarm.worker
         volumes:
-            - wazuh-certs:/var/wazuh-manager/etc/certs
-            - ${WAZUH_LOCAL_PATH}/framework/scripts:/var/wazuh-manager/framework/scripts
-            - ${WAZUH_LOCAL_PATH}/api/scripts:/var/wazuh-manager/api/scripts
-            - ${WAZUH_LOCAL_PATH}/framework/wazuh:/var/wazuh-manager/framework/python/lib/python${WAZUH_PYTHON_VERSION}/site-packages/wazuh
-            - ${WAZUH_LOCAL_PATH}/api/api:/var/wazuh-manager/framework/python/lib/python${WAZUH_PYTHON_VERSION}/site-packages/api
+            - guardsarm-certs:/var/guardsarm-manager/etc/certs
+            - ${GUARDSARM_LOCAL_PATH}/framework/scripts:/var/guardsarm-manager/framework/scripts
+            - ${GUARDSARM_LOCAL_PATH}/api/scripts:/var/guardsarm-manager/api/scripts
+            - ${GUARDSARM_LOCAL_PATH}/framework/guardsarm:/var/guardsarm-manager/framework/python/lib/python${GUARDSARM_PYTHON_VERSION}/site-packages/guardsarm
+            - ${GUARDSARM_LOCAL_PATH}/api/api:/var/guardsarm-manager/framework/python/lib/python${GUARDSARM_PYTHON_VERSION}/site-packages/api
         depends_on:
-            wazuh.manager:
+            guardsarm.manager:
                 condition: service_started
         environment:
-            NODE_NAME: "wazuh.worker1"
+            NODE_NAME: "guardsarm.worker1"
         ports:
             - "55051:55000"
         entrypoint:
             - /scripts/entrypoint.sh
-            - wazuh.worker1
+            - guardsarm.worker1
             - worker
 
-    wazuh.worker2:
-        image: wazuh-manager
-        hostname: wazuh.worker2
+    guardsarm.worker2:
+        image: guardsarm-manager
+        hostname: guardsarm.worker2
         pull_policy: never
         networks:
-            wazuh.net:
+            guardsarm.net:
                 aliases:
-                    - wazuh2.worker
+                    - guardsarm2.worker
         volumes:
-            - wazuh-certs:/var/wazuh-manager/etc/certs
-            - ${WAZUH_LOCAL_PATH}/framework/scripts:/var/wazuh-manager/framework/scripts
-            - ${WAZUH_LOCAL_PATH}/api/scripts:/var/wazuh-manager/api/scripts
-            - ${WAZUH_LOCAL_PATH}/framework/wazuh:/var/wazuh-manager/framework/python/lib/python${WAZUH_PYTHON_VERSION}/site-packages/wazuh
-            - ${WAZUH_LOCAL_PATH}/api/api:/var/wazuh-manager/framework/python/lib/python${WAZUH_PYTHON_VERSION}/site-packages/api
+            - guardsarm-certs:/var/guardsarm-manager/etc/certs
+            - ${GUARDSARM_LOCAL_PATH}/framework/scripts:/var/guardsarm-manager/framework/scripts
+            - ${GUARDSARM_LOCAL_PATH}/api/scripts:/var/guardsarm-manager/api/scripts
+            - ${GUARDSARM_LOCAL_PATH}/framework/guardsarm:/var/guardsarm-manager/framework/python/lib/python${GUARDSARM_PYTHON_VERSION}/site-packages/guardsarm
+            - ${GUARDSARM_LOCAL_PATH}/api/api:/var/guardsarm-manager/framework/python/lib/python${GUARDSARM_PYTHON_VERSION}/site-packages/api
         depends_on:
-            wazuh.manager:
+            guardsarm.manager:
                 condition: service_started
         environment:
-            NODE_NAME: "wazuh.worker2"
+            NODE_NAME: "guardsarm.worker2"
         ports:
             - "55052:55000"
         entrypoint:
             - /scripts/entrypoint.sh
-            - wazuh.worker2
+            - guardsarm.worker2
             - worker
 
     nginx.lb:
@@ -140,55 +140,55 @@ services:
         ports:
             - "1514:1514"
         networks:
-            wazuh.net:
+            guardsarm.net:
                 aliases:
                     - nginx.lb
         depends_on:
-            wazuh.manager:
+            guardsarm.manager:
                 condition: service_started
-            wazuh.worker1:
+            guardsarm.worker1:
                 condition: service_started
-            wazuh.worker2:
+            guardsarm.worker2:
                 condition: service_started
         entrypoint:
             - /scripts/entrypoint.sh
 
-    wazuh.agent:
+    guardsarm.agent:
         build:
-            context: ./wazuh-agent
-        image: wazuh-agent
+            context: ./guardsarm-agent
+        image: guardsarm-agent
         pull_policy: never
         networks:
-            - wazuh.net
+            - guardsarm.net
         entrypoint:
             - /scripts/entrypoint.sh
             - nginx.lb
-            - ${WAZUH_VERSION}
+            - ${GUARDSARM_VERSION}
         depends_on:
             nginx.lb:
                 condition: service_started
 
-    wazuh.dashboard:
-        image: public.ecr.aws/wazuh-cicd/wazuh/wazuh-dashboard:5.0.0-latest
-        container_name: wazuh.dashboard
-        hostname: wazuh.dashboard
+    guardsarm.dashboard:
+        image: public.ecr.aws/guardsarm-cicd/guardsarm/guardsarm-dashboard:5.0.0-latest
+        container_name: guardsarm.dashboard
+        hostname: guardsarm.dashboard
         networks:
-            - wazuh.net
+            - guardsarm.net
         ports:
             - "443:5601"
         volumes:
-            - ./config/wazuh_dashboard_certs:/tmp/certs
-            - ./wazuh-dashboard/wazuh.dashboard.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml:ro
-            - wazuh-dashboard-custom:/usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom
+            - ./config/guardsarm_dashboard_certs:/tmp/certs
+            - ./guardsarm-dashboard/guardsarm.dashboard.yml:/usr/share/guardsarm-dashboard/config/opensearch_dashboards.yml:ro
+            - guardsarm-dashboard-custom:/usr/share/guardsarm-dashboard/plugins/guardsarm/public/assets/custom
         depends_on:
-            wazuh.indexer:
+            guardsarm.indexer:
                 condition: service_healthy
 
 volumes:
-  wazuh-indexer-data:
-  wazuh-certs:
-  wazuh-dashboard-custom:
+  guardsarm-indexer-data:
+  guardsarm-certs:
+  guardsarm-dashboard-custom:
 
 networks:
-  wazuh.net:
+  guardsarm.net:
     driver: bridge

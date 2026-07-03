@@ -1,8 +1,8 @@
 # API Reference
 
-The Wazuh Engine API is split into two contracts:
+The GuardSarm Engine API is split into two contracts:
 
-- [Public API Reference](public-api-reference.md): endpoints consumed by supported external integrations such as `wazuh-indexer` in standalone mode.
+- [Public API Reference](public-api-reference.md): endpoints consumed by supported external integrations such as `guardsarm-indexer` in standalone mode.
 - [Private API Reference](private-api-reference.md): internal-only endpoints used by development tooling, testing, and maintenance workflows.
 
 Interactive ReDoc pages:

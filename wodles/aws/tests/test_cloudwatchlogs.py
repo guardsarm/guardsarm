@@ -32,7 +32,7 @@ TEST_CLOUDWATCH_SCHEMA = "schema_cloudwatchlogs_test.sql"
 @pytest.mark.parametrize('only_logs_after', [utils.TEST_ONLY_LOGS_AFTER, None])
 @pytest.mark.parametrize('aws_log_groups', [TEST_LOG_GROUP, None])
 @pytest.mark.parametrize('remove_log_streams', [True, False])
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('aws_service.AWSService.__init__', side_effect=aws_service.AWSService.__init__)
 def test_aws_cloudwatchlogs_initializes_properly(mock_aws_service, mock_sts_client,
                                     remove_log_streams: bool, aws_log_groups: str or None,
@@ -65,15 +65,15 @@ def test_aws_cloudwatchlogs_initializes_properly(mock_aws_service, mock_sts_clie
 @pytest.mark.parametrize('remove_log_streams', [True, False])
 @pytest.mark.parametrize('only_logs_after', [utils.TEST_ONLY_LOGS_AFTER, None])
 @pytest.mark.parametrize('reparse', [True, False])
-@patch('wazuh_integration.WazuhAWSDatabase.init_db')
-@patch('wazuh_integration.WazuhAWSDatabase.close_db')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.init_db')
+@patch('guardsarm_integration.GuardSarmAWSDatabase.close_db')
 @patch('cloudwatchlogs.AWSCloudWatchLogs.purge_db')
 @patch('cloudwatchlogs.AWSCloudWatchLogs.update_values')
 @patch('cloudwatchlogs.AWSCloudWatchLogs.get_data_from_db')
 @patch('cloudwatchlogs.AWSCloudWatchLogs.get_alerts_within_range')
 @patch('cloudwatchlogs.AWSCloudWatchLogs.get_log_streams', return_value=[TEST_LOG_STREAM])
 @patch('cloudwatchlogs.AWSCloudWatchLogs.remove_aws_log_stream')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('cloudwatchlogs.aws_tools.debug')
 def test_aws_cloudwatchlogs_get_alerts(mock_debug, mock_sts_client, mock_remove_aws_log_stream, mock_get_log_streams,
                                        mock_get_alerts_within_range, mock_get_data_from_db,
@@ -120,7 +120,7 @@ def test_aws_cloudwatchlogs_get_alerts(mock_debug, mock_sts_client, mock_remove_
     mock_close.assert_called_once()
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('cloudwatchlogs.aws_tools.debug')
 def test_aws_cloudwatchlogs_remove_aws_log_stream(mock_debug, mock_sts_client):
     """Test 'remove_aws_log_stream' method makes the necessary calls in order to remove the specified log stream
@@ -136,7 +136,7 @@ def test_aws_cloudwatchlogs_remove_aws_log_stream(mock_debug, mock_sts_client):
     mock_delete_log_stream.assert_called_once_with(logGroupName=TEST_LOG_GROUP, logStreamName=TEST_LOG_STREAM)
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('cloudwatchlogs.aws_tools.debug')
 def test_aws_cloudwatchlogs_remove_aws_log_stream_handles_exceptions(mock_debug, mock_sts_client):
     """Test 'remove_aws_log_stream' method handles exceptions raised when trying
@@ -165,8 +165,8 @@ def test_aws_cloudwatchlogs_remove_aws_log_stream_handles_exceptions(mock_debug,
 @pytest.mark.parametrize('start_time', [None, TEST_START_TIME + 1])
 @pytest.mark.parametrize('timestamp', [TEST_END_TIME, TEST_START_TIME])
 @pytest.mark.parametrize('token', [None, TEST_TOKEN])
-@patch('wazuh_integration.WazuhIntegration.send_msg')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.send_msg')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('cloudwatchlogs.aws_tools.debug')
 def test_aws_cloudwatchlogs_get_alerts_within_range(mock_debug, mock_sts_client, mock_send_msg,
                                                     token: str or None, timestamp: int,
@@ -234,7 +234,7 @@ def test_aws_cloudwatchlogs_get_alerts_within_range(mock_debug, mock_sts_client,
                                f'available. Attempting again.', 1)
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 def test_aws_cloudwatchlogs_get_alerts_within_range_handles_exceptions_on_client_error(mock_sts_client):
     """Test 'get_alerts_within_range' method handles exceptions raised
     when trying to get log events from AWS CloudWatch Logs.
@@ -252,7 +252,7 @@ def test_aws_cloudwatchlogs_get_alerts_within_range_handles_exceptions_on_client
     assert e.value.code == utils.THROTTLING_ERROR_CODE
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 def test_aws_cloudwatchlogs_get_data_from_db(mock_sts_client, custom_database):
     """Test 'get_data_from_db' method retrieves the expected information from the DB.
     """
@@ -278,7 +278,7 @@ def test_aws_cloudwatchlogs_get_data_from_db(mock_sts_client, custom_database):
 @pytest.mark.parametrize('result_before', [None,
                                            {'token': TEST_TOKEN, 'start_time': TEST_START_TIME - 1,
                                             'end_time': TEST_END_TIME - 1}])
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 def test_aws_cloudwatchlogs_update_values(mock_sts_client, result_before: dict or None, result_after: dict or None,
                                           values: dict or None):
     """Test 'update_values' method returns the expected dict with the results of previous executions.
@@ -328,7 +328,7 @@ def test_aws_cloudwatchlogs_update_values(mock_sts_client, result_before: dict o
     assert result == instance.update_values(values, result_after, result_before)
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('cloudwatchlogs.aws_tools.debug')
 def test_aws_cloudwatchlogs_save_data_db(mock_debug, mock_sts_client, custom_database):
     """Test 'save_data_db' method inserts token, start_time and end_time values into the DB and updates them if
@@ -381,7 +381,7 @@ def test_aws_cloudwatchlogs_save_data_db(mock_debug, mock_sts_client, custom_dat
                                  'logStreams': []
                              }], [])
                          ])
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('cloudwatchlogs.aws_tools.debug')
 def test_aws_cloudwatchlogs_get_log_streams(mock_debug, mock_sts_client,
                                             describe_log_streams_response, expected_result_list: list[str]):
@@ -410,7 +410,7 @@ def test_aws_cloudwatchlogs_get_log_streams(mock_debug, mock_sts_client,
     assert expected_result_list == result_list
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('cloudwatchlogs.aws_tools.debug')
 def test_aws_cloudwatchlogs_get_log_streams_handles_exceptions(mock_debug, mock_sts_client):
     """Test 'get_log_streams' method handles exceptions raised when trying to fetch the log streams
@@ -435,7 +435,7 @@ def test_aws_cloudwatchlogs_get_log_streams_handles_exceptions(mock_debug, mock_
     assert e.value.code == utils.THROTTLING_ERROR_CODE
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('cloudwatchlogs.AWSCloudWatchLogs.get_log_streams', return_value=[])
 def test_aws_cloudwatchlogs_purge_db(mock_get_log_streams, mock_sts_client, custom_database):
     """Test 'purge_db' method removes the records for log streams when they no longer exist on AWS CloudWatch Logs."""
@@ -457,8 +457,8 @@ def test_aws_cloudwatchlogs_purge_db(mock_get_log_streams, mock_sts_client, cust
                                         utils.SQL_COUNT_ROWS.format(table_name=instance.db_table_name)) == 0
 
 
-@patch('wazuh_integration.WazuhIntegration.send_msg')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.send_msg')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('cloudwatchlogs.aws_tools.debug')
 def test_aws_cloudwatchlogs_get_alerts_within_range_skips_json_event_matching_discard_field(
         mock_debug, mock_sts_client, mock_send_msg):
@@ -486,8 +486,8 @@ def test_aws_cloudwatchlogs_get_alerts_within_range_skips_json_event_matching_di
         f'field. The event will be skipped.', 2)
 
 
-@patch('wazuh_integration.WazuhIntegration.send_msg')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.send_msg')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('cloudwatchlogs.aws_tools.debug')
 def test_aws_cloudwatchlogs_get_alerts_within_range_processes_json_event_not_matching_discard_field(
         mock_debug, mock_sts_client, mock_send_msg):
@@ -515,8 +515,8 @@ def test_aws_cloudwatchlogs_get_alerts_within_range_processes_json_event_not_mat
         f'"action" field. The event will be processed.', 3)
 
 
-@patch('wazuh_integration.WazuhIntegration.send_msg')
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.send_msg')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('cloudwatchlogs.aws_tools.debug')
 def test_aws_cloudwatchlogs_get_alerts_within_range_skips_plain_text_event_matching_discard_regex(
         mock_debug, mock_sts_client, mock_send_msg):
@@ -543,7 +543,7 @@ def test_aws_cloudwatchlogs_get_alerts_within_range_skips_plain_text_event_match
         f'+++ The ".*REJECT.*" regex found a match. The event will be skipped.', 2)
 
 
-@patch('wazuh_integration.WazuhIntegration.get_sts_client')
+@patch('guardsarm_integration.GuardSarmIntegration.get_sts_client')
 @patch('cloudwatchlogs.aws_tools.error')
 def test_aws_cloudwatchlogs_get_log_streams_logs_error_on_endpoint_connection_error(
         mock_error, mock_sts_client):

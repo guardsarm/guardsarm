@@ -13,14 +13,14 @@
 #include "agentd.h"
 
 /**
- * @brief Spawn a detached process to stop and restart the WazuhSvc service.
+ * @brief Spawn a detached process to stop and restart the GuardSarmSvc service.
  *
- * Calling os_stop_service() from within WazuhSvc kills all its threads before
- * os_start_service() can run. A detached copy of wazuh-agent.exe is independent
- * of WazuhSvc, survives the stop, and brings it back up. The caller returns "ok"
+ * Calling os_stop_service() from within GuardSarmSvc kills all its threads before
+ * os_start_service() can run. A detached copy of guardsarm-agent.exe is independent
+ * of GuardSarmSvc, survives the stop, and brings it back up. The caller returns "ok"
  * immediately so the req-protocol response reaches remoted before the service
  * goes down — mirroring the old wcom_restart/wcom_reload pattern of spawning a
- * separate process (restart-wazuh.exe) and returning "ok" straight away.
+ * separate process (restart-guardsarm.exe) and returning "ok" straight away.
  *
  * @param action  Label used in the debug log ("restart" or "reload").
  * @param output  Allocated response string set by this function.
@@ -33,10 +33,10 @@ static size_t control_run_detached(const char *action, char **output)
     char exe[MAX_PATH];
     char cmd[OS_FLSIZE];
 
-    /* Resolve the full path of the running wazuh-agent.exe binary and spawn a
+    /* Resolve the full path of the running guardsarm-agent.exe binary and spawn a
      * detached copy of it with the "service-restart" argument.  That child
-     * process runs outside WazuhSvc, waits briefly, stops the service and then
-     * starts it again — mirroring the old restart-wazuh.exe pattern.  The
+     * process runs outside GuardSarmSvc, waits briefly, stops the service and then
+     * starts it again — mirroring the old restart-guardsarm.exe pattern.  The
      * caller returns "ok" immediately so the req-protocol response reaches
      * remoted before the service goes down. */
     if (!GetModuleFileNameA(NULL, exe, MAX_PATH)) {

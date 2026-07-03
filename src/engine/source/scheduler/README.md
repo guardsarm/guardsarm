@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **scheduler** module provides a multi-threaded, priority-aware task scheduling system for the Wazuh engine. It manages the execution of periodic and one-time background tasks using a configurable thread pool and a sorted, thread-safe priority queue.
+The **scheduler** module provides a multi-threaded, priority-aware task scheduling system for the GuardSarm engine. It manages the execution of periodic and one-time background tasks using a configurable thread pool and a sorted, thread-safe priority queue.
 
 Tasks are identified by unique names and configured with an execution interval, an optional immediate-execution flag, CPU priority (nice value), and a callable function. The scheduler handles task lifecycle—including automatic removal of one-time tasks and rescheduling of recurring ones—while guaranteeing thread safety across all operations.
 

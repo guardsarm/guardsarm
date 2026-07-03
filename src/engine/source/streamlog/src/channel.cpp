@@ -495,7 +495,7 @@ void ChannelHandler::validateAndNormalizeConfig(RotationConfig& config)
     // Check if the base path is writable, avoiding check mode_t
     {
         // File test
-        auto testPath = config.basePath / ".wazuh_test_write_permission";
+        auto testPath = config.basePath / ".guardsarm_test_write_permission";
         std::ofstream testFile(testPath);
         if (!testFile)
         {
@@ -506,7 +506,7 @@ void ChannelHandler::validateAndNormalizeConfig(RotationConfig& config)
         std::filesystem::remove(testPath);
 
         // Dir test
-        auto testDirPath = config.basePath / ".wazuh_test_dir_permission";
+        auto testDirPath = config.basePath / ".guardsarm_test_dir_permission";
         std::error_code ec;
         std::filesystem::create_directory(testDirPath, ec);
         if (ec)

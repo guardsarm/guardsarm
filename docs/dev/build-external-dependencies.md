@@ -1,6 +1,6 @@
 # Build External Dependencies
 
-This document describes the GitHub Actions workflow that rebuilds Wazuh's vendored external dependencies (curl, openssl, rocksdb, …) across every platform we ship, and produces the consolidated `externals-all.tar.gz` blob that gets published to `packages.wazuh.com/deps/<DEPS_VERSION>/`.
+This document describes the GitHub Actions workflow that rebuilds GuardSarm's vendored external dependencies (curl, openssl, rocksdb, …) across every platform we ship, and produces the consolidated `externals-all.tar.gz` blob that gets published to `packages.guardsarm.com/deps/<DEPS_VERSION>/`.
 
 Workflow file: [`.github/workflows/5_builderpackage_externals.yml`](../../.github/workflows/5_builderpackage_externals.yml)
 
@@ -18,7 +18,7 @@ Supporting scripts under `packages/externals/`:
 - You need to bump one or more upstream library versions (e.g. CVE patch, new feature).
 - You need to refresh the full deps tarball from currently vendored sources (e.g. after a toolchain change that affects how everything compiles).
 
-The output of a successful run is the artifact you upload to `packages.wazuh.com/deps/<new-DEPS_VERSION>/`. A separate PR then bumps `DEPS_VERSION` in `src/Makefile` to point at that new directory.
+The output of a successful run is the artifact you upload to `packages.guardsarm.com/deps/<new-DEPS_VERSION>/`. A separate PR then bumps `DEPS_VERSION` in `src/Makefile` to point at that new directory.
 
 ## Running the workflow
 
@@ -72,8 +72,8 @@ build-externals (matrix, 7 jobs)
 ```
 
 - **`build-externals`** — each leg seeds `src/external/`, applies `--dependencies` overrides, runs the build, and uploads `externals-<leg>-<target>.tar.gz`.
-- **`consolidate`** — downloads every per-leg tarball, merges into the canonical `libraries/{linux,darwin,windows,sources}/` layout, and uploads `externals-all.tar.gz` (the artifact you publish to `packages.wazuh.com/deps/<version>/`).
-- **`smoke-build`** — for each of the 4 Linux combinations (amd64/arm64 × agent/manager) plus a windows-i686 leg, pulls `externals-all.tar.gz`, points `make deps RESOURCES_URL=file://…` at the local tree, then runs the real Wazuh build inside the matching builder image (`pkg_rpm_<target>_builder_<arch>` for Linux, `compile_windows_agent` for windows). Confirms the precompiled tarballs you just packed actually get consumed. Emits `::warning::` for any dep that fell back to source compile — that means the binary was packed at a path `src/external/CMakeLists.txt` doesn't expect. The windows leg is what catches host-side tools shipped in `libraries/windows/<dep>.tar.gz` (e.g. flatbuffers' `flatc`, invoked during `make TARGET=winagent` schema codegen) that were built against a newer glibc/libstdc++ than the consumer image — without it, that mismatch only surfaces downstream when the windows agent build runs.
+- **`consolidate`** — downloads every per-leg tarball, merges into the canonical `libraries/{linux,darwin,windows,sources}/` layout, and uploads `externals-all.tar.gz` (the artifact you publish to `packages.guardsarm.com/deps/<version>/`).
+- **`smoke-build`** — for each of the 4 Linux combinations (amd64/arm64 × agent/manager) plus a windows-i686 leg, pulls `externals-all.tar.gz`, points `make deps RESOURCES_URL=file://…` at the local tree, then runs the real GuardSarm build inside the matching builder image (`pkg_rpm_<target>_builder_<arch>` for Linux, `compile_windows_agent` for windows). Confirms the precompiled tarballs you just packed actually get consumed. Emits `::warning::` for any dep that fell back to source compile — that means the binary was packed at a path `src/external/CMakeLists.txt` doesn't expect. The windows leg is what catches host-side tools shipped in `libraries/windows/<dep>.tar.gz` (e.g. flatbuffers' `flatc`, invoked during `make TARGET=winagent` schema codegen) that were built against a newer glibc/libstdc++ than the consumer image — without it, that mismatch only surfaces downstream when the windows agent build runs.
 
 ## Output
 
@@ -126,12 +126,12 @@ everywhere — including the Windows agent. Only non-Windows targets link `libbz
 
 | Dependency | La | Lm | Ma | Wa | Published as |
 |------------|----|----|----|----|--------------|
-| bzip2 | ✔ | ✔ | ✔ | ✔ | precompiled `.a` (linked on non-Windows only). Agent/server link it via `shared/src/bzip2_op.c`→`libwazuhext`; server also builds rocksdb (`WITH_BZ2`). |
+| bzip2 | ✔ | ✔ | ✔ | ✔ | precompiled `.a` (linked on non-Windows only). Agent/server link it via `shared/src/bzip2_op.c`→`libguardsarmext`; server also builds rocksdb (`WITH_BZ2`). |
 
 ### Linux agent only
 
 Consumers are `data_provider`/sysinfo, `syscheckd` (whodata), `rootcheck` — all
-agent-only subdirectories. The server's `wazuh_modules` builds
+agent-only subdirectories. The server's `guardsarm_modules` builds
 inventory_sync/vulnerability_scanner instead, so it links none of these.
 
 | Dependency | La | Lm | Ma | Wa | Published as |
@@ -181,7 +181,7 @@ inventory_sync/vulnerability_scanner instead, so it links none of these.
 
 ### Test frameworks (downloaded on all targets, compiled only into test binaries)
 
-These are *compiled* only when `UNIT_TEST`/`WAZUH_ENGINE_TEST` is set, but they are
+These are *compiled* only when `UNIT_TEST`/`GUARDSARM_ENGINE_TEST` is set, but they are
 *downloaded* unconditionally: the deps step (`make deps TARGET=…`) does not pass
 `TEST=1`, and the unit-test CI consumes the same per-(os,arch) bundle, so gating
 the download behind a flag drops them from the bundle and breaks every test build.
@@ -211,7 +211,7 @@ the download behind a flag drops them from the bundle and breaks every test buil
 
 `DEPS_VERSION` (defined in `src/Makefile`) is the single source of truth for every blob this workflow downloads:
 
-- `make deps EXTERNAL_SRC_ONLY=yes` (the source seed for `src/external/`) reads `RESOURCES_URL = packages.wazuh.com/deps/$(DEPS_VERSION)/`.
+- `make deps EXTERNAL_SRC_ONLY=yes` (the source seed for `src/external/`) reads `RESOURCES_URL = packages.guardsarm.com/deps/$(DEPS_VERSION)/`.
 - The cpython pass-through block pulls `…/deps/${DEPS_VERSION}/libraries/sources/cpython_<arch>.tar.gz`.
 - `stage_precompiled` pulls `…/deps/${DEPS_VERSION}/libraries/linux/<arch>/libbpf-bootstrap.tar.gz`.
 
@@ -219,15 +219,15 @@ If your branch has bumped `DEPS_VERSION` to the version you're trying to *produc
 
 ### `libbpf-bootstrap` and `cpython` are re-shipped, not rebuilt
 
-Two deps are not actually compiled by this workflow — `build_external.sh` downloads prebuilt blobs from `packages.wazuh.com/deps/${DEPS_VERSION}/…` and packs them into the per-leg tarballs:
+Two deps are not actually compiled by this workflow — `build_external.sh` downloads prebuilt blobs from `packages.guardsarm.com/deps/${DEPS_VERSION}/…` and packs them into the per-leg tarballs:
 
-- **`libbpf-bootstrap`** needs clang ≥ 7 with the BPF backend and Linux UAPI headers ≥ 4.13 (`linux/bpf_perf_event.h`), and the legacy agent builder image (CentOS 6 / Debian wheezy era, glibc 2.12) has neither — a from-source attempt fails with `linux/bpf_perf_event.h: No such file or directory`. Wazuh builds it in a separate centos:7 + clang-15-from-source image (issue #28626). Linux legs only; macOS and Windows agents don't include it.
+- **`libbpf-bootstrap`** needs clang ≥ 7 with the BPF backend and Linux UAPI headers ≥ 4.13 (`linux/bpf_perf_event.h`), and the legacy agent builder image (CentOS 6 / Debian wheezy era, glibc 2.12) has neither — a from-source attempt fails with `linux/bpf_perf_event.h: No such file or directory`. GuardSarm builds it in a separate centos:7 + clang-15-from-source image (issue #28626). Linux legs only; macOS and Windows agents don't include it.
 - **`cpython`** has its own dedicated pipeline (`5_builderpackage_embedded-python.yml`, runs `framework/cpython/compile.sh`). Manager legs only; the agent `EXTERNAL_RES` has no `$(CPYTHON)`.
 
 So bumping either of these is out of scope here. The flow is:
 
 1. Run the dedicated pipeline (embedded-python for cpython; the centos:7+clang-15 image for libbpf-bootstrap — that build is currently out-of-repo).
-2. Upload the new blob into `packages.wazuh.com/deps/<new-DEPS_VERSION>/libraries/…` alongside the rest of the externals tree this workflow produces.
+2. Upload the new blob into `packages.guardsarm.com/deps/<new-DEPS_VERSION>/libraries/…` alongside the rest of the externals tree this workflow produces.
 3. Bump `DEPS_VERSION` in `src/Makefile`. Because `build_external.sh` reads `DEPS_VERSION` straight from the Makefile, this single bump is what makes the next run pick up the new cpython / libbpf blob.
 
 ### macOS and Windows are agent-only

@@ -1,5 +1,5 @@
 /*
- * Wazuh Content Manager
+ * GuardSarm Content Manager
  * Copyright (C) 2015, Wazuh Inc.
  * Nov 29, 2023.
  *

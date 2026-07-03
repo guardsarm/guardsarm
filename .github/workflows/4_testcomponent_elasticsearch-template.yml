@@ -1,6 +1,6 @@
-name: 4.X - wazuh-template for Elasticsearch test
+name: 4.X - guardsarm-template for Elasticsearch test
 
-# if the file wazuh/extensions/elasticsearch/7.x/wazuh-template.json is modified launch the test or is a part of
+# if the file guardsarm/extensions/elasticsearch/7.x/guardsarm-template.json is modified launch the test or is a part of
 # a pull request
 
 on:

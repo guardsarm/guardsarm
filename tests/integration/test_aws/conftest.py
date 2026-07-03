@@ -12,8 +12,8 @@ import boto3
 from botocore.exceptions import ClientError
 
 # qa-integration-framework imports
-from wazuh_testing.logger import logger
-from wazuh_testing.modules.aws.utils import (
+from guardsarm_testing.logger import logger
+from guardsarm_testing.modules.aws.utils import (
     create_bucket,
     upload_log_events,
     create_log_group,
@@ -34,8 +34,8 @@ from wazuh_testing.modules.aws.utils import (
     delete_sqs_queue,
     delete_bucket_files
 )
-from wazuh_testing.utils.services import control_service
-from wazuh_testing.constants.aws import US_EAST_1_REGION
+from guardsarm_testing.utils.services import control_service
+from guardsarm_testing.constants.aws import US_EAST_1_REGION
 
 @pytest.fixture
 def mark_cases_as_skipped(metadata):

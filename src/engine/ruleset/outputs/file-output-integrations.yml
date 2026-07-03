@@ -2,11 +2,11 @@ name: output/file-output-integrations/0
 enabled: false
 
 metadata:
-  module: wazuh
+  module: guardsarm
   title: file output event
   description: Output integrations events to a file
   compatibility: >
-    This decoder has been tested on Wazuh version 5.x
+    This decoder has been tested on GuardSarm version 5.x
   versions:
     - 5.x
   author:
@@ -16,4 +16,4 @@ metadata:
     - ""
 
 outputs:
-  - file: "wazuh-events-v5"
+  - file: "guardsarm-events-v5"

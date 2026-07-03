@@ -1,5 +1,5 @@
 /*
- * Wazuh content manager
+ * GuardSarm content manager
  * Copyright (C) 2015, Wazuh Inc.
  * May 23, 2023.
  *
@@ -203,7 +203,7 @@ private:
         {
             throw std::invalid_argument {"Missing or empty consumerName"};
         }
-        context.httpUserAgent = context.configData.at("consumerName").get<std::string>() + "/" + __wazuh_version;
+        context.httpUserAgent = context.configData.at("consumerName").get<std::string>() + "/" + __guardsarm_version;
     }
 
 public:

@@ -1,10 +1,10 @@
 # Load balancers
 
-A load balancer distributes workloads across multiple resources. In a Wazuh server cluster, it distributes Wazuh agents among worker nodes to improve scalability, availability, and performance.
+A load balancer distributes workloads across multiple resources. In a GuardSarm server cluster, it distributes GuardSarm agents among worker nodes to improve scalability, availability, and performance.
 
 ## Overview
 
-Load balancers allow agents to enroll and report to different Wazuh server nodes transparently. If a node becomes unavailable, agents reconnect to another available node.
+Load balancers allow agents to enroll and report to different GuardSarm server nodes transparently. If a node becomes unavailable, agents reconnect to another available node.
 
 This document covers two commonly used load balancers:
 
@@ -15,7 +15,7 @@ This document covers two commonly used load balancers:
 
 ## NGINX
 
-NGINX can be used as a TCP load balancer to distribute Wazuh agent traffic across cluster nodes.
+NGINX can be used as a TCP load balancer to distribute GuardSarm agent traffic across cluster nodes.
 
 ### Installation
 
@@ -63,7 +63,7 @@ nginx -s reload
 
 ## HAProxy
 
-HAProxy provides high availability and load balancing for TCP-based services such as Wazuh agent connections.
+HAProxy provides high availability and load balancing for TCP-based services such as GuardSarm agent connections.
 
 ### Installation
 
@@ -86,20 +86,20 @@ defaults
     timeout client 1m
     timeout server 1m
 
-frontend wazuh_register
+frontend guardsarm_register
     bind :1515
-    default_backend wazuh_register
+    default_backend guardsarm_register
 
-backend wazuh_register
+backend guardsarm_register
     balance leastconn
     server master <MASTER_NODE>:1515 check
     server worker1 <WORKER_NODE>:1515 check
 
-frontend wazuh_reporting
+frontend guardsarm_reporting
     bind :1514
-    default_backend wazuh_reporting
+    default_backend guardsarm_reporting
 
-backend wazuh_reporting
+backend guardsarm_reporting
     balance leastconn
     server master <MASTER_NODE>:1514 check
     server worker1 <WORKER_NODE>:1514 check
@@ -137,9 +137,9 @@ haproxy:
     reload_cmd: service haproxy reload
 ```
 
-### Enable helper in Wazuh master
+### Enable helper in GuardSarm master
 
-Add the following section to `wazuh-manager.conf`:
+Add the following section to `guardsarm-manager.conf`:
 
 ```xml
 <haproxy_helper>
@@ -153,11 +153,11 @@ Add the following section to `wazuh-manager.conf`:
 Restart the manager:
 
 ```bash
-systemctl restart wazuh-manager
+systemctl restart guardsarm-manager
 ```
 
 Verify logs:
 
 ```bash
-tail /var/wazuh-manager/logs/cluster.log
+tail /var/guardsarm-manager/logs/cluster.log
 ```

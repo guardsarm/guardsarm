@@ -1,5 +1,5 @@
 /*
- * Wazuh Syscheck
+ * GuardSarm Syscheck
  * Copyright (C) 2015, Wazuh Inc.
  * September 9, 2021.
  *
@@ -11,7 +11,7 @@
 
 #include <string.h>
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef GUARDSARM_UNIT_TESTING
 #include "fimDBHelpersUTInterface.hpp"
 #else
 #include "fimDB.hpp"

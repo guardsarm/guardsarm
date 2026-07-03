@@ -1,5 +1,5 @@
 /*
- * Wazuh Utils - rocksDB queue.
+ * GuardSarm Utils - rocksDB queue.
  * Copyright (C) 2015, Wazuh Inc.
  * Jun 2, 2023.
  *

@@ -1,5 +1,5 @@
 /*
- * Shared functions for querying wazuh-agentd
+ * Shared functions for querying guardsarm-agentd
  * Copyright (C) 2015, Wazuh Inc.
  *
  * This program is free software; you can redistribute it
@@ -15,9 +15,9 @@
 #include <stddef.h>
 
 /**
- * @brief Query wazuh-agentd via local socket or agcom_dispatch
+ * @brief Query guardsarm-agentd via local socket or agcom_dispatch
  *
- * Sends a command to wazuh-agentd and receives the response. On Unix/Linux,
+ * Sends a command to guardsarm-agentd and receives the response. On Unix/Linux,
  * this uses a Unix domain socket. On Windows, it uses agcom_dispatch.
  *
  * The response format from agentd is expected to be:

@@ -1,6 +1,6 @@
 # Migrating from Filebeat to the Indexer Connector
 
-In Wazuh 4.x, Filebeat was a separate package on the manager host that shipped alerts and archives to the Wazuh Indexer. In Wazuh 5.x this is done by the built-in **Indexer Connector**, part of the manager process. Filebeat is removed.
+In GuardSarm 4.x, Filebeat was a separate package on the manager host that shipped alerts and archives to the GuardSarm Indexer. In GuardSarm 5.x this is done by the built-in **Indexer Connector**, part of the manager process. Filebeat is removed.
 
 There is no Filebeat configuration to reproduce. The manager connects to the indexer directly, so the only values you need to carry over are the ones you already set in `filebeat.yml`: the indexer hosts, the credentials, and the TLS certificates.
 
@@ -8,14 +8,14 @@ Filebeat is not uninstalled automatically during the manager upgrade. Removing i
 
 ## Configuration mapping
 
-| `filebeat.yml` (4.x) | Wazuh 5.x | Where |
+| `filebeat.yml` (4.x) | GuardSarm 5.x | Where |
 |---|---|---|
-| `output.elasticsearch.hosts` | `<indexer><hosts><host>` (include `https://` and port) | `wazuh-manager.conf` |
-| `output.elasticsearch.username` | `wazuh-manager-keystore -f indexer -k username -v <value>` | Keystore |
-| `output.elasticsearch.password` | `wazuh-manager-keystore -f indexer -k password -v <value>` | Keystore |
-| `output.elasticsearch.ssl.certificate_authorities` | `<indexer><ssl><certificate_authorities><ca>` | `wazuh-manager.conf` |
-| `output.elasticsearch.ssl.certificate` | `<indexer><ssl><certificate>` | `wazuh-manager.conf` |
-| `output.elasticsearch.ssl.key` | `<indexer><ssl><key>` | `wazuh-manager.conf` |
+| `output.elasticsearch.hosts` | `<indexer><hosts><host>` (include `https://` and port) | `guardsarm-manager.conf` |
+| `output.elasticsearch.username` | `guardsarm-manager-keystore -f indexer -k username -v <value>` | Keystore |
+| `output.elasticsearch.password` | `guardsarm-manager-keystore -f indexer -k password -v <value>` | Keystore |
+| `output.elasticsearch.ssl.certificate_authorities` | `<indexer><ssl><certificate_authorities><ca>` | `guardsarm-manager.conf` |
+| `output.elasticsearch.ssl.certificate` | `<indexer><ssl><certificate>` | `guardsarm-manager.conf` |
+| `output.elasticsearch.ssl.key` | `<indexer><ssl><key>` | `guardsarm-manager.conf` |
 
 Every other `filebeat.yml` setting is gone and requires no action:
 
@@ -23,7 +23,7 @@ Every other `filebeat.yml` setting is gone and requires no action:
 - **Queue/buffering** (`queue.mem.*`): managed internally by the connector.
 - **TLS options** (`ssl.verification_mode`, `ssl.supported_protocols`, `ssl.cipher_suites`): the connector always verifies the server certificate. If you used `verification_mode: none`, you must now provide a valid CA.
 - **Processors** (`add_host_metadata`, `add_fields`, `drop_fields`, etc.): not supported. If you relied on them to enrich events, move that logic to the Engine decoders/integrations.
-- **Templates and ILM** (`setup.template.*`, `setup.ilm.*`): managed on the Wazuh Indexer.
+- **Templates and ILM** (`setup.template.*`, `setup.ilm.*`): managed on the GuardSarm Indexer.
 - **Logging and sandboxing** (`logging.*`, `seccomp`): not applicable; use the manager logs.
 
 ## Migration steps
@@ -38,36 +38,36 @@ From `/etc/filebeat/filebeat.yml`, note:
 
 ### 2. Deploy the certificates
 
-Place the certificates Filebeat used (previously under `/etc/filebeat/certs/`) at `/var/wazuh-manager/etc/certs/`:
+Place the certificates Filebeat used (previously under `/etc/filebeat/certs/`) at `/var/guardsarm-manager/etc/certs/`:
 
 ```bash
 NODE_NAME=manager  # Replace with your manager node name
 
-sudo mkdir -p /var/wazuh-manager/etc/certs
+sudo mkdir -p /var/guardsarm-manager/etc/certs
 
-sudo tar -xf wazuh-certificates.tar -C /var/wazuh-manager/etc/certs/ \
+sudo tar -xf guardsarm-certificates.tar -C /var/guardsarm-manager/etc/certs/ \
   ./$NODE_NAME.pem ./$NODE_NAME-key.pem ./root-ca.pem
 
-sudo mv /var/wazuh-manager/etc/certs/$NODE_NAME.pem \
-        /var/wazuh-manager/etc/certs/manager.pem
-sudo mv /var/wazuh-manager/etc/certs/$NODE_NAME-key.pem \
-        /var/wazuh-manager/etc/certs/manager-key.pem
+sudo mv /var/guardsarm-manager/etc/certs/$NODE_NAME.pem \
+        /var/guardsarm-manager/etc/certs/manager.pem
+sudo mv /var/guardsarm-manager/etc/certs/$NODE_NAME-key.pem \
+        /var/guardsarm-manager/etc/certs/manager-key.pem
 
-sudo chmod 500 /var/wazuh-manager/etc/certs
-sudo chmod 400 /var/wazuh-manager/etc/certs/*
-sudo chown -R wazuh-manager:wazuh-manager /var/wazuh-manager/etc/certs
+sudo chmod 500 /var/guardsarm-manager/etc/certs
+sudo chmod 400 /var/guardsarm-manager/etc/certs/*
+sudo chown -R guardsarm-manager:guardsarm-manager /var/guardsarm-manager/etc/certs
 ```
 
 ### 3. Store the credentials in the keystore
 
 ```bash
-sudo /var/wazuh-manager/bin/wazuh-manager-keystore -f indexer -k username -v <your_username>
-sudo /var/wazuh-manager/bin/wazuh-manager-keystore -f indexer -k password -v <your_password>
+sudo /var/guardsarm-manager/bin/guardsarm-manager-keystore -f indexer -k username -v <your_username>
+sudo /var/guardsarm-manager/bin/guardsarm-manager-keystore -f indexer -k password -v <your_password>
 ```
 
 ### 4. Configure the `<indexer>` block
 
-Add the block to `/var/wazuh-manager/etc/wazuh-manager.conf` using your hosts and certificate paths:
+Add the block to `/var/guardsarm-manager/etc/guardsarm-manager.conf` using your hosts and certificate paths:
 
 ```xml
 <indexer>
@@ -76,10 +76,10 @@ Add the block to `/var/wazuh-manager/etc/wazuh-manager.conf` using your hosts an
   </hosts>
   <ssl>
     <certificate_authorities>
-      <ca>/var/wazuh-manager/etc/certs/root-ca.pem</ca>
+      <ca>/var/guardsarm-manager/etc/certs/root-ca.pem</ca>
     </certificate_authorities>
-    <certificate>/var/wazuh-manager/etc/certs/manager.pem</certificate>
-    <key>/var/wazuh-manager/etc/certs/manager-key.pem</key>
+    <certificate>/var/guardsarm-manager/etc/certs/manager.pem</certificate>
+    <key>/var/guardsarm-manager/etc/certs/manager-key.pem</key>
   </ssl>
 </indexer>
 ```
@@ -101,8 +101,8 @@ Credentials are not set here; they come from the keystore (step 3).
 ```bash
 sudo systemctl stop filebeat
 sudo systemctl disable filebeat
-sudo systemctl restart wazuh-manager
-sudo systemctl status wazuh-manager
+sudo systemctl restart guardsarm-manager
+sudo systemctl status guardsarm-manager
 ```
 
 ### 6. Remove Filebeat

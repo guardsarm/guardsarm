@@ -2,7 +2,7 @@
 
 ## Overview
 
-Active Response is implemented through `wazuh-execd`, a daemon running on agents, that receives and executes security response commands. The architecture follows a message-driven model where JSON commands are sent from the manager to agents, parsed, validated, and executed with proper lifecycle management.
+Active Response is implemented through `guardsarm-execd`, a daemon running on agents, that receives and executes security response commands. The architecture follows a message-driven model where JSON commands are sent from the manager to agents, parsed, validated, and executed with proper lifecycle management.
 
 ## Component Architecture
 
@@ -10,7 +10,7 @@ Active Response is implemented through `wazuh-execd`, a daemon running on agents
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                        wazuh-engine                                 │
+│                        guardsarm-engine                                 │
 │                                                                     │
 │  ┌───────────────────────────────────────────────────────────────┐  │
 │  │                   Alert Processing                            │  │
@@ -23,7 +23,7 @@ Active Response is implemented through `wazuh-execd`, a daemon running on agents
                                  │ {"command": "enable", ...}
                                  ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│                     wazuh-manager-remoted                           │
+│                     guardsarm-manager-remoted                           │
 │                                                                     │
 │  Forwards AR commands to target agents                             │
 └────────────────────────────────┬────────────────────────────────────┘
@@ -39,7 +39,7 @@ Active Response is implemented through `wazuh-execd`, a daemon running on agents
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                        wazuh-agentd                                 │
+│                        guardsarm-agentd                                 │
 │                                                                     │
 │  Receives encrypted messages from manager                          │
 └────────────────────────────────┬────────────────────────────────────┘
@@ -47,7 +47,7 @@ Active Response is implemented through `wazuh-execd`, a daemon running on agents
                                  │ Decrypts and forwards
                                  ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│                        wazuh-execd                                  │
+│                        guardsarm-execd                                  │
 │                                                                     │
 │  ┌───────────────────────────────────────────────────────────────┐  │
 │  │                    Command Receiver                           │  │
@@ -87,9 +87,9 @@ Active Response is implemented through `wazuh-execd`, a daemon running on agents
 
 1. **Rule Match**: Manager's `engine` detects an event matching an Active Response rule
 2. **Command Generation**: `engine` builds a JSON message with `"command": "enable"`
-3. **Manager Distribution**: Command sent to `wazuh-remoted` for agent delivery
-4. **Agent Reception**: Agent's `wazuh-agentd` receives and decrypts the message
-5. **Execd Processing**: `wazuh-execd` validates and queues the command
+3. **Manager Distribution**: Command sent to `guardsarm-remoted` for agent delivery
+4. **Agent Reception**: Agent's `guardsarm-agentd` receives and decrypts the message
+5. **Execd Processing**: `guardsarm-execd` validates and queues the command
 6. **Deduplication Check**: Executes key verification to prevent duplicates
 7. **Script Execution**: Forks and executes the AR script (e.g., `block-ip`)
 8. **Script Input**: Script receives JSON via stdin
@@ -203,7 +203,7 @@ All Active Response messages follow this structure:
 
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "active_response": {
       "name": "string",
       "executable": "string",
@@ -316,7 +316,7 @@ Active Response uses a metadata-driven approach where all execution metadata is 
 
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "active_response": {
       "name": "block-ip",
       "executable": "block-ip",

@@ -1,5 +1,5 @@
 /*
- * Wazuh router - Subscriber tests
+ * GuardSarm router - Subscriber tests
  * Copyright (C) 2015, Wazuh Inc.
  * July 17, 2023.
  *

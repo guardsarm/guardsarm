@@ -7,14 +7,14 @@
 import pytest
 
 from pathlib import Path
-from wazuh_testing.tools.simulators.agent_simulator import connect
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
-from wazuh_testing.modules.remoted.configuration import REMOTED_DEBUG
-from wazuh_testing.modules.remoted import patterns
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.tools.monitors import queue_monitor
-from wazuh_testing.utils.callbacks import generate_callback
+from guardsarm_testing.tools.simulators.agent_simulator import connect
+from guardsarm_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from guardsarm_testing.modules.remoted.configuration import REMOTED_DEBUG
+from guardsarm_testing.modules.remoted import patterns
+from guardsarm_testing.constants.paths.logs import GUARDSARM_LOG_PATH
+from guardsarm_testing.tools.monitors.file_monitor import FileMonitor
+from guardsarm_testing.tools.monitors import queue_monitor
+from guardsarm_testing.utils.callbacks import generate_callback
 
 from . import CONFIGS_PATH, TEST_CASES_PATH
 
@@ -36,12 +36,12 @@ local_internal_options = {REMOTED_DEBUG: '2'}
 # Test function.
 @pytest.mark.parametrize('test_configuration, test_metadata',  zip(test_configuration, test_metadata), ids=cases_ids)
 def test_protocols_communication(test_configuration, test_metadata, configure_local_internal_options,
-                                 truncate_monitored_files, set_wazuh_configuration, daemons_handler,
+                                 truncate_monitored_files, set_guardsarm_configuration, daemons_handler,
                                  simulate_agents):
     '''
     description: Check agent-manager communication via TCP, UDP or both.
                  The test connects a simulated agent on the configured protocol and port, then
-                 verifies that remoted loaded the agent key (KEY_UPDATE in wazuh log) and that
+                 verifies that remoted loaded the agent key (KEY_UPDATE in guardsarm log) and that
                  the manager responds to the startup message with an ACK.
 
     parameters:
@@ -56,18 +56,18 @@ def test_protocols_communication(test_configuration, test_metadata, configure_lo
             brief: Truncate all monitored log files before and after the test execution.
         - configure_local_internal_options:
             type: fixture
-            brief: Configure the Wazuh local internal options using the values from `local_internal_options`.
+            brief: Configure the GuardSarm local internal options using the values from `local_internal_options`.
         - daemons_handler:
             type: fixture
-            brief: Restart all wazuh services once the test finishes.
+            brief: Restart all guardsarm services once the test finishes.
         - simulate_agents:
             type: fixture
             brief: Create simulated agents.
-        - set_wazuh_configuration:
+        - set_guardsarm_configuration:
             type: fixture
             brief: Apply changes to the ossec.conf configuration.
     '''
-    log_monitor = FileMonitor(WAZUH_LOG_PATH)
+    log_monitor = FileMonitor(GUARDSARM_LOG_PATH)
     agent = simulate_agents[0]
 
     sender, injector = connect(agent, protocol=test_metadata['protocol1'],

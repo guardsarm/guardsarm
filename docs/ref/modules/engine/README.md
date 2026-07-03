@@ -2,15 +2,15 @@
 
 >[!NOTE]
 > This documentation uses the term “engine” to refer to the decoding and enrichment engine;
-> this is the `wazuh-manager-analysisd` daemon.
+> this is the `guardsarm-manager-analysisd` daemon.
 
 ## Introduction
 The engine is responsible for transforming raw data into standardized schema documents, enriching it with threat
-intelligence, and forwarding it to designated destinations (`wazuh-indexer`).
+intelligence, and forwarding it to designated destinations (`guardsarm-indexer`).
 
 ## Data flow
 
-Events are received from `wazuh-manager-remoted`, which is responsible for receiving events from the agents.
+Events are received from `guardsarm-manager-remoted`, which is responsible for receiving events from the agents.
 The data flow begins when an event enters the orchestrator and continues until it is processed by the security policy.
 Below is a high-level flowchart illustrating this process.
 
@@ -60,7 +60,7 @@ The **orchestrator** is the central runtime component that manages active securi
 the orchestrator forwards an independent copy of it to each active policy for processing. Because each policy receives
 its own copy of the raw event, a single incoming event can produce multiple output documents — one per active policy.
 
-Wazuh ships with a built-in **standard** policy that covers all supported log sources and integrations. Users can
+GuardSarm ships with a built-in **standard** policy that covers all supported log sources and integrations. Users can
 additionally define a **custom** policy to extend or adapt the processing pipeline for their specific needs.
 
 Each event travels through the following ordered stages inside a policy:
@@ -68,7 +68,7 @@ Each event travels through the following ordered stages inside a policy:
 1. **Pre-filter** *(optional)*: Evaluated before decoding. If configured, events that do not satisfy the filter
    conditions are discarded immediately, avoiding unnecessary decoding work. If no pre-filter is configured,
    all events proceed to the decoding stage unconditionally.
-2. **Decoders**: Normalize and extract fields from the raw event, mapping them to the [Wazuh Common Schema](#).
+2. **Decoders**: Normalize and extract fields from the raw event, mapping them to the [GuardSarm Common Schema](#).
    This stage is mandatory — every event must traverse the decoder tree.
 3. **Enrichment** *(optional)*: Plugins that augment the normalized event with additional context after decoding.
    Built-in plugins include GeoIP geolocation and Indicator of Compromise (IOC) matching. Enrichment can be
@@ -76,14 +76,14 @@ Each event travels through the following ordered stages inside a policy:
 4. **Post-filter** *(optional)*: Evaluated after enrichment (or after decoding if enrichment is disabled).
    If configured, events that do not satisfy the filter conditions are discarded before reaching the outputs.
    If no post-filter is configured, all events are forwarded unconditionally.
-5. **Outputs**: Send the final processed events to configured destinations, such as `wazuh-indexer` or other
+5. **Outputs**: Send the final processed events to configured destinations, such as `guardsarm-indexer` or other
    downstream components.
 
 
 ### Event format
 
 The following examples illustrate how the Engine transforms a raw log into a fully structured and enriched event.
-The raw log is collected by the agent and forwarded to `wazuh-manager-remoted` with added agent and cluster metadata.
+The raw log is collected by the agent and forwarded to `guardsarm-manager-remoted` with added agent and cluster metadata.
 The Engine then decodes, normalizes, and enriches it into the final schema-conformant JSON document.
 
 Event collected on agent:
@@ -95,7 +95,7 @@ Event collected on agent:
 Input event example:
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "protocol": {
       "queue": 49,
       "location": "/var/ossec/logs/active-responses.log"
@@ -109,17 +109,17 @@ Input event example:
           "type": "linux"
         },
         "architecture": "x86_64",
-        "hostname": "wazuh-agent-50-rocky8"
+        "hostname": "guardsarm-agent-50-rocky8"
       },
       "id": "002",
-      "name": "wazuh-agent-50-rocky8",
+      "name": "guardsarm-agent-50-rocky8",
       "version": "v5.0.0",
       "groups": [
         "default"
       ]
     },
     "cluster": {
-      "name": "wazuh",
+      "name": "guardsarm",
       "node": "node01"
     }
   },
@@ -133,7 +133,7 @@ Input event example:
 Processed event:
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "protocol": {
       "queue": 49,
       "location": "/var/ossec/logs/active-responses.log"
@@ -147,24 +147,24 @@ Processed event:
           "type": "linux"
         },
         "architecture": "x86_64",
-        "hostname": "wazuh-agent-50-rocky8"
+        "hostname": "guardsarm-agent-50-rocky8"
       },
       "id": "002",
-      "name": "wazuh-agent-50-rocky8",
+      "name": "guardsarm-agent-50-rocky8",
       "version": "v5.0.0",
       "groups": [
         "default"
       ]
     },
     "cluster": {
-      "name": "wazuh",
+      "name": "guardsarm",
       "node": "node01"
     },
     "integration": {
       "category": "cloud-services",
       "name": "aws",
       "decoders": [
-        "decoder/core-wazuh-message/0",
+        "decoder/core-guardsarm-message/0",
         "decoder/aws-route53-resolver-logs/0"
       ]
     },
@@ -360,9 +360,9 @@ postFilter -->|pass| outputs
 postFilter -->|discard| discardPost
 ```
 
-Wazuh ships with a predefined **standard** policy that covers all supported log sources and enables all its
+GuardSarm ships with a predefined **standard** policy that covers all supported log sources and enables all its
 components to work out of the box. It includes pre-configured decoders, enrichments, and outputs for every
-Wazuh-supported integration.
+GuardSarm-supported integration.
 
 Each log source has its own format and transport specifics. The standard policy encapsulates those details,
 allowing users to focus on their own integrations and rules without dealing with the underlying log transport
@@ -372,7 +372,7 @@ or disabled per policy depending on the use case.
 
 ### Decoding process
 The decoding process converts the unstructured or semi-structured raw event received by the engine into a
-schema-based JSON document aligned with the Wazuh Common Schema.
+schema-based JSON document aligned with the GuardSarm Common Schema.
 
 All events enter the decoder stage through the **root decoder**, which acts as the entry point of the decoder
 tree. The root decoder evaluates the event and, upon matching, passes it down to the appropriate child decoders
@@ -500,7 +500,7 @@ Conceptually:
 
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "space": {
       "name": "standard|custom"
     }
@@ -546,7 +546,7 @@ discarded -->|yes| drop
 
 ##### Cleanup of decoder temporary variables
 
-Decoders can only map fields that belong to the **Wazuh Common Schema (WCS)** or to **temporary variables**.
+Decoders can only map fields that belong to the **GuardSarm Common Schema (WCS)** or to **temporary variables**.
 Temporary variables are fields whose names start with `_` (e.g., `_raw_message`, `_parsed_ts`). They provide
 a scratch space that decoders can write to and read from as an event travels through the decoder tree, enabling
 intermediate values to be shared across decoders during processing.
@@ -555,7 +555,7 @@ Once the decoding stage is complete, temporary variables have served their purpo
 cleanup step is **mandatory** and always runs at the end of pre-enrichment — it is not configurable by the user.
 
 After cleanup, every field present in the event is guaranteed to belong to the WCS. This invariant is what
-allows the event to be correctly indexed in the Wazuh Indexer, since only schema-conformant fields are accepted.
+allows the event to be correctly indexed in the GuardSarm Indexer, since only schema-conformant fields are accepted.
 
 #### Enrichment
 
@@ -589,7 +589,7 @@ enrichment --> geo --> ioc --> next
 
 During installation, the Engine generates enrichment source definition files for both **geo/ASN** and **IOC** enrichment.
 
-These files define which event fields will be observed at runtime to decide whether enrichment should be applied. They are generated automatically based on predefined rules that indicate which fields from the **Wazuh Common Schema (WCS)** should be observed for each type of enrichment.
+These files define which event fields will be observed at runtime to decide whether enrichment should be applied. They are generated automatically based on predefined rules that indicate which fields from the **GuardSarm Common Schema (WCS)** should be observed for each type of enrichment.
 
 This means the set of fields inspected by enrichment is not decided dynamically for every event. Instead, it is determined beforehand through these generated definitions, which ensures a controlled and consistent enrichment process.
 
@@ -600,7 +600,7 @@ classDef src fill:#eeeeee,stroke-width:1px
 classDef proc fill:#3f51b5,stroke-width:2px,color:#fff
 classDef out fill:#2196f3,stroke-width:2px,color:#fff
 
-wcs["Wazuh Common Schema (WCS)"]:::src
+wcs["GuardSarm Common Schema (WCS)"]:::src
 rules["Predefined enrichment rules"]:::src
 install["Installation process"]:::proc
 geoDef["Generated geo/ASN observed-fields file"]:::out
@@ -690,7 +690,7 @@ Conceptually:
 
 ```json
 {
-  "wazuh": {
+  "guardsarm": {
     "threat": {
       "indicator": {
         "type": "ipv4-addr",
@@ -785,20 +785,20 @@ This design keeps event control decisions in pre-enrichment, leaves the enrichme
 
 Once an event has completed the full processing pipeline — decoding, optional enrichment, and optional post-filter —
 it is forwarded to the **output stage**. Outputs are responsible for delivering the decoded event to one or more
-configured destinations, such as the Wazuh Indexer or a local file.
+configured destinations, such as the GuardSarm Indexer or a local file.
 
 Unlike decoders and enrichment assets, which are downloaded from the content distribution infrastructure,
-**outputs are bundled with the `wazuh-manager` installation** and stored locally on the manager host. They do not
-originate from the Wazuh Indexer.
+**outputs are bundled with the `guardsarm-manager` installation** and stored locally on the manager host. They do not
+originate from the GuardSarm Indexer.
 
 #### Output directory structure
 
-Outputs are stored under `/var/wazuh-manager/etc/outputs/` and organized by space name:
+Outputs are stored under `/var/guardsarm-manager/etc/outputs/` and organized by space name:
 
 ```
-/var/wazuh-manager/etc/outputs/
+/var/guardsarm-manager/etc/outputs/
 ├── default/                          # Fallback outputs, applied to all spaces unless overridden
-│   ├── indexer.yml                   # Sends decoded events to the Wazuh Indexer (enabled)
+│   ├── indexer.yml                   # Sends decoded events to the GuardSarm Indexer (enabled)
 │   └── file-output-integrations.yml  # Writes decoded events to a local file (disabled)
 ├── standard/                         # (Optional) Outputs specific to the standard space
 └── custom/                           # (Optional) Outputs specific to the custom space
@@ -815,7 +815,7 @@ The two outputs included in the default installation are:
 
 | File | Description | Default state |
 |------|-------------|---------------|
-| `indexer.yml` | Forwards decoded events to the configured `wazuh-indexer` | Enabled |
+| `indexer.yml` | Forwards decoded events to the configured `guardsarm-indexer` | Enabled |
 | `file-output-integrations.yml` | Writes decoded events to a local file on the manager | Disabled |
 
 The output stage operates as a broadcaster: the decoded event is dispatched independently to every active output,
@@ -844,7 +844,7 @@ flowchart TD
 
 #### Unclassified events
 
-An event is considered **unclassified** when its `wazuh.integration.category` field equals `"unclassified"`.
+An event is considered **unclassified** when its `guardsarm.integration.category` field equals `"unclassified"`.
 This happens when the last decoder that matched the event belongs to an integration whose category is
 `unclassified`. That integration acts as a catch-all — its decoder accepts events that no other integration's
 decoder matched, ensuring every event that completes the pipeline has an assigned category.
@@ -856,25 +856,25 @@ helper to determine whether an unclassified event should be indexed:
 # Excerpt from indexer.yml
 outputs:
   - first_of:
-    - check: index_unclassified_events($wazuh.integration.category)
+    - check: index_unclassified_events($guardsarm.integration.category)
       then:
-        - wazuh-indexer:
-            index: "wazuh-events-v5-unclassified"
+        - guardsarm-indexer:
+            index: "guardsarm-events-v5-unclassified"
 
-    - check: string_not_equal($wazuh.integration.category, "unclassified")
+    - check: string_not_equal($guardsarm.integration.category, "unclassified")
       then:
-        - wazuh-indexer:
-            index: "wazuh-events-v5-${wazuh.integration.category}"
+        - guardsarm-indexer:
+            index: "guardsarm-events-v5-${guardsarm.integration.category}"
 ```
 
 The routing logic uses a `first_of` block that evaluates two conditions in order:
 
 1. If `index_unclassified_events` returns `true` — meaning the policy has unclassified-events indexing enabled
-   **and** `wazuh.integration.category` equals `"unclassified"` — the event is sent to
-   `wazuh-events-v5-unclassified`.
+   **and** `guardsarm.integration.category` equals `"unclassified"` — the event is sent to
+   `guardsarm-events-v5-unclassified`.
 2. If `string_not_equal` succeeds — meaning the category is not `"unclassified"` — the event is classified
    and sent to the data stream corresponding to its integration category:
-   `wazuh-events-v5-${wazuh.integration.category}`.
+   `guardsarm-events-v5-${guardsarm.integration.category}`.
 
 If neither condition matches — the event is unclassified but the policy has unclassified-events indexing
 disabled — no output is selected and the event is **not indexed**.
@@ -888,10 +888,10 @@ classDef alt fill:#3f51b5,stroke-width:2px,color:#fff
 classDef skip fill:#9e9e9e,stroke-width:1px,color:#fff
 
 start["Output stage (indexer.yml)"]:::cond
-check1["index_unclassified_events($wazuh.integration.category)"]:::cond
-check2["string_not_equal($wazuh.integration.category, 'unclassified')"]:::cond
-unclassified["wazuh-events-v5-unclassified"]:::yes
-classified["wazuh-events-v5-${wazuh.integration.category}"]:::alt
+check1["index_unclassified_events($guardsarm.integration.category)"]:::cond
+check2["string_not_equal($guardsarm.integration.category, 'unclassified')"]:::cond
+unclassified["guardsarm-events-v5-unclassified"]:::yes
+classified["guardsarm-events-v5-${guardsarm.integration.category}"]:::alt
 dropped["Event not indexed"]:::skip
 
 start --> check1
@@ -937,14 +937,14 @@ For example, a network event log structured according to the schema might look l
 
 ### Configuration
 The schema configuration for the engine follows a structured format where each field is defined.
-It's called the Wazuh Common Schema (WCS) and it's fetched (synched) from the wazuh indexer repository
-([original yaml source](https://raw.githubusercontent.com/wazuh/wazuh-indexer-plugins/refs/heads/main/wcs/stateless/events/main/docs/wcs_flat.yml)).
+It's called the GuardSarm Common Schema (WCS) and it's fetched (synched) from the guardsarm indexer repository
+([original yaml source](https://raw.githubusercontent.com/guardsarm/guardsarm-indexer-plugins/refs/heads/main/wcs/stateless/events/main/docs/wcs_flat.yml)).
 It's not inteded to be modified by the user and it consists of a JSON object with the following key elements:
 
 - Fields Definition:
   - The fields object contains a list of field names as keys.
   - Each field has a corresponding object defining his type.
-    - `type`: Specifies the wazuh indexer field type, such as date, keyword, text, integer, etc.
+    - `type`: Specifies the guardsarm indexer field type, such as date, keyword, text, integer, etc.
 
 ```json
 {
@@ -984,23 +984,23 @@ It's not inteded to be modified by the user and it consists of a JSON object wit
 ## Content Management: Managing the Engine's processing
 
 Although the Engine stores all assets and policy configurations locally for runtime execution, **the source of truth
-for all content management resides in the Wazuh Indexer**. Creating custom decoders and integrations, enabling or
-disabling them, and modifying policy-related settings are all actions performed through the Wazuh Indexer — not
+for all content management resides in the GuardSarm Indexer**. Creating custom decoders and integrations, enabling or
+disabling them, and modifying policy-related settings are all actions performed through the GuardSarm Indexer — not
 directly on the Engine.
 
 Before building the operational graph, the Engine must ensure that its local state reflects the latest configuration
-available in the Wazuh Indexer. This is achieved through **CMSync**, an internal submodule of the Engine responsible
-for periodically pulling content from the Wazuh Indexer and applying any detected changes to the Engine's local store.
+available in the GuardSarm Indexer. This is achieved through **CMSync**, an internal submodule of the Engine responsible
+for periodically pulling content from the GuardSarm Indexer and applying any detected changes to the Engine's local store.
 
 ### Synchronization process
 
 CMSync synchronizes content independently for each space — **Standard** and **Custom** — following the same
 two-step process for each:
 
-1. **Hash comparison**: CMSync retrieves the content hash stored in the Wazuh Indexer for the space and compares
+1. **Hash comparison**: CMSync retrieves the content hash stored in the GuardSarm Indexer for the space and compares
    it against the locally stored hash. This check is lightweight and allows CMSync to determine quickly whether
    the space content has changed at all.
-2. **Content fetch**: If the hashes differ, CMSync downloads the full content for that space from the Wazuh
+2. **Content fetch**: If the hashes differ, CMSync downloads the full content for that space from the GuardSarm
    Indexer and applies it to the Engine's local store. The Engine then rebuilds the affected operational graphs.
 
 The content synchronized per space includes:
@@ -1017,20 +1017,20 @@ The content synchronized per space includes:
 
 ### Spaces
 
-Spaces are a concept that originates in the **Wazuh Indexer**, where content is organized and stored under
-named spaces. The Engine mirrors this structure: when CMSync pulls content from the Wazuh Indexer, assets are
+Spaces are a concept that originates in the **GuardSarm Indexer**, where content is organized and stored under
+named spaces. The Engine mirrors this structure: when CMSync pulls content from the GuardSarm Indexer, assets are
 kept separated by the same space they belong to in the indexer. The Engine's space separation is therefore a
-direct reflection of the Wazuh Indexer's organization, not an independent concept.
+direct reflection of the GuardSarm Indexer's organization, not an independent concept.
 
 The two spaces are:
 
-- **Standard** — Contains the default integrations curated and maintained by Wazuh CTI. The Wazuh Indexer
+- **Standard** — Contains the default integrations curated and maintained by GuardSarm CTI. The GuardSarm Indexer
   is responsible for downloading and hosting this content from the CTI feed; the Engine never communicates
-  with CTI directly. CMSync synchronizes the Engine's local copy from the Wazuh Indexer.
+  with CTI directly. CMSync synchronizes the Engine's local copy from the GuardSarm Indexer.
 - **Custom** — An independent space for user-defined or user-modified content. Users manage this space
-  through the Wazuh Indexer, and CMSync propagates any changes to the Engine.
+  through the GuardSarm Indexer, and CMSync propagates any changes to the Engine.
 
-On a fresh start, the Engine triggers an initial synchronization to pull both spaces from the Wazuh Indexer,
+On a fresh start, the Engine triggers an initial synchronization to pull both spaces from the GuardSarm Indexer,
 ensuring all assets are available before building policies and defining routes. After this initial load,
 subsequent synchronization cycles run periodically to keep the local state up to date.
 
@@ -1039,7 +1039,7 @@ operational graph.
 
 ## Assets
 
-In the Wazuh Engine, assets represent the fundamental components of security policies and are the smallest unit within
+In the GuardSarm Engine, assets represent the fundamental components of security policies and are the smallest unit within
 such a policy.
 
 Each asset is organized into various stages that dictate operational procedures when processing an event.
@@ -1192,7 +1192,7 @@ The key syntax is `parse|<source_field>: [<expr1>, <expr2>, ...]`.
 ---
 
 **`outputs`** — An array of output operations that deliver the event to external destinations. Each element in the array can be:
-- A **direct output operation** (e.g. `wazuh-indexer:`, `file:`), executed unconditionally.
+- A **direct output operation** (e.g. `guardsarm-indexer:`, `file:`), executed unconditionally.
 - A **`first_of`** block: an ordered list of branches, each with an optional `check` condition and a `then` list of output operations. The first branch whose `check` passes executes its `then` and the remaining branches are skipped.
 
 Cannot modify the event.
@@ -1239,7 +1239,7 @@ Every integration must declare one of the following seven categories:
 | `system-activity` | Operating system and host-level events (audit logs, syslog, etc.) |
 | `other` | Events that do not fit any of the above categories |
 
-The category assigned to an integration propagates to all events decoded by that integration's decoders. It is recorded in `wazuh.integration.category` on every processed event and is used by the output stage to route events to the correct data stream (e.g. `wazuh-events-v5-cloud-services`).
+The category assigned to an integration propagates to all events decoded by that integration's decoders. It is recorded in `guardsarm.integration.category` on every processed event and is used by the output stage to route events to the correct data stream (e.g. `guardsarm-events-v5-cloud-services`).
 
 ### Operations
 Operations are the fundamental units within the operation graph. Each operation can succeed or fail, forming the basis
@@ -1483,7 +1483,7 @@ non-schema fields.
 
 Once the decoder tree has finished processing, all variables are removed from the event before it enters the enrichment
 stage (see [Cleanup of decoder temporary variables](#cleanup-of-decoder-temporary-variables)). After this point,
-every field in the event belongs to the Wazuh Common Schema (WCS).
+every field in the event belongs to the GuardSarm Common Schema (WCS).
 
 Key characteristics:
 - **Decoder-tree scoped** — Variables persist across the entire decoder tree traversal; any decoder that runs after the
@@ -1598,7 +1598,7 @@ Use this section as the conceptual overview of the asset itself, and refer to th
 
 ### Decoders
 
-Decoders are the assets responsible for normalizing raw events into structured documents that conform to the [Wazuh Common Schema](#). All events enter the decoder tree through the root decoder and traverse a branch of child decoders, each contributing progressively more specialized field extraction and normalization.
+Decoders are the assets responsible for normalizing raw events into structured documents that conform to the [GuardSarm Common Schema](#). All events enter the decoder tree through the root decoder and traverse a branch of child decoders, each contributing progressively more specialized field extraction and normalization.
 
 The decoder tree is evaluated depth-first. After a decoder successfully processes an event, the engine evaluates that decoder's child decoders in order; only the first child that accepts the event is followed (logical OR among siblings). See [Execution Graph Summary](#execution-graph-summary) for traversal order details.
 
@@ -1629,8 +1629,8 @@ kanban
     - `author` (object): Author information:
         ```yaml
         name: Wazuh, Inc.
-        email: info@wazuh.com
-        url: https://wazuh.com
+        email: info@guardsarm.com
+        url: https://guardsarm.com
         date: 2022-11-15
         ```
     - `reference` (array): Links to product documentation:
@@ -1822,7 +1822,7 @@ normalize:
 ### Outputs
 
 Outputs are the last stage of the policy pipeline. They receive the fully decoded and enriched event and deliver it
-to one or more configured destinations (e.g., `wazuh-indexer`, a file, or an external system). All active output
+to one or more configured destinations (e.g., `guardsarm-indexer`, a file, or an external system). All active output
 assets receive the event simultaneously — the broadcaster pattern described in [Output process](#output-process).
 
 
@@ -1849,7 +1849,7 @@ kanban
   broadcast to every matching output.
 
 - **Outputs**: The delivery stage. Defines how the event is sent to its destination. Each entry can be a direct
-  output operation (e.g., `wazuh-indexer:`, `file:`) or a `first_of` block with conditional branching. Cannot
+  output operation (e.g., `guardsarm-indexer:`, `file:`) or a `first_of` block with conditional branching. Cannot
   modify the event. See the [Outputs stage](#output) for syntax details.
 
 ### Filters
@@ -1903,18 +1903,18 @@ id: fef71314-00c6-41f5-ab26-15e271e9f913
 enabled: true
 type: pre-filter
 metadata:
-  module: wazuh
+  module: guardsarm
   title: Platform filter
   description: Filter events by platform
-  compatibility: Wazuh 5.*
+  compatibility: GuardSarm 5.*
   versions:
-    - Wazuh 5.*
+    - GuardSarm 5.*
   author:
     name: Wazuh, Inc.
-    url: https://wazuh.com
+    url: https://guardsarm.com
     date: 2024-01-31
   references:
-    - https://documentation.wazuh.com/
+    - https://documentation.guardsarm.com/
 check: $host.os.platform == 'ubuntu'
 ```
 
@@ -1978,7 +1978,7 @@ check: int_less($http.response.status_code, 400)
 ```
 
 ```yaml
-check: $wazuh.origin == /var/log/apache2/access.log OR $wazuh.origin == /var/log/httpd/access_log
+check: $guardsarm.origin == /var/log/apache2/access.log OR $guardsarm.origin == /var/log/httpd/access_log
 ```
 
 ### Parse
@@ -2110,7 +2110,7 @@ Example:
 ```yaml
 normalize:
   - map:
-      - wazuh.decoders: array_append(windows-sysmon)
+      - guardsarm.decoders: array_append(windows-sysmon)
       - event.dataset: sysmon
       - event.kind: event
 
@@ -2143,7 +2143,7 @@ These parsers are used automatically when a field of its type is used in a logpa
 
 For example, if you use the field `<event.start>` which is of type `date`, it will be parsed automatically by the date parser.
 
-These parsers will generate fields which are type-compatible with Wazuh Indexer.
+These parsers will generate fields which are type-compatible with GuardSarm Indexer.
 
 | Type        | Parser       | Description                                                                                          |
 |-------------|--------------|------------------------------------------------------------------------------------------------------|
@@ -2474,40 +2474,40 @@ Total number of events discarded during postfiltering for a given space.
 
 ### Where to find the logs
 
-The Engine writes its logs to the Wazuh manager log file, alongside the rest of the
-Wazuh components:
+The Engine writes its logs to the GuardSarm manager log file, alongside the rest of the
+GuardSarm components:
 
 ```
-/var/wazuh-manager/logs/wazuh-manager.log
+/var/guardsarm-manager/logs/guardsarm-manager.log
 ```
 
 Each log line follows the format `YYYY/MM/DD HH:MM:SS <component>: LEVEL: message`.
-Most Engine messages use the `wazuh-manager-analysisd` component tag, but some subsystems
+Most Engine messages use the `guardsarm-manager-analysisd` component tag, but some subsystems
 (such as the Indexer Connector) use their own tag:
 
 ```
 2026/04/14 20:07:43 IndexerConnector: WARNING: No username and password found in the keystore, using default values.
-2026/04/14 20:07:44 wazuh-manager-analysisd: INFO: Indexer Connector initialized.
-2026/04/14 20:09:16 wazuh-manager-analysisd: INFO: Archiver initialized.
-2026/04/14 20:09:16 wazuh-manager-analysisd: INFO: Remote engine's server initialized and started.
-2026/04/14 20:09:16 wazuh-manager-analysisd: INFO: Engine started.
+2026/04/14 20:07:44 guardsarm-manager-analysisd: INFO: Indexer Connector initialized.
+2026/04/14 20:09:16 guardsarm-manager-analysisd: INFO: Archiver initialized.
+2026/04/14 20:09:16 guardsarm-manager-analysisd: INFO: Remote engine's server initialized and started.
+2026/04/14 20:09:16 guardsarm-manager-analysisd: INFO: Engine started.
 ```
 
 Warning and error lines include a context tag in brackets that identifies the internal
 component that produced the message:
 
 ```
-2026/04/14 20:09:16 wazuh-manager-analysisd: WARNING: [CMSync::exist()] Check 'standard' space in wazuh-indexer - Attempt 1/3: No available server
-2026/04/14 20:09:26 wazuh-manager-analysisd: WARNING: [CMSync] Failed to synchronize namespace for space 'standard': No available server
-2026/04/14 20:09:46 wazuh-manager-analysisd: WARNING: [IOC::Sync] Synchronization cycle failed: No available server
+2026/04/14 20:09:16 guardsarm-manager-analysisd: WARNING: [CMSync::exist()] Check 'standard' space in guardsarm-indexer - Attempt 1/3: No available server
+2026/04/14 20:09:26 guardsarm-manager-analysisd: WARNING: [CMSync] Failed to synchronize namespace for space 'standard': No available server
+2026/04/14 20:09:46 guardsarm-manager-analysisd: WARNING: [IOC::Sync] Synchronization cycle failed: No available server
 ```
 
 When debug level is active, additional diagnostic messages appear with the same format:
 
 ```
-2026/04/14 20:09:16 wazuh-manager-analysisd: DEBUG: Geo sync scheduled with interval: 360 seconds.
-2026/04/14 20:09:16 wazuh-manager-analysisd: DEBUG: Remote configuration synchronize scheduled with interval: 120 seconds.
-2026/04/14 20:09:16 wazuh-manager-analysisd: DEBUG: IOC Sync task scheduled with interval: 360 seconds, 3 max retries.
+2026/04/14 20:09:16 guardsarm-manager-analysisd: DEBUG: Geo sync scheduled with interval: 360 seconds.
+2026/04/14 20:09:16 guardsarm-manager-analysisd: DEBUG: Remote configuration synchronize scheduled with interval: 120 seconds.
+2026/04/14 20:09:16 guardsarm-manager-analysisd: DEBUG: IOC Sync task scheduled with interval: 360 seconds, 3 max retries.
 ```
 
 ### Log types
@@ -2526,7 +2526,7 @@ are written to the log file.
 
 ### How to enable debug logging
 
-Open the file `/var/wazuh-manager/etc/wazuh-manager-internal-options.conf` and find
+Open the file `/var/guardsarm-manager/etc/guardsarm-manager-internal-options.conf` and find
 (or add) the `analysisd.debug` line:
 
 ```ini
@@ -2537,7 +2537,7 @@ Open the file `/var/wazuh-manager/etc/wazuh-manager-internal-options.conf` and f
 analysisd.debug=1
 ```
 
-Save the file and restart the `wazuh-manager` service for the change to take effect.
+Save the file and restart the `guardsarm-manager` service for the change to take effect.
 
 > [!NOTE]
 > Use `debug` (1) for day-to-day troubleshooting. Only switch to `trace` (2) when
@@ -2610,7 +2610,7 @@ applied and processed it:
 
 ```
 traces:
-[🟢] decoder/core-wazuh-message/0 -> success
+[🟢] decoder/core-guardsarm-message/0 -> success
   ↳ @timestamp: get_date -> Success
 [🟢] decoder/integrations/0 -> success
   ↳ event.original: exists -> Success
@@ -2628,7 +2628,7 @@ traces:
   ↳ event.outcome: map("success") -> Success
   ↳ [_tmp_json: delete] -> Success
 [🟢] filter/DiscardedEvents -> success
-  ↳ Discard_event() -> Success: Event will be indexed (wazuh.space.event_discarded=false)
+  ↳ Discard_event() -> Success: Event will be indexed (guardsarm.space.event_discarded=false)
 [🟢] cleanup/DecoderTemporaryVariables -> success
   ↳ cleanupDecoderTemporaryVariables() -> Success: Removed root keys prefixed with '_'
 [🟢] enrichment/Geo -> success
@@ -2637,7 +2637,7 @@ traces:
   ↳ IOC(connection) -> Failure: Source field(s) not found for 'source.ip, source.port'
 ```
 
-The first successful decoder, `decoder/core-wazuh-message/0`, prepares the event
+The first successful decoder, `decoder/core-guardsarm-message/0`, prepares the event
 and sets `@timestamp`. The `decoder/integrations/0` asset verifies that the raw
 event exists and parses it into `_tmp_json`. Decoders that do not match the event
 return failures and the Engine continues evaluating the next candidates.
@@ -2645,7 +2645,7 @@ return failures and the Engine continues evaluating the next candidates.
 The matched decoder maps the event fields to the normalized schema. The
 `filter/DiscardedEvents` asset decides whether the event
 should be indexed. In this example, the event is kept because
-`wazuh.space.event_discarded=false`.
+`guardsarm.space.event_discarded=false`.
 
 After decoding and filtering, the Engine removes temporary fields with
 `cleanup/DecoderTemporaryVariables` and runs enrichment assets. `enrichment/Geo`
@@ -2675,11 +2675,11 @@ output:
   user:
     id: EX_PRINCIPAL_ID
     name: Alice
-  wazuh:
+  guardsarm:
     integration:
       category: cloud-services
       decoders:
-        - decoder/core-wazuh-message/0
+        - decoder/core-guardsarm-message/0
         - decoder/integrations/0
         - decoder/aws-cloudtrail/0
       name: aws
@@ -2692,8 +2692,8 @@ output:
 
 ## Internal options reference
 
-All of the following settings live in `/var/wazuh-manager/etc/wazuh-manager-internal-options.conf`.
-Edit the file and restart the `wazuh-manager` service for changes to take effect.
+All of the following settings live in `/var/guardsarm-manager/etc/guardsarm-manager-internal-options.conf`.
+Edit the file and restart the `guardsarm-manager` service for changes to take effect.
 
 ### Event queue
 
@@ -2713,16 +2713,16 @@ Edit the file and restart the `wazuh-manager` service for changes to take effect
 | Setting | Description | Default |
 |:--------|:------------|:-------:|
 | `analysisd.remote_conf_sync_interval` | Seconds between remote engine configuration synchronization cycles. | `120` |
-| `analysisd.remote_conf_indexer_connector_max_retries` | Maximum retry attempts for remote configuration requests to the Wazuh Indexer. | `3` |
+| `analysisd.remote_conf_indexer_connector_max_retries` | Maximum retry attempts for remote configuration requests to the GuardSarm Indexer. | `3` |
 | `analysisd.remote_conf_indexer_connector_retry_interval` | Seconds between retry attempts for remote configuration synchronization. | `5` |
-| `analysisd.cm_sync_interval` | Seconds between content synchronization cycles from the Wazuh Indexer. | `120` |
-| `analysisd.cmsync_indexer_connector_sync_batch_size` | Maximum number of content documents requested per Wazuh Indexer page during content synchronization. | `100` |
-| `analysisd.cmsync_indexer_connector_max_retries` | Maximum retry attempts for content synchronization requests to the Wazuh Indexer. | `3` |
+| `analysisd.cm_sync_interval` | Seconds between content synchronization cycles from the GuardSarm Indexer. | `120` |
+| `analysisd.cmsync_indexer_connector_sync_batch_size` | Maximum number of content documents requested per GuardSarm Indexer page during content synchronization. | `100` |
+| `analysisd.cmsync_indexer_connector_max_retries` | Maximum retry attempts for content synchronization requests to the GuardSarm Indexer. | `3` |
 | `analysisd.cmsync_indexer_connector_retry_interval` | Seconds between retry attempts for content synchronization. | `5` |
 | `analysisd.ioc_sync_interval` | Seconds between IoC database synchronization cycles. `0` disables IoC sync. | `360` |
-| `analysisd.ioc_indexer_connector_max_retries` | Maximum retry attempts for IoC synchronization requests to the Wazuh Indexer. | `3` |
+| `analysisd.ioc_indexer_connector_max_retries` | Maximum retry attempts for IoC synchronization requests to the GuardSarm Indexer. | `3` |
 | `analysisd.ioc_indexer_connector_retry_interval` | Seconds between retry attempts for IoC synchronization. | `5` |
-| `analysisd.ioc_indexer_connector_ioc_sync_batch_size` | Maximum number of IoC documents streamed per Wazuh Indexer page while synchronizing IoC databases. | `1000` |
+| `analysisd.ioc_indexer_connector_ioc_sync_batch_size` | Maximum number of IoC documents streamed per GuardSarm Indexer page while synchronizing IoC databases. | `1000` |
 | `analysisd.geo_sync_interval` | Seconds between GeoIP database synchronization cycles. `0` disables GeoIP sync. | `360` |
 
 ## F.A.Q
