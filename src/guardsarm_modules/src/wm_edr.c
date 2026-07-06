@@ -30,6 +30,7 @@
 #include "defs.h"
 #include "mq_op.h"
 #include "cJSON.h"
+#include "sha256_op.h"
 
 static void* wm_edr_main(wm_edr_t *edr);           // Module main function. It won't return
 static void wm_edr_destroy(wm_edr_t *edr);         // Destroy configuration
@@ -48,6 +49,7 @@ const wm_context WM_EDR_CONTEXT = {
 static int queue_fd = 0;                           // Output queue file descriptor
 static OSHash *seen_procs = NULL;                  // Seen "pid:starttime" -> emitted
 static OSHash *seen_conns = NULL;                  // Seen "l-r-state" -> emitted
+static OSHash *seen_persist = NULL;                // Seen persistence path -> emitted
 static FILE *edr_log = NULL;                       // Mirror log for the host applier
 
 /* ------------------------------------------------------------------ helpers */
@@ -116,6 +118,33 @@ static void proc_user(const char *pid, char *out, size_t out_sz) {
         }
     }
     fclose(f);
+}
+
+// Known script interpreters — a process whose executable basename matches is a
+// script-execution event (MITRE T1059).
+static const char *SCRIPT_INTERPRETERS[] = {
+    "bash", "sh", "dash", "zsh", "ksh", "csh", "tcsh", "ash",
+    "python", "python2", "python3", "perl", "ruby", "php", "node", "lua",
+    "powershell", "pwsh", "wscript", "cscript", "cmd", NULL};
+
+static int basename_is_interpreter(const char *name) {
+    for (int i = 0; SCRIPT_INTERPRETERS[i]; i++) {
+        if (!strcmp(name, SCRIPT_INTERPRETERS[i])) return 1;
+    }
+    return 0;
+}
+
+// Heuristic: encoded / download-and-execute command-line patterns (T1059/T1105).
+static int cmd_is_suspicious(const char *cmd) {
+    if (!cmd || !cmd[0]) return 0;
+    static const char *SIG[] = {
+        "base64 -d", "base64 --decode", "-enc", "-EncodedCommand", "FromBase64String",
+        "curl ", "wget ", "|sh", "| sh", "|bash", "| bash", "IEX(", "Invoke-Expression",
+        "/dev/tcp/", "nc -e", "ncat -e", "chmod +x", "eval ", NULL};
+    for (int i = 0; SIG[i]; i++) {
+        if (strstr(cmd, SIG[i])) return 1;
+    }
+    return 0;
 }
 
 // Emit a process-exec event for a newly-seen PID.
@@ -208,6 +237,35 @@ static void emit_process(wm_edr_t *edr, const char *pid) {
     cJSON_AddStringToObject(proc, "user", user);
     cJSON_AddStringToObject(proc, "start", ts);
 
+    // Executable path + working directory (readlink) and SHA256 of the image.
+    char exe[PATH_MAX] = "", cwd[PATH_MAX] = "";
+    snprintf(path, sizeof(path), "/proc/%s/exe", pid);
+    ssize_t el = readlink(path, exe, sizeof(exe) - 1);
+    if (el > 0) {
+        exe[el] = '\0';
+        cJSON_AddStringToObject(proc, "executable", exe);
+    }
+    snprintf(path, sizeof(path), "/proc/%s/cwd", pid);
+    ssize_t cl = readlink(path, cwd, sizeof(cwd) - 1);
+    if (cl > 0) {
+        cwd[cl] = '\0';
+        cJSON_AddStringToObject(proc, "working_directory", cwd);
+    }
+    if (exe[0]) {
+        os_sha256 sha = {0};
+        if (OS_SHA256_File(exe, sha, OS_BINARY) == 0) {
+            cJSON *h = cJSON_AddObjectToObject(proc, "hash");
+            cJSON_AddStringToObject(h, "sha256", sha);
+        }
+    }
+    // Script-execution + suspicious-command classification (MITRE T1059/T1105).
+    if (basename_is_interpreter(comm)) {
+        cJSON_AddBoolToObject(proc, "is_script", 1);
+    }
+    if (cmd_is_suspicious(cmdline)) {
+        cJSON_AddBoolToObject(proc, "suspicious", 1);
+    }
+
     wm_edr_emit(edr, event);
     cJSON_Delete(event);
 }
@@ -299,6 +357,68 @@ static void scan_network(wm_edr_t *edr) {
     }
 }
 
+/* ---------------------------------------------------------- persistence sweep */
+
+static void emit_persistence(wm_edr_t *edr, const char *type, const char *path_val) {
+    if (!path_val || !path_val[0] || OSHash_Get(seen_persist, path_val)) {
+        return;
+    }
+    if (OSHash_Add(seen_persist, path_val, (void *)1) != 2) {
+        if (seen_persist && OSHash_Get_Elem_ex(seen_persist) > 20000) {
+            OSHash_Free(seen_persist);
+            seen_persist = OSHash_Create();
+        }
+        return;
+    }
+    char ts[32];
+    time_t now = time(NULL);
+    struct tm tmv;
+    gmtime_r(&now, &tmv);
+    strftime(ts, sizeof(ts), "%Y-%m-%dT%H:%M:%SZ", &tmv);
+
+    cJSON *event = cJSON_CreateObject();
+    cJSON_AddStringToObject(event, "collector", "edr_persistence");
+    cJSON *data = cJSON_AddObjectToObject(event, "data");
+    cJSON *p = cJSON_AddObjectToObject(data, "persistence");
+    cJSON_AddStringToObject(p, "type", type);
+    cJSON_AddStringToObject(p, "path", path_val);
+    cJSON_AddStringToObject(p, "detected", ts);
+    wm_edr_emit(edr, event);
+    cJSON_Delete(event);
+}
+
+static void scan_persistence_dir(wm_edr_t *edr, const char *dir, const char *type) {
+    DIR *d = opendir(dir);
+    if (!d) {
+        return;
+    }
+    struct dirent *ent;
+    char full[PATH_MAX];
+    while ((ent = readdir(d)) != NULL) {
+        if (ent->d_name[0] == '.') continue;
+        snprintf(full, sizeof(full), "%s/%s", dir, ent->d_name);
+        emit_persistence(edr, type, full);
+    }
+    closedir(d);
+}
+
+// Sweep the common Linux persistence locations and emit an edr_persistence event
+// for each newly-seen entry (cron, systemd units, startup scripts, shell rc).
+static void scan_persistence(wm_edr_t *edr) {
+    static const char *CRON[] = {"/etc/cron.d", "/etc/cron.daily", "/etc/cron.hourly",
+                                 "/etc/cron.weekly", "/etc/cron.monthly",
+                                 "/var/spool/cron/crontabs", "/var/spool/cron", NULL};
+    for (int i = 0; CRON[i]; i++) scan_persistence_dir(edr, CRON[i], "cron");
+    scan_persistence_dir(edr, "/etc/systemd/system", "systemd-service");
+    scan_persistence_dir(edr, "/etc/profile.d", "shell-profile");
+
+    static const char *RC[] = {"/root/.bashrc", "/root/.bash_profile", "/root/.profile",
+                               "/etc/rc.local", "/etc/bash.bashrc", NULL};
+    for (int i = 0; RC[i]; i++) {
+        if (access(RC[i], F_OK) == 0) emit_persistence(edr, "shell-profile", RC[i]);
+    }
+}
+
 /* --------------------------------------------------------------------- main */
 
 void* wm_edr_main(wm_edr_t *edr) {
@@ -309,6 +429,7 @@ void* wm_edr_main(wm_edr_t *edr) {
 
     seen_procs = OSHash_Create();
     seen_conns = OSHash_Create();
+    seen_persist = OSHash_Create();
 
     char log_path[PATH_MAX];
     snprintf(log_path, sizeof(log_path), "%s", WM_EDR_LOG_PATH);
@@ -319,9 +440,10 @@ void* wm_edr_main(wm_edr_t *edr) {
     }
 
     edr->flags.running = 1;
-    mtinfo(WM_EDR_LOGTAG, "Native EDR telemetry started (interval %us, processes=%u network=%u).",
-           edr->interval, edr->flags.processes, edr->flags.network);
+    mtinfo(WM_EDR_LOGTAG, "Native EDR telemetry started (interval %us, processes=%u network=%u persistence=%u).",
+           edr->interval, edr->flags.processes, edr->flags.network, edr->flags.persistence);
 
+    unsigned int cycle = 0;
     while (edr->flags.running) {
         if (edr->flags.processes) {
             scan_processes(edr);
@@ -329,6 +451,11 @@ void* wm_edr_main(wm_edr_t *edr) {
         if (edr->flags.network) {
             scan_network(edr);
         }
+        // Persistence changes slowly — sweep every ~12 cycles (bounded overhead).
+        if (edr->flags.persistence && (cycle == 0 || cycle % 12 == 0)) {
+            scan_persistence(edr);
+        }
+        cycle++;
         sleep(edr->interval);
     }
 
@@ -342,6 +469,7 @@ static void wm_edr_destroy(wm_edr_t *edr) {
     }
     if (seen_procs) { OSHash_Free(seen_procs); seen_procs = NULL; }
     if (seen_conns) { OSHash_Free(seen_conns); seen_conns = NULL; }
+    if (seen_persist) { OSHash_Free(seen_persist); seen_persist = NULL; }
     free(edr);
 }
 
@@ -351,6 +479,7 @@ static cJSON *wm_edr_dump(const wm_edr_t *edr) {
     cJSON_AddStringToObject(wm_edr, "enabled", edr->flags.enabled ? "yes" : "no");
     cJSON_AddStringToObject(wm_edr, "processes", edr->flags.processes ? "yes" : "no");
     cJSON_AddStringToObject(wm_edr, "network", edr->flags.network ? "yes" : "no");
+    cJSON_AddStringToObject(wm_edr, "persistence", edr->flags.persistence ? "yes" : "no");
     cJSON_AddNumberToObject(wm_edr, "interval", edr->interval);
     cJSON_AddNumberToObject(wm_edr, "max_eps", edr->max_eps);
     cJSON_AddItemToObject(root, "edr", wm_edr);

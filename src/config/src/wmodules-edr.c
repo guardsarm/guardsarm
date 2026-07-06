@@ -17,6 +17,7 @@ static const char *XML_DISABLED = "disabled";
 static const char *XML_INTERVAL = "interval";
 static const char *XML_PROCESSES = "processes";
 static const char *XML_NETWORK = "network";
+static const char *XML_PERSISTENCE = "persistence";
 static const char *XML_MAX_EPS = "max_eps";
 
 int wm_edr_read(const OS_XML *xml, XML_NODE node, wmodule *module) {
@@ -30,6 +31,7 @@ int wm_edr_read(const OS_XML *xml, XML_NODE node, wmodule *module) {
         edr->flags.enabled = 1;
         edr->flags.processes = 1;
         edr->flags.network = 1;
+        edr->flags.persistence = 1;
         edr->interval = WM_EDR_DEFAULT_INTERVAL;
         edr->max_eps = 100;
         module->context = &WM_EDR_CONTEXT;
@@ -79,6 +81,8 @@ int wm_edr_read(const OS_XML *xml, XML_NODE node, wmodule *module) {
             edr->flags.processes = (node[i]->content && !strcmp(node[i]->content, "yes")) ? 1 : 0;
         } else if (!strcmp(node[i]->element, XML_NETWORK)) {
             edr->flags.network = (node[i]->content && !strcmp(node[i]->content, "yes")) ? 1 : 0;
+        } else if (!strcmp(node[i]->element, XML_PERSISTENCE)) {
+            edr->flags.persistence = (node[i]->content && !strcmp(node[i]->content, "yes")) ? 1 : 0;
         } else if (!strcmp(node[i]->element, XML_MAX_EPS)) {
             if (node[i]->content) {
                 edr->max_eps = atol(node[i]->content);

@@ -27,8 +27,9 @@
 
 typedef struct wm_edr_flags_t {
     unsigned int enabled:1;                // main switch
-    unsigned int processes:1;              // process-exec telemetry
+    unsigned int processes:1;              // process-exec telemetry (+ hash/cwd/script)
     unsigned int network:1;                // network-connection telemetry
+    unsigned int persistence:1;            // cron/systemd/startup persistence telemetry
     unsigned int running:1;                // module is running
 } wm_edr_flags_t;
 
