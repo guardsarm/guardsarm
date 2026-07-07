@@ -33,8 +33,8 @@ os_version:
     - Windows Server 2019
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/capabilities/syscollector.html
-    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/capabilities/syscollector.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html
 '''
 import sys
 from pathlib import Path

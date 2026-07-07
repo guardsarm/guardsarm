@@ -7,7 +7,7 @@ make sure that you have an instance of the GuardSarm manager running and configu
 to accept this system as an agent.
 
 For more information on how to install the server version of GuardSarm, look at:
-https://documentation.guardsarm.com
+https://documentation.guardsarmsiem.com
 
 
 
@@ -24,7 +24,7 @@ https://documentation.guardsarm.com
 1- How to obtain more information
 
 You can obtain more information about GuardSarm on the following links:
-https://documentation.guardsarm.com
+https://documentation.guardsarmsiem.com
 
 
 2- What this agent does
@@ -45,4 +45,4 @@ The Windows agent does the following tasks:
 Visit the following link for information on how to get help or
 support for GuardSarm:
 
-https://guardsarm.com/
+https://guardsarmsiem.com/

@@ -374,14 +374,14 @@ void test_wm_agent_upgrade_validate_wpk_version_windows_https_ok(void **state)
 
     os_strdup("v3.13.1 4a313b1312c23a213f2e3209fe0909dd\nv4.0.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/windows/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/windows/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/windows/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/windows/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.0.0_windows.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -402,14 +402,14 @@ void test_wm_agent_upgrade_validate_wpk_version_windows_http_ok(void **state)
 
     os_strdup("v3.13.1 4a313b1312c23a213f2e3209fe0909dd\nv4.0.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "http://packages.guardsarm.com/wpk/windows/versions");
+    expect_string(__wrap_wurl_http_get, url, "http://packages.guardsarmsiem.com/wpk/windows/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "http://packages.guardsarm.com/wpk/windows/");
+    assert_string_equal(task->wpk_repository, "http://packages.guardsarmsiem.com/wpk/windows/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v3.13.1_windows.wpk");
     assert_string_equal(task->wpk_sha1, "4a313b1312c23a213f2e3209fe0909dd");
 }
@@ -419,7 +419,7 @@ void test_wm_agent_upgrade_validate_wpk_version_windows_invalid_version(void **s
 {
     wm_agent_info *agent = state[0];
     wm_upgrade_task *task = state[1];
-    char *repo = "packages.guardsarm.com/4.x/wpk";
+    char *repo = "packages.guardsarmsiem.com/4.x/wpk";
     char *versions = NULL;
 
     os_strdup("windows", agent->platform);
@@ -432,7 +432,7 @@ void test_wm_agent_upgrade_validate_wpk_version_windows_invalid_version(void **s
 
     os_strdup("v3.13.1 4a313b1312c23a213f2e3209fe0909dd\nv4.0.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "http://packages.guardsarm.com/4.x/wpk/windows/versions");
+    expect_string(__wrap_wurl_http_get, url, "http://packages.guardsarmsiem.com/4.x/wpk/windows/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
@@ -448,7 +448,7 @@ void test_wm_agent_upgrade_validate_wpk_version_windows_invalid_repo(void **stat
 {
     wm_agent_info *agent = state[0];
     wm_upgrade_task *task = state[1];
-    char *repo = "error.guardsarm.com/wpk/";
+    char *repo = "error.guardsarmsiem.com/wpk/";
     char *versions = NULL;
 
     os_strdup("windows", agent->platform);
@@ -459,7 +459,7 @@ void test_wm_agent_upgrade_validate_wpk_version_windows_invalid_repo(void **stat
     task->use_http = true;
     os_strdup("v4.2.0", task->wpk_version);
 
-    expect_string(__wrap_wurl_http_get, url, "http://error.guardsarm.com/wpk/windows/versions");
+    expect_string(__wrap_wurl_http_get, url, "http://error.guardsarmsiem.com/wpk/windows/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
@@ -488,14 +488,14 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_https_ok(void **state)
 
     os_strdup("v3.13.1 4a313b1312c23a213f2e3209fe0909dd\nv4.0.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/linux/x64/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/linux/x64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/linux/x64/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/linux/x64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.0.0_linux_x64.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -517,14 +517,14 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_http_ok(void **state)
 
     os_strdup("v3.13.1 4a313b1312c23a213f2e3209fe0909dd\nv4.0.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "http://packages.guardsarm.com/wpk/linux/x64/versions");
+    expect_string(__wrap_wurl_http_get, url, "http://packages.guardsarmsiem.com/wpk/linux/x64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "http://packages.guardsarm.com/wpk/linux/x64/");
+    assert_string_equal(task->wpk_repository, "http://packages.guardsarmsiem.com/wpk/linux/x64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v3.13.1_linux_x64.wpk");
     assert_string_equal(task->wpk_sha1, "4a313b1312c23a213f2e3209fe0909dd");
 }
@@ -553,7 +553,7 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_invalid_version(void **sta
 {
     wm_agent_info *agent = state[0];
     wm_upgrade_task *task = state[1];
-    char *repo = "packages.guardsarm.com/4.x/wpk";
+    char *repo = "packages.guardsarmsiem.com/4.x/wpk";
     char *versions = NULL;
 
     os_strdup("ubuntu", agent->platform);
@@ -567,7 +567,7 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_invalid_version(void **sta
 
     os_strdup("error\nerror\nerror", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "http://packages.guardsarm.com/4.x/wpk/linux/x64/versions");
+    expect_string(__wrap_wurl_http_get, url, "http://packages.guardsarmsiem.com/4.x/wpk/linux/x64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
@@ -583,7 +583,7 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_invalid_repo(void **state)
 {
     wm_agent_info *agent = state[0];
     wm_upgrade_task *task = state[1];
-    char *repo = "error.guardsarm.com/wpk/";
+    char *repo = "error.guardsarmsiem.com/wpk/";
     char *versions = NULL;
 
     os_strdup("ubuntu", agent->platform);
@@ -595,7 +595,7 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_invalid_repo(void **state)
     task->use_http = true;
     os_strdup("v4.2.0", task->wpk_version);
 
-    expect_string(__wrap_wurl_http_get, url, "http://error.guardsarm.com/wpk/linux/x64/versions");
+    expect_string(__wrap_wurl_http_get, url, "http://error.guardsarmsiem.com/wpk/linux/x64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
@@ -624,14 +624,14 @@ void test_wm_agent_upgrade_validate_wpk_version_ubuntu_old_version(void **state)
 
     os_strdup("v3.3.0 ad87687f6876e876876bb86ad54e57aa", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/wpk/ubuntu/16.04/x64/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/wpk/ubuntu/16.04/x64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/wpk/ubuntu/16.04/x64/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/wpk/ubuntu/16.04/x64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v3.3.0_ubuntu_16.04_x64.wpk");
     assert_string_equal(task->wpk_sha1, "ad87687f6876e876876bb86ad54e57aa");
 }
@@ -652,14 +652,14 @@ void test_wm_agent_upgrade_validate_wpk_version_rhel_old_version(void **state)
 
     os_strdup("v3.3.0 ad87687f6876e876876bb86ad54e57aa", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/wpk/rhel/6/x86/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/wpk/rhel/6/x86/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/wpk/rhel/6/x86/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/wpk/rhel/6/x86/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v3.3.0_rhel_6_x86.wpk");
     assert_string_equal(task->wpk_sha1, "ad87687f6876e876876bb86ad54e57aa");
 }
@@ -668,7 +668,7 @@ void test_wm_agent_upgrade_validate_wpk_version_no_version(void **state)
 {
     wm_agent_info *agent = state[0];
     wm_upgrade_task *task = state[1];
-    char *repo = "packages.guardsarm.com/4.x/wpk";
+    char *repo = "packages.guardsarmsiem.com/4.x/wpk";
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, repo);
 
@@ -695,14 +695,14 @@ void test_wm_agent_upgrade_validate_wpk_version_macos_https_ok(void **state)
 
     os_strdup("v3.13.1 4a313b1312c23a213f2e3209fe0909dd\nv4.0.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/macos/x64/pkg/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/macos/x64/pkg/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/macos/x64/pkg/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/macos/x64/pkg/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.0.0_macos_x64.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -724,14 +724,14 @@ void test_wm_agent_upgrade_validate_wpk_version_macos_http_ok(void **state)
 
     os_strdup("v3.13.1 4a313b1312c23a213f2e3209fe0909dd\nv4.0.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "http://packages.guardsarm.com/wpk/macos/x64/pkg/versions");
+    expect_string(__wrap_wurl_http_get, url, "http://packages.guardsarmsiem.com/wpk/macos/x64/pkg/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "http://packages.guardsarm.com/wpk/macos/x64/pkg/");
+    assert_string_equal(task->wpk_repository, "http://packages.guardsarmsiem.com/wpk/macos/x64/pkg/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v3.13.1_macos_x64.wpk");
     assert_string_equal(task->wpk_sha1, "4a313b1312c23a213f2e3209fe0909dd");
 }
@@ -753,14 +753,14 @@ void test_wm_agent_upgrade_validate_wpk_version_macos_x86_64(void **state)
 
     os_strdup("v4.9.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/macos/pkg/intel64/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/macos/pkg/intel64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/macos/pkg/intel64/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/macos/pkg/intel64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.9.0_macos_intel64.pkg.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -782,14 +782,14 @@ void test_wm_agent_upgrade_validate_wpk_version_macos_aarch64(void **state)
 
     os_strdup("v4.9.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/macos/pkg/arm64/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/macos/pkg/arm64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/macos/pkg/arm64/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/macos/pkg/arm64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.9.0_macos_arm64.pkg.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -810,14 +810,14 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_package_rpm_x86_64(void **
 
     os_strdup("v4.9.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/linux/rpm/x86_64/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/linux/rpm/x86_64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/linux/rpm/x86_64/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/linux/rpm/x86_64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.9.0_linux_x86_64.rpm.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -838,14 +838,14 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_package_rpm_aarch64(void *
 
     os_strdup("v4.9.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/linux/rpm/aarch64/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/linux/rpm/aarch64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/linux/rpm/aarch64/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/linux/rpm/aarch64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.9.0_linux_aarch64.rpm.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -867,14 +867,14 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_package_rpm_rpm(void **sta
 
     os_strdup("v4.9.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/linux/rpm/x86_64/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/linux/rpm/x86_64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/linux/rpm/x86_64/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/linux/rpm/x86_64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.9.0_linux_x86_64.rpm.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -900,14 +900,14 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_package_rpm_deb(void **sta
     expect_string(__wrap__mtwarn, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtwarn, formatted_msg, "(8169): Agent '15' with platform 'centos' won't be upgraded using package 'deb' without the force option. Ignoring...");
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/linux/rpm/x86_64/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/linux/rpm/x86_64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/linux/rpm/x86_64/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/linux/rpm/x86_64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.9.0_linux_x86_64.rpm.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -934,14 +934,14 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_package_rpm_deb_force(void
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8170): Agent '20' with platform 'centos' will be upgraded using package 'deb'");
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/linux/deb/amd64/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/linux/deb/amd64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/linux/deb/amd64/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/linux/deb/amd64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.9.0_linux_amd64.deb.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -963,14 +963,14 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_package_deb_x86_64(void **
 
     os_strdup("v4.9.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/linux/deb/amd64/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/linux/deb/amd64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/linux/deb/amd64/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/linux/deb/amd64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.9.0_linux_amd64.deb.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -992,14 +992,14 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_package_deb_aarch64(void *
 
     os_strdup("v4.9.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/linux/deb/arm64/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/linux/deb/arm64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/linux/deb/arm64/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/linux/deb/arm64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.9.0_linux_arm64.deb.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -1022,14 +1022,14 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_package_deb_deb(void **sta
 
     os_strdup("v4.9.0 231ef123a32d312b4123c21313ee6780", versions);
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/linux/deb/amd64/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/linux/deb/amd64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/linux/deb/amd64/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/linux/deb/amd64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.9.0_linux_amd64.deb.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -1055,14 +1055,14 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_package_deb_rpm(void **sta
     expect_string(__wrap__mtwarn, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtwarn, formatted_msg, "(8169): Agent '0' with platform 'ubuntu' won't be upgraded using package 'rpm' without the force option. Ignoring...");
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/linux/deb/amd64/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/linux/deb/amd64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/linux/deb/amd64/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/linux/deb/amd64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.9.0_linux_amd64.deb.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -1089,14 +1089,14 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_package_deb_rpm_force(void
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8170): Agent '0' with platform 'ubuntu' will be upgraded using package 'rpm'");
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/linux/rpm/x86_64/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/linux/rpm/x86_64/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/linux/rpm/x86_64/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/linux/rpm/x86_64/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.9.0_linux_x86_64.rpm.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -1120,7 +1120,7 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_package_unsupported_x86_64
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SYSTEM_NOT_SUPPORTED);
-    assert_string_equal(task->wpk_repository, "packages.guardsarm.com/4.x/wpk/");
+    assert_string_equal(task->wpk_repository, "packages.guardsarmsiem.com/4.x/wpk/");
     assert_null(task->wpk_file);
     assert_null(task->wpk_sha1);
 }
@@ -1144,7 +1144,7 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_package_unsupported_aarch6
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SYSTEM_NOT_SUPPORTED);
-    assert_string_equal(task->wpk_repository, "packages.guardsarm.com/4.x/wpk/");
+    assert_string_equal(task->wpk_repository, "packages.guardsarmsiem.com/4.x/wpk/");
     assert_null(task->wpk_file);
     assert_null(task->wpk_sha1);
 }
@@ -1169,14 +1169,14 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_package_unsupported_rpm(vo
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8172): Agent '0' with unsupported platform 'unsupported' will be upgraded with package 'rpm'");
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/linux/rpm/i386/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/linux/rpm/i386/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/linux/rpm/i386/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/linux/rpm/i386/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.9.0_linux_i386.rpm.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -1201,14 +1201,14 @@ void test_wm_agent_upgrade_validate_wpk_version_linux_package_unsupported_deb(vo
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8172): Agent '0' with unsupported platform 'unsupported' will be upgraded with package 'deb'");
 
-    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarm.com/4.x/wpk/linux/deb/i386/versions");
+    expect_string(__wrap_wurl_http_get, url, "https://packages.guardsarmsiem.com/4.x/wpk/linux/deb/i386/versions");
     expect_value(__wrap_wurl_http_get, timeout, WM_UPGRADE_DEFAULT_REQUEST_TIMEOUT);
     will_return(__wrap_wurl_http_get, versions);
 
     int ret = wm_agent_upgrade_validate_wpk_version(agent, task, NULL);
 
     assert_int_equal(ret, WM_UPGRADE_SUCCESS);
-    assert_string_equal(task->wpk_repository, "https://packages.guardsarm.com/4.x/wpk/linux/deb/i386/");
+    assert_string_equal(task->wpk_repository, "https://packages.guardsarmsiem.com/4.x/wpk/linux/deb/i386/");
     assert_string_equal(task->wpk_file, "guardsarm_agent_v4.9.0_linux_i386.deb.wpk");
     assert_string_equal(task->wpk_sha1, "231ef123a32d312b4123c21313ee6780");
 }
@@ -1425,7 +1425,7 @@ void test_wm_agent_upgrade_validate_wpk_exist(void **state)
     wm_upgrade_task *task = *state;
     char *sha1 = "74691287f21a312ab2a12e31a23f21a33d242d52";
 
-    os_strdup("https://packages.guardsarm.com/4.x/wpk/windows/", task->wpk_repository);
+    os_strdup("https://packages.guardsarmsiem.com/4.x/wpk/windows/", task->wpk_repository);
     os_strdup("guardsarm_agent_v4.0.0_windows.wpk", task->wpk_file);
     os_strdup(sha1, task->wpk_sha1);
 
@@ -1451,7 +1451,7 @@ void test_wm_agent_upgrade_validate_wpk_exist_diff_sha1(void **state)
     wm_upgrade_task *task = *state;
     char *sha1 = "74691287f21a312ab2a12e31a23f21a33d242d52";
 
-    os_strdup("https://packages.guardsarm.com/4.x/wpk/windows/", task->wpk_repository);
+    os_strdup("https://packages.guardsarmsiem.com/4.x/wpk/windows/", task->wpk_repository);
     os_strdup("guardsarm_agent_v4.0.0_windows.wpk", task->wpk_file);
     os_strdup(sha1, task->wpk_sha1);
 
@@ -1468,9 +1468,9 @@ void test_wm_agent_upgrade_validate_wpk_exist_diff_sha1(void **state)
     will_return(__wrap_fclose, 0);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
-    expect_string(__wrap__mtdebug1, formatted_msg, "(8161): Downloading WPK file from: 'https://packages.guardsarm.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk'");
+    expect_string(__wrap__mtdebug1, formatted_msg, "(8161): Downloading WPK file from: 'https://packages.guardsarmsiem.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk'");
 
-    expect_string(__wrap_wurl_request, url, "https://packages.guardsarm.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
+    expect_string(__wrap_wurl_request, url, "https://packages.guardsarmsiem.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
     expect_string(__wrap_wurl_request, dest, "var/upgrade/guardsarm_agent_v4.0.0_windows.wpk");
     expect_value(__wrap_wurl_request, timeout, WM_UPGRADE_WPK_DOWNLOAD_TIMEOUT);
     will_return(__wrap_wurl_request, 0);
@@ -1490,7 +1490,7 @@ void test_wm_agent_upgrade_validate_wpk_download_retry(void **state)
     wm_upgrade_task *task = *state;
     char *sha1 = "74691287f21a312ab2a12e31a23f21a33d242d52";
 
-    os_strdup("https://packages.guardsarm.com/4.x/wpk/windows/", task->wpk_repository);
+    os_strdup("https://packages.guardsarmsiem.com/4.x/wpk/windows/", task->wpk_repository);
     os_strdup("guardsarm_agent_v4.0.0_windows.wpk", task->wpk_file);
     os_strdup(sha1, task->wpk_sha1);
 
@@ -1499,16 +1499,16 @@ void test_wm_agent_upgrade_validate_wpk_download_retry(void **state)
     will_return(__wrap_wfopen, 0);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
-    expect_string(__wrap__mtdebug1, formatted_msg, "(8161): Downloading WPK file from: 'https://packages.guardsarm.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk'");
+    expect_string(__wrap__mtdebug1, formatted_msg, "(8161): Downloading WPK file from: 'https://packages.guardsarmsiem.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk'");
 
-    expect_string(__wrap_wurl_request, url, "https://packages.guardsarm.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
+    expect_string(__wrap_wurl_request, url, "https://packages.guardsarmsiem.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
     expect_string(__wrap_wurl_request, dest, "var/upgrade/guardsarm_agent_v4.0.0_windows.wpk");
     expect_value(__wrap_wurl_request, timeout, WM_UPGRADE_WPK_DOWNLOAD_TIMEOUT);
     will_return(__wrap_wurl_request, 1);
 
     expect_value(__wrap_sleep, seconds, 1);
 
-    expect_string(__wrap_wurl_request, url, "https://packages.guardsarm.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
+    expect_string(__wrap_wurl_request, url, "https://packages.guardsarmsiem.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
     expect_string(__wrap_wurl_request, dest, "var/upgrade/guardsarm_agent_v4.0.0_windows.wpk");
     expect_value(__wrap_wurl_request, timeout, WM_UPGRADE_WPK_DOWNLOAD_TIMEOUT);
     will_return(__wrap_wurl_request, 0);
@@ -1528,7 +1528,7 @@ void test_wm_agent_upgrade_validate_wpk_download_diff_sha1(void **state)
     wm_upgrade_task *task = *state;
     char *sha1 = "74691287f21a312ab2a12e31a23f21a33d242d52";
 
-    os_strdup("https://packages.guardsarm.com/4.x/wpk/windows/", task->wpk_repository);
+    os_strdup("https://packages.guardsarmsiem.com/4.x/wpk/windows/", task->wpk_repository);
     os_strdup("guardsarm_agent_v4.0.0_windows.wpk", task->wpk_file);
     os_strdup(sha1, task->wpk_sha1);
 
@@ -1537,9 +1537,9 @@ void test_wm_agent_upgrade_validate_wpk_download_diff_sha1(void **state)
     will_return(__wrap_wfopen, 0);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
-    expect_string(__wrap__mtdebug1, formatted_msg, "(8161): Downloading WPK file from: 'https://packages.guardsarm.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk'");
+    expect_string(__wrap__mtdebug1, formatted_msg, "(8161): Downloading WPK file from: 'https://packages.guardsarmsiem.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk'");
 
-    expect_string(__wrap_wurl_request, url, "https://packages.guardsarm.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
+    expect_string(__wrap_wurl_request, url, "https://packages.guardsarmsiem.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
     expect_string(__wrap_wurl_request, dest, "var/upgrade/guardsarm_agent_v4.0.0_windows.wpk");
     expect_value(__wrap_wurl_request, timeout, WM_UPGRADE_WPK_DOWNLOAD_TIMEOUT);
     will_return(__wrap_wurl_request, 0);
@@ -1559,7 +1559,7 @@ void test_wm_agent_upgrade_validate_wpk_download_retry_max(void **state)
     wm_upgrade_task *task = *state;
     char *sha1 = "74691287f21a312ab2a12e31a23f21a33d242d52";
 
-    os_strdup("https://packages.guardsarm.com/4.x/wpk/windows/", task->wpk_repository);
+    os_strdup("https://packages.guardsarmsiem.com/4.x/wpk/windows/", task->wpk_repository);
     os_strdup("guardsarm_agent_v4.0.0_windows.wpk", task->wpk_file);
     os_strdup(sha1, task->wpk_sha1);
 
@@ -1568,37 +1568,37 @@ void test_wm_agent_upgrade_validate_wpk_download_retry_max(void **state)
     will_return(__wrap_wfopen, 0);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
-    expect_string(__wrap__mtdebug1, formatted_msg, "(8161): Downloading WPK file from: 'https://packages.guardsarm.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk'");
+    expect_string(__wrap__mtdebug1, formatted_msg, "(8161): Downloading WPK file from: 'https://packages.guardsarmsiem.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk'");
 
-    expect_string(__wrap_wurl_request, url, "https://packages.guardsarm.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
+    expect_string(__wrap_wurl_request, url, "https://packages.guardsarmsiem.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
     expect_string(__wrap_wurl_request, dest, "var/upgrade/guardsarm_agent_v4.0.0_windows.wpk");
     expect_value(__wrap_wurl_request, timeout, WM_UPGRADE_WPK_DOWNLOAD_TIMEOUT);
     will_return(__wrap_wurl_request, 1);
 
     expect_value(__wrap_sleep, seconds, 1);
 
-    expect_string(__wrap_wurl_request, url, "https://packages.guardsarm.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
+    expect_string(__wrap_wurl_request, url, "https://packages.guardsarmsiem.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
     expect_string(__wrap_wurl_request, dest, "var/upgrade/guardsarm_agent_v4.0.0_windows.wpk");
     expect_value(__wrap_wurl_request, timeout, WM_UPGRADE_WPK_DOWNLOAD_TIMEOUT);
     will_return(__wrap_wurl_request, 1);
 
     expect_value(__wrap_sleep, seconds, 2);
 
-    expect_string(__wrap_wurl_request, url, "https://packages.guardsarm.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
+    expect_string(__wrap_wurl_request, url, "https://packages.guardsarmsiem.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
     expect_string(__wrap_wurl_request, dest, "var/upgrade/guardsarm_agent_v4.0.0_windows.wpk");
     expect_value(__wrap_wurl_request, timeout, WM_UPGRADE_WPK_DOWNLOAD_TIMEOUT);
     will_return(__wrap_wurl_request, 1);
 
     expect_value(__wrap_sleep, seconds, 3);
 
-    expect_string(__wrap_wurl_request, url, "https://packages.guardsarm.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
+    expect_string(__wrap_wurl_request, url, "https://packages.guardsarmsiem.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
     expect_string(__wrap_wurl_request, dest, "var/upgrade/guardsarm_agent_v4.0.0_windows.wpk");
     expect_value(__wrap_wurl_request, timeout, WM_UPGRADE_WPK_DOWNLOAD_TIMEOUT);
     will_return(__wrap_wurl_request, 1);
 
     expect_value(__wrap_sleep, seconds, 4);
 
-    expect_string(__wrap_wurl_request, url, "https://packages.guardsarm.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
+    expect_string(__wrap_wurl_request, url, "https://packages.guardsarmsiem.com/4.x/wpk/windows/guardsarm_agent_v4.0.0_windows.wpk");
     expect_string(__wrap_wurl_request, dest, "var/upgrade/guardsarm_agent_v4.0.0_windows.wpk");
     expect_value(__wrap_wurl_request, timeout, WM_UPGRADE_WPK_DOWNLOAD_TIMEOUT);
     will_return(__wrap_wurl_request, 1);

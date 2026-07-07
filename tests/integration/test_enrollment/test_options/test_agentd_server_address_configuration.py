@@ -52,7 +52,7 @@ os_version:
     - Windows Server 2012
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/client.html#address
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/ossec-conf/client.html#address
 
 tags:
     - agentd

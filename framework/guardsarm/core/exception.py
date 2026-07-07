@@ -53,11 +53,11 @@ class GuardSarmException(Exception):
         # Configuration: 1100 - 1199
         1101: {'message': 'Requested component does not exist'},
         1102: {'message': 'Invalid section',
-               'remediation': f'Please, visit the official documentation (https://documentation.guardsarm.com/'
+               'remediation': f'Please, visit the official documentation (https://documentation.guardsarmsiem.com/'
                               f'{DOCU_VERSION}/user-manual/reference/ossec-conf/index.html) '
                               'to get more information about configuration sections'},
         1103: {'message': 'Invalid field in section',
-               'remediation': f'Please, visit the official documentation (https://documentation.guardsarm.com/'
+               'remediation': f'Please, visit the official documentation (https://documentation.guardsarmsiem.com/'
                               f'{DOCU_VERSION}/user-manual/reference/ossec-conf/index.html) '
                               'to get more information about configuration sections'},
         1104: {'message': 'Invalid type',
@@ -65,7 +65,7 @@ class GuardSarmException(Exception):
         1105: 'Error reading API configuration',
         1106: {'message': 'Requested section not present in configuration',
                'remediation': 'Please, check your configuration file. '
-                              f'You can visit the official documentation (https://documentation.guardsarm.com/'
+                              f'You can visit the official documentation (https://documentation.guardsarmsiem.com/'
                               f'{DOCU_VERSION}/user-manual/reference/ossec-conf/index.html) '
                               'to get more information about configuration sections'},
         1107: 'Internal options file not found',
@@ -84,7 +84,7 @@ class GuardSarmException(Exception):
                'remediation': 'Please, check your configuration file and try again'
                },
         1116: {'message': "Requested component configuration does not exist",
-               'remediation': f"Please, visit the official documentation (https://documentation.guardsarm.com/"
+               'remediation': f"Please, visit the official documentation (https://documentation.guardsarmsiem.com/"
                               f"{DOCU_VERSION}/user-manual/api/reference.html#operation/"
                               f"api.controllers.agents_controller.get_agent_config) to check available component "
                               f"configurations"},
@@ -98,7 +98,7 @@ class GuardSarmException(Exception):
                        f"{MAX_SOCKET_BUFFER_SIZE // 1024} KB"},
         1124: {'message': 'Remote command detected',
                'remediation': f'To solve this issue, please enable the remote commands in the API settings or add an '
-                              f'exception: https://documentation.guardsarm.com/{DOCU_VERSION}/user-manual/api/'
+                              f'exception: https://documentation.guardsarmsiem.com/{DOCU_VERSION}/user-manual/api/'
                               f'configuration.html#remote-commands-localfile-and-wodle-command'},
         1125: {'message': 'Invalid ossec configuration',
                'remediation': 'Please, provide a valid ossec configuration'
@@ -109,11 +109,11 @@ class GuardSarmException(Exception):
         1127: {'message': 'Protected section was modified',
                'remediation': 'To solve this, either revert the changes made to this section or disable the protection '
                               'in the API settings: '
-                              f"https://documentation.guardsarm.com/{DOCU_VERSION}/user-manual/api/configuration.html"},
+                              f"https://documentation.guardsarmsiem.com/{DOCU_VERSION}/user-manual/api/configuration.html"},
         1128: {'message': 'Invalid configuration for the given component'},
         1129: {'message': 'Higher version agents detected',
                'remediation': f'To solve this issue, please enable agents higher versions in the API settings: '
-                              f'https://documentation.guardsarm.com/{DOCU_VERSION}/user-manual/api/'
+                              f'https://documentation.guardsarmsiem.com/{DOCU_VERSION}/user-manual/api/'
                               f'configuration.html#agents'},
 
         # Stats: 1300 - 1399
@@ -155,8 +155,8 @@ class GuardSarmException(Exception):
                },
         1707: {'message': 'Cannot send request, agent is not active',
                'remediation': 'Please, check non-active agents connection and try again. Visit '
-                              f'https://documentation.guardsarm.com/{DOCU_VERSION}/user-manual/registering/index.html and '
-                              f'https://documentation.guardsarm.com/{DOCU_VERSION}/user-manual/agents/agent-connection.'
+                              f'https://documentation.guardsarmsiem.com/{DOCU_VERSION}/user-manual/registering/index.html and '
+                              f'https://documentation.guardsarmsiem.com/{DOCU_VERSION}/user-manual/agents/agent-connection.'
                               f'html to obtain more information on registering and connecting agents'
                },
         1708: {'message': 'There is an agent with the same ID',
@@ -172,7 +172,7 @@ class GuardSarmException(Exception):
                'remediation': 'Please, use another group ID'
                },
         1712: {'message': 'Default group is not deletable',
-               'remediation': f'Please, visit the official documentation (https://documentation.guardsarm.com/'
+               'remediation': f'Please, visit the official documentation (https://documentation.guardsarmsiem.com/'
                               f'{DOCU_VERSION}/user-manual/agents/grouping-agents.html)'
                               'to get more information'
                },
@@ -195,18 +195,18 @@ class GuardSarmException(Exception):
                'remediation': 'Please, use `GET /agents/groups/:group_id/files` to get all available group files'
                },
         1728: {'message': 'Invalid node type',
-               'remediation': f'Valid types are `master` and `worker`. Please, visit https://documentation.guardsarm.com/'
+               'remediation': f'Valid types are `master` and `worker`. Please, visit https://documentation.guardsarmsiem.com/'
                               f'{DOCU_VERSION}/user-manual/configuring-cluster/index.html '
                               'to get more information about cluster configuration'},
         1730: {'message': 'Node does not exist',
                'remediation': 'Make sure the name is correct and that the node is up. You can check it using '
-                              f'`cluster_control -l` (https://documentation.guardsarm.com/{DOCU_VERSION}/user-manual/'
+                              f'`cluster_control -l` (https://documentation.guardsarmsiem.com/{DOCU_VERSION}/user-manual/'
                               f'reference/tools/cluster_control.html#get-connected-nodes)'},
         1731: {'message': 'Agent is not eligible for the action to be performed',
                'remediation': 'Please, make sure the agent meets the requirements.'},
         1734: {'message': 'Error removing agent from group',
                'remediation': f'Agent does not belong to specified group, to assign the agent to a group follow: '
-                              f'https://documentation.guardsarm.com/{DOCU_VERSION}/user-manual/agents/grouping-agents.html'
+                              f'https://documentation.guardsarmsiem.com/{DOCU_VERSION}/user-manual/agents/grouping-agents.html'
                },
         1735: {'message': 'Agent version is not compatible with this feature',
                'remediation': 'Please update the agent, in case the problem persists contact us at: https://github.com'
@@ -285,12 +285,12 @@ class GuardSarmException(Exception):
         3002: {'message': 'Error creating PID file'},
         3003: {'message': 'Error during file handling'},
         3004: {'message': 'Error in cluster configuration',
-               'remediation': f'Please, visit the official documentation (https://documentation.guardsarm.com/'
+               'remediation': f'Please, visit the official documentation (https://documentation.guardsarmsiem.com/'
                               f'{DOCU_VERSION}/user-manual/configuring-cluster/index.html)'
                               ' to get more information about how to configure a cluster'},
         3005: 'Error reading cluster JSON file',
         3006: {'message': 'Error reading cluster configuration',
-               'remediation': f'Please, visit the official documentation (https://documentation.guardsarm.com/'
+               'remediation': f'Please, visit the official documentation (https://documentation.guardsarmsiem.com/'
                               f'{DOCU_VERSION}/user-manual/configuring-cluster/index.html)'
                               ' to get more information about how to configure a cluster'},
         3007: 'Client.keys file received in master node',
@@ -310,26 +310,26 @@ class GuardSarmException(Exception):
         3024: "Length of command exceeds limit defined in guardsarm.cluster.common.Handler.cmd_len.",
         3025: {'message': "Could not decrypt message",
                'remediation': "Check the cluster key is correct in the worker's "
-                              f"[guardsarm-manager.conf](https://documentation.guardsarm.com/{DOCU_VERSION}/user-manual/reference/"
+                              f"[guardsarm-manager.conf](https://documentation.guardsarmsiem.com/{DOCU_VERSION}/user-manual/reference/"
                               f"ossec-conf/cluster.html#key)"
                               ", ensure it is the same that the master's."},
         3026: "Error sending request: Memory error. Request chunk size divided by 2.",
         3027: "Unknown received task name",
         3028: {'message': "Worker node ID already exists",
-               'remediation': f"Check and fix [worker names](https://documentation.guardsarm.com/{DOCU_VERSION}/"
+               'remediation': f"Check and fix [worker names](https://documentation.guardsarmsiem.com/{DOCU_VERSION}/"
                               f"user-manual/reference/ossec-conf/cluster.html#node-name)"
                               " and restart the `guardsarm-manager` service."},
         3029: {"message": "Connected worker with same name as the master",
-               "remediation": f"Check and fix the [worker name](https://documentation.guardsarm.com/{DOCU_VERSION}/"
+               "remediation": f"Check and fix the [worker name](https://documentation.guardsarmsiem.com/{DOCU_VERSION}/"
                               f"user-manual/reference/ossec-conf/cluster.html#node-name)"
                               " and restart the `guardsarm-manager` service in the node"},
         3030: {'message': 'Worker does not belong to the same cluster',
-               'remediation': f"Change the [cluster name](https://documentation.guardsarm.com/{DOCU_VERSION}/"
+               'remediation': f"Change the [cluster name](https://documentation.guardsarmsiem.com/{DOCU_VERSION}/"
                               f"user-manual/reference/ossec-conf/cluster.html#name)"
                               " in the worker configuration to match the master's and restart the `guardsarm-manager` "
                               "service"},
         3031: {'message': "Worker and master versions are not the same",
-               'remediation': f"[Update](https://documentation.guardsarm.com/{DOCU_VERSION}/upgrade-guide/index.html)"
+               'remediation': f"[Update](https://documentation.guardsarmsiem.com/{DOCU_VERSION}/upgrade-guide/index.html)"
                               " master and workers to the same version."},
         3032: "Could not forward DAPI request. Connection not available.",
         3034: "Error sending file. File not found.",
@@ -353,7 +353,7 @@ class GuardSarmException(Exception):
         3051: "Too many concurrent divided messages",
         3052: "Invalid cluster file parameter",
         3060: {'message': "Invalid node name format",
-               'remediation': f"Check and fix [worker names](https://documentation.guardsarm.com/{DOCU_VERSION}/"
+               'remediation': f"Check and fix [worker names](https://documentation.guardsarmsiem.com/{DOCU_VERSION}/"
                               f"user-manual/reference/ossec-conf/cluster.html#node-name)"
                               " and restart the `guardsarm-manager` service."},
 
@@ -362,7 +362,7 @@ class GuardSarmException(Exception):
         4000: {'message': "Permission denied",
                'remediation': "Please, make sure you have permissions to execute the current request. "
                               f"For more information on how to set up permissions, please visit https://documentation."
-                              f"guardsarm.com/{DOCU_VERSION}/user-manual/api/rbac/configuration.html"},
+                              f"guardsarmsiem.com/{DOCU_VERSION}/user-manual/api/rbac/configuration.html"},
         4001: {'message': 'The body of the request is empty, you must specify what you want to modify'},
         4002: {'message': 'The specified role does not exist',
                'remediation': 'Please, create the specified role with the endpoint POST /security/roles'},
@@ -388,7 +388,7 @@ class GuardSarmException(Exception):
         4018: {'message': 'Level cannot be a negative number'},
         4019: {'message': 'Invalid resource specified',
                'remediation': f'Please, check the current RBAC resources, for more information please visit https:/'
-                              f'/documentation.guardsarm.com/{DOCU_VERSION}/user-manual/api/rbac/configuration.html'},
+                              f'/documentation.guardsarmsiem.com/{DOCU_VERSION}/user-manual/api/rbac/configuration.html'},
         4020: {'message': 'Invalid endpoint specified',
                'remediation': 'Valid endpoints are: '},
         4021: 'Error reading security configuration',
@@ -402,7 +402,7 @@ class GuardSarmException(Exception):
         4500: {'message': 'The specified resources are invalid',
                'remediation': 'Please, make sure permissions are properly defined, '
                               f'for more information on setting up permissions please visit https://documentation.'
-                              f'guardsarm.com/{DOCU_VERSION}/user-manual/api/rbac/configuration.html'},
+                              f'guardsarmsiem.com/{DOCU_VERSION}/user-manual/api/rbac/configuration.html'},
 
         # User management
         5000: {'message': 'The user could not be created',
@@ -432,14 +432,14 @@ class GuardSarmException(Exception):
                           'The current IP has been blocked due to a high number of login attempts'},
         6001: {'message': 'Maximum number of requests per minute reached',
                'remediation': f'This limit can be changed in api.yaml file. More information here: https:/'
-                              f'/documentation.guardsarm.com/{DOCU_VERSION}/user-manual/api/configuration.html#'
+                              f'/documentation.guardsarmsiem.com/{DOCU_VERSION}/user-manual/api/configuration.html#'
                               f'configuration-file'},
         6002: {'message': 'The body type is not the one specified in the content-type'},
         6003: {'message': 'Error trying to load the JWT secret',
                'remediation': 'Make sure you have the right permissions: GUARDSARM_PATH/api/configuration/security/'
                               'jwt_secret'},
         6004: {'message': 'The current user does not have authentication enabled through authorization context',
-               'remediation': f'You can enable it using the following endpoint: https://documentation.guardsarm.com/'
+               'remediation': f'You can enable it using the following endpoint: https://documentation.guardsarmsiem.com/'
                               f'{DOCU_VERSION}/user-manual/api/reference.html#operation/api.controllers.'
                               f'security_controller.edit_run_as'},
     }

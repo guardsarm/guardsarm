@@ -62,7 +62,7 @@ Required action:
   2. Then upgrade to 5.0.0
 
 For more information, visit:
-  https://documentation.guardsarm.com/current/upgrade-guide/
+  https://documentation.guardsarmsiem.com/current/upgrade-guide/
 ═════════════════════════════════════════════════════════════════
 EOF
                 echo -n "1" > ${DIR}/var/upgrade/upgrade_result

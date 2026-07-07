@@ -13,8 +13,8 @@ from connexion.testing import TestContext
 from api.controllers.util import JSON_CONTENT_TYPE
 from api.controllers.test.utils import CustomAffectedItems
 
-with patch('guardsarm.common.guardsarm_uid'):
-    with patch('guardsarm.common.guardsarm_gid'):
+with patch('guardsarmsiem.common.guardsarm_uid'):
+    with patch('guardsarmsiem.common.guardsarm_gid'):
         sys.modules['guardsarm.rbac.orm'] = MagicMock()
         import guardsarm.rbac.decorators
         from api.controllers.security_controller import (

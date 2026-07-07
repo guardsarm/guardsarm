@@ -150,7 +150,7 @@ MAX_GROUPS_PER_MULTIGROUP = 128
 
 # ============================================= GuardSarm constants - Version ==============================================
 # Agent upgrading variables.
-WPK_REPO_URL_4_X = "packages.guardsarm.com/4.x/wpk/"
+WPK_REPO_URL_4_X = "packages.guardsarmsiem.com/4.x/wpk/"
 # Agent component stats required version.
 AGENT_COMPONENT_STATS_REQUIRED_VERSION = {'logcollector': 'v4.2.0', 'agent': 'v4.2.0'}
 # Version variables (legacy, required, etc).

@@ -16,7 +16,7 @@ assignees: ''
 Whenever possible, issues should be created for bug reporting and feature requests.
 For questions related to the user experience, please refer:
 - GuardSarm mailing list: https://groups.google.com/forum/#!forum/guardsarm
-- Join GuardSarm on Slack: https://guardsarm.com/community/join-us-on-slack
+- Join GuardSarm on Slack: https://guardsarmsiem.com/community/join-us-on-slack
 -->
 
 ## Checks

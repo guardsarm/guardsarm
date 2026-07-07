@@ -111,7 +111,7 @@ int config_dir(char *name, char *dir, char *vfile)
     printf("%s: You may have it configured in a format different\n"
            "               than W3C Extended or you just don't have today's\n"
            "               log available.\n", name);
-    printf("%s: https://documentation.guardsarm.com\n\n", name);
+    printf("%s: https://documentation.guardsarmsiem.com\n\n", name);
 
     /* Add IIS config */
     fp = wfopen(GUARDSARMCONF, "a");
@@ -209,7 +209,7 @@ int main(int argc, char **argv)
 
     printf("%s: Looking for IIS log files to monitor.\r\n",
            argv[0]);
-    printf("%s: For more information: https://documentation.guardsarm.com\r\n",
+    printf("%s: For more information: https://documentation.guardsarmsiem.com\r\n",
            argv[0]);
     printf("\r\n");
 

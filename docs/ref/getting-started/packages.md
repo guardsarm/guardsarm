@@ -153,7 +153,7 @@ GuardSarm packages are available in different repositories depending on the rele
 | **Nightly**        | `https://packages-staging.xdrsiem.guardsarm.info/nightly/<VERSION>/`          | Public (HTTPS) | `<version>-latest`  |
 | **Nightly Backup** | `https://packages-staging.xdrsiem.guardsarm.info/nightly-backup/<TIMESTAMP>/` | Public (HTTPS) | `<version>-latest`  |
 | **Pre-release**    | `https://packages-staging.xdrsiem.guardsarm.info/pre-release/5.x/`            | Public (HTTPS) | `<version>-<stage>` |
-| **Production**     | `https://packages.guardsarm.com/production/5.x/`                              | Public (HTTPS) | `<version>`         |
+| **Production**     | `https://packages.guardsarmsiem.com/production/5.x/`                              | Public (HTTPS) | `<version>`         |
 
 ### Package paths by format
 
@@ -195,8 +195,8 @@ curl -O https://packages-staging.xdrsiem.guardsarm.info/pre-release/5.x/yum/guar
 
 **Production:**
 ```bash
-curl -O https://packages.guardsarm.com/production/5.x/apt/pool/main/w/guardsarm-manager/guardsarm-manager_5.0.0_amd64.deb
-curl -O https://packages.guardsarm.com/production/5.x/yum/guardsarm-agent-5.0.0.x86_64.rpm
+curl -O https://packages.guardsarmsiem.com/production/5.x/apt/pool/main/w/guardsarm-manager/guardsarm-manager_5.0.0_amd64.deb
+curl -O https://packages.guardsarmsiem.com/production/5.x/yum/guardsarm-agent-5.0.0.x86_64.rpm
 ```
 
 ---

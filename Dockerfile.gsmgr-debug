@@ -14,7 +14,7 @@ WORKDIR /build/guardsarm/src
 
 # A fork uses upstream build artifacts until it hosts its own mirrors.
 RUN sed -i \
-      -e 's#https://packages.guardsarm.com/deps/#https://packages.wazuh.com/deps/#g' \
+      -e 's#https://packages.guardsarmsiem.com/deps/#https://packages.wazuh.com/deps/#g' \
       -e 's#github.com/guardsarm/guardsarm-http-request#github.com/wazuh/wazuh-http-request#g' \
       -e 's#guardsarm/guardsarm-indexer-plugins#wazuh/wazuh-indexer-plugins#g' \
       Makefile

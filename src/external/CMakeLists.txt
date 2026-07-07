@@ -167,7 +167,7 @@ target_include_directories(ext_zlib INTERFACE ${EXTERNAL_DIR}/zlib)
 # The agent never links minizip — only the server does (engine,
 # content_manager). It is still built for the agent target because
 # libminizip.a lives inside the zlib tree (zlib/contrib/minizip/) and the
-# precompiled zlib dependency published on packages.guardsarm.com already
+# precompiled zlib dependency published on packages.guardsarmsiem.com already
 # includes it. Building it here too keeps the agent's external tree aligned
 # with that shared zlib tarball instead of diverging from it. Windows
 # genuinely never needs it.

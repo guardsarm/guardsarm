@@ -37,8 +37,8 @@ os_version:
     - Windows Server 2012
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/capabilities/log-data-collection/index.html
-    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/localfile.html#reconnect-time
+    - https://documentation.guardsarmsiem.com/current/user-manual/capabilities/log-data-collection/index.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/ossec-conf/localfile.html#reconnect-time
 
 tags:
     - logcollector_configuration

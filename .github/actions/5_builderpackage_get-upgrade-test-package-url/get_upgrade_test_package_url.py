@@ -63,7 +63,7 @@ def get_release_package_url(component: str, os: str, system: str,
             release_architecture = _get_release_architecture(system,
                                                              architecture)
             url = (
-                f"https://packages.guardsarm.com/{guardsarm_major}.x/{system_url}"
+                f"https://packages.guardsarmsiem.com/{guardsarm_major}.x/{system_url}"
                 f"/guardsarm-{component}-/{guardsarm_version}-1{architecture_separator}"
                 f"{release_architecture}.{system}"
             )
@@ -77,19 +77,19 @@ def get_release_package_url(component: str, os: str, system: str,
                     release_architecture = _get_release_architecture(system,
                                                              architecture)
                     url = (
-                        f"https://packages.guardsarm.com/{guardsarm_major}.x/{system_url}"
+                        f"https://packages.guardsarmsiem.com/{guardsarm_major}.x/{system_url}"
                         f"/guardsarm-{component}{version_separator}{guardsarm_version}-1"
                         f"{architecture_separator}{release_architecture}.{system}"
                     )
                 case "windows":
                     url = (
-                        f"https://packages.guardsarm.com/{guardsarm_major}.x/windows/"
+                        f"https://packages.guardsarmsiem.com/{guardsarm_major}.x/windows/"
                         f"guardsarm-{component}-{guardsarm_version}-1.msi"
                     )
                 case "macos":
                     architecture = "arm64" if architecture == "arm64" else "intel64"
                     url = (
-                        f"https://packages.guardsarm.com/{guardsarm_major}.x/macos/"
+                        f"https://packages.guardsarmsiem.com/{guardsarm_major}.x/macos/"
                         f"guardsarm-{component}-{guardsarm_version}-1.{architecture}.pkg"
                     )
         case _:

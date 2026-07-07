@@ -21,7 +21,7 @@ It is required to use -k or --aws-wpk-key, --aws-wpk-cert parameters
     --tag <name>                   [Optional] Tag to use with the docker image.
     -h,   --help                   Show this help.
 
-Please, visit the following link for the full WPK packages building documentation: [Generate GuardSarm WPK packages automatically.](https://documentation.guardsarm.com/current/development/packaging/generate-wpk-package.html)
+Please, visit the following link for the full WPK packages building documentation: [Generate GuardSarm WPK packages automatically.](https://documentation.guardsarmsiem.com/current/development/packaging/generate-wpk-package.html)
 
 ## Workflows
 
@@ -59,7 +59,7 @@ It is responsible for generating the WPKs for each system using the generate_wpk
 
 ## Contribute
 
-If you want to contribute to our project please don't hesitate to send a pull request. You can also join our users [mailing list](https://groups.google.com/d/forum/guardsarm) by sending an email to [guardsarm+subscribe@googlegroups.com](mailto:guardsarm+subscribe@googlegroups.com)or join to our Slack channel by filling this [form](https://guardsarm.com/community/join-us-on-slack/) to ask questions and participate in discussions.
+If you want to contribute to our project please don't hesitate to send a pull request. You can also join our users [mailing list](https://groups.google.com/d/forum/guardsarm) by sending an email to [guardsarm+subscribe@googlegroups.com](mailto:guardsarm+subscribe@googlegroups.com)or join to our Slack channel by filling this [form](https://guardsarmsiem.com/community/join-us-on-slack/) to ask questions and participate in discussions.
 
 ## License and copyright
 

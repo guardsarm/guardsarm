@@ -126,7 +126,7 @@ jobs:
       - name: Download released .msi
         run: |
           mkdir C:\win-agent-released
-          python -m wget https://packages.guardsarm.com/4.x/windows/guardsarm-agent-${{ matrix.guardsarm_version }}.msi -o C:\win-agent-released
+          python -m wget https://packages.guardsarmsiem.com/4.x/windows/guardsarm-agent-${{ matrix.guardsarm_version }}.msi -o C:\win-agent-released
       - name: Download base folder
         uses: actions/download-artifact@v4
         with:

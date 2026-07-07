@@ -25,7 +25,7 @@ DB_DATE_FORMAT = "%Y%m%d"
 DEFAULT_DATABASE_NAME = "s3_cloudtrail"
 LATE_ARRIVAL_LOG_TABLES = {"cloudtrail", "alb", "clb", "nlb"}
 
-RETRY_CONFIGURATION_URL = 'https://documentation.guardsarm.com/current/amazon/services/prerequisites/' \
+RETRY_CONFIGURATION_URL = 'https://documentation.guardsarmsiem.com/current/amazon/services/prerequisites/' \
                           'considerations.html#Connection-configuration-for-retries'
 
 INVALID_CREDENTIALS_ERROR_CODE = "SignatureDoesNotMatch"

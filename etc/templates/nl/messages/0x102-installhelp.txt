@@ -19,4 +19,4 @@
     (ideaal voor webservers en database servers)
 
   - Meer informatie vindt u op:
-    https://documentation.guardsarm.com
+    https://documentation.guardsarmsiem.com

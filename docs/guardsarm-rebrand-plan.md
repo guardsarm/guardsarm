@@ -54,7 +54,7 @@ paths, users, daemons, ports, index names, or protocol constants.
 | Alter API contract (routes, envelope, `JWT_ISSUER`, RBAC, error codes) → breaks clients, invalidates JWTs | critical | Branding layer never touches API identifiers; future change requires /v2 |
 | Strip/replace copyright / GPLv2 / OSSEC attribution → license violation | high | Category E; guard checks LICENSE + header; append-only via NOTICE |
 | Mixed-version/name cluster fails to form | high | Cluster identifiers frozen; cross-version test before any R2 |
-| URLs cut over before infra exists → dead links | medium | Isolated; provided guardsarm.com targets documented as requiring provisioning |
+| URLs cut over before infra exists → dead links | medium | Isolated; provided guardsarmsiem.com targets documented as requiring provisioning |
 | CI breakage from `ghcr.io/wazuh`/S3/workflow renames | high | Frozen R1; external-infra migration |
 | SCA/AR IDs renamed → breaks compliance history/rule refs | high | Frozen (category D) |
 | Vendored `http-request` submodule drift | medium | `.gitmodules` untouched; pin commit |

@@ -46,7 +46,7 @@ If run without arguments, the script will **compile** the project with Coverity 
   Required for `--build-image` and `--upload`.
 * `EMAIL`
   Email address associated with the Coverity account.
-  Default: `devel@guardsarm.com`.
+  Default: `devel@guardsarmsiem.com`.
 
 ### Build output
 

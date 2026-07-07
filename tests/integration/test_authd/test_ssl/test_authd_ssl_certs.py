@@ -37,8 +37,8 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/reference/daemons/guardsarm-manager-authd.html
-    - https://documentation.guardsarm.com/current/user-manual/registering/host-verification-registration.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/daemons/guardsarm-manager-authd.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/registering/host-verification-registration.html
 
 tags:
     - enrollment

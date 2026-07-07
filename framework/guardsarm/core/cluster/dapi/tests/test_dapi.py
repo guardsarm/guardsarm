@@ -20,8 +20,8 @@ from guardsarm.core import common
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../../../../../api'))
 
-with patch('guardsarm.common.guardsarm_uid'):
-    with patch('guardsarm.common.guardsarm_gid'):
+with patch('guardsarmsiem.common.guardsarm_uid'):
+    with patch('guardsarmsiem.common.guardsarm_gid'):
         sys.modules['guardsarm.rbac.orm'] = MagicMock()
         import guardsarm.rbac.decorators
 

@@ -44,9 +44,9 @@ os_version:
 
 references:
     - https://man7.org/linux/man-pages/man8/auditd.8.html
-    - https://documentation.guardsarm.com/current/user-manual/capabilities/auditing-whodata/who-linux.html
-    - https://documentation.guardsarm.com/current/user-manual/capabilities/file-integrity/index.html
-    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/syscheck.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/capabilities/auditing-whodata/who-linux.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/capabilities/file-integrity/index.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/ossec-conf/syscheck.html
 
 pytest_args:
     - fim_mode:

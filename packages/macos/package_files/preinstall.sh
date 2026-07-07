@@ -88,7 +88,7 @@ Upgrade to GuardSarm 5.0.0 is only supported from version 4.14.0 or later."
         echo "  2. Then upgrade to 5.0.0"
         echo ""
         echo "For more information, visit:"
-        echo "  https://documentation.guardsarm.com/current/upgrade-guide/"
+        echo "  https://documentation.guardsarmsiem.com/current/upgrade-guide/"
         echo "═════════════════════════════════════════════════════════════════"
         echo -n "1" > ${DIR}/var/upgrade/upgrade_result
         exit 1

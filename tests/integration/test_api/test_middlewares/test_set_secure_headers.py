@@ -49,7 +49,7 @@ os_version:
     - Red Hat 6
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/api/getting-started.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/api/getting-started.html
 
 tags:
     - api

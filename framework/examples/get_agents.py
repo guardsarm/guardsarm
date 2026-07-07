@@ -2,7 +2,7 @@
 
 ###
 #  Copyright (C) 2015, Wazuh Inc.All rights reserved.
-#  GuardSarm.com
+#  GuardSarmsiem.com
 #
 #  This program is free software; you can redistribute it
 #  and/or modify it under the terms of the GNU General Public

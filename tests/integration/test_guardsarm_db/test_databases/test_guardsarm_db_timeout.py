@@ -27,7 +27,7 @@ os_platform:
     - linux
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/reference/daemons/guardsarm-manager-db.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/daemons/guardsarm-manager-db.html
 
 tags:
     - guardsarm_db

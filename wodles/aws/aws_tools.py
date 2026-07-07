@@ -17,10 +17,10 @@ import sys
 import re
 
 DEFAULT_AWS_CONFIG_PATH = path.join(path.expanduser('~'), '.aws', 'config')
-CREDENTIALS_URL = 'https://documentation.guardsarm.com/current/amazon/services/prerequisites/credentials.html'
+CREDENTIALS_URL = 'https://documentation.guardsarmsiem.com/current/amazon/services/prerequisites/credentials.html'
 DEPRECATED_MESSAGE = 'The {name} authentication parameter was deprecated in {release}. ' \
                      'Please use another authentication method instead. Check {url} for more information.'
-SECURITY_LAKE_IAM_ROLE_AUTHENTICATION_URL = 'https://documentation.guardsarm.com/current/cloud-security/amazon/services/' \
+SECURITY_LAKE_IAM_ROLE_AUTHENTICATION_URL = 'https://documentation.guardsarmsiem.com/current/cloud-security/amazon/services/' \
                                         'supported-services/security-lake.html#configuring-an-iam-role'
 
 ALL_REGIONS = (

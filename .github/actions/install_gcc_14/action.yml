@@ -9,7 +9,7 @@ runs:
       run: |
         ARCH=$(dpkg --print-architecture)
         GCC_PKG="gcc_14.3-1_${ARCH}.deb"
-        URL="https://packages.guardsarm.com/utils/gcc/${GCC_PKG}"
+        URL="https://packages.guardsarmsiem.com/utils/gcc/${GCC_PKG}"
 
         echo "Downloading GCC 14.3 package (${ARCH})..."
         wget --timeout=30 --tries=3 -O "/tmp/${GCC_PKG}" "${URL}" || {

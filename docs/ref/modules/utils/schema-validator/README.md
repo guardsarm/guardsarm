@@ -228,5 +228,5 @@ ctest -L schema_validator -V
 ## References
 
 - [GuardSarm-indexer Mapping Documentation](https://www.elastic.co/guide/en/GuardSarm-indexer/reference/current/mapping.html)
-- [GuardSarm Indexer Templates](https://documentation.guardsarm.com/current/user-manual/guardsarm-indexer/index.html)
+- [GuardSarm Indexer Templates](https://documentation.guardsarmsiem.com/current/user-manual/guardsarm-indexer/index.html)
 - [JSON Schema Validation](https://json-schema.org/)

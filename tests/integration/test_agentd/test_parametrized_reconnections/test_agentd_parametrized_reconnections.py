@@ -50,7 +50,7 @@ os_version:
     - Windows Server 2016
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/registering/index.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/registering/index.html
 
 tags:
     - enrollment

@@ -10,7 +10,7 @@ For configuration options see [Agent Upgrade Configuration](../../configuration/
 
 A WPK is a gzip-compressed tar archive containing the GuardSarm agent binaries and an installer script (`pkg_install.sh`) for a specific platform and version. WPK files are identified by a SHA-1 checksum distributed alongside them from the WPK repository.
 
-Default repository: `packages.guardsarm.com/<major>.x/wpk/` (auto-derived from the manager version). A custom URL can be set with `wpk_repository` in the configuration.
+Default repository: `packages.guardsarmsiem.com/<major>.x/wpk/` (auto-derived from the manager version). A custom URL can be set with `wpk_repository` in the configuration.
 
 ## Upgrade flow
 

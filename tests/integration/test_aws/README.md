@@ -64,7 +64,7 @@ For a step-by-step example guide using linux go to the [test setup section](#lin
 
 - **Credentials**:
     Set the credentials at `$HOME/.aws/credentials` (being `HOME` the home directory of the user who runs the tests, 
- more information [here](https://documentation.guardsarm.com/current/amazon/services/prerequisites/credentials.html#profiles) with the content:
+ more information [here](https://documentation.guardsarmsiem.com/current/amazon/services/prerequisites/credentials.html#profiles) with the content:
 
 ```ini
 [default]
@@ -77,7 +77,7 @@ aws_secret_access_key = <secret-key-value>
 ```
 
 Set the configurations at `$HOME/.aws/config` (being `HOME` the home directory of the user who runs the tests, 
- more information [here](https://documentation.guardsarm.com/current/amazon/services/prerequisites/credentials.html#profiles) with the content:
+ more information [here](https://documentation.guardsarmsiem.com/current/amazon/services/prerequisites/credentials.html#profiles) with the content:
 
  ```ini
 [default]
@@ -154,7 +154,7 @@ You can run these tests on a manager or an agent. In case you are using an agent
 the correct version (GuardSarm branch).
 
 _We are skipping GuardSarm installation steps. For further information,
-check [GuardSarm documentation](https://documentation.guardsarm.com/current/installation-guide/index.html)._
+check [GuardSarm documentation](https://documentation.guardsarmsiem.com/current/installation-guide/index.html)._
 
 ### Linux
 

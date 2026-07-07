@@ -270,7 +270,7 @@ paths:
                           description: Default filter to allow all events (for default ruleset)
                           author:
                             name: Wazuh, Inc.
-                            url: https://guardsarm.com
+                            url: https://guardsarmsiem.com
                             date: 2022/11/08
                         check: $host.os.platform == 'ubuntu'
                         type: pre-filter

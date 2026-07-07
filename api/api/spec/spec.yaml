@@ -363,7 +363,7 @@ components:
             detail: "Permission denied: Resource type: *:*"
             remediation: "Please, make sure you have permissions to execute the current request. For more information
             on how to set up permissions, please visit
-            https://documentation.guardsarm.com/5.0/user-manual/api/rbac/configuration.html"
+            https://documentation.guardsarmsiem.com/5.0/user-manual/api/rbac/configuration.html"
             error: 4000
             dapi_errors:
               unknown-node:
@@ -430,7 +430,7 @@ components:
             title: "GuardSarm Error"
             detail: "Maximum number of requests per minute reached"
             remediation: "This limit can be changed in api.yaml file. More information here:
-            https://documentation.guardsarm.com/5.0/user-manual/api/security/configuration.html"
+            https://documentation.guardsarmsiem.com/5.0/user-manual/api/security/configuration.html"
             code: 6001
 
     ResourceNotFoundResponse:
@@ -443,7 +443,7 @@ components:
             title: "Resource Not Found"
             detail: "The group does not exist"
             remediation: "Please, use `GET /groups` to find all available groups:
-            https://documentation.guardsarm.com/5.0/user-manual/api/rbac/configuration.html"
+            https://documentation.guardsarmsiem.com/5.0/user-manual/api/rbac/configuration.html"
             code: 1710
             dapi_errors:
               unknown-node:
@@ -5605,8 +5605,8 @@ paths:
                           code: 1707
                           message: "Cannot send request, agent is not active"
                           remediation: "Please, check non-active agents connection and try again.
-                           Visit https://documentation.guardsarm.com/5.0/user-manual/registering/index.html
-                           and https://documentation.guardsarm.com/5.0/user-manual/agents/agent-connection.html
+                           Visit https://documentation.guardsarmsiem.com/5.0/user-manual/registering/index.html
+                           and https://documentation.guardsarmsiem.com/5.0/user-manual/agents/agent-connection.html
                            to obtain more information on registering and connecting agents"
                         id:
                           - '009'
@@ -5716,8 +5716,8 @@ paths:
                           code: 1707
                           message: "Cannot send request, agent is not active"
                           remediation: "Please, check non-active agents connection and try again.
-                           Visit https://documentation.guardsarm.com/5.0/user-manual/registering/index.html
-                           and https://documentation.guardsarm.com/5.0/user-manual/agents/agent-connection.html
+                           Visit https://documentation.guardsarmsiem.com/5.0/user-manual/registering/index.html
+                           and https://documentation.guardsarmsiem.com/5.0/user-manual/agents/agent-connection.html
                            to obtain more information on registering and connecting agents"
                         id:
                           - '009'
@@ -10108,4 +10108,4 @@ paths:
 
 externalDocs:
   description: "Learn more about the GuardSarm API"
-  url: 'https://documentation.guardsarm.com/5.0/user-manual/api/index.html'
+  url: 'https://documentation.guardsarmsiem.com/5.0/user-manual/api/index.html'

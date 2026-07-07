@@ -45,7 +45,7 @@ os_version:
     - Red Hat 6
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/api/configuration.html#logs
+    - https://documentation.guardsarmsiem.com/current/user-manual/api/configuration.html#logs
 
 tags:
     - api

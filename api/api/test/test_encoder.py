@@ -8,8 +8,8 @@ from unittest.mock import patch
 
 import pytest
 
-with patch('guardsarm.common.guardsarm_uid'):
-    with patch('guardsarm.common.guardsarm_gid'):
+with patch('guardsarmsiem.common.guardsarm_uid'):
+    with patch('guardsarmsiem.common.guardsarm_gid'):
         from api.encoder import prettify, dumps
         from guardsarm.core.results import GuardSarmResult
 

@@ -50,10 +50,10 @@ os_version:
     - Windows Server 2016
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/capabilities/log-data-collection/index.html
-    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/localfile.html#command
-    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/localfile.html#alias
-    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/localfile.html#log-format
+    - https://documentation.guardsarmsiem.com/current/user-manual/capabilities/log-data-collection/index.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/ossec-conf/localfile.html#command
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/ossec-conf/localfile.html#alias
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/ossec-conf/localfile.html#log-format
 
 tags:
     - logcollector_configuration

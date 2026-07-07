@@ -18,7 +18,7 @@ runs:
         run: |
           set -euo pipefail
 
-          GUARDSARM_CLANG_FORMAT_URL="https://packages.guardsarm.com/utils/clang-format/clang-format.tar.gz"
+          GUARDSARM_CLANG_FORMAT_URL="https://packages.guardsarmsiem.com/utils/clang-format/clang-format.tar.gz"
           RUNNER_TEMP_DIR="${RUNNER_TEMP:-/tmp}"
           TOOL_ROOT="${RUNNER_TEMP_DIR}/guardsarm-clang-format"
           TOOL_BIN="${TOOL_ROOT}/bin/clang-format"

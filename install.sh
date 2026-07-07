@@ -637,7 +637,7 @@ AddPFTable()
     echo ""
     echo "   - ${pfmessage}:"
     echo "     ${moreinfo}"
-    echo "     https://documentation.guardsarm.com"
+    echo "     https://documentation.guardsarmsiem.com"
 
     echo ""
     echo ""
@@ -961,7 +961,7 @@ Upgrade to GuardSarm 5.0.0 is only supported from version 4.14.0 or later."
         fi
         echo ""
         echo "For more information, visit:"
-        echo "  https://documentation.guardsarm.com/current/upgrade-guide/"
+        echo "  https://documentation.guardsarmsiem.com/current/upgrade-guide/"
         echo "═════════════════════════════════════════════════════════════════"
         echo ""
         exit 1
@@ -1036,7 +1036,7 @@ main()
     fi
 
     # Installer banner.
-    echo " $NAME $VERSION (Rev. $REVISION) ${installscript} - https://guardsarm.com"
+    echo " $NAME $VERSION (Rev. $REVISION) ${installscript} - https://guardsarmsiem.com"
     catMsg "0x101-initial"
     echo ""
     echo "  - $system: $UNAME (${DIST_NAME} ${DIST_VER}.${DIST_SUBVER})"
@@ -1204,13 +1204,13 @@ main()
         echo " - ${addserveragent}"
         echo ""
         echo "   ${moreinfo}"
-        echo "   https://documentation.guardsarm.com/"
+        echo "   https://documentation.guardsarmsiem.com/"
         echo ""
 
     elif [ "X$INSTYPE" = "Xagent" ]; then
         echo ""
         echo " - ${moreinfo}"
-        echo "   https://documentation.guardsarm.com/"
+        echo "   https://documentation.guardsarmsiem.com/"
         echo ""
     fi
 

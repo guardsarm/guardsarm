@@ -11,8 +11,8 @@ from unittest.mock import patch, AsyncMock, MagicMock, call
 import pytest
 from uvloop import EventLoopPolicy, new_event_loop
 
-with patch('guardsarm.common.guardsarm_uid'):
-    with patch('guardsarm.common.guardsarm_gid'):
+with patch('guardsarmsiem.common.guardsarm_uid'):
+    with patch('guardsarmsiem.common.guardsarm_gid'):
         from guardsarm.core.cluster.local_client import *
         from guardsarm.core.cluster.common import InBuffer
         from guardsarm.core.exception import GuardSarmInternalError

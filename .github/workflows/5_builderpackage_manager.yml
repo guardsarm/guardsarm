@@ -359,10 +359,10 @@ jobs:
         run: |
           if [ "$INPUT_SYSTEM" = "deb" ]; then
             FILE_NAME_PUBLIC="guardsarm-manager_${PUBLIC_RELEASE_VERSION}-1_${ARCH}.deb"
-            BASE_URL="https://packages.guardsarm.com/5.x/apt/pool/main/w/guardsarm-manager"
+            BASE_URL="https://packages.guardsarmsiem.com/5.x/apt/pool/main/w/guardsarm-manager"
           elif [ "$INPUT_SYSTEM" = "rpm" ]; then
             FILE_NAME_PUBLIC="guardsarm-manager-${PUBLIC_RELEASE_VERSION}-1.${ARCH}.rpm"
-            BASE_URL="https://packages.guardsarm.com/5.x/yum"
+            BASE_URL="https://packages.guardsarmsiem.com/5.x/yum"
           else
             echo "Unsupported system type: $INPUT_SYSTEM"
             exit 1

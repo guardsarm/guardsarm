@@ -15,13 +15,13 @@ assignees: ''
 Whenever possible, issues should be created for bug reporting and feature requests.
 For questions related to the user experience, please refer:
 - GuardSarm mailing list: https://groups.google.com/forum/#!forum/guardsarm
-- Join GuardSarm on Slack: https://guardsarm.com/community/join-us-on-slack
+- Join GuardSarm on Slack: https://guardsarmsiem.com/community/join-us-on-slack
 
 Please fill the table above. Feel free to extend it at your convenience.
 -->
 
 <!--
 
-You may want to set debug options `<component>.debug=2` (see https://documentation.guardsarm.com/current/user-manual/reference/internal-options.html) to get verbose logs. This may help investigate the issue.
+You may want to set debug options `<component>.debug=2` (see https://documentation.guardsarmsiem.com/current/user-manual/reference/internal-options.html) to get verbose logs. This may help investigate the issue.
 
 -->

@@ -16,7 +16,7 @@ file(GLOB PROJECT_SOURCES *.cpp)
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
-# The pre-compiled rocksdb dependency (packages.guardsarm.com) was built with GCC 14,
+# The pre-compiled rocksdb dependency (packages.guardsarmsiem.com) was built with GCC 14,
 # which emits references to std::ios_base_library_init() not present in GCC 11's
 # libstdc++ (Ubuntu 22). This flag suppresses the link-time check for undefined
 # symbols in shared libraries; the symbol is harmlessly absent at runtime.

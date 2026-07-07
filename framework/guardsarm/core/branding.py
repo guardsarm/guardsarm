@@ -35,10 +35,10 @@ _FALLBACK = {
     "vendor_name": "Wazuh Inc.",
     "legal_entity": "Wazuh Inc.",
     "author": "Wazuh Inc.",
-    "contact": "info@guardsarm.com",
-    "security_contact": "security@guardsarm.com",
-    "site": "https://guardsarm.com",
-    "doc_url": "https://documentation.guardsarm.com",
+    "contact": "info@guardsarmsiem.com",
+    "security_contact": "security@guardsarmsiem.com",
+    "site": "https://guardsarmsiem.com",
+    "doc_url": "https://documentation.guardsarmsiem.com",
     "github_org": "https://github.com/guardsarm",
 }
 

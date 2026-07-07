@@ -222,7 +222,7 @@ def generate_self_signed_certificate(private_key: rsa.RSAPrivateKey, certificate
         x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"California"),
         x509.NameAttribute(NameOID.LOCALITY_NAME, u"San Francisco"),
         x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"GuardSarm"),
-        x509.NameAttribute(NameOID.COMMON_NAME, u"guardsarm.com"),
+        x509.NameAttribute(NameOID.COMMON_NAME, u"guardsarmsiem.com"),
     ])
     cert = x509.CertificateBuilder().subject_name(
         subject

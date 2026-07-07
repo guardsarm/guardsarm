@@ -40,8 +40,8 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/capabilities/file-integrity/index.html
-    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/syscheck.html#synchronization
+    - https://documentation.guardsarmsiem.com/current/user-manual/capabilities/file-integrity/index.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/ossec-conf/syscheck.html#synchronization
 
 pytest_args:
     - fim_mode:

@@ -3,7 +3,7 @@ Version:        0.1.0
 Release:        1
 Summary:        GuardSarm Internal Engine Tools (runtime venv + offline wheels)
 License:        GPL-2.0-only
-URL:            https://guardsarm.com
+URL:            https://guardsarmsiem.com
 Source0:        %{name}-%{version}.tar.gz
 
 # ------------------------------
@@ -453,7 +453,7 @@ exit 0
 %ghost %{prefix}/.pip-selfcheck.json
 
 %changelog
-* Thu Oct 16 2025 GuardSarm Team <dev@guardsarm.com> - 0.1.0-1
+* Thu Oct 16 2025 GuardSarm Team <dev@guardsarmsiem.com> - 0.1.0-1
 - Implemented version fallback for charset_normalizer (wheels-only) including 2.1.1/2.0.12 to ensure py3-none-any availability.
 - Vendored docker, websocket-client, and packaging.
 - Two-phase installation: internal (no-deps) + filtered third-party wheels.

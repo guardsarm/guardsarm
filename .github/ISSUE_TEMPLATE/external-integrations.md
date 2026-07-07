@@ -15,7 +15,7 @@ assignees: ''
 Whenever possible, issues should be created for bug reporting and feature requests.
 For questions related to the user experience, please refer to:
 - GuardSarm mailing list: https://groups.google.com/forum/#!forum/guardsarm
-- Join GuardSarm on Slack: https://guardsarm.com/community/join-us-on-slack
+- Join GuardSarm on Slack: https://guardsarmsiem.com/community/join-us-on-slack
 
 Please fill in the table above. Feel free to extend it at your convenience.
 -->
@@ -28,7 +28,7 @@ In case of a feature request of a new service please provide example logs of tha
 In case of a bug report:
 - Indicate the GuardSarm version.
 - Tell if it has failed on a manager, an agent, or both.
-- Attach logs that illustrate the bug inside the <detail> tag below -you may want to set debug options `guardsarm_modules.debug=2` and restart GuardSarm (see https://documentation.guardsarm.com/current/user-manual/reference/internal-options.html) to get verbose logs. This may help investigate the issue-.
+- Attach logs that illustrate the bug inside the <detail> tag below -you may want to set debug options `guardsarm_modules.debug=2` and restart GuardSarm (see https://documentation.guardsarmsiem.com/current/user-manual/reference/internal-options.html) to get verbose logs. This may help investigate the issue-.
 
 <details><summary><SERVICE> logs</summary>
 

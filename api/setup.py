@@ -18,7 +18,7 @@ setup(
     name='api',
     version='5.0.1',
     description="GuardSarm API",
-    author_email="info@guardsarm.com",
+    author_email="info@guardsarmsiem.com",
     author="GuardSarm",
     url="https://github.com/guardsarm",
     keywords=["GuardSarm API"],

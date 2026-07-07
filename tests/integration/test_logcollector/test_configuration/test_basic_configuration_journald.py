@@ -41,8 +41,8 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/capabilities/log-data-collection/index.html
-    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/localfile.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/capabilities/log-data-collection/index.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/ossec-conf/localfile.html
 
 tags:
     - logcollector

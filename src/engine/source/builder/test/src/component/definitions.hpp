@@ -62,7 +62,7 @@ auto constexpr FILTER_JSON = R"({
             "name": "Wazuh, Inc.",
             "date": "2026/01/29"
         },
-        "references": ["https://documentation.guardsarm.com/"]
+        "references": ["https://documentation.guardsarmsiem.com/"]
     },
     "check": [{
         "guardsarm.protocol.queue": 49

@@ -115,7 +115,7 @@ metadata:
   modified: "2026-04-14"
   description: "Detects SSH authentication attempts using usernames that do not exist on the system."
   references:
-    - "https://documentation.guardsarm.com/current/..."
+    - "https://documentation.guardsarmsiem.com/current/..."
 
 logsource:
   product: "sshd"
@@ -467,7 +467,7 @@ curl -sk -u admin:admin -X POST \
         "title": "My custom rule",
         "description": "Migrated from 4.x rule 91560.",
         "author": "Security Team",
-        "references": ["https://documentation.guardsarm.com/"]
+        "references": ["https://documentation.guardsarmsiem.com/"]
       },
       "enabled": true,
       "status": "experimental",
@@ -755,7 +755,7 @@ metadata:
   date: "2026-03-24"
   description: "Detects when the GuardSarm vulnerability scanner identifies a new or updated vulnerability on an endpoint."
   references:
-    - "https://documentation.guardsarm.com/current/user-manual/capabilities/vulnerability-detection/index.html"
+    - "https://documentation.guardsarmsiem.com/current/user-manual/capabilities/vulnerability-detection/index.html"
 
 logsource:
   product: "guardsarm-vd"
@@ -1099,7 +1099,7 @@ Common mappings:
 
 ## Additional resources
 
-- [GuardSarm 4.x Rules Syntax Reference](https://documentation.guardsarm.com/4.9/user-manual/ruleset/ruleset-xml-syntax/rules.html)
+- [GuardSarm 4.x Rules Syntax Reference](https://documentation.guardsarmsiem.com/4.9/user-manual/ruleset/ruleset-xml-syntax/rules.html)
 - [Sigma Rule Specification](https://sigmahq.io/docs/basics/rules.html)
 - [Sigma Conditions](https://sigmahq.io/docs/basics/conditions.html)
 - [Sigma Modifiers](https://sigmahq.io/docs/basics/modifiers.html)

@@ -38,8 +38,8 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/reference/daemons/guardsarm-manager-authd.html
-    - https://documentation.guardsarm.com/current/user-manual/reference/tools/agent_groups.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/daemons/guardsarm-manager-authd.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/tools/agent_groups.html
 
 tags:
     - enrollment

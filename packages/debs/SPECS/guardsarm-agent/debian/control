@@ -1,10 +1,10 @@
 Source: guardsarm-agent
 Section: admin
 Priority: extra
-Maintainer: GuardSarm <info@guardsarm.com>
+Maintainer: GuardSarm <info@guardsarmsiem.com>
 Build-Depends: debhelper (>= 7.0.50~), make, gcc, linux-libc-dev, gawk, libaudit-dev, selinux-basics
 Standards-Version: 3.8.4
-Homepage: https://guardsarm.com
+Homepage: https://guardsarmsiem.com
 
 Package: guardsarm-agent
 Architecture: any

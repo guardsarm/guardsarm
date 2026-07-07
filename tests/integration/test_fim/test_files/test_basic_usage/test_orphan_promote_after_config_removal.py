@@ -42,7 +42,7 @@ os_platform:
 
 references:
     - https://github.com/guardsarm/guardsarm/issues/36134
-    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/syscheck.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/ossec-conf/syscheck.html
 
 tags:
     - fim

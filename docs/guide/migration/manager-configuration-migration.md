@@ -110,9 +110,9 @@ In 5.0 the `<global>` parser only accepts `<agents_disconnection_time>` and `<ag
   <logall>no</logall>
   <logall_json>no</logall_json>
   <email_notification>no</email_notification>
-  <smtp_server>smtp.example.guardsarm.com</smtp_server>
-  <email_from>guardsarm@example.guardsarm.com</email_from>
-  <email_to>recipient@example.guardsarm.com</email_to>
+  <smtp_server>smtp.example.guardsarmsiem.com</smtp_server>
+  <email_from>guardsarm@example.guardsarmsiem.com</email_from>
+  <email_to>recipient@example.guardsarmsiem.com</email_to>
   <email_maxperhour>12</email_maxperhour>
   <email_log_source>alerts.log</email_log_source>
   <agents_disconnection_time>15m</agents_disconnection_time>

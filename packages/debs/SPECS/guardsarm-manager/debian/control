@@ -1,10 +1,10 @@
 Source: guardsarm-manager
 Section: admin
 Priority: extra
-Maintainer: GuardSarm <info@guardsarm.com>
+Maintainer: GuardSarm <info@guardsarmsiem.com>
 Build-Depends: debhelper (>= 7.0.50~), libssl-dev, linux-libc-dev, gawk, libaudit-dev
 Standards-Version: 3.8.4
-Homepage: https://guardsarm.com
+Homepage: https://guardsarmsiem.com
 
 Package: guardsarm-manager
 Architecture: any

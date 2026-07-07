@@ -42,8 +42,8 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/api/getting-started.html
-    - https://documentation.guardsarm.com/current/user-manual/api/configuration.html#cors
+    - https://documentation.guardsarmsiem.com/current/user-manual/api/getting-started.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/api/configuration.html#cors
     - https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
 
 tags:

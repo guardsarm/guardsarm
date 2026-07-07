@@ -80,11 +80,11 @@ coordinated work in the following repos (owner will clone/rebrand separately):
 The following were set to GuardSarm targets in R1 but require the destination to
 exist, or were intentionally left as Wazuh (frozen) pending infra:
 
-- **Domains/hosting:** `guardsarm.com`, `documentation.guardsarm.com` (README,
+- **Domains/hosting:** `guardsarmsiem.com`, `documentation.guardsarmsiem.com` (README,
   book.toml, install.sh, header template, packaging URLs now point here).
 - **GitHub org:** `github.com/guardsarm` (README/setup.py/book.toml
   `git-repository-url`) — repos must be created or links will 404.
-- **Mailboxes:** `info@guardsarm.com`, `security@guardsarm.com` (SECURITY.md,
+- **Mailboxes:** `info@guardsarmsiem.com`, `security@guardsarmsiem.com` (SECURITY.md,
   setup.py, packaging) — must be provisioned.
 - **Still frozen (Wazuh) pending infra migration:** `ghcr.io/wazuh` container
   registry, S3 buckets (`xdrsiem-packages-dev-internal`),

@@ -143,7 +143,7 @@ static int read_main_elements(const OS_XML *xml, int modules,
                 mwarn(
                     "The '%s' configuration is deprecated, please update your settings to use the new '%s' instead "
                     "(default values will be used based on your previous configurations). "
-                    "See https://documentation.guardsarm.com",
+                    "See https://documentation.guardsarmsiem.com",
                     osvulndetector,
                     osvulndetection);
                 if (Read_Vulnerability_Detection(xml, chld_node, d1, true) < 0) {

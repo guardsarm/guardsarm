@@ -81,8 +81,8 @@
 #define __guardsarm_name    "GuardSarm"       /* FROZEN: wire/DB/metadata literal -- see note above */
 #define __guardsarm_version "v5.0.1"      /* FROZEN: version compat literal -- see note above */
 #define __author        "Wazuh Inc."
-#define __contact       "info@guardsarm.com"
-#define __site          "http://www.guardsarm.com"
+#define __contact       "info@guardsarmsiem.com"
+#define __site          "http://www.guardsarmsiem.com"
 #define __license                                                                                                      \
     "\
 This program is free software; you can redistribute it and/or modify\n\

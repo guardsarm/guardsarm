@@ -169,7 +169,7 @@ echo "[generate_external] per-dep zips:"
 ls -la "${OUTDIR}/external_artifacts/" 2>/dev/null || echo "  (none — build may have failed)"
 
 # Re-pack the per-dep zips into the S3 layout `make deps` consumes from
-# packages.guardsarm.com/deps/<version>/libraries/. Each runner emits a single
+# packages.guardsarmsiem.com/deps/<version>/libraries/. Each runner emits a single
 # tarball that already contains its slice of the libraries/ tree, so
 # downloading every artifact from a run and extracting each into the same
 # destination yields the complete tree — no aggregation job needed.

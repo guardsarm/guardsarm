@@ -42,8 +42,8 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/api/getting-started.html
-    - https://documentation.guardsarm.com/current/user-manual/api/configuration.html#access
+    - https://documentation.guardsarmsiem.com/current/user-manual/api/getting-started.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/api/configuration.html#access
     - https://en.wikipedia.org/wiki/Denial-of-service_attack
 
 tags:

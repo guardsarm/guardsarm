@@ -32,7 +32,7 @@ RUN /usr/local/bin/retry.sh --attempts 5 --delay 10 --backoff 2 --max-delay 40 -
 
 RUN /usr/local/bin/retry.sh --attempts 5 --delay 5 --backoff 2 --max-delay 30 --timeout 360 -- \
     curl -fsSL --connect-timeout 20 --max-time 300 -o /tmp/gcc_14.3-1_arm64.deb \
-    https://packages.guardsarm.com/utils/gcc/gcc_14.3-1_arm64.deb
+    https://packages.guardsarmsiem.com/utils/gcc/gcc_14.3-1_arm64.deb
 RUN dpkg -i /tmp/gcc_14.3-1_arm64.deb && \
     ln -fs /opt/gcc-14/bin/g++ /usr/bin/c++ && \
     ln -fs /opt/gcc-14/bin/g++ /usr/bin/g++ && \
@@ -44,7 +44,7 @@ ENV PATH "/opt/gcc-14/bin:${PATH}"
 
 RUN /usr/local/bin/retry.sh --attempts 5 --delay 5 --backoff 2 --max-delay 30 --timeout 360 -- \
     curl -fsSL --connect-timeout 20 --max-time 300 -o /tmp/binutils_2.38-1_arm64.deb \
-    https://packages.guardsarm.com/utils/binutils/binutils_2.38-1_arm64.deb
+    https://packages.guardsarmsiem.com/utils/binutils/binutils_2.38-1_arm64.deb
 RUN dpkg -i /tmp/binutils_2.38-1_arm64.deb
 
 ENV PATH "/opt/binutils-2/bin:${PATH}"

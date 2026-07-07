@@ -46,7 +46,7 @@ os_version:
     - Red Hat 6
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/registering/restful-api-registration.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/registering/restful-api-registration.html
 
 tags:
     - authd

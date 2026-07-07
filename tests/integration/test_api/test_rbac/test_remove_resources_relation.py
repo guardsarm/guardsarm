@@ -42,8 +42,8 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/api/getting-started.html
-    - https://documentation.guardsarm.com/current/user-manual/api/reference.html#tag/Security
+    - https://documentation.guardsarmsiem.com/current/user-manual/api/getting-started.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/api/reference.html#tag/Security
     - https://en.wikipedia.org/wiki/Role-based_access_control
 
 tags:

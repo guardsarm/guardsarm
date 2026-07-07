@@ -1079,8 +1079,8 @@ The following use cases describe concrete end-to-end test scenarios for verifyin
 
 ## Related Documentation
 
-- [GuardSarm FIM Overview](https://documentation.guardsarm.com/current/user-manual/capabilities/file-integrity/index.html)
-- [Who-data Monitoring](https://documentation.guardsarm.com/current/user-manual/capabilities/file-integrity/auditing-whodata.html)
-- [FIM Alerts Reference](https://documentation.guardsarm.com/current/user-manual/capabilities/file-integrity/fim-alerts.html)
-- [agent.conf — Centralized Agent Configuration](https://documentation.guardsarm.com/current/user-manual/reference/centralized-configuration.html)
-- [GuardSarm Rules Reference](https://documentation.guardsarm.com/current/user-manual/ruleset/ruleset-xml-syntax/rules.html)
+- [GuardSarm FIM Overview](https://documentation.guardsarmsiem.com/current/user-manual/capabilities/file-integrity/index.html)
+- [Who-data Monitoring](https://documentation.guardsarmsiem.com/current/user-manual/capabilities/file-integrity/auditing-whodata.html)
+- [FIM Alerts Reference](https://documentation.guardsarmsiem.com/current/user-manual/capabilities/file-integrity/fim-alerts.html)
+- [agent.conf — Centralized Agent Configuration](https://documentation.guardsarmsiem.com/current/user-manual/reference/centralized-configuration.html)
+- [GuardSarm Rules Reference](https://documentation.guardsarmsiem.com/current/user-manual/ruleset/ruleset-xml-syntax/rules.html)

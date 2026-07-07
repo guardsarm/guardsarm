@@ -12,8 +12,8 @@ or protocol constant. No data migration is required or performed.
   read **GuardSarm** (display version `1.0.0` if `product_version` is set).
 - Package Descriptions/Summaries, systemd unit `Description=`, Windows Services
   console `DisplayName`, `.exe` properties, installer text read **GuardSarm**.
-- Documentation/website/contact strings point at `guardsarm.com` /
-  `documentation.guardsarm.com` / `info@guardsarm.com` **where the destination
+- Documentation/website/contact strings point at `guardsarmsiem.com` /
+  `documentation.guardsarmsiem.com` / `info@guardsarmsiem.com` **where the destination
   infrastructure exists** (see remaining-work).
 
 ## What does NOT change (and why your deployment keeps working)
@@ -46,7 +46,7 @@ or protocol constant. No data migration is required or performed.
 |---|---|---|---|
 | 1 | Frozen identifiers | `sh tools/rebrand/check-frozen-identifiers.sh` | PASS |
 | 2 | Build wiring | CMake configure; inspect `compile_commands.json` | `-DPRODUCT_NAME="GuardSarm"`, `-DVERSION="v5.0.1"` unchanged |
-| 3 | Banner | any daemon `-V` | `GuardSarm 1.0.0 - GuardSarm (info@guardsarm.com)` |
+| 3 | Banner | any daemon `-V` | `GuardSarm 1.0.0 - GuardSarm (info@guardsarmsiem.com)` |
 | 4 | Service display | `systemctl status wazuh-manager` / `services.msc` | Description/DisplayName = GuardSarm; unit/service **name** unchanged |
 | 5 | **Legacy agent interop** | connect a stock Wazuh 5.0.x agent | enrolls (1515) + connects (1514); manager logs a populated **agent version** (keepalive parse) |
 | 6 | DB version field | API `GET /agents` `version` | `"Wazuh v…"` (frozen) |

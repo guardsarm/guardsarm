@@ -24,7 +24,7 @@ Enable or disable the agent upgrade module.
 
 ### wpk_repository
 
-Base URL from which WPK upgrade packages are downloaded. A trailing `/` is added automatically at runtime if absent. If not set, the manager constructs the URL as `packages.guardsarm.com/<major>.x/wpk/` using the manager's own major version.
+Base URL from which WPK upgrade packages are downloaded. A trailing `/` is added automatically at runtime if absent. If not set, the manager constructs the URL as `packages.guardsarmsiem.com/<major>.x/wpk/` using the manager's own major version.
 
 - **Default value**: none (auto-derived from manager version)
 - **Allowed values**: Any valid URL

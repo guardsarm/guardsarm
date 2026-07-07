@@ -30,7 +30,7 @@ LOGGING_MSG_FORMAT = '%(asctime)s azure: %(levelname)s: %(message)s'
 LOGGING_DATE_FORMAT = '%Y/%m/%d %H:%M:%S'
 LOG_LEVELS = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
 
-CREDENTIALS_URL = 'https://documentation.guardsarm.com/current/azure/activity-services/prerequisites/credentials.html'
+CREDENTIALS_URL = 'https://documentation.guardsarmsiem.com/current/azure/activity-services/prerequisites/credentials.html'
 URL_LOGGING = 'https://login.microsoftonline.com'
 
 

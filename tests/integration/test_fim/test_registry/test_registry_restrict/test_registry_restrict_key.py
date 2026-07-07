@@ -37,8 +37,8 @@ os_version:
     - Windows Server 2012
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/capabilities/file-integrity/index.html
-    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/syscheck.html#windows-registry
+    - https://documentation.guardsarmsiem.com/current/user-manual/capabilities/file-integrity/index.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/ossec-conf/syscheck.html#windows-registry
 
 pytest_args:
     - fim_mode:

@@ -17,8 +17,8 @@ respective contributors.
 ## What the GuardSarm fork changes
 
 - Product name and user-facing brand strings/URLs are rebranded
-  `wazuh` -> `guardsarm` (guardsarm.com, documentation.guardsarm.com,
-  packages.guardsarm.com, cti.guardsarm.com).
+  `wazuh` -> `guardsarm` (guardsarmsiem.com, documentation.guardsarmsiem.com,
+  packages.guardsarmsiem.com, cti.guardsarmsiem.com).
 - Protocol and on-disk identifiers that affect wire/schema compatibility are
   deliberately **frozen** and NOT global-replaced.
 - New GuardSarm-authored content (the local CTI/content backend under

@@ -5,7 +5,7 @@
 # Runs inside a GuardSarm package builder image. Populates src/external/ from a
 # locally-staged consolidated dependency tree (the externals-all artifact
 # produced by 5_builderpackage_externals.yml's consolidate job) instead of
-# pulling from packages.guardsarm.com, then builds the agent or the manager from
+# pulling from packages.guardsarmsiem.com, then builds the agent or the manager from
 # source. No package is produced — this only confirms the freshly built
 # dependencies link into a working GuardSarm build.
 #
@@ -64,7 +64,7 @@ ls -la "${DEPS_DIR}/libraries" "${DEPS_DIR}/libraries"/* 2>/dev/null || true
 # absolute paths and breaks the next configure step.
 rm -rf "${SRC_DIR}/build"
 
-# Point `make deps` at the local tree instead of packages.guardsarm.com.
+# Point `make deps` at the local tree instead of packages.guardsarmsiem.com.
 # RESOURCES_URL is `:=`-assigned in src/Makefile, but a command-line override
 # still wins; the deps rules fetch with `curl`, which handles file:// URLs, so
 # each <dep>.tar.gz is "downloaded" straight off local disk. Only the external

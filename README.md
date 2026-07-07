@@ -2,10 +2,10 @@
 
 # GuardSarm
 
-[![Documentation](https://img.shields.io/badge/docs-view-green.svg)](https://documentation.guardsarm.com)
-[![Documentation](https://img.shields.io/badge/web-view-green.svg)](https://guardsarm.com)
+[![Documentation](https://img.shields.io/badge/docs-view-green.svg)](https://documentation.guardsarmsiem.com)
+[![Documentation](https://img.shields.io/badge/web-view-green.svg)](https://guardsarmsiem.com)
 
-> **GuardSarm** is a security platform built on the open source [GuardSarm](https://guardsarm.com) project. It preserves full interoperability with existing GuardSarm deployments, agents, data and integrations. See [`docs/guardsarm-compatibility.md`](docs/guardsarm-compatibility.md) for the compatibility policy and [`NOTICE`](NOTICE) for attribution.
+> **GuardSarm** is a security platform built on the open source [GuardSarm](https://guardsarmsiem.com) project. It preserves full interoperability with existing GuardSarm deployments, agents, data and integrations. See [`docs/guardsarm-compatibility.md`](docs/guardsarm-compatibility.md) for the compatibility policy and [`NOTICE`](NOTICE) for attribution.
 
 GuardSarm is a free and open source platform used for threat prevention, detection, and response. It is capable of protecting workloads across on-premises, virtualized, containerized, and cloud-based environments.
 
@@ -164,25 +164,25 @@ Here you can find all the automation tools maintained by the GuardSarm team.
 
 ## Documentation
 
-* [Full documentation](https://documentation.guardsarm.com)
-* [GuardSarm installation guide](https://documentation.guardsarm.com/current/installation-guide/index.html)
+* [Full documentation](https://documentation.guardsarmsiem.com)
+* [GuardSarm installation guide](https://documentation.guardsarmsiem.com/current/installation-guide/index.html)
 
 ## Get involved
 
-Become part of the [GuardSarm's community](https://guardsarm.com/community/) to learn from other users, participate in discussions, talk to our developers and contribute to the project.
+Become part of the [GuardSarm's community](https://guardsarmsiem.com/community/) to learn from other users, participate in discussions, talk to our developers and contribute to the project.
 
 If you want to contribute to our project please don’t hesitate to make pull-requests, submit issues or send commits, we will review all your questions.
 
-You can also join our [Slack community channel](https://guardsarm.com/community/join-us-on-slack/) and [mailing list](https://groups.google.com/d/forum/guardsarm) by sending an email to [guardsarm+subscribe@googlegroups.com](mailto:guardsarm+subscribe@googlegroups.com), to ask questions and participate in discussions.
+You can also join our [Slack community channel](https://guardsarmsiem.com/community/join-us-on-slack/) and [mailing list](https://groups.google.com/d/forum/guardsarm) by sending an email to [guardsarm+subscribe@googlegroups.com](mailto:guardsarm+subscribe@googlegroups.com), to ask questions and participate in discussions.
 
 Stay up to date on news, releases, engineering articles and more.
 
-* [GuardSarm website](http://guardsarm.com)
+* [GuardSarm website](http://guardsarmsiem.com)
 * [Linkedin](https://www.linkedin.com/company/guardsarm)
 * [YouTube](https://www.youtube.com/c/guardsarmsecurity)
 * [Twitter](https://twitter.com/guardsarm)
-* [GuardSarm blog](https://guardsarm.com/blog/)
-* [Slack announcements channel](https://guardsarm.com/community/join-us-on-slack/)
+* [GuardSarm blog](https://guardsarmsiem.com/blog/)
+* [Slack announcements channel](https://guardsarmsiem.com/community/join-us-on-slack/)
 
 ## Authors
 

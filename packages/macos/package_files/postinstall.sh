@@ -1,6 +1,6 @@
 #! /bin/bash
 # By Spransy, Derek" <DSPRANS () emory ! edu> and Charlie Scott
-# Modified by Santiago Bassett (http://www.guardsarm.com) - Feb 2016
+# Modified by Santiago Bassett (http://www.guardsarmsiem.com) - Feb 2016
 # alterations by bil hays 2013
 # -Switched to bash
 # -Added some sanity checks

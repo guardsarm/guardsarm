@@ -2,7 +2,7 @@
 
 #Copyright (C) 2015, Wazuh Inc.
 # Install functions for GuardSarm
-# GuardSarm.com (https://github.com/guardsarm)
+# GuardSarmsiem.com (https://github.com/guardsarm)
 
 InstallSELinuxPolicyPackage(){
 

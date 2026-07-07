@@ -20,7 +20,7 @@
 PRODUCT_NAME="GuardSarm"
 PRODUCT_SHORT_NAME="GuardSarm"
 PRODUCT_AUTHOR="Wazuh Inc."
-PRODUCT_SITE="https://guardsarm.com"
+PRODUCT_SITE="https://guardsarmsiem.com"
 PRODUCT_DISPLAY_VERSION=""
 
 # Minimal JSON string-field extractor (no jq dependency).

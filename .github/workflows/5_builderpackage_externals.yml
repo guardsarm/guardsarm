@@ -6,7 +6,7 @@ name: 5.X - Package - Build external dependencies
 # layout expected by `make deps` (libraries/<os>/<arch>/<dep>.tar.gz plus
 # libraries/sources/<dep>.tar.gz). The `consolidate` job then merges every
 # per-leg tarball into a single externals-all.tar.gz ready for upload to
-# packages.guardsarm.com/deps/<version>/ — use that artifact, not a hand-merge
+# packages.guardsarmsiem.com/deps/<version>/ — use that artifact, not a hand-merge
 # of the per-leg ones, since on Linux the agent and manager legs overlap.
 #
 # A deps release is whole-or-nothing: every consumer platform needs its
@@ -173,7 +173,7 @@ jobs:
 
   consolidate:
     # Merge every per-leg tarball into a single libraries/ tree shaped
-    # like the packages.guardsarm.com/deps/<version>/ layout: sources/ holds
+    # like the packages.guardsarmsiem.com/deps/<version>/ layout: sources/ holds
     # the union of upstream blobs (byte-identical across legs, so any
     # leg's copy works), linux/<arch>/ holds the Linux binaries, darwin/<arch>/
     # holds the macOS leg binaries, and windows/ holds the MinGW leg
@@ -297,7 +297,7 @@ jobs:
     # Sanity check: build the agent and the manager from source against the
     # dependency tree we just consolidated, to confirm the binaries actually
     # link. No package is produced — this runs `make deps` (pointed at the
-    # local tree, not packages.guardsarm.com) then the plain `make` build inside
+    # local tree, not packages.guardsarmsiem.com) then the plain `make` build inside
     # the same builder images build-externals uses. The full build log is
     # uploaded for human review; the analysis step only flags the obvious
     # signal (a dep that got recompiled from source instead of being consumed

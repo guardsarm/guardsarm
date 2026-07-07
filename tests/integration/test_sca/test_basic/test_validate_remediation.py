@@ -29,7 +29,7 @@ os_version:
     - Windows Server 2016
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/capabilities/sec-config-assessment/index.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/capabilities/sec-config-assessment/index.html
 
 tags:
     - sca

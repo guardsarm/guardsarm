@@ -457,7 +457,7 @@
                         <Shortcut Id="EDIT_CONF" Name="Edit conf" Target="[APPLICATIONFOLDER]ossec.conf" WorkingDirectory="APPLICATIONFOLDER" />
                         <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the application" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
                         <Shortcut Id="RUN_WIN32UI" Name="Manage Agent" Target="[APPLICATIONFOLDER]win32ui.exe" WorkingDirectory="APPLICATIONFOLDER" />
-                        <util:InternetShortcut Id="WebsiteShortcut" Name="Documentation" Target="https://documentation.guardsarm.com" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" />
+                        <util:InternetShortcut Id="WebsiteShortcut" Name="Documentation" Target="https://documentation.guardsarmsiem.com" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" />
                     </Component>
                 </Directory>
             </Directory>
@@ -689,7 +689,7 @@
         <UpgradeVersion Maximum="4.14.0" IncludeMaximum="no" Property="IS_UPGRADING_FROM_UNSUPPORTED_VERSION" />
         <UpgradeVersion Maximum="5.0.0" IncludeMaximum="no" Property="IS_UPGRADING_FROM_PRIOR_TO_5X" /></Upgrade>
 
-        <CustomAction Id="PreventUnsupportedUpgrade" Error="Upgrade to GuardSarm 5.0.0 is only supported from version 4.14.0 or later.&#x0A;&#x0A;Your current version is not supported for direct upgrade to 5.0.0&#x0A;&#x0A;Required action:&#x0A;  1. Upgrade to version 4.14.0 or later first&#x0A;  2. Then upgrade to 5.0.0&#x0A;&#x0A;For more information, visit:&#x0A;  https://documentation.guardsarm.com/current/upgrade-guide/" />
+        <CustomAction Id="PreventUnsupportedUpgrade" Error="Upgrade to GuardSarm 5.0.0 is only supported from version 4.14.0 or later.&#x0A;&#x0A;Your current version is not supported for direct upgrade to 5.0.0&#x0A;&#x0A;Required action:&#x0A;  1. Upgrade to version 4.14.0 or later first&#x0A;  2. Then upgrade to 5.0.0&#x0A;&#x0A;For more information, visit:&#x0A;  https://documentation.guardsarmsiem.com/current/upgrade-guide/" />
     </Product>
     <Fragment>
         <Binary Id="CustomImage" SourceFile="ui\bannrbmp.jpg" />

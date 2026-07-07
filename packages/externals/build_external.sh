@@ -423,14 +423,14 @@ done
 log "running 'make deps' (EXTERNAL_SRC_ONLY=yes) to populate dep sources"
 make -C "${SRC_DIR}" EXTERNAL_SRC_ONLY=yes deps TARGET="${MAKE_TARGET}"
 
-# Some cached source tarballs at packages.guardsarm.com (notably the openssl one)
+# Some cached source tarballs at packages.guardsarmsiem.com (notably the openssl one)
 # were originally packed with bsdtar on macOS, so every file has a
 # `com.apple.provenance` xattr and the archive carries an AppleDouble `._<file>`
 # sibling for each. GNU tar on the Linux runners extracts those AppleDouble
 # files as regular files; without this step they flow through snapshot_src and
 # snapshot_built into every per-leg tarball (6149 `._*` entries in the openssl
 # leg output, confirmed by raw byte-walk of the cached tarball at
-# `packages.guardsarm.com/deps/99-29585/libraries/sources/openssl.tar.gz`).
+# `packages.guardsarmsiem.com/deps/99-29585/libraries/sources/openssl.tar.gz`).
 log "stripping AppleDouble (._*) files from extracted source trees"
 find "${SRC_DIR}/external" -name '._*' -delete
 
@@ -468,7 +468,7 @@ if [ "${BUILD_TARGET}" = "manager" ]; then
         *)     cpython_arch="" ;;
     esac
     if [ -n "${cpython_arch}" ]; then
-        cpython_url="https://packages.guardsarm.com/deps/${DEPS_VERSION}/libraries/sources/cpython_${cpython_arch}.tar.gz"
+        cpython_url="https://packages.guardsarmsiem.com/deps/${DEPS_VERSION}/libraries/sources/cpython_${cpython_arch}.tar.gz"
         cpython_out="${ARTIFACTS_DIR}/cpython_${cpython_arch}.passthrough.tar.gz"
         log "fetching cpython pass-through from ${cpython_url}"
         if curl -fsSL "${cpython_url}" -o "${cpython_out}"; then
@@ -507,7 +507,7 @@ done
 #   - libffi: ExternalProject_Add's BUILD_BYPRODUCTS doesn't translate to
 #     a working make rule under the Make generator with BUILD_IN_SOURCE TRUE.
 #     guardsarmext's link step then fails with "No rule to make target".
-# We reuse the existing precompiled tarballs from packages.guardsarm.com.
+# We reuse the existing precompiled tarballs from packages.guardsarmsiem.com.
 # Done after the source-snapshot loop so the *_src.zip artifacts stay clean.
 # Future bumps of these specific deps would need the original build env
 # (per-image toolchain or external CI), so they're out of scope here.
@@ -523,7 +523,7 @@ stage_precompiled() {
         arm64)  arch_path="aarch64" ;;
         *)      log "stage_precompiled: unsupported arch ${ARCHITECTURE_TARGET}; skipping ${name}"; return 0 ;;
     esac
-    local url="https://packages.guardsarm.com/deps/${DEPS_VERSION}/libraries/linux/${arch_path}/${name}.tar.gz"
+    local url="https://packages.guardsarmsiem.com/deps/${DEPS_VERSION}/libraries/linux/${arch_path}/${name}.tar.gz"
     local tar="${DOWNLOAD_DIR}/${name}-precompiled.tar.gz"
     log "staging precompiled ${name} from ${url}"
     if ! curl -fsSL "${url}" -o "${tar}"; then

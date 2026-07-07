@@ -42,8 +42,8 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/api/getting-started.html
-    - https://documentation.guardsarm.com/current/user-manual/api/configuration.html#https
+    - https://documentation.guardsarmsiem.com/current/user-manual/api/getting-started.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/api/configuration.html#https
 
 tags:
     - api

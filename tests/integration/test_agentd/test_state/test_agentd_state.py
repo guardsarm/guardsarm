@@ -40,7 +40,7 @@ os_version:
     - Windows Server 2016
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/reference/statistics-files/guardsarm-agentd-state.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/statistics-files/guardsarm-agentd-state.html
 
 tags:
     - stats_file

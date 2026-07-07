@@ -42,7 +42,7 @@ function upsert_certs() {
     fi
 
     local guardsarm_install_script="guardsarm-install.sh"
-    local guardsarm_install_url="https://packages.guardsarm.com/4.14/guardsarm-install.sh"
+    local guardsarm_install_url="https://packages.guardsarmsiem.com/4.14/guardsarm-install.sh"
     local config_file="config.yml"
 
     # Download guardsarm-install.sh

@@ -14,8 +14,8 @@ from freezegun import freeze_time
 from uvloop import EventLoopPolicy
 
 
-with patch('guardsarm.common.guardsarm_uid'):
-    with patch('guardsarm.common.guardsarm_gid'):
+with patch('guardsarmsiem.common.guardsarm_uid'):
+    with patch('guardsarmsiem.common.guardsarm_gid'):
         from guardsarm.core.cluster.server import *
         from guardsarm.core.cluster import common as c_common
         from guardsarm.core.exception import GuardSarmClusterError, GuardSarmError, GuardSarmResourceNotFound

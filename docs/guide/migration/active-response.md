@@ -661,7 +661,7 @@ Together these two examples exercise every concrete shape you will encounter: a 
 
 ## Other 4.14 AR scenarios
 
-Examples 1 and 2 cover the two most common shapes (default consolidated script, custom shell script with `extra_arguments`). For every other scenario described in the [GuardSarm 4.14 AR reference](https://documentation.guardsarm.com/4.14/user-manual/capabilities/active-response/), the table below lists the 5.x migration approach.
+Examples 1 and 2 cover the two most common shapes (default consolidated script, custom shell script with `extra_arguments`). For every other scenario described in the [GuardSarm 4.14 AR reference](https://documentation.guardsarmsiem.com/4.14/user-manual/capabilities/active-response/), the table below lists the 5.x migration approach.
 
 | 4.14 feature                                                                     | 5.x migration approach                                                                                                                                                              |
 | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

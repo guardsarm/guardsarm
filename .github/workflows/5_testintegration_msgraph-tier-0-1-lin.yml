@@ -42,7 +42,7 @@ jobs:
       - name: Download m365proxy and config http for msgraph module
         run: |
           sed -i 's/https:\/\/%s\/%s/http:\/\/%s\/%s/g' src/guardsarm_modules/src/wm_ms_graph.h
-          curl -L http://packages.guardsarm.com/utils/m365proxy/m365proxy.tar.gz | \
+          curl -L http://packages.guardsarmsiem.com/utils/m365proxy/m365proxy.tar.gz | \
           tar zvx -C /tmp/
       - name: Install a compatible CMake
         uses: ./.github/actions/reinstall_cmake

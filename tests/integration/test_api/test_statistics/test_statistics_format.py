@@ -49,8 +49,8 @@ os_version:
     - Red Hat 6
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/api/reference.html (Get GuardSarm daemon stats)
-    - https://documentation.guardsarm.com/current/user-manual/api/reference.html (Get GuardSarm daemon stats from an agent)
+    - https://documentation.guardsarmsiem.com/current/user-manual/api/reference.html (Get GuardSarm daemon stats)
+    - https://documentation.guardsarmsiem.com/current/user-manual/api/reference.html (Get GuardSarm daemon stats from an agent)
 
 tags:
     - api

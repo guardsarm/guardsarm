@@ -39,7 +39,7 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/capabilities/active-response/#active-response
+    - https://documentation.guardsarmsiem.com/current/user-manual/capabilities/active-response/#active-response
 '''
 import sys
 import pytest

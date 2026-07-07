@@ -11,10 +11,10 @@ import pytest
 
 from guardsarm.core.exception import GuardSarmClusterError
 
-with patch('guardsarm.common.getgrnam'):
-    with patch('guardsarm.common.getpwnam'):
-        with patch('guardsarm.common.guardsarm_uid'):
-            with patch('guardsarm.common.guardsarm_gid'):
+with patch('guardsarmsiem.common.getgrnam'):
+    with patch('guardsarmsiem.common.getpwnam'):
+        with patch('guardsarmsiem.common.guardsarm_uid'):
+            with patch('guardsarmsiem.common.guardsarm_gid'):
                 sys.modules['guardsarm.rbac.orm'] = MagicMock()
 
                 from guardsarm.core.cluster import control

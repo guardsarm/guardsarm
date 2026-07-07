@@ -37,7 +37,7 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/auth.html#remote-enrollment
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/ossec-conf/auth.html#remote-enrollment
 
 tags:
     - enrollment

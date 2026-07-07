@@ -43,11 +43,11 @@
 #endif
 
 #ifndef PRODUCT_CONTACT
-#define PRODUCT_CONTACT "info@guardsarm.com"
+#define PRODUCT_CONTACT "info@guardsarmsiem.com"
 #endif
 
 #ifndef PRODUCT_SITE
-#define PRODUCT_SITE "http://www.guardsarm.com"
+#define PRODUCT_SITE "http://www.guardsarmsiem.com"
 #endif
 
 /* Display-only product version. When branding.json defines no product_version,

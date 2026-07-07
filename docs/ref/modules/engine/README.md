@@ -1629,8 +1629,8 @@ kanban
     - `author` (object): Author information:
         ```yaml
         name: Wazuh, Inc.
-        email: info@guardsarm.com
-        url: https://guardsarm.com
+        email: info@guardsarmsiem.com
+        url: https://guardsarmsiem.com
         date: 2022-11-15
         ```
     - `reference` (array): Links to product documentation:
@@ -1911,10 +1911,10 @@ metadata:
     - GuardSarm 5.*
   author:
     name: Wazuh, Inc.
-    url: https://guardsarm.com
+    url: https://guardsarmsiem.com
     date: 2024-01-31
   references:
-    - https://documentation.guardsarm.com/
+    - https://documentation.guardsarmsiem.com/
 check: $host.os.platform == 'ubuntu'
 ```
 

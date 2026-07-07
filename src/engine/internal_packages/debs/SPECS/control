@@ -1,10 +1,10 @@
 Source: guardsarm-internal-tools
 Section: utils
 Priority: optional
-Maintainer: GuardSarm Team <dev@guardsarm.com>
+Maintainer: GuardSarm Team <dev@guardsarmsiem.com>
 Build-Depends: debhelper-compat (= 13), dh-python, python3 (>= 3.10), python3-venv, python3-pip, git
 Standards-Version: 4.6.2
-Homepage: https://guardsarm.com
+Homepage: https://guardsarmsiem.com
 
 Package: guardsarm-internal-tools
 Architecture: any

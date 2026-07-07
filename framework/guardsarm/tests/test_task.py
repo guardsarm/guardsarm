@@ -10,8 +10,8 @@ from unittest.mock import patch
 
 import pytest
 
-with patch('guardsarm.common.guardsarm_uid'):
-    with patch('guardsarm.common.guardsarm_gid'):
+with patch('guardsarmsiem.common.guardsarm_uid'):
+    with patch('guardsarmsiem.common.guardsarm_gid'):
         import guardsarm.rbac.decorators
 
         from guardsarm.tests.util import get_fake_database_data, RBAC_bypasser, InitWDBSocketMock

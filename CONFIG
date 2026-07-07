@@ -7,7 +7,7 @@ Copyright (C) 2014 Trend Micro Inc.
 
 = Information about GuardSarm =
 
-Visit https://www.guardsarm.com
+Visit https://www.guardsarmsiem.com
 
 
 = Recommended Installation =
@@ -19,4 +19,4 @@ See INSTALL
 
 Just follow the steps from the install.sh script.
 More information at
-https://documentation.guardsarm.com
+https://documentation.guardsarmsiem.com

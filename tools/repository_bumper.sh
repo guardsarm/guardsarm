@@ -369,7 +369,7 @@ update_file_api() {
             sed -i -E \
                 "s~(blob/)(v?main|v[0-9]+\.[0-9]+\.[0-9]+(-[a-z]+[0-9]+)?|[0-9]+\.[0-9]+\.[0-9]+)(/)~\1${url_ref}\4~g" \
                 "$spec_file"
-            # documentation URLs use 2-part version without v prefix (e.g. guardsarm.com/5.0/)
+            # documentation URLs use 2-part version without v prefix (e.g. guardsarmsiem.com/5.0/)
             sed -i -E \
                 "s~(guardsarm\.com/)(main|[0-9]+\.[0-9]+)(/)~\1${version_short}\3~g" \
                 "$spec_file"
@@ -435,10 +435,10 @@ update_file_packages() {
     # Update .spec files - always update the first changelog entry in place
     for spec_file in $(find "$DIR_PACKAGE" -type f -name "*.spec"); do
         sed -i -E \
-            "0,/^\* .+ support <info@guardsarm\.com> - [0-9]+\.[0-9]+\.[0-9]+$/s|^\* .+ support <info@guardsarm\.com> - [0-9]+\.[0-9]+\.[0-9]+$|* ${spec_date} support <info@guardsarm.com> - ${final_version}|" \
+            "0,/^\* .+ support <info@guardsarm\.com> - [0-9]+\.[0-9]+\.[0-9]+$/s|^\* .+ support <info@guardsarm\.com> - [0-9]+\.[0-9]+\.[0-9]+$|* ${spec_date} support <info@guardsarmsiem.com> - ${final_version}|" \
             "$spec_file"
         sed -i -E \
-            "0,/^- More info: https:\/\/documentation\.guardsarm\.com\/current\/release-notes\/release-[0-9]+-[0-9]+-[0-9]+\.html$/s|^- More info: .*$|- More info: https://documentation.guardsarm.com/current/release-notes/release-${version_dashed}.html|" \
+            "0,/^- More info: https:\/\/documentation\.guardsarm\.com\/current\/release-notes\/release-[0-9]+-[0-9]+-[0-9]+\.html$/s|^- More info: .*$|- More info: https://documentation.guardsarmsiem.com/current/release-notes/release-${version_dashed}.html|" \
             "$spec_file"
         log_action "Updated changelog entry for version ${final_version} in: $spec_file"
     done
@@ -448,7 +448,7 @@ update_file_packages() {
         local INSTALL_TYPE
         INSTALL_TYPE=$(basename "$(dirname "$(dirname "$changelog_file")")")
 
-        awk -v pkg="$INSTALL_TYPE" -v new_ver="$final_version" -v new_url="https://documentation.guardsarm.com/current/release-notes/release-${version_dashed}.html" -v new_date="$formatted_date" '
+        awk -v pkg="$INSTALL_TYPE" -v new_ver="$final_version" -v new_url="https://documentation.guardsarmsiem.com/current/release-notes/release-${version_dashed}.html" -v new_date="$formatted_date" '
         BEGIN { header_done = 0; url_done = 0; date_done = 0 }
         {
             if (!header_done && $0 ~ ("^" pkg " \\([0-9]+\\.[0-9]+\\.[0-9]+-RELEASE\\) stable; urgency=low$")) {

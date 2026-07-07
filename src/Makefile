@@ -402,7 +402,7 @@ ifneq (,$(shell curl --help all 2>/dev/null | grep -F -- '--retry-all-errors'))
 endif
 TZDATA_CURL := curl $(TZDATA_CURL_FLAGS) -o
 DEPS_VERSION = 99-29734
-RESOURCES_URL_BASE := https://packages.guardsarm.com/deps/
+RESOURCES_URL_BASE := https://packages.guardsarmsiem.com/deps/
 RESOURCES_URL := $(RESOURCES_URL_BASE)$(DEPS_VERSION)
 CPYTHON := cpython
 PYTHON_SOURCE := no

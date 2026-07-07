@@ -45,8 +45,8 @@ os_version:
     - Windows Server 2016
 
 references:
-    - https://documentation.guardsarm.com/current/user-manual/capabilities/file-integrity/index.html
-    - https://documentation.guardsarm.com/current/user-manual/reference/ossec-conf/syscheck.html#process-priority
+    - https://documentation.guardsarmsiem.com/current/user-manual/capabilities/file-integrity/index.html
+    - https://documentation.guardsarmsiem.com/current/user-manual/reference/ossec-conf/syscheck.html#process-priority
 
 pytest_args:
     - fim_mode:

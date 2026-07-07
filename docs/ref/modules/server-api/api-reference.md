@@ -3,7 +3,7 @@
 This document covers the key API endpoints with practical examples, the GuardSarm Query Language (WQL), error handling, and input validation.
 
 > All paths are validated against `api/api/spec/spec.yaml` (OpenAPI 3.0).
-> For the complete endpoint specification, refer to the [official GuardSarm API Reference](https://documentation.guardsarm.com/current/user-manual/api/reference.html).
+> For the complete endpoint specification, refer to the [official GuardSarm API Reference](https://documentation.guardsarmsiem.com/current/user-manual/api/reference.html).
 
 ---
 

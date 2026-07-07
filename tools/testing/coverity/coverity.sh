@@ -5,7 +5,7 @@ set -euo pipefail
 # Defaults
 PROJECT="${PROJECT:-guardsarm}"
 COVERITY_TOKEN="${COVERITY_TOKEN:-}"
-EMAIL="${EMAIL:-devel@guardsarm.com}"
+EMAIL="${EMAIL:-devel@guardsarmsiem.com}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(realpath "$SCRIPT_DIR/../../..")"
 COVERITY_DIR="$SCRIPT_DIR"
@@ -39,7 +39,7 @@ No arguments: runs both --build and --upload
 Environment variables:
   PROJECT         Coverity project name (default: "guardsarm")
   COVERITY_TOKEN  Coverity token (required for --build-image or --upload)
-  EMAIL           Email associated with Coverity account (default: devel@guardsarm.com)
+  EMAIL           Email associated with Coverity account (default: devel@guardsarmsiem.com)
 EOF
 }
 

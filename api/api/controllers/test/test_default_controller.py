@@ -9,8 +9,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from connexion.lifecycle import ConnexionResponse
 
-with patch('guardsarm.common.guardsarm_uid'):
-    with patch('guardsarm.common.guardsarm_gid'):
+with patch('guardsarmsiem.common.guardsarm_uid'):
+    with patch('guardsarmsiem.common.guardsarm_gid'):
         sys.modules['guardsarm.rbac.orm'] = MagicMock()
         import guardsarm.rbac.decorators
         from api.controllers.default_controller import (BasicInfo, DATE_FORMAT,

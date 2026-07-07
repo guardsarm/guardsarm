@@ -24,8 +24,8 @@ from uvloop import EventLoopPolicy, new_event_loop
 from guardsarm import GuardSarm
 from guardsarm.core import exception
 
-with patch('guardsarm.common.guardsarm_uid'):
-    with patch('guardsarm.common.guardsarm_gid'):
+with patch('guardsarmsiem.common.guardsarm_uid'):
+    with patch('guardsarmsiem.common.guardsarm_gid'):
         sys.modules['guardsarm.rbac.orm'] = MagicMock()
         import guardsarm.rbac.decorators
 

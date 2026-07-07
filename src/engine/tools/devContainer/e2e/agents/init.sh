@@ -60,8 +60,8 @@ done
 # ------------------------------------------------------------------------------
 GUARDSARM_4X_VERSION="${GUARDSARM_4X_VERSION:-4.14.3-1}"
 
-GUARDSARM_4X_DEB_URL="https://packages.guardsarm.com/4.x/apt/pool/main/w/guardsarm-agent/guardsarm-agent_${GUARDSARM_4X_VERSION}_amd64.deb"
-GUARDSARM_4X_RPM_URL="https://packages.guardsarm.com/4.x/yum/guardsarm-agent-${GUARDSARM_4X_VERSION}.x86_64.rpm"
+GUARDSARM_4X_DEB_URL="https://packages.guardsarmsiem.com/4.x/apt/pool/main/w/guardsarm-agent/guardsarm-agent_${GUARDSARM_4X_VERSION}_amd64.deb"
+GUARDSARM_4X_RPM_URL="https://packages.guardsarmsiem.com/4.x/yum/guardsarm-agent-${GUARDSARM_4X_VERSION}.x86_64.rpm"
 
 #  GUARDSARM_5X_YAML_URL="https://packages-staging.xdrsiem.guardsarm.info/nightly/5.0.0/artifact-urls/artifact_urls_5.0.0-latest.yaml"
 GUARDSARM_5X_YAML_URL="https://packages-staging.xdrsiem.guardsarm.info/nightly-backup/artifact_urls_5.0.0-latest.yaml"
