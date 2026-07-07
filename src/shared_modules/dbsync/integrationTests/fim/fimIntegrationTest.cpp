@@ -1,6 +1,7 @@
 /*
  * GuardSarm DBSYNC
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * August 6, 2020.
  *
  * This program is free software; you can redistribute it

@@ -1,6 +1,7 @@
 /*
  * GuardSarm Module Config for native EDR telemetry
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  *
  * Parses the <wodle name="edr"> block: enable/disable, sweep interval, and the
  * process / network feature switches.

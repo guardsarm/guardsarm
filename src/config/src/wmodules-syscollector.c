@@ -1,6 +1,7 @@
 /*
  * GuardSarm Syscollector Module Configuration
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * March 9, 2017.
  *
  * This program is free software; you can redistribute it

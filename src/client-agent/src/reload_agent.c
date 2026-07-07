@@ -1,5 +1,6 @@
 /* Agent restarting function
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * Aug 23, 2017.
  *
  * This program is free software; you can redistribute it

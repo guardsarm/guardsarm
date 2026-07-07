@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * Copyright (C), 2000-2004 by the monit project group.
  * All Rights Reserved.
  *

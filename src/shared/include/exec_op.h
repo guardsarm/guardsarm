@@ -1,6 +1,7 @@
 /*
  * Subprocess execution library
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * May 1, 2018
  *
  * This program is free software; you can redistribute it

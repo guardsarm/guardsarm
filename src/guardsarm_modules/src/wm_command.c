@@ -1,6 +1,7 @@
 /*
  * GuardSarm Module for custom command execution
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * October 26, 2017.
  *
  * This program is free software; you can redistribute it

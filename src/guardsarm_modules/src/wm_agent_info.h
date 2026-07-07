@@ -1,6 +1,7 @@
 /*
  * GuardSarm Module for Agent Information Management
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * November 25, 2024.
  *
  * This program is free software; you can redistribute it

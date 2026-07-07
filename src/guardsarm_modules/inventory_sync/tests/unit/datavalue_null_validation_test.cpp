@@ -1,6 +1,7 @@
 /**
  * GuardSarm Inventory Sync - DataValue NULL validation tests
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * June 5, 2026.
  *
  * This program is free software; you can redistribute it

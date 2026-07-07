@@ -1,6 +1,7 @@
 /*
  * GuardSarm router - RemoteSubscriber tests
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * June 25, 2025.
  *
  * This program is free software; you can redistribute it

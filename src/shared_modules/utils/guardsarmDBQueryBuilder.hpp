@@ -1,6 +1,7 @@
 /*
  * GuardSarm DB Query Builder
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * October 31, 2023.
  *
  * This program is free software; you can redistribute it

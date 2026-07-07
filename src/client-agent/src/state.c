@@ -2,6 +2,7 @@
  * August 2, 2017
  *
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * All right reserved.
  *
  * This program is free software; you can redistribute it

@@ -1,6 +1,7 @@
 /*
  * GuardSarm Module for native EDR telemetry (process + network)
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  *
  * See wm_edr.h for a description. Native, self-contained: no external library,
  * no dbsync — a lightweight /proc sweeper that streams JSON telemetry to the

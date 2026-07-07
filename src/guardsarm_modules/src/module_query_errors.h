@@ -1,6 +1,7 @@
 /*
  * GuardSarm Module Query Error Codes
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public

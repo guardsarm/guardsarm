@@ -1,6 +1,7 @@
 /*
  * GuardSarm Module for Task management.
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * July 13, 2020.
  *
  * This program is free software; you can redistribute it

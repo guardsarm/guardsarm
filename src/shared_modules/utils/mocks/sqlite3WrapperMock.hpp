@@ -1,6 +1,7 @@
 /*
  * GuardSarm SQLITE3 Wrapper
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * May 5, 2025.
  *
  * This program is free software; you can redistribute it

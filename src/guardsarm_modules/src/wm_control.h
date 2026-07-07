@@ -1,6 +1,7 @@
 /*
  * GuardSarm Module for Agent control
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * January, 2019
  *
  * This program is free software; you can redistribute it

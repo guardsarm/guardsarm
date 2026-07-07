@@ -2,6 +2,7 @@
 
 # GuardSarm package builder
 # Copyright (C) 2015, Wazuh Inc.
+# Copyright (C) 2026, GuardSarm.
 #
 # This program is a free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public

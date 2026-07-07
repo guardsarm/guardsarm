@@ -1,6 +1,7 @@
 /*
  * GuardSarm shared modules utils
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * July 10, 2024.
  *
  * This program is free software; you can redistribute it

@@ -1,6 +1,7 @@
 /*
  * GuardSarm Module for AWS S3 integration
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * January 08, 2018.
  *
  * Updated by Jeremy Phillips <jeremy@uranusbytes.com>

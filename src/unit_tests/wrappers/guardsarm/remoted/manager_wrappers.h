@@ -1,6 +1,7 @@
 /*
  * GuardSarm Shared Configuration Manager
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * Feb 1, 2023.
  *
  * This program is free software; you can redistribute it

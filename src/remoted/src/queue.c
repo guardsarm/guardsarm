@@ -1,5 +1,6 @@
 /* Remoted queue handling library
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * April 2, 2018.
  *
  * This program is free software; you can redistribute it

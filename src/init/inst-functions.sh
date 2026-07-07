@@ -2,6 +2,7 @@
 
 # GuardSarm Installer Functions
 # Copyright (C) 2015, Wazuh Inc.
+# Copyright (C) 2026, GuardSarm.
 # November 18, 2016.
 #
 # This program is free software; you can redistribute it

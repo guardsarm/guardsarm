@@ -2,6 +2,7 @@
 
 # Shell script functions for GuardSarm
 # Copyright (C) 2015, Wazuh Inc.
+# Copyright (C) 2026, GuardSarm.
 # Author: Daniel B. Cid <daniel.cid@gmail.com>
 
 TRUE="true";

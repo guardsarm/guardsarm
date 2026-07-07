@@ -1,6 +1,7 @@
 /*
  * GuardSarm - Content Migration tests
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * March 03, 2023.
  *
  */

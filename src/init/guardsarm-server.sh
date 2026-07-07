@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Copyright (C) 2015, Wazuh Inc.
+# Copyright (C) 2026, GuardSarm.
 # guardsarm-manager-control        This shell script takes care of starting
 #                      or stopping guardsarm-hids
 # Author: Daniel B. Cid <daniel.cid@gmail.com>

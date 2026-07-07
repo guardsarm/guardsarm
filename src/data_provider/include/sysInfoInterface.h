@@ -1,6 +1,7 @@
 /*
  * GuardSarm SysInfo
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * November 9, 2020.
  *
  * This program is free software; you can redistribute it

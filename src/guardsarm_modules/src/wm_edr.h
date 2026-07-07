@@ -1,6 +1,7 @@
 /*
  * GuardSarm Module for native EDR telemetry (process + network)
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  *
  * Native on-agent endpoint telemetry collector. Watches /proc for short-lived
  * process executions (with parent lineage + command line + user) and active

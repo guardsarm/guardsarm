@@ -1,6 +1,7 @@
 /*
  * GuardSarm Syscheck
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * December 31, 2021.
  *
  * This program is free software; you can redistribute it

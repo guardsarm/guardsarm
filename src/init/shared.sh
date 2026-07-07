@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Copyright (C) 2015, Wazuh Inc.
+# Copyright (C) 2026, GuardSarm.
 # Shared variables and functions
 # Author: Daniel B. Cid <daniel.cid@gmail.com>
 

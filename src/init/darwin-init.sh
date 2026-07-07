@@ -4,6 +4,7 @@
 # by Lorenzo Costanzia di Costigliole <mummie@tin.it>
 # Modified by Wazuh, Inc. <info@wazuh.com>.
 # Copyright (C) 2015, Wazuh Inc.
+# Copyright (C) 2026, GuardSarm.
 # This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 
 INSTALLATION_PATH=${1}

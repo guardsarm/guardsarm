@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Copyright (C) 2015, Wazuh Inc.
+# Copyright (C) 2026, GuardSarm.
 # guardsarm-control        This shell script takes care of starting
 #                      or stopping GuardSarm
 # Author: Daniel B. Cid <daniel.cid@gmail.com>

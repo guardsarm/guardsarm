@@ -1,6 +1,7 @@
 /*
  * Dll load notification helper.
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * November 16, 2022.
  *
  * This program is free software; you can redistribute it

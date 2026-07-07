@@ -1,6 +1,7 @@
 /*
  * GuardSarm Module for Security Configuration Assessment
  * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * November 25, 2018.
  *
  * This program is free software; you can redistribute it
