@@ -6,7 +6,7 @@ downstream derivative of **Wazuh** (version 5.0.1).
 ## Upstream
 
 - Upstream project: **wazuh/wazuh**
-- Upstream URL: 
+- Upstream URL: https://github.com/wazuh/wazuh
 - License: **GPLv2** (GNU General Public License, version 2)
 
 The original upstream copyright and the `LICENSE` file are retained **unmodified**
