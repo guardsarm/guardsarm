@@ -61,8 +61,8 @@ function get_guardsarm_installation_directory {
     Start-NativePowerShell {
         # Registry paths to check (in order of preference)
         $registryPaths = @(
+            @{Path = "HKLM:\SOFTWARE\WOW6432Node\GuardSarm, Inc.\GuardSarm Agent"; Key = "GuardSarmInstallDir"},
             @{Path = "HKLM:\SOFTWARE\WOW6432Node\Wazuh, Inc.\Wazuh Agent"; Key = "WazuhInstallDir"},
-            @{Path = "HKLM:\SOFTWARE\WOW6432Node\GuardSarm\GuardSarm Agent"; Key = "GuardSarmInstallDir"},
             @{Path = "HKLM:\SOFTWARE\WOW6432Node\ossec"; Key = "Install_Dir"}
         )
 

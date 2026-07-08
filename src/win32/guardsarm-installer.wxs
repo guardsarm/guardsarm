@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-    <!-- GuardSarm rebrand note: Product Name, Manufacturer and UpgradeCode are FROZEN.
-         Name and Manufacturer feed the registry path Software\[Manufacturer]\[ProductName]
-         (see RegistrySearch below) used to locate an existing install for upgrades;
-         changing them would break upgrade detection for existing GuardSarm installs. They are
-         deferred to a later release with a registry-migration step. The user-visible
-         Add/Remove-Programs and Services-console strings are rebranded via the package
-         Description and the ServiceInstall DisplayName/Description instead. -->
-    <Product Id="*" Name="Wazuh Agent" Language="1033" Version="5.0.1" Manufacturer="Wazuh, Inc." UpgradeCode="F495AC57-7BDE-4C4B-92D8-DBE40A9AA5A0">
+    <!-- GuardSarm identity: Name and Manufacturer feed the registry path
+         Software\[Manufacturer]\[ProductName] (see RegistrySearch below) that do_upgrade.ps1
+         reads to locate an install - keep the two in sync. A fresh UpgradeCode is used since
+         GuardSarm is a distinct product from the upstream lineage. -->
+    <Product Id="*" Name="GuardSarm Agent" Language="1033" Version="2.0.0" Manufacturer="GuardSarm, Inc." UpgradeCode="B99F1031-0B64-47A3-A0D6-75F7962E3A80">
         <Package Description="GuardSarm helps you to gain security visibility into your infrastructure by monitoring hosts at an operating system and application level. It provides the following capabilities: log analysis, file integrity monitoring, intrusions detection and policy and compliance monitoring" Comments="guardsarm-agent" InstallerVersion="200" Compressed="yes" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" CompressionLevel="high" />
 
