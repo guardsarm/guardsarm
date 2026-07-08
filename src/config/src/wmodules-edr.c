@@ -14,6 +14,11 @@
 
 #include "wmodules.h"
 
+// The native EDR module (guardsarm_modules/edr) reads /proc and is Linux-only; its
+// WM_EDR_CONTEXT is not linked into the Windows agent. The config reader is only
+// invoked off-Windows (see wmodules-config.c), so exclude it from the WIN32 build.
+#ifndef WIN32
+
 static const char *XML_DISABLED = "disabled";
 static const char *XML_INTERVAL = "interval";
 static const char *XML_PROCESSES = "processes";
@@ -96,3 +101,5 @@ int wm_edr_read(const OS_XML *xml, XML_NODE node, wmodule *module) {
 
     return 0;
 }
+
+#endif  // !WIN32

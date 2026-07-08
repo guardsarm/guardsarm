@@ -103,7 +103,9 @@ int Read_WModule(const OS_XML *xml, xml_node *node, void *d1, void *d2)
             return OS_INVALID;
         }
     }
-#else
+#elif !defined(WIN32)
+    // The native EDR module (guardsarm_modules/edr) is Linux-only; WM_EDR_CONTEXT is
+    // not linked on Windows, so only reference it off-WIN32 (manager warns).
     else if (!strcmp(node->values[0], WM_EDR_CONTEXT.name)) {
         mwarn("The '%s' module only works for the Linux agent", node->values[0]);
     }
