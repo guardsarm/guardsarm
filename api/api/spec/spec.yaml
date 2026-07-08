@@ -39,8 +39,8 @@ info:
 
     <SecurityDefinitions />
 
-  version: '5.0.1'
-  x-revision: 'alpha0'
+  version: '2.0.0'
+  x-revision: '40000'
   title: 'GuardSarm API REST'
   license:
     name: 'GPL 2.0'
