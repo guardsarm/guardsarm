@@ -315,6 +315,7 @@ ${GUARDSARM_LIB_OUTPUT_PATH}${LIBSTDCPP_NAME}: ${libstdc++_path}
 	mkdir -p ${GUARDSARM_LIB_OUTPUT_PATH}
 	cp $< $@
 	${STRIP_TOOL} -x $@
+	@if [ "${LIBSTDCPP_NAME}" = "libstdc++.so.6" ]; then ln -sf ${LIBSTDCPP_NAME} ${GUARDSARM_LIB_OUTPUT_PATH}libstdc++.so; fi
 
 ${GUARDSARM_LIB_OUTPUT_PATH}${LIBGCC_S_NAME}: ${libgcc_s_path}
 	mkdir -p ${GUARDSARM_LIB_OUTPUT_PATH}
