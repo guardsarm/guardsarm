@@ -1,0 +1,50 @@
+# GuardSarm agent image: build the agent target from the compiled base, install as
+# an agent, and enroll to the manager at startup.
+FROM guardsarm-mgr-base:2.0.0
+
+# Same fixes as the manager: LF line endings + libwazuhext soname alias.
+RUN find /build/guardsarm -name '*.sh' -exec sed -i 's/\r$//' {} + \
+ && sed -i 's/\r$//' /build/guardsarm/install.sh
+RUN cp /build/guardsarm/src/build/lib/libguardsarmext.so /build/guardsarm/src/build/lib/libwazuhext.so 2>/dev/null || true
+
+# --- RUNTIME FIX: rebrand the indexer-plugin schema JSONs BEFORE the agent build.
+# CMake embeds these JSONs into libschema_validator.so. The agent validates every
+# stateful message locally against those embedded schemas BEFORE transmission; the
+# syscollector/FIM/SCA modules emit to guardsarm-states-* indices. `make deps` in the
+# base image fetched the UPSTREAM plugins (wazuh-states-* keys), so without this the
+# validator keys are wazuh-* and the agent discards ALL state data with
+# "No schema validator found for index guardsarm-states-... Discarding message".
+# Rename wazuh->guardsarm in every plugin JSON so the compiled validator carries the
+# correct guardsarm-states-* keys (matches the live OpenSearch templates).
+RUN sed -i 's/wazuh/guardsarm/g' /build/guardsarm/src/external/indexer-plugins/*.json \
+ && ! grep -l wazuh /build/guardsarm/src/external/indexer-plugins/*.json
+
+WORKDIR /build/guardsarm/src
+# The base image only fetched server deps; the agent target additionally needs libdb.
+RUN make deps TARGET=agent INDEXER_PLUGINS_REFS=main -j"$(nproc)"
+RUN make TARGET=agent INDEXER_PLUGINS_REFS=main -j"$(nproc)"
+
+WORKDIR /build/guardsarm
+ENV LD_LIBRARY_PATH=/build/guardsarm/src/build/lib:/build/guardsarm/src/external/jemalloc/lib:/var/ossec/lib
+RUN USER_LANGUAGE=en USER_NO_STOP=y USER_INSTALL_TYPE=agent USER_DIR=/var/ossec \
+    USER_ENABLE_SYSCHECK=y USER_ENABLE_ROOTCHECK=y USER_ENABLE_SYSCOLLECTOR=y \
+    USER_ENABLE_ACTIVE_RESPONSE=y USER_AGENT_SERVER_IP=host.docker.internal \
+    USER_AUTO_START=n USER_BINARYINSTALL=yes \
+    bash install.sh
+
+RUN ln -sf libguardsarmext.so /var/ossec/lib/libwazuhext.so 2>/dev/null || true; \
+    cp -a /build/guardsarm/src/external/jemalloc/lib/libjemalloc.so.2 /var/ossec/lib/ 2>/dev/null || true
+
+ENV LD_LIBRARY_PATH=/var/ossec/lib
+
+# Enroll to the manager (authd on host 1517) and connect (remoted on host 1516), then run.
+CMD bash -c '\
+  CONF=/var/ossec/etc/ossec.conf; \
+  sed -i "s#<address>[^<]*</address>#<address>host.docker.internal</address>#" "$CONF"; \
+  sed -i "0,/<port>1514</s//<port>1516</" "$CONF"; \
+  ( /var/ossec/bin/guardsarm-agent-auth -m host.docker.internal -p 1517 -A guardsarm-agent-01 2>&1 || true ); \
+  sleep 2; \
+  ( /var/ossec/bin/guardsarm-control start || true ); \
+  sleep 5; \
+  echo "=== agent daemons ==="; /var/ossec/bin/guardsarm-control status 2>/dev/null || ps -e | grep -i guardsarm; \
+  touch /var/ossec/logs/ossec.log; tail -f /var/ossec/logs/ossec.log'

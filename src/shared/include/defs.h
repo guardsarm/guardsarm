@@ -79,7 +79,7 @@
  *   - enrollment/upgrade    : on-wire version (locally #undef'd to "v5.0.0" in protocol files)
  * User-visible branding lives in the PRODUCT_* macros (branding.h), NOT here. */
 #define __guardsarm_name    "GuardSarm"       /* FROZEN: wire/DB/metadata literal -- see note above */
-#define __guardsarm_version "v5.0.1"      /* FROZEN: version compat literal -- see note above */
+#define __guardsarm_version "v2.0.0"      /* FROZEN: version compat literal -- see note above */
 #define __author        "Wazuh Inc."
 #define __contact       "info@guardsarmsiem.com"
 #define __site          "http://www.guardsarmsiem.com"
