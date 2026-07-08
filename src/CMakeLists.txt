@@ -30,6 +30,15 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Modern Linux toolchains (el10 / gcc 14) default to PIE at link; some test/util tools
+# don't build their objects position-independent, which fails the PIE link
+# ("relocation R_X86_64_32S ... can not be used when making a PIE object"). Compile all
+# Linux objects position-independent so the default-PIE link succeeds. Windows (MinGW)
+# is left alone - its DLL targets set POSITION_INDEPENDENT_CODE 0 to avoid a warning.
+if(UNIX AND NOT APPLE)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
+
 # Coverity static analysis compatibility
 if(COVERITY)
   add_definitions(-D__GNUC__=8)
