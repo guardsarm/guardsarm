@@ -1,0 +1,12 @@
+# GuardSarm manager 2.0.0 — re-applies runtime config onto the flattened 2.0.0
+# rootfs (exported from the running gsmgr container; a corrupted content-store layer
+# blocked a plain `docker commit`). Filesystem carries the 2.0.0 version data.
+FROM guardsarm-manager:2.0.0-rootfs
+
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    LD_LIBRARY_PATH=/var/ossec/lib:/var/ossec/framework/python/lib
+
+WORKDIR /build/guardsarm
+EXPOSE 1514/tcp 1515/tcp 1516/tcp 55000/tcp
+
+CMD ["/bin/sh","-c","bash -c '  ( /var/ossec/bin/guardsarm-manager-control start || /var/ossec/bin/guardsarm-control start || true );   sleep 8;   echo \"=== GuardSarm daemons ===\"; /var/ossec/bin/guardsarm-manager-control status 2>/dev/null || /var/ossec/bin/guardsarm-control status 2>/dev/null || ps -e;   touch /var/ossec/logs/ossec.log; tail -f /var/ossec/logs/ossec.log'"]

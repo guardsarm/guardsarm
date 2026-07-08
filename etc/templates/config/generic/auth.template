@@ -1,7 +1,7 @@
   <!-- Configuration for guardsarm-authd -->
   <auth>
     <disabled>no</disabled>
-    <port>1515</port>
+    <port>7515</port>
     <use_source_ip>no</use_source_ip>
     <purge>yes</purge>
     <use_password>no</use_password>

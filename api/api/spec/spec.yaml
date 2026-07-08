@@ -19,7 +19,7 @@ info:
 
     Login with USER and PASSWORD:
 
-    `curl -u <USER>:<PASSWORD> -k -X POST "https://<HOST_IP>:55000/security/user/authenticate"`
+    `curl -u <USER>:<PASSWORD> -k -X POST "https://<HOST_IP>:7550/security/user/authenticate"`
     ```json
     {
         "data": {
@@ -30,11 +30,11 @@ info:
     ```
     Use the token from the previous response to perform any endpoint request:
 
-    `curl -k -X <METHOD> "https://<HOST_IP>:55000/<ENDPOINT>" -H  "Authorization: Bearer <YOUR_JWT_TOKEN>"`
+    `curl -k -X <METHOD> "https://<HOST_IP>:7550/<ENDPOINT>" -H  "Authorization: Bearer <YOUR_JWT_TOKEN>"`
 
     Change the token base duration:
 
-    `curl -k -X PUT "https://<HOST_IP>:55000/security/config" -H "Authorization: Bearer <YOUR_JWT_TOKEN>"
+    `curl -k -X PUT "https://<HOST_IP>:7550/security/config" -H "Authorization: Bearer <YOUR_JWT_TOKEN>"
     -d '{"auth_token_exp_timeout": <NEW_EXPIRE_TIME_IN_SECONDS>}'`
 
     <SecurityDefinitions />
@@ -57,7 +57,7 @@ servers:
       host:
         default: localhost
       port:
-        default: '55000'
+        default: '7550'
 
 x-rbac-catalog:
   resources:
@@ -6792,7 +6792,7 @@ paths:
                     - node_name: "master_node"
                       node_api_config:
                         host: 0.0.0.0
-                        port: 55000
+                        port: 7550
                         drop_privileges: true
                         max_upload_size: 10485760
                         authentication_pool_size: 2
@@ -6830,7 +6830,7 @@ paths:
                     - node_name: "worker1"
                       node_api_config:
                         host: 0.0.0.0
-                        port: 55000
+                        port: 7550
                         drop_privileges: true
                         max_upload_size: 10485760
                         authentication_pool_size: 2
@@ -6867,7 +6867,7 @@ paths:
                     - node_name: "worker2"
                       node_api_config:
                         host: 0.0.0.0
-                        port: 55000
+                        port: 7550
                         drop_privileges: true
                         max_upload_size: 10485760
                         authentication_pool_size: 2
