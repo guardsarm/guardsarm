@@ -1,4 +1,5 @@
 /* Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it
@@ -28,6 +29,12 @@ PersistentQueueStorage::PersistentQueueStorage(const std::string& dbPath, Logger
         createTableIfNotExists();
         m_connection.execute("PRAGMA synchronous = NORMAL;");
         m_connection.execute("PRAGMA journal_mode = WAL;");
+        // GuardSarm: without a busy timeout, a writer's BEGIN IMMEDIATE returns SQLITE_BUSY
+        // instantly whenever it collides with an in-flight writer (e.g. the syscollector scan
+        // persisting deltas while the sync worker tries to fetch). On slower platforms
+        // (Windows) that race is frequent and left the whole inventory queue stuck PENDING.
+        // Wait for the write lock instead of failing the sync outright.
+        m_connection.execute("PRAGMA busy_timeout = 30000;");
     }
     // LCOV_EXCL_START
     catch (const std::exception& ex)

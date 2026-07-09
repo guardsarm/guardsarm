@@ -1,4 +1,5 @@
 /* Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026, GuardSarm.
  * Copyright (C) 2009 Trend Micro Inc.
  * All right reserved.
  *
@@ -31,8 +32,13 @@
 #define HC_SHUTDOWN                     "agent shutdown "
 #define HC_ACK                          "agent ack "
 
-/* Minimum agent version that supports module limits */
-#define MIN_VERSION_MODULE_LIMITS       "v5.0.0"
+/* Minimum agent version that supports module limits.
+ * GuardSarm rebaselined the agent/wire version to v2.0.0, so the gate that
+ * decides whether the manager sends the JSON handshake ACK (cluster_name,
+ * cluster_node, agent_groups, module limits) must accept v2.0.0. Leaving this
+ * at v5.0.0 made the manager fall back to the bare legacy ACK for our agents,
+ * which blocked agent-info metadata -> groups -> the whole inventory sync. */
+#define MIN_VERSION_MODULE_LIMITS       "v2.0.0"
 #define HC_REQUEST                      "req "
 #define CFGA_DB_DUMP                    "sca-dump"
 #define HC_SK                           "syscheck "
