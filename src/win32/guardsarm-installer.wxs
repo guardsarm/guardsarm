@@ -189,7 +189,7 @@
             <Custom Action="CleanupLegacyDatabases" After="InstallFiles">IS_UPGRADING_FROM_PRIOR_TO_5X</Custom>
 
             <!-- Start services if necessary -->
-            <Custom Action="StartGuardSarmSvc" After="InstallFinalize">((WIX_UPGRADE_DETECTED) OR (PATCH)) AND ((OSSECRUNNING = "Running") OR (GUARDSARMRUNNING = "Running"))</Custom>
+            <Custom Action="StartGuardSarmSvc" After="InstallFinalize">(NOT Installed AND NOT WIX_UPGRADE_DETECTED) OR (((WIX_UPGRADE_DETECTED) OR (PATCH)) AND ((OSSECRUNNING = "Running") OR (GUARDSARMRUNNING = "Running")))</Custom>
 
             <!-- Stop the service as soon as possible on uninstall, and only on uninstall, in order to unlock the files and folders that must be deleted. -->
 			<Custom Action="SetRemoveAllDataValue" Before="InstallFinalize">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
