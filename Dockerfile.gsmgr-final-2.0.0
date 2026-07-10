@@ -124,6 +124,10 @@ ENV LD_LIBRARY_PATH=/var/guardsarm-manager/lib:/var/guardsarm-manager/framework/
 # lets startup re-create it automatically (idempotent — only when the router table is empty).
 COPY activate_routes.py /var/guardsarm-manager/bin/activate_routes.py
 
+# Liveness (gap L13): the manager is healthy when analysisd's socket is accepting.
+# s6 supervises the daemons; this lets Docker/k8s tell "daemons functional" from
+# "container up". start-period covers the ~60-90s cold start.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=100s --retries=3   CMD [ -S /var/guardsarm-manager/queue/sockets/analysis ] || exit 1
 CMD bash -c '\
   ( /var/guardsarm-manager/bin/guardsarm-manager-control start || true ); \
   for i in $(seq 1 40); do [ -S /var/guardsarm-manager/queue/sockets/analysis ] && break; sleep 2; done; \
