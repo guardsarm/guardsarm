@@ -113,10 +113,10 @@ public:
      */
     void runActionScheduled()
     {
-        logDebug2(WM_CONTENTUPDATER, "Starting scheduled action for '%s'", m_topicName.c_str());
+        logDebug2(GM_CONTENTUPDATER, "Starting scheduled action for '%s'", m_topicName.c_str());
         if (!runActionExclusively(ActionOrchestrator::UpdateData::createContentUpdateData(-1)))
         {
-            logDebug2(WM_CONTENTUPDATER, "Action in progress for '%s', scheduled request ignored", m_topicName.c_str());
+            logDebug2(GM_CONTENTUPDATER, "Action in progress for '%s', scheduled request ignored", m_topicName.c_str());
         }
     }
 
@@ -133,7 +133,7 @@ public:
         {
             m_schedulerThread.join();
         }
-        logDebug2(WM_CONTENTUPDATER, "Scheduler stopped for '%s'", m_topicName.c_str());
+        logDebug2(GM_CONTENTUPDATER, "Scheduler stopped for '%s'", m_topicName.c_str());
     }
 
     /**
@@ -172,10 +172,10 @@ public:
      */
     void runActionOnDemand(const ActionOrchestrator::UpdateData& updateData)
     {
-        logDebug2(WM_CONTENTUPDATER, "Starting on-demand action for '%s'", m_topicName.c_str());
+        logDebug2(GM_CONTENTUPDATER, "Starting on-demand action for '%s'", m_topicName.c_str());
         if (!runActionExclusively(updateData))
         {
-            logDebug2(WM_CONTENTUPDATER, "Action in progress for '%s', on-demand request ignored", m_topicName.c_str());
+            logDebug2(GM_CONTENTUPDATER, "Action in progress for '%s', on-demand request ignored", m_topicName.c_str());
         }
     }
 
@@ -204,7 +204,7 @@ private:
 
     void runAction(const ActionOrchestrator::UpdateData& updateData)
     {
-        logDebug2(WM_CONTENTUPDATER, "Action for '%s' started", m_topicName.c_str());
+        logDebug2(GM_CONTENTUPDATER, "Action for '%s' started", m_topicName.c_str());
 
         try
         {
@@ -212,10 +212,10 @@ private:
         }
         catch (const std::exception& e)
         {
-            logError(WM_CONTENTUPDATER, "Action for '%s' failed: %s.", m_topicName.c_str(), e.what());
+            logError(GM_CONTENTUPDATER, "Action for '%s' failed: %s.", m_topicName.c_str(), e.what());
         }
 
-        logDebug2(WM_CONTENTUPDATER, "Action for '%s' finished", m_topicName.c_str());
+        logDebug2(GM_CONTENTUPDATER, "Action for '%s' finished", m_topicName.c_str());
         m_actionInProgress = false;
     }
 };

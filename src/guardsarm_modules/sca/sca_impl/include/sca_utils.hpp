@@ -14,13 +14,13 @@ namespace sca
     };
 
     /// @brief Types of supported rules.
-    enum WM_SCA_TYPE
+    enum GM_SCA_TYPE
     {
-        WM_SCA_TYPE_FILE,
-        WM_SCA_TYPE_REGISTRY,
-        WM_SCA_TYPE_PROCESS,
-        WM_SCA_TYPE_DIR,
-        WM_SCA_TYPE_COMMAND
+        GM_SCA_TYPE_FILE,
+        GM_SCA_TYPE_REGISTRY,
+        GM_SCA_TYPE_PROCESS,
+        GM_SCA_TYPE_DIR,
+        GM_SCA_TYPE_COMMAND
     };
 
     /// @brief Types of supported check results.

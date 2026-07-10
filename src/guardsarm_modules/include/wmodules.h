@@ -14,16 +14,16 @@
 #include "config.h"
 #include "wmodules_def.h"
 
-#define WM_STATE_DIR    "var/wodles"               // Default directory for states.
-#define WM_DIR_WIN      "wodles"                    // Default directory for states (Windows)
-#define WM_STRING_MAX   67108864                    // Max. dynamic string size (64 MB).
-#define WM_BUFFER_MAX   1024                        // Max. static buffer size.
-#define WM_BUFFER_MIN   1024                        // Starting JSON buffer length.
-#define WM_MAX_ATTEMPTS 3                           // Max. number of attempts.
-#define WM_MAX_WAIT     500                           // Max. wait between attempts in milliseconds.
-#define WM_IO_WRITE     0
-#define WM_IO_READ      1
-#define WM_ERROR_TIMEOUT 1                          // Error code for timeout.
+#define GM_STATE_DIR    "var/wodles"               // Default directory for states.
+#define GM_DIR_WIN      "wodles"                    // Default directory for states (Windows)
+#define GM_STRING_MAX   67108864                    // Max. dynamic string size (64 MB).
+#define GM_BUFFER_MAX   1024                        // Max. static buffer size.
+#define GM_BUFFER_MIN   1024                        // Starting JSON buffer length.
+#define GM_MAX_ATTEMPTS 3                           // Max. number of attempts.
+#define GM_MAX_WAIT     500                           // Max. wait between attempts in milliseconds.
+#define GM_IO_WRITE     0
+#define GM_IO_READ      1
+#define GM_ERROR_TIMEOUT 1                          // Error code for timeout.
 #define VU_WM_NAME "vulnerability-detector"
 #define AZ_WM_NAME "azure-logs"
 #define SCA_WM_NAME "sca"
@@ -38,8 +38,8 @@
 #define SYSCOLLECTOR_WM_NAME "syscollector"
 #define FIM_NAME "fim"                      // FIM module name. It is not a wm:module, but we define the name for query it.
 
-#define WM_DEF_TIMEOUT      1800            // Default runtime limit (30 minutes)
-#define WM_DEF_INTERVAL     86400           // Default cycle interval (1 day)
+#define GM_DEF_TIMEOUT      1800            // Default runtime limit (30 minutes)
+#define GM_DEF_INTERVAL     86400           // Default cycle interval (1 day)
 
 #define DAY_SEC    86400
 
@@ -79,49 +79,49 @@ typedef enum crypto_type {
 #include "wm_ms_graph.h"
 #include "wm_inventory_sync.h"
 
-extern wmodule *wmodules;       // Loaded modules.
-extern int wm_task_nice;        // Nice value for tasks.
-extern int wm_max_eps;          // Maximum events per second sent by GuardSarm Module
-extern int wm_kill_timeout;     // Time for a process to quit before killing it
-extern int wm_debug_level;
-extern volatile sig_atomic_t wm_shutdown_requested;
+extern gmodule *gmodules;       // Loaded modules.
+extern int gm_task_nice;        // Nice value for tasks.
+extern int gm_max_eps;          // Maximum events per second sent by GuardSarm Module
+extern int gm_kill_timeout;     // Time for a process to quit before killing it
+extern int gm_debug_level;
+extern volatile sig_atomic_t gm_shutdown_requested;
 
-void wm_sleep_interruptible(int seconds);
-void wm_sleep_until_interruptible(time_t abs_time);
+void gm_sleep_interruptible(int seconds);
+void gm_sleep_until_interruptible(time_t abs_time);
 // Like select() on a single read fd but checks wm_shutdown_requested every second; returns 0 on shutdown.
-int wm_select_interruptible(int sock, fd_set *fdset);
+int gm_select_interruptible(int sock, fd_set *fdset);
 
 // Read XML configuration and internal options
-int wm_config();
+int gm_config();
 cJSON *getModulesConfig(void);
 cJSON *getModulesInternalOptions(void);
 int modulesSync(char* args, size_t length);
 
 // Add module to the global list
-void wm_add(wmodule *module);
+void gm_add(gmodule *module);
 
 /*
  * @brief Get ID group of GuardSarm user.
  *
  * @return ID group.
  */
-gid_t wm_getGroupID(void);
+gid_t gm_getGroupID(void);
 
 /*
  * @brief Set ID group of guardsarm modules
  *
  * @param[in] gid ID group.
  */
-void wm_setGroupID(const gid_t gid);
+void gm_setGroupID(const gid_t gid);
 
 // Check general configuration
-int wm_check();
+int gm_check();
 
 // Destroy configuration data
-void wm_destroy();
+void gm_destroy();
 
 // Destroy module
-void wm_module_free(wmodule * config);
+void gm_module_free(gmodule * config);
 
 /* Execute command with timeout of secs. exitcode can be NULL.
  *
@@ -132,45 +132,45 @@ void wm_module_free(wmodule * config);
  * contain data.
  * env_path is a pointer to an string to add to the PATH environment variable.
  */
-int wm_exec(char *command, char **output, int *exitcode, int secs, const char * add_path);
+int gm_exec(char *command, char **output, int *exitcode, int secs, const char * add_path);
 
 #ifdef WIN32
 // Add process to pool
-void wm_append_handle(HANDLE hProcess);
+void gm_append_handle(HANDLE hProcess);
 
 // Remove process group from pool
-void wm_remove_handle(HANDLE hProcess);
+void gm_remove_handle(HANDLE hProcess);
 #else
 // Add process to pool
-void wm_append_sid(pid_t sid);
+void gm_append_sid(pid_t sid);
 
 // Remove process group from pool
-void wm_remove_sid(pid_t sid);
+void gm_remove_sid(pid_t sid);
 #endif
 
 // Initialize children pool
-void wm_children_pool_init();
+void gm_children_pool_init();
 
 // Terminate every child process group
-void wm_kill_children();
+void gm_kill_children();
 
 // Reads an HTTP header and extracts an element from a regex
-char* wm_read_http_header_element(char *header, char *regex);
+char* gm_read_http_header_element(char *header, char *regex);
 
 /* Load or save the running state
  * op: WM_IO_READ | WM_IO_WRITE
  * Returns 0 if success, or 1 if fail.
  */
-int wm_state_io(const char * tag, int op, void *state, size_t size);
+int gm_state_io(const char * tag, int op, void *state, size_t size);
 
 // Frees the wmodule struct
-void wm_free(wmodule * c);
+void gm_free(gmodule * c);
 
 // Send message to a queue with a specific delay
-int wm_sendmsg(int usec, int queue, const char *message, const char *locmsg, char loc) __attribute__((nonnull));
+int gm_sendmsg(int usec, int queue, const char *message, const char *locmsg, char loc) __attribute__((nonnull));
 
 // Send message to a queue with a specific delay, and the option to stop the wait process.
-int wm_sendmsg_ex(int usec, int queue, const char *message, const char *locmsg, char loc, bool (*fn_prd)()) __attribute__((nonnull));
+int gm_sendmsg_ex(int usec, int queue, const char *message, const char *locmsg, char loc, bool (*fn_prd)()) __attribute__((nonnull));
 
 /**
  Check the binary which executes a command has the specified hash.
@@ -179,7 +179,7 @@ int wm_sendmsg_ex(int usec, int queue, const char *message, const char *locmsg, 
     -1 if the binary doesn't exist.
     -2 invalid parameters.
 */
-int wm_validate_command(const char *command, const char *digest, crypto_type ctype);
+int gm_validate_command(const char *command, const char *digest, crypto_type ctype);
 
 #ifndef WIN32
 // Com request thread dispatcher
@@ -203,7 +203,7 @@ int wmcom_sync(char * buffer, size_t length);
  * @return Pointer to a module structure.
  * @return NULL if the module was not found.
  */
-wmodule * wm_find_module(const char * name);
+gmodule * gm_find_module(const char * name);
 
 /**
  * @brief Run a query in a module
@@ -215,7 +215,7 @@ wmodule * wm_find_module(const char * name);
  * @param output Output payload
  * @return Size of the output
  */
-size_t wm_module_query(char * query, char ** output);
+size_t gm_module_query(char * query, char ** output);
 
 /**
  * @brief Query module with JSON format (efficient version with module_name parameter)
@@ -224,7 +224,7 @@ size_t wm_module_query(char * query, char ** output);
  * @param output Output response
  * @return size_t Size of the response
  */
-size_t wm_module_query_json_ex(const char* module_name, const char* json_command, char** output);
+size_t gm_module_query_json_ex(const char* module_name, const char* json_command, char** output);
 
 /**
  * @brief Query FIM module directly via syscom socket
@@ -232,6 +232,6 @@ size_t wm_module_query_json_ex(const char* module_name, const char* json_command
  * @param response Output response
  * @return size_t Size of the response
  */
-size_t wm_fim_query_json(const char* command, char** response);
+size_t gm_fim_query_json(const char* command, char** response);
 
 #endif // W_MODULES

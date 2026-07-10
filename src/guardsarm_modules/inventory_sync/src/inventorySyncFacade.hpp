@@ -41,7 +41,7 @@ constexpr int DEFAULT_TIME {60 * 10}; // 10 minutes
 constexpr auto INVENTORY_SYNC_PATH {"queue/inventory_sync"};
 constexpr auto INVENTORY_SYNC_TOPIC {"inventory-states"};
 constexpr auto INVENTORY_SYNC_SUBSCRIBER_ID {"inventory-sync-module"};
-constexpr auto WM_INVENTORY_SYNC_LOGTAG {"guardsarm-manager-modulesd:inventory-sync"};
+constexpr auto GM_INVENTORY_SYNC_LOGTAG {"guardsarm-manager-modulesd:inventory-sync"};
 constexpr auto GUARDSARM_STATES_INDEX_PATTERN {"guardsarm-states-*"};
 constexpr auto SOCKET_KEYSTORE_PATH {"queue/sockets/keystore"};
 
@@ -605,7 +605,7 @@ public:
 
         logDebug2(LOGGER_DEFAULT_TAG, "Configuration: %s", configuration.dump().c_str());
         m_indexerConnector = std::make_unique<TIndexerConnector>(
-            configuration.at("indexer"), LoggingContext {WM_INVENTORY_SYNC_LOGTAG, logFunction});
+            configuration.at("indexer"), LoggingContext {GM_INVENTORY_SYNC_LOGTAG, logFunction});
 
         if (!configuration.contains("clusterName"))
         {

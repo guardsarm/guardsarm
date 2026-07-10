@@ -208,13 +208,13 @@ private:
 
         if (context.spUpdaterBaseContext->spStopCondition->check())
         {
-            logInfo(WM_CONTENTUPDATER,
+            logInfo(GM_CONTENTUPDATER,
                     "IndexerDownloader: Stop requested before waiting for consumer '%s' to become ready.",
                     consumerStatusId.c_str());
             return false;
         }
 
-        IndexerConnectorSync syncConnector(m_config.at("indexer"), LoggingContext {WM_CONTENTUPDATER, {}});
+        IndexerConnectorSync syncConnector(m_config.at("indexer"), LoggingContext {GM_CONTENTUPDATER, {}});
 
         const auto pollSeconds = static_cast<size_t>(
             std::chrono::duration_cast<std::chrono::seconds>(CONSUMER_STATUS_POLL_INTERVAL).count());
@@ -227,7 +227,7 @@ private:
         {
             if (context.spUpdaterBaseContext->spStopCondition->check())
             {
-                logInfo(WM_CONTENTUPDATER,
+                logInfo(GM_CONTENTUPDATER,
                         "IndexerDownloader: Stop requested while waiting for consumer '%s' to become ready.",
                         consumerStatusId.c_str());
                 return false;
@@ -247,14 +247,14 @@ private:
                 switch (status)
                 {
                     case ConsumerStatus::Ready:
-                        logInfo(WM_CONTENTUPDATER,
+                        logInfo(GM_CONTENTUPDATER,
                                 "IndexerDownloader: Consumer '%s' in index '%s' is ready. Starting feed download.",
                                 consumerStatusId.c_str(),
                                 consumerStatusIndex.c_str());
                         return true;
 
                     case ConsumerStatus::Missing:
-                        logInfo(WM_CONTENTUPDATER,
+                        logInfo(GM_CONTENTUPDATER,
                                 "IndexerDownloader: Consumer '%s' not found in '%s'. Waiting %zus before retrying.",
                                 consumerStatusId.c_str(),
                                 consumerStatusIndex.c_str(),
@@ -262,7 +262,7 @@ private:
                         break;
 
                     case ConsumerStatus::Empty:
-                        logInfo(WM_CONTENTUPDATER,
+                        logInfo(GM_CONTENTUPDATER,
                                 "IndexerDownloader: Consumer '%s' has empty status in '%s'. Waiting %zus before "
                                 "retrying.",
                                 consumerStatusId.c_str(),
@@ -271,7 +271,7 @@ private:
                         break;
 
                     case ConsumerStatus::Running:
-                        logInfo(WM_CONTENTUPDATER,
+                        logInfo(GM_CONTENTUPDATER,
                                 "IndexerDownloader: Consumer '%s' is still running in '%s'. Waiting %zus before "
                                 "retrying.",
                                 consumerStatusId.c_str(),
@@ -283,7 +283,7 @@ private:
                         ++failedStatusCount;
                         if (failedStatusCount >= INDEXER_WARN_AFTER_ATTEMPTS)
                         {
-                            logWarn(WM_CONTENTUPDATER,
+                            logWarn(GM_CONTENTUPDATER,
                                     "IndexerDownloader: Consumer '%s' in '%s' reports a failed status. Waiting %zus "
                                     "before retrying.",
                                     consumerStatusId.c_str(),
@@ -292,7 +292,7 @@ private:
                         }
                         else
                         {
-                            logDebug2(WM_CONTENTUPDATER,
+                            logDebug2(GM_CONTENTUPDATER,
                                       "IndexerDownloader: Consumer '%s' in '%s' reports a failed status — waiting %zus "
                                       "before retrying (attempt %zu/%zu).",
                                       consumerStatusId.c_str(),
@@ -304,7 +304,7 @@ private:
                         break;
 
                     case ConsumerStatus::Unknown:
-                        logWarn(WM_CONTENTUPDATER,
+                        logWarn(GM_CONTENTUPDATER,
                                 "IndexerDownloader: Consumer '%s' in '%s' returned an unknown status '%s'. Waiting "
                                 "%zus before retrying.",
                                 consumerStatusId.c_str(),
@@ -319,7 +319,7 @@ private:
                 ++queryFailures;
                 if (queryFailures >= INDEXER_WARN_AFTER_ATTEMPTS)
                 {
-                    logWarn(WM_CONTENTUPDATER,
+                    logWarn(GM_CONTENTUPDATER,
                             "IndexerDownloader: Failed to query consumer '%s' in '%s' (%s). Waiting %zus before "
                             "retrying.",
                             consumerStatusId.c_str(),
@@ -329,7 +329,7 @@ private:
                 }
                 else
                 {
-                    logDebug2(WM_CONTENTUPDATER,
+                    logDebug2(GM_CONTENTUPDATER,
                               "IndexerDownloader: Indexer not available yet — cannot query consumer '%s' in '%s' (%s). "
                               "Waiting %zus before retrying (attempt %zu/%zu).",
                               consumerStatusId.c_str(),
@@ -344,7 +344,7 @@ private:
             if (context.spUpdaterBaseContext->spStopCondition->waitFor(
                     std::chrono::duration_cast<std::chrono::milliseconds>(CONSUMER_STATUS_POLL_INTERVAL)))
             {
-                logInfo(WM_CONTENTUPDATER,
+                logInfo(GM_CONTENTUPDATER,
                         "IndexerDownloader: Stop requested while waiting for consumer '%s' to become ready.",
                         consumerStatusId.c_str());
                 return false;
@@ -381,7 +381,7 @@ private:
             return;
         }
 
-        logDebug2(WM_CONTENTUPDATER,
+        logDebug2(GM_CONTENTUPDATER,
                   "IndexerDownloader: invalidating stored cursor and forcing a full reload on the next attempt.");
         context.spUpdaterBaseContext->spRocksDB->put(
             Utils::getCompactTimestamp(std::time(nullptr)), "0", Components::Columns::CURRENT_OFFSET);
@@ -521,7 +521,7 @@ private:
 
         const auto& sourceFilter = getSourceFilter();
 
-        IndexerConnectorSync syncConnector(m_config.at("indexer"), LoggingContext {WM_CONTENTUPDATER, {}});
+        IndexerConnectorSync syncConnector(m_config.at("indexer"), LoggingContext {GM_CONTENTUPDATER, {}});
 
         auto pit = syncConnector.createPointInTime({indexName}, PIT_KEEP_ALIVE);
         auto pitGuard = std::unique_ptr<PointInTime, std::function<void(PointInTime*)>>(
@@ -536,11 +536,11 @@ private:
                 {
                     if (escalateLogs)
                     {
-                        logWarn(WM_CONTENTUPDATER, "IndexerDownloader: Failed to delete PIT: %s", e.what());
+                        logWarn(GM_CONTENTUPDATER, "IndexerDownloader: Failed to delete PIT: %s", e.what());
                     }
                     else
                     {
-                        logDebug2(WM_CONTENTUPDATER, "IndexerDownloader: Failed to delete PIT: %s", e.what());
+                        logDebug2(GM_CONTENTUPDATER, "IndexerDownloader: Failed to delete PIT: %s", e.what());
                     }
                 }
             });
@@ -553,7 +553,7 @@ private:
         {
             if (context.spUpdaterBaseContext->spStopCondition->check())
             {
-                logInfo(WM_CONTENTUPDATER, "IndexerDownloader: Stop requested during PIT fetch — aborting.");
+                logInfo(GM_CONTENTUPDATER, "IndexerDownloader: Stop requested during PIT fetch — aborting.");
                 break;
             }
 
@@ -619,7 +619,7 @@ private:
 
         const auto& sourceFilter = getSourceFilter();
 
-        IndexerConnectorSync syncConnector(m_config.at("indexer"), LoggingContext {WM_CONTENTUPDATER, {}});
+        IndexerConnectorSync syncConnector(m_config.at("indexer"), LoggingContext {GM_CONTENTUPDATER, {}});
 
         auto pit = syncConnector.createPointInTime({indexName}, PIT_KEEP_ALIVE);
         auto pitGuard = std::unique_ptr<PointInTime, std::function<void(PointInTime*)>>(
@@ -634,11 +634,11 @@ private:
                 {
                     if (escalateLogs)
                     {
-                        logWarn(WM_CONTENTUPDATER, "IndexerDownloader: Failed to delete PIT: %s", e.what());
+                        logWarn(GM_CONTENTUPDATER, "IndexerDownloader: Failed to delete PIT: %s", e.what());
                     }
                     else
                     {
-                        logDebug2(WM_CONTENTUPDATER, "IndexerDownloader: Failed to delete PIT: %s", e.what());
+                        logDebug2(GM_CONTENTUPDATER, "IndexerDownloader: Failed to delete PIT: %s", e.what());
                     }
                 }
             });
@@ -650,7 +650,7 @@ private:
         std::vector<std::string> errors;
         std::mutex errorsMutex;
 
-        logInfo(WM_CONTENTUPDATER,
+        logInfo(GM_CONTENTUPDATER,
                 "IndexerDownloader: Starting sliced PIT download with %zu slices, pageSize=%zu",
                 numSlices,
                 pageSize);
@@ -660,7 +660,7 @@ private:
             try
             {
                 // Each slice gets its own connector to avoid sharing HTTP state across threads.
-                IndexerConnectorSync sliceConnector(m_config.at("indexer"), LoggingContext {WM_CONTENTUPDATER, {}});
+                IndexerConnectorSync sliceConnector(m_config.at("indexer"), LoggingContext {GM_CONTENTUPDATER, {}});
 
                 const nlohmann::json sliceParam = {{"id", sliceId}, {"max", numSlices}};
                 std::optional<nlohmann::json> searchAfter = std::nullopt;
@@ -672,7 +672,7 @@ private:
                 {
                     if (context.spUpdaterBaseContext->spStopCondition->check())
                     {
-                        logInfo(WM_CONTENTUPDATER, "IndexerDownloader: Stop requested — slice %zu aborting.", sliceId);
+                        logInfo(GM_CONTENTUPDATER, "IndexerDownloader: Stop requested — slice %zu aborting.", sliceId);
                         break;
                     }
 
@@ -720,7 +720,7 @@ private:
                         }
                         catch (const std::exception& e)
                         {
-                            logWarn(WM_CONTENTUPDATER,
+                            logWarn(GM_CONTENTUPDATER,
                                     "IndexerDownloader: Slice %zu failed to parse cursor '%s': %s",
                                     sliceId,
                                     sliceCursor.c_str(),
@@ -733,7 +733,7 @@ private:
                     std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0)
                         .count();
                 const bool stopped = context.spUpdaterBaseContext->spStopCondition->check();
-                logInfo(WM_CONTENTUPDATER,
+                logInfo(GM_CONTENTUPDATER,
                         "IndexerDownloader: Slice %zu (%zu/%zu) %s — %zu docs in %ldms",
                         sliceId,
                         sliceId + 1,
@@ -748,11 +748,11 @@ private:
                 errors.push_back("Slice " + std::to_string(sliceId) + ": " + e.what());
                 if (escalateLogs)
                 {
-                    logWarn(WM_CONTENTUPDATER, "IndexerDownloader: Slice %zu failed: %s", sliceId, e.what());
+                    logWarn(GM_CONTENTUPDATER, "IndexerDownloader: Slice %zu failed: %s", sliceId, e.what());
                 }
                 else
                 {
-                    logDebug2(WM_CONTENTUPDATER, "IndexerDownloader: Slice %zu failed: %s", sliceId, e.what());
+                    logDebug2(GM_CONTENTUPDATER, "IndexerDownloader: Slice %zu failed: %s", sliceId, e.what());
                 }
             }
         };
@@ -799,12 +799,12 @@ private:
         {
             if (attempt == 0)
             {
-                logInfo(WM_CONTENTUPDATER, "IndexerDownloader: Starting initial full load (slices=%zu)", numSlices);
+                logInfo(GM_CONTENTUPDATER, "IndexerDownloader: Starting initial full load (slices=%zu)", numSlices);
             }
             else
             {
                 logInfo(
-                    WM_CONTENTUPDATER, "IndexerDownloader: Retrying initial full load (attempt %zu) ...", attempt + 1);
+                    GM_CONTENTUPDATER, "IndexerDownloader: Retrying initial full load (attempt %zu) ...", attempt + 1);
             }
 
             // Stay at INFO/DEBUG for the first attempts, escalate to WARNING/ERROR afterwards.
@@ -829,14 +829,14 @@ private:
                 exceptionOccurred = true;
                 if (escalate)
                 {
-                    logWarn(WM_CONTENTUPDATER,
+                    logWarn(GM_CONTENTUPDATER,
                             "IndexerDownloader: Initial load failed (%s) — retrying in %zus.",
                             e.what(),
                             static_cast<size_t>(INDEXER_RETRY_INTERVAL.count()));
                 }
                 else
                 {
-                    logDebug2(WM_CONTENTUPDATER,
+                    logDebug2(GM_CONTENTUPDATER,
                               "IndexerDownloader: Indexer not available yet (%s) — retrying in %zus "
                               "(attempt %zu/%zu).",
                               e.what(),
@@ -849,7 +849,7 @@ private:
             if (totalProcessed > 0)
             {
                 const bool stopped = context.spUpdaterBaseContext->spStopCondition->check();
-                logInfo(WM_CONTENTUPDATER,
+                logInfo(GM_CONTENTUPDATER,
                         "IndexerDownloader: Initial load download phase %s — %zu documents, cursor: '%s'",
                         stopped ? "interrupted" : "complete",
                         totalProcessed,
@@ -861,13 +861,13 @@ private:
             {
                 if (escalate)
                 {
-                    logWarn(WM_CONTENTUPDATER,
+                    logWarn(GM_CONTENTUPDATER,
                             "IndexerDownloader: Indexer index not ready (0 documents) — retrying in %zus.",
                             static_cast<size_t>(INDEXER_RETRY_INTERVAL.count()));
                 }
                 else
                 {
-                    logDebug2(WM_CONTENTUPDATER,
+                    logDebug2(GM_CONTENTUPDATER,
                               "IndexerDownloader: Indexer index not ready yet (0 documents) — retrying in %zus "
                               "(attempt %zu/%zu).",
                               static_cast<size_t>(INDEXER_RETRY_INTERVAL.count()),
@@ -882,7 +882,7 @@ private:
             if (context.spUpdaterBaseContext->spStopCondition->waitFor(
                     std::chrono::duration_cast<std::chrono::milliseconds>(INDEXER_RETRY_INTERVAL)))
             {
-                logInfo(WM_CONTENTUPDATER, "IndexerDownloader: Stop requested during initial load retry — aborting.");
+                logInfo(GM_CONTENTUPDATER, "IndexerDownloader: Stop requested during initial load retry — aborting.");
                 return 0;
             }
         }
@@ -896,14 +896,14 @@ private:
      */
     size_t incrementalUpdate(UpdaterContext& context, const std::string& lastCursor) const
     {
-        logInfo(WM_CONTENTUPDATER, "IndexerDownloader: Starting incremental update from offset %s", lastCursor.c_str());
+        logInfo(GM_CONTENTUPDATER, "IndexerDownloader: Starting incremental update from offset %s", lastCursor.c_str());
 
         const nlohmann::json query = {{"range", {{"offset", {{"gt", std::stoull(lastCursor)}}}}}};
 
         const size_t totalProcessed = fetchWithPit(context, query, lastCursor);
         const bool stopped = context.spUpdaterBaseContext->spStopCondition->check();
 
-        logInfo(WM_CONTENTUPDATER,
+        logInfo(GM_CONTENTUPDATER,
                 "IndexerDownloader: Incremental update download phase %s — %zu documents, new cursor: '%s'",
                 stopped ? "interrupted" : "complete",
                 totalProcessed,
@@ -930,7 +930,7 @@ public:
      */
     std::shared_ptr<UpdaterContext> handleRequest(std::shared_ptr<UpdaterContext> context) override
     {
-        logDebug1(WM_CONTENTUPDATER, "IndexerDownloader - Starting process");
+        logDebug1(GM_CONTENTUPDATER, "IndexerDownloader - Starting process");
 
         // Early completion-validation failures are expected (indexer settling): DEBUG until the threshold.
         size_t completionFailures = 0;
@@ -951,7 +951,7 @@ public:
                 }
                 catch (const std::exception&)
                 {
-                    logWarn(WM_CONTENTUPDATER,
+                    logWarn(GM_CONTENTUPDATER,
                             "IndexerDownloader: stored cursor '%s' is not a valid integer — falling back to initial "
                             "load.",
                             lastCursor.c_str());
@@ -991,14 +991,14 @@ public:
             ++completionFailures;
             if (completionFailures >= INDEXER_WARN_AFTER_ATTEMPTS)
             {
-                logWarn(WM_CONTENTUPDATER,
+                logWarn(GM_CONTENTUPDATER,
                         "IndexerDownloader: downloaded feed is not ready after completion validation. "
                         "The stored cursor was invalidated and a full reload will be retried in %zus.",
                         static_cast<size_t>(INDEXER_RETRY_INTERVAL.count()));
             }
             else
             {
-                logDebug2(WM_CONTENTUPDATER,
+                logDebug2(GM_CONTENTUPDATER,
                           "IndexerDownloader: downloaded feed not ready yet after completion validation — "
                           "invalidating cursor and retrying a full reload in %zus (attempt %zu/%zu).",
                           static_cast<size_t>(INDEXER_RETRY_INTERVAL.count()),
@@ -1009,7 +1009,7 @@ public:
             if (context->spUpdaterBaseContext->spStopCondition->waitFor(
                     std::chrono::duration_cast<std::chrono::milliseconds>(INDEXER_RETRY_INTERVAL)))
             {
-                logInfo(WM_CONTENTUPDATER,
+                logInfo(GM_CONTENTUPDATER,
                         "IndexerDownloader: Stop requested during completion validation retry — aborting.");
                 break;
             }

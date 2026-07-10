@@ -190,7 +190,7 @@ void agent_info_clear_agent_groups()
     }
 }
 
-void agent_info_start(const struct wm_agent_info_t* agent_info_config)
+void agent_info_start(const struct gm_agent_info_t* agent_info_config)
 {
     if (!agent_info_config)
     {

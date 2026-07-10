@@ -4,8 +4,8 @@
  * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
-#ifndef WM_CONTROL_WRAPPERS_H
-#define WM_CONTROL_WRAPPERS_H
+#ifndef GM_CONTROL_WRAPPERS_H
+#define GM_CONTROL_WRAPPERS_H
 
 #include <stdbool.h>
 #include <stddef.h>

@@ -29,37 +29,37 @@
 
 #define TEST_MAX_DATES 5
 
-#define WM_COMMAND_TEST_LOGTAG "guardsarm-modulesd:command"
+#define GM_COMMAND_TEST_LOGTAG "guardsarm-modulesd:command"
 
-static wmodule *command_module;
+static gmodule *command_module;
 static OS_XML *lxml;
 extern int test_mode;
 
-typedef enum wm_command_payload_case {
-    WM_PAYLOAD_CASE_NORMAL = 0,
-    WM_PAYLOAD_CASE_EMPTY,
-    WM_PAYLOAD_CASE_TRUNCATED,
-    WM_PAYLOAD_CASE_METADATA_ONLY,
-} wm_command_payload_case;
+typedef enum gm_command_payload_case {
+    GM_PAYLOAD_CASE_NORMAL = 0,
+    GM_PAYLOAD_CASE_EMPTY,
+    GM_PAYLOAD_CASE_TRUNCATED,
+    GM_PAYLOAD_CASE_METADATA_ONLY,
+} gm_command_payload_case;
 
-typedef struct wm_command_payload_expectation {
-    wm_command_payload_case payload_case;
+typedef struct gm_command_payload_expectation {
+    gm_command_payload_case payload_case;
     const char *command_line;
     const char *tag;
     int exit_code;
     const char *raw_output;
     const char *expected_output;   // For NORMAL/EMPTY/METADATA_ONLY expects exact; for TRUNCATED expects prefix match.
-} wm_command_payload_expectation;
+} gm_command_payload_expectation;
 
-static wm_command_payload_expectation g_payload_expectation;
+static gm_command_payload_expectation g_payload_expectation;
 
-static size_t wm_command_max_json_payload_len(void) {
-    const char *extag = WM_COMMAND_CONTEXT.name;
+static size_t gm_command_max_json_payload_len(void) {
+    const char *extag = GM_COMMAND_CONTEXT.name;
     const size_t header_len = 3 + strlen(extag); // "1:" + extag + ":"
     return header_len < OS_MAXSTR ? (OS_MAXSTR - header_len - 1) : 0;
 }
 
-static const char *wm_command_json_get_string(const cJSON *obj, const char *key) {
+static const char *gm_command_json_get_string(const cJSON *obj, const char *key) {
     const cJSON *item = cJSON_GetObjectItemCaseSensitive((cJSON *)obj, key);
     if (!cJSON_IsString(item) || !item->valuestring) {
         return NULL;
@@ -67,12 +67,12 @@ static const char *wm_command_json_get_string(const cJSON *obj, const char *key)
     return item->valuestring;
 }
 
-static const cJSON *wm_command_json_get_object(const cJSON *obj, const char *key) {
+static const cJSON *gm_command_json_get_object(const cJSON *obj, const char *key) {
     const cJSON *item = cJSON_GetObjectItemCaseSensitive((cJSON *)obj, key);
     return cJSON_IsObject(item) ? item : NULL;
 }
 
-static const cJSON *wm_command_json_get_array(const cJSON *obj, const char *key) {
+static const cJSON *gm_command_json_get_array(const cJSON *obj, const char *key) {
     const cJSON *item = cJSON_GetObjectItemCaseSensitive((cJSON *)obj, key);
     return cJSON_IsArray(item) ? item : NULL;
 }
@@ -81,7 +81,7 @@ static int check_wm_sendmsg_message_is_valid_command_json(const LargestIntegralT
                                                           const LargestIntegralType check_data) {
     (void)check_data;
     const char *message = (const char *)value;
-    const size_t max_len = wm_command_max_json_payload_len();
+    const size_t max_len = gm_command_max_json_payload_len();
 
     assert_non_null(message);
     assert_true(max_len > 0);
@@ -90,18 +90,18 @@ static int check_wm_sendmsg_message_is_valid_command_json(const LargestIntegralT
     cJSON *root = cJSON_Parse(message);
     assert_non_null(root);
 
-    const cJSON *event_obj = wm_command_json_get_object(root, "event");
+    const cJSON *event_obj = gm_command_json_get_object(root, "event");
     assert_non_null(event_obj);
 
-    const char *event_module = wm_command_json_get_string(event_obj, "module");
+    const char *event_module = gm_command_json_get_string(event_obj, "module");
     assert_non_null(event_module);
     assert_string_equal(event_module, "guardsarm-wodle-cmd");
 
-    const char *event_start = wm_command_json_get_string(event_obj, "start");
+    const char *event_start = gm_command_json_get_string(event_obj, "start");
     assert_non_null(event_start);
 
     if (g_payload_expectation.tag) {
-        const cJSON *tags = wm_command_json_get_array(root, "tags");
+        const cJSON *tags = gm_command_json_get_array(root, "tags");
         assert_non_null(tags);
         assert_int_equal(cJSON_GetArraySize((cJSON *)tags), 1);
         const cJSON *tag_item = cJSON_GetArrayItem((cJSON *)tags, 0);
@@ -110,18 +110,18 @@ static int check_wm_sendmsg_message_is_valid_command_json(const LargestIntegralT
         assert_string_equal(tag_item->valuestring, g_payload_expectation.tag);
     }
 
-    const cJSON *process = wm_command_json_get_object(root, "process");
+    const cJSON *process = gm_command_json_get_object(root, "process");
     assert_non_null(process);
 
-    const char *proc_name = wm_command_json_get_string(process, "name");
+    const char *proc_name = gm_command_json_get_string(process, "name");
     assert_non_null(proc_name);
     assert_string_equal(proc_name, "echo");
 
-    const char *proc_path = wm_command_json_get_string(process, "path");
+    const char *proc_path = gm_command_json_get_string(process, "path");
     assert_non_null(proc_path);
     assert_true(strstr(proc_path, "echo") != NULL);
 
-    const char *command_line = wm_command_json_get_string(process, "command_line");
+    const char *command_line = gm_command_json_get_string(process, "command_line");
     assert_non_null(command_line);
     assert_string_equal(command_line, g_payload_expectation.command_line);
 
@@ -129,7 +129,7 @@ static int check_wm_sendmsg_message_is_valid_command_json(const LargestIntegralT
     assert_true(cJSON_IsNumber(exit_code));
     assert_int_equal(exit_code->valueint, g_payload_expectation.exit_code);
 
-    const cJSON *args = wm_command_json_get_array(process, "args");
+    const cJSON *args = gm_command_json_get_array(process, "args");
     assert_non_null(args);
     // Validate expected args for the default command line used in most tests.
     if (strcmp(g_payload_expectation.command_line, "/bin/echo arg1 arg2") == 0) {
@@ -142,18 +142,18 @@ static int check_wm_sendmsg_message_is_valid_command_json(const LargestIntegralT
         assert_string_equal(arg1->valuestring, "arg2");
     }
 
-    const cJSON *process_io = wm_command_json_get_object(process, "io");
+    const cJSON *process_io = gm_command_json_get_object(process, "io");
     assert_non_null(process_io);
-    const char *io_text = wm_command_json_get_string(process_io, "text");
+    const char *io_text = gm_command_json_get_string(process_io, "text");
     assert_non_null(io_text);
 
     switch (g_payload_expectation.payload_case) {
-    case WM_PAYLOAD_CASE_NORMAL:
-    case WM_PAYLOAD_CASE_EMPTY:
-    case WM_PAYLOAD_CASE_METADATA_ONLY:
+    case GM_PAYLOAD_CASE_NORMAL:
+    case GM_PAYLOAD_CASE_EMPTY:
+    case GM_PAYLOAD_CASE_METADATA_ONLY:
         assert_string_equal(io_text, g_payload_expectation.expected_output ? g_payload_expectation.expected_output : "");
         break;
-    case WM_PAYLOAD_CASE_TRUNCATED:
+    case GM_PAYLOAD_CASE_TRUNCATED:
         assert_non_null(g_payload_expectation.raw_output);
         assert_true(strlen(io_text) < strlen(g_payload_expectation.raw_output));
         if (g_payload_expectation.expected_output) {
@@ -167,7 +167,7 @@ static int check_wm_sendmsg_message_is_valid_command_json(const LargestIntegralT
 }
 
 static int setup_test_payload(void **state) {
-    wm_command_t *command = calloc(1, sizeof(wm_command_t));
+    gm_command_t *command = calloc(1, sizeof(gm_command_t));
     assert_non_null(command);
 
     command->enabled = 1;
@@ -183,13 +183,13 @@ static int setup_test_payload(void **state) {
 
     command->scan_config = init_config_from_string("<interval>10s</interval>\n");
 
-    wm_max_eps = 1000000; // Avoid division by zero; wm_sendmsg is wrapped in these tests.
+    gm_max_eps = 1000000; // Avoid division by zero; wm_sendmsg is wrapped in these tests.
     *state = command;
     return 0;
 }
 
 static int teardown_test_payload(void **state) {
-    wm_command_t *command = (wm_command_t *)*state;
+    gm_command_t *command = (gm_command_t *)*state;
     if (command) {
         sched_scan_free(&(command->scan_config));
         free(command->tag);
@@ -200,20 +200,20 @@ static int teardown_test_payload(void **state) {
     return 0;
 }
 
-static void wm_command_prepare_single_iteration(void) {
+static void gm_command_prepare_single_iteration(void) {
     will_return(__wrap_FOREVER, 0);
 }
 
-static void wm_command_expect_sendmsg_json(void) {
+static void gm_command_expect_sendmsg_json(void) {
     expect_any(__wrap_wm_sendmsg, usec);
     expect_any(__wrap_wm_sendmsg, queue);
     expect_check(__wrap_wm_sendmsg, message, check_wm_sendmsg_message_is_valid_command_json, 0);
-    expect_string(__wrap_wm_sendmsg, locmsg, WM_COMMAND_CONTEXT.name);
+    expect_string(__wrap_wm_sendmsg, locmsg, GM_COMMAND_CONTEXT.name);
     expect_value(__wrap_wm_sendmsg, loc, LOCALFILE_MQ);
     will_return(__wrap_wm_sendmsg, 0);
 }
 
-static size_t wm_command_build_base_len_for_test(const char *event_start,
+static size_t gm_command_build_base_len_for_test(const char *event_start,
                                                  const char *tag,
                                                  const char *command_line,
                                                  const char *proc_name,
@@ -263,7 +263,7 @@ static size_t wm_command_build_base_len_for_test(const char *event_start,
     return len;
 }
 
-static size_t wm_command_build_payload_len_for_test(const char *event_start,
+static size_t gm_command_build_payload_len_for_test(const char *event_start,
                                                     const char *tag,
                                                     const char *command_line,
                                                     const char *proc_name,
@@ -314,8 +314,8 @@ static size_t wm_command_build_payload_len_for_test(const char *event_start,
     return len;
 }
 
-static size_t wm_command_compute_metadata_only_command_filler_len(void) {
-    const size_t max_len = wm_command_max_json_payload_len();
+static size_t gm_command_compute_metadata_only_command_filler_len(void) {
+    const size_t max_len = gm_command_max_json_payload_len();
     assert_true(max_len > 0);
 
     const char *event_start = "2026-04-27T00:00:00.000Z";
@@ -342,8 +342,8 @@ static size_t wm_command_compute_metadata_only_command_filler_len(void) {
         assert_non_null(cmd_cpy);
         char **argv = w_strtok(cmd_cpy);
 
-        const size_t len_empty = wm_command_build_payload_len_for_test(event_start, tag, cmdline, proc_name, proc_path, argv, status, "");
-        const size_t len_probe = wm_command_build_payload_len_for_test(event_start, tag, cmdline, proc_name, proc_path, argv, status, probe_output);
+        const size_t len_empty = gm_command_build_payload_len_for_test(event_start, tag, cmdline, proc_name, proc_path, argv, status, "");
+        const size_t len_probe = gm_command_build_payload_len_for_test(event_start, tag, cmdline, proc_name, proc_path, argv, status, probe_output);
 
         free_strarray(argv);
         free(cmd_cpy);
@@ -359,8 +359,8 @@ static size_t wm_command_compute_metadata_only_command_filler_len(void) {
 }
 
 /****************************************************************/
-static void wmodule_cleanup(wmodule *module){
-    wm_command_t* module_data = (wm_command_t *)module->data;
+static void gmodule_cleanup(gmodule *module){
+    gm_command_t* module_data = (gm_command_t *)module->data;
     free(module_data->sha256_hash);
     free(module_data->sha1_hash);
     free(module_data->full_command);
@@ -373,7 +373,7 @@ static void wmodule_cleanup(wmodule *module){
 
 /***  SETUPS/TEARDOWNS  ******/
 static int setup_module() {
-    command_module = calloc(1, sizeof(wmodule));
+    command_module = calloc(1, sizeof(gmodule));
     const char *string =
         "<disabled>no</disabled>\n"
         "<tag>test</tag>\n"
@@ -390,7 +390,7 @@ static int setup_module() {
     lxml = malloc(sizeof(OS_XML));
     XML_NODE nodes = string_to_xml_node(string, lxml);
 
-    int ret = wm_command_read(nodes, command_module, 0);
+    int ret = gm_command_read(nodes, command_module, 0);
     OS_ClearNode(nodes);
     test_mode = 1;
     return ret;
@@ -398,25 +398,25 @@ static int setup_module() {
 
 static int teardown_module(){
     test_mode = 0;
-    wmodule_cleanup(command_module);
+    gmodule_cleanup(command_module);
     OS_ClearXML(lxml);
     return 0;
 }
 
 static int setup_test_executions(void **state){
-    wm_max_eps = 1;
+    gm_max_eps = 1;
     return 0;
 }
 
 static int teardown_test_executions(void **state){
-    wm_command_t* module_data = (wm_command_t *) *state;
+    gm_command_t* module_data = (gm_command_t *) *state;
     sched_scan_free(&(module_data->scan_config));
     return 0;
 }
 
 static int setup_test_read(void **state) {
     test_structure *test = calloc(1, sizeof(test_structure));
-    test->module =  calloc(1, sizeof(wmodule));
+    test->module =  calloc(1, sizeof(gmodule));
     *state = test;
     return 0;
 }
@@ -425,15 +425,15 @@ static int teardown_test_read(void **state) {
     test_structure *test = *state;
     OS_ClearNode(test->nodes);
     OS_ClearXML(&(test->xml));
-    wm_command_t *module_data = (wm_command_t*)test->module->data;
+    gm_command_t *module_data = (gm_command_t*)test->module->data;
     sched_scan_free(&(module_data->scan_config));
-    wmodule_cleanup(test->module);
+    gmodule_cleanup(test->module);
     os_free(test);
     return 0;
 }
 
 static int setup_test_checksum(void **state) {
-    wm_command_t *command = calloc(1, sizeof(wm_command_t));
+    gm_command_t *command = calloc(1, sizeof(gm_command_t));
     command->full_command = strdup("/test/file.sh --debug");
     command->md5_hash = strdup("d41d8cd98f00b204e9800998ecf8427e");
     command->sha1_hash = strdup("da39a3ee5e6b4b0d3255bfef95601890afd80709");
@@ -443,7 +443,7 @@ static int setup_test_checksum(void **state) {
 }
 
 static int teardown_test_checksum(void **state) {
-    wm_command_t *command = *state;
+    gm_command_t *command = *state;
     os_free(command->full_command);
     os_free(command->md5_hash);
     os_free(command->sha1_hash);
@@ -454,7 +454,7 @@ static int teardown_test_checksum(void **state) {
 
 /** Tests **/
 void test_interval_execution(void **state) {
-    wm_command_t* module_data = (wm_command_t *)command_module->data;
+    gm_command_t* module_data = (gm_command_t *)command_module->data;
     *state = module_data;
     module_data->scan_config.next_scheduled_scan_time = 0;
     module_data->scan_config.scan_day = 0;
@@ -511,7 +511,7 @@ void test_interval_execution(void **state) {
 }
 
 static void test_command_payload_normal_output(void **state) {
-    wm_command_t *command = (wm_command_t *)*state;
+    gm_command_t *command = (gm_command_t *)*state;
     const char *output = "hello \"world\"\\nsecond-line";
 
     expect_string(__wrap_StartMQ, path, DEFAULTQUEUE);
@@ -538,21 +538,21 @@ static void test_command_payload_normal_output(void **state) {
     expect_any(__wrap__mtdebug1, tag);
     expect_any(__wrap__mtdebug1, formatted_msg);
 
-    wm_command_prepare_single_iteration();
-    wm_command_expect_sendmsg_json();
+    gm_command_prepare_single_iteration();
+    gm_command_expect_sendmsg_json();
 
-    g_payload_expectation.payload_case = WM_PAYLOAD_CASE_NORMAL;
+    g_payload_expectation.payload_case = GM_PAYLOAD_CASE_NORMAL;
     g_payload_expectation.command_line = command->command;
     g_payload_expectation.tag = command->tag;
     g_payload_expectation.exit_code = 7;
     g_payload_expectation.raw_output = output;
     g_payload_expectation.expected_output = output;
 
-    WM_COMMAND_CONTEXT.start(command);
+    GM_COMMAND_CONTEXT.start(command);
 }
 
 static void test_command_payload_empty_output(void **state) {
-    wm_command_t *command = (wm_command_t *)*state;
+    gm_command_t *command = (gm_command_t *)*state;
     const char *output = "";
 
     expect_string(__wrap_StartMQ, path, DEFAULTQUEUE);
@@ -575,22 +575,22 @@ static void test_command_payload_empty_output(void **state) {
     expect_any(__wrap__mtdebug1, tag);
     expect_any(__wrap__mtdebug1, formatted_msg);
 
-    wm_command_prepare_single_iteration();
-    wm_command_expect_sendmsg_json();
+    gm_command_prepare_single_iteration();
+    gm_command_expect_sendmsg_json();
 
-    g_payload_expectation.payload_case = WM_PAYLOAD_CASE_EMPTY;
+    g_payload_expectation.payload_case = GM_PAYLOAD_CASE_EMPTY;
     g_payload_expectation.command_line = command->command;
     g_payload_expectation.tag = command->tag;
     g_payload_expectation.exit_code = 0;
     g_payload_expectation.raw_output = output;
     g_payload_expectation.expected_output = "";
 
-    WM_COMMAND_CONTEXT.start(command);
+    GM_COMMAND_CONTEXT.start(command);
 }
 
 static void test_command_payload_long_output_truncates(void **state) {
-    wm_command_t *command = (wm_command_t *)*state;
-    const size_t max_len = wm_command_max_json_payload_len();
+    gm_command_t *command = (gm_command_t *)*state;
+    const size_t max_len = gm_command_max_json_payload_len();
     assert_true(max_len > 0);
 
     // Make output far larger than OS_MAXSTR so truncation path is hit.
@@ -624,24 +624,24 @@ static void test_command_payload_long_output_truncates(void **state) {
     expect_any(__wrap__mtdebug1, tag);
     expect_any(__wrap__mtdebug1, formatted_msg);
 
-    wm_command_prepare_single_iteration();
-    wm_command_expect_sendmsg_json();
+    gm_command_prepare_single_iteration();
+    gm_command_expect_sendmsg_json();
 
-    g_payload_expectation.payload_case = WM_PAYLOAD_CASE_TRUNCATED;
+    g_payload_expectation.payload_case = GM_PAYLOAD_CASE_TRUNCATED;
     g_payload_expectation.command_line = command->command;
     g_payload_expectation.tag = command->tag;
     g_payload_expectation.exit_code = 0;
     g_payload_expectation.raw_output = output;
     g_payload_expectation.expected_output = "BBBB";
 
-    WM_COMMAND_CONTEXT.start(command);
+    GM_COMMAND_CONTEXT.start(command);
     free(output);
 }
 
 static void test_command_payload_metadata_only_fallback(void **state) {
-    wm_command_t *command = (wm_command_t *)*state;
+    gm_command_t *command = (gm_command_t *)*state;
     
-    size_t filler_len = wm_command_compute_metadata_only_command_filler_len();
+    size_t filler_len = gm_command_compute_metadata_only_command_filler_len();
     const char *prefix = "/bin/echo ";
 
     // Reduce until it actually fits at runtime
@@ -657,7 +657,7 @@ static void test_command_payload_metadata_only_fallback(void **state) {
         char *cmd_cpy = strdup(cmdline);
         char **argv = w_strtok(cmd_cpy);
 
-        size_t len_empty = wm_command_build_payload_len_for_test(
+        size_t len_empty = gm_command_build_payload_len_for_test(
             "2026-04-27T00:00:00.000Z",
             command->tag,
             cmdline,
@@ -672,7 +672,7 @@ static void test_command_payload_metadata_only_fallback(void **state) {
         free(cmd_cpy);
         free(cmdline);
 
-        if (len_empty <= wm_command_max_json_payload_len()) {
+        if (len_empty <= gm_command_max_json_payload_len()) {
             break;
         }
 
@@ -717,17 +717,17 @@ static void test_command_payload_metadata_only_fallback(void **state) {
     expect_any(__wrap__mtdebug1, tag);
     expect_any(__wrap__mtdebug1, formatted_msg);
 
-    wm_command_prepare_single_iteration();
-    wm_command_expect_sendmsg_json();
+    gm_command_prepare_single_iteration();
+    gm_command_expect_sendmsg_json();
 
-    g_payload_expectation.payload_case = WM_PAYLOAD_CASE_METADATA_ONLY;
+    g_payload_expectation.payload_case = GM_PAYLOAD_CASE_METADATA_ONLY;
     g_payload_expectation.command_line = command->command;
     g_payload_expectation.tag = command->tag;
     g_payload_expectation.exit_code = 0;
     g_payload_expectation.raw_output = output;
     g_payload_expectation.expected_output = "";
 
-    WM_COMMAND_CONTEXT.start(command);
+    GM_COMMAND_CONTEXT.start(command);
 }
 
 void test_fake_tag(void **state) {
@@ -748,7 +748,7 @@ void test_fake_tag(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "No such tag 'fake' at module 'command'.");
     test->nodes = string_to_xml_node(string, &(test->xml));
-    assert_int_equal(wm_command_read(test->nodes, test->module, 0),-1);
+    assert_int_equal(gm_command_read(test->nodes, test->module, 0),-1);
 }
 
 void test_read_scheduling_monthday_configuration(void **state) {
@@ -769,8 +769,8 @@ void test_read_scheduling_monthday_configuration(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__mwarn, formatted_msg, "Interval must be a multiple of one month. New interval value: 1M");
     test->nodes = string_to_xml_node(string, &(test->xml));
-    assert_int_equal(wm_command_read(test->nodes, test->module, 0),0);
-    wm_command_t *module_data = (wm_command_t*)test->module->data;
+    assert_int_equal(gm_command_read(test->nodes, test->module, 0),0);
+    gm_command_t *module_data = (gm_command_t*)test->module->data;
     assert_int_equal(module_data->scan_config.scan_day, 1);
     assert_int_equal(module_data->scan_config.interval, 1);
     assert_int_equal(module_data->scan_config.month_interval, true);
@@ -796,8 +796,8 @@ void test_read_scheduling_weekday_configuration(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__mwarn, formatted_msg, "Interval must be a multiple of one week. New interval value: 1w");
     test->nodes = string_to_xml_node(string, &(test->xml));
-    assert_int_equal(wm_command_read(test->nodes, test->module, 0),0);
-    wm_command_t *module_data = (wm_command_t*)test->module->data;
+    assert_int_equal(gm_command_read(test->nodes, test->module, 0),0);
+    gm_command_t *module_data = (gm_command_t*)test->module->data;
     assert_int_equal(module_data->scan_config.scan_day, 0);
     assert_int_equal(module_data->scan_config.interval, 604800);
     assert_int_equal(module_data->scan_config.month_interval, false);
@@ -822,10 +822,10 @@ void test_read_scheduling_daytime_configuration(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__mwarn, formatted_msg, "Interval must be a multiple of one day. New interval value: 1d");
     test->nodes = string_to_xml_node(string, &(test->xml));
-    assert_int_equal(wm_command_read(test->nodes, test->module, 0),0);
-    wm_command_t *module_data = (wm_command_t*)test->module->data;
+    assert_int_equal(gm_command_read(test->nodes, test->module, 0),0);
+    gm_command_t *module_data = (gm_command_t*)test->module->data;
     assert_int_equal(module_data->scan_config.scan_day, 0);
-    assert_int_equal(module_data->scan_config.interval, WM_DEF_INTERVAL);
+    assert_int_equal(module_data->scan_config.interval, GM_DEF_INTERVAL);
     assert_int_equal(module_data->scan_config.month_interval, false);
     assert_int_equal(module_data->scan_config.scan_wday, -1);
     assert_string_equal(module_data->scan_config.scan_time, "10:53");
@@ -847,8 +847,8 @@ void test_read_scheduling_interval_configuration(void **state) {
     ;
     test_structure *test = *state;
     test->nodes = string_to_xml_node(string, &(test->xml));
-    assert_int_equal(wm_command_read(test->nodes, test->module, 0),0);
-    wm_command_t *module_data = (wm_command_t*)test->module->data;
+    assert_int_equal(gm_command_read(test->nodes, test->module, 0),0);
+    gm_command_t *module_data = (gm_command_t*)test->module->data;
     assert_int_equal(module_data->scan_config.scan_day, 0);
     assert_int_equal(module_data->scan_config.interval, 10); // 10 seconds
     assert_int_equal(module_data->scan_config.month_interval, false);
@@ -856,38 +856,38 @@ void test_read_scheduling_interval_configuration(void **state) {
 }
 
 void test_validate_command_checksums_success(void **state) {
-    wm_command_t *command = *state;
+    gm_command_t *command = *state;
 
     expect_wm_validate_command("/test/file.sh", command->md5_hash, MD5SUM, 1);
     expect_wm_validate_command("/test/file.sh", command->sha1_hash, SHA1SUM, 1);
     expect_wm_validate_command("/test/file.sh", command->sha256_hash, SHA256SUM, 1);
 
-    expect_string(__wrap__mtdebug1, tag, WM_COMMAND_TEST_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_COMMAND_TEST_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "MD5 checksum verification was successful for command '/test/file.sh --debug'.");
-    expect_string(__wrap__mtdebug1, tag, WM_COMMAND_TEST_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_COMMAND_TEST_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "SHA1 checksum verification was successful for command '/test/file.sh --debug'.");
-    expect_string(__wrap__mtdebug1, tag, WM_COMMAND_TEST_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_COMMAND_TEST_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "SHA256 checksum verification was successful for command '/test/file.sh --debug'.");
 
     assert_int_equal(validate_command_checksums(command, "/test/file.sh"), 0);
 }
 
 void test_validate_command_checksums_failure(void **state) {
-    wm_command_t *command = *state;
+    gm_command_t *command = *state;
 
     expect_wm_validate_command("/test/file.sh", command->md5_hash, MD5SUM, 1);
     expect_wm_validate_command("/test/file.sh", command->sha1_hash, SHA1SUM, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_COMMAND_TEST_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_COMMAND_TEST_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "MD5 checksum verification was successful for command '/test/file.sh --debug'.");
-    expect_string(__wrap__mterror, tag, WM_COMMAND_TEST_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_COMMAND_TEST_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "SHA1 checksum verification failed for command '/test/file.sh --debug'.");
 
     assert_int_equal(validate_command_checksums(command, "/test/file.sh"), -1);
 }
 
 static int setup_test_full_command(void **state) {
-    wm_command_t *command = calloc(1, sizeof(wm_command_t));
+    gm_command_t *command = calloc(1, sizeof(gm_command_t));
     assert_non_null(command);
 
     command->enabled = 1;
@@ -901,13 +901,13 @@ static int setup_test_full_command(void **state) {
     command->sha1_hash = strdup("da39a3ee5e6b4b0d3255bfef95601890afd80709");
     command->scan_config = init_config_from_string("<interval>10s</interval>\n");
 
-    wm_max_eps = 1000000;
+    gm_max_eps = 1000000;
     *state = command;
     return 0;
 }
 
 static int teardown_test_full_command(void **state) {
-    wm_command_t *command = (wm_command_t *)*state;
+    gm_command_t *command = (gm_command_t *)*state;
     if (command) {
         sched_scan_free(&(command->scan_config));
         free(command->tag);
@@ -920,7 +920,7 @@ static int teardown_test_full_command(void **state) {
 }
 
 static void test_full_command_windows_no_args(void **state) {
-    wm_command_t *command = (wm_command_t *)*state;
+    gm_command_t *command = (gm_command_t *)*state;
     command->command = strdup("C:\\\\Windows\\\\System32\\\\whoami.exe");
 
     expect_string(__wrap_get_binary_path, command, "C:\\Windows\\System32\\whoami.exe");
@@ -945,13 +945,13 @@ static void test_full_command_windows_no_args(void **state) {
 
     will_return(__wrap_FOREVER, 0);
 
-    WM_COMMAND_CONTEXT.start(command);
+    GM_COMMAND_CONTEXT.start(command);
 
     assert_string_equal(command->full_command, "C:\\Windows\\System32\\whoami.exe");
 }
 
 static void test_full_command_windows_with_args(void **state) {
-    wm_command_t *command = (wm_command_t *)*state;
+    gm_command_t *command = (gm_command_t *)*state;
     command->command = strdup("C:\\\\Windows\\\\System32\\\\cmd.exe /c dir");
 
     expect_string(__wrap_get_binary_path, command, "C:\\Windows\\System32\\cmd.exe");
@@ -976,13 +976,13 @@ static void test_full_command_windows_with_args(void **state) {
 
     will_return(__wrap_FOREVER, 0);
 
-    WM_COMMAND_CONTEXT.start(command);
+    GM_COMMAND_CONTEXT.start(command);
 
     assert_string_equal(command->full_command, "C:\\Windows\\System32\\cmd.exe /c dir");
 }
 
 static void test_full_command_linux_no_args(void **state) {
-    wm_command_t *command = (wm_command_t *)*state;
+    gm_command_t *command = (gm_command_t *)*state;
     command->command = strdup("/usr/bin/uptime");
 
     expect_string(__wrap_get_binary_path, command, "/usr/bin/uptime");
@@ -1007,13 +1007,13 @@ static void test_full_command_linux_no_args(void **state) {
 
     will_return(__wrap_FOREVER, 0);
 
-    WM_COMMAND_CONTEXT.start(command);
+    GM_COMMAND_CONTEXT.start(command);
 
     assert_string_equal(command->full_command, "/usr/bin/uptime");
 }
 
 static void test_full_command_quoted_args(void **state) {
-    wm_command_t *command = (wm_command_t *)*state;
+    gm_command_t *command = (gm_command_t *)*state;
     command->command = strdup("/bin/bash \"my script.sh\" \"arg with spaces\"");
 
     expect_string(__wrap_get_binary_path, command, "/bin/bash");
@@ -1038,13 +1038,13 @@ static void test_full_command_quoted_args(void **state) {
 
     will_return(__wrap_FOREVER, 0);
 
-    WM_COMMAND_CONTEXT.start(command);
+    GM_COMMAND_CONTEXT.start(command);
 
     assert_string_equal(command->full_command, "/bin/bash \"my script.sh\" \"arg with spaces\"");
 }
 
 static void test_full_command_quoted_binary_with_spaces(void **state) {
-    wm_command_t *command = (wm_command_t *)*state;
+    gm_command_t *command = (gm_command_t *)*state;
     command->command = strdup("\"C:\\\\Program Files\\\\app.exe\" --flag value");
 
     expect_string(__wrap_get_binary_path, command, "C:\\Program Files\\app.exe");
@@ -1069,13 +1069,13 @@ static void test_full_command_quoted_binary_with_spaces(void **state) {
 
     will_return(__wrap_FOREVER, 0);
 
-    WM_COMMAND_CONTEXT.start(command);
+    GM_COMMAND_CONTEXT.start(command);
 
     assert_string_equal(command->full_command, "\"C:\\Program Files\\app.exe\" --flag value");
 }
 
 static void test_full_command_leading_spaces(void **state) {
-    wm_command_t *command = (wm_command_t *)*state;
+    gm_command_t *command = (gm_command_t *)*state;
     command->command = strdup("  /usr/bin/echo hello");
 
     expect_string(__wrap_get_binary_path, command, "/usr/bin/echo");
@@ -1100,13 +1100,13 @@ static void test_full_command_leading_spaces(void **state) {
 
     will_return(__wrap_FOREVER, 0);
 
-    WM_COMMAND_CONTEXT.start(command);
+    GM_COMMAND_CONTEXT.start(command);
 
     assert_string_equal(command->full_command, "/usr/bin/echo hello");
 }
 
 static void test_full_command_unquoted_path_with_spaces(void **state) {
-    wm_command_t *command = (wm_command_t *)*state;
+    gm_command_t *command = (gm_command_t *)*state;
     command->command = strdup("C:\\\\Program\\ Files\\\\app.exe --verbose");
 
     expect_string(__wrap_get_binary_path, command, "C:\\Program Files\\app.exe");
@@ -1131,7 +1131,7 @@ static void test_full_command_unquoted_path_with_spaces(void **state) {
 
     will_return(__wrap_FOREVER, 0);
 
-    WM_COMMAND_CONTEXT.start(command);
+    GM_COMMAND_CONTEXT.start(command);
 
     assert_string_equal(command->full_command, "\"C:\\Program Files\\app.exe\" --verbose");
 }

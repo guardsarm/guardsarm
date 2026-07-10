@@ -16,43 +16,43 @@
 #include "wmodules.h"
 #include "wm_task_manager_tasks.h"
 
-wm_task_manager_upgrade* wm_task_manager_init_upgrade_parameters() {
-    wm_task_manager_upgrade *parameters;
-    os_calloc(1, sizeof(wm_task_manager_upgrade), parameters);
+gm_task_manager_upgrade* gm_task_manager_init_upgrade_parameters() {
+    gm_task_manager_upgrade *parameters;
+    os_calloc(1, sizeof(gm_task_manager_upgrade), parameters);
     return parameters;
 }
 
-wm_task_manager_upgrade_get_status* wm_task_manager_init_upgrade_get_status_parameters() {
-    wm_task_manager_upgrade_get_status *parameters;
-    os_calloc(1, sizeof(wm_task_manager_upgrade_get_status), parameters);
+gm_task_manager_upgrade_get_status* gm_task_manager_init_upgrade_get_status_parameters() {
+    gm_task_manager_upgrade_get_status *parameters;
+    os_calloc(1, sizeof(gm_task_manager_upgrade_get_status), parameters);
     return parameters;
 }
 
-wm_task_manager_upgrade_update_status* wm_task_manager_init_upgrade_update_status_parameters() {
-    wm_task_manager_upgrade_update_status *parameters;
-    os_calloc(1, sizeof(wm_task_manager_upgrade_update_status), parameters);
+gm_task_manager_upgrade_update_status* gm_task_manager_init_upgrade_update_status_parameters() {
+    gm_task_manager_upgrade_update_status *parameters;
+    os_calloc(1, sizeof(gm_task_manager_upgrade_update_status), parameters);
     return parameters;
 }
 
-wm_task_manager_upgrade_result* wm_task_manager_init_upgrade_result_parameters() {
-    wm_task_manager_upgrade_result *parameters;
-    os_calloc(1, sizeof(wm_task_manager_upgrade_result), parameters);
+gm_task_manager_upgrade_result* gm_task_manager_init_upgrade_result_parameters() {
+    gm_task_manager_upgrade_result *parameters;
+    os_calloc(1, sizeof(gm_task_manager_upgrade_result), parameters);
     return parameters;
 }
 
-wm_task_manager_upgrade_cancel_tasks* wm_task_manager_init_upgrade_cancel_tasks_parameters() {
-    wm_task_manager_upgrade_cancel_tasks *parameters;
-    os_calloc(1, sizeof(wm_task_manager_upgrade_cancel_tasks), parameters);
+gm_task_manager_upgrade_cancel_tasks* gm_task_manager_init_upgrade_cancel_tasks_parameters() {
+    gm_task_manager_upgrade_cancel_tasks *parameters;
+    os_calloc(1, sizeof(gm_task_manager_upgrade_cancel_tasks), parameters);
     return parameters;
 }
 
-wm_task_manager_task* wm_task_manager_init_task() {
-    wm_task_manager_task *task;
-    os_calloc(1, sizeof(wm_task_manager_task), task);
+gm_task_manager_task* gm_task_manager_init_task() {
+    gm_task_manager_task *task;
+    os_calloc(1, sizeof(gm_task_manager_task), task);
     return task;
 }
 
-void wm_task_manager_free_upgrade_parameters(wm_task_manager_upgrade* parameters) {
+void gm_task_manager_free_upgrade_parameters(gm_task_manager_upgrade* parameters) {
     if (parameters) {
         os_free(parameters->node);
         os_free(parameters->module);
@@ -61,7 +61,7 @@ void wm_task_manager_free_upgrade_parameters(wm_task_manager_upgrade* parameters
     }
 }
 
-void wm_task_manager_free_upgrade_get_status_parameters(wm_task_manager_upgrade_get_status* parameters) {
+void gm_task_manager_free_upgrade_get_status_parameters(gm_task_manager_upgrade_get_status* parameters) {
     if (parameters) {
         os_free(parameters->node);
         os_free(parameters->agent_ids);
@@ -69,7 +69,7 @@ void wm_task_manager_free_upgrade_get_status_parameters(wm_task_manager_upgrade_
     }
 }
 
-void wm_task_manager_free_upgrade_update_status_parameters(wm_task_manager_upgrade_update_status* parameters) {
+void gm_task_manager_free_upgrade_update_status_parameters(gm_task_manager_upgrade_update_status* parameters) {
     if (parameters) {
         os_free(parameters->node);
         os_free(parameters->agent_ids);
@@ -79,33 +79,33 @@ void wm_task_manager_free_upgrade_update_status_parameters(wm_task_manager_upgra
     }
 }
 
-void wm_task_manager_free_upgrade_result_parameters(wm_task_manager_upgrade_result* parameters) {
+void gm_task_manager_free_upgrade_result_parameters(gm_task_manager_upgrade_result* parameters) {
     if (parameters) {
         os_free(parameters->agent_ids);
         os_free(parameters);
     }
 }
 
-void wm_task_manager_free_upgrade_cancel_tasks_parameters(wm_task_manager_upgrade_cancel_tasks* parameters) {
+void gm_task_manager_free_upgrade_cancel_tasks_parameters(gm_task_manager_upgrade_cancel_tasks* parameters) {
     if (parameters) {
         os_free(parameters->node);
         os_free(parameters);
     }
 }
 
-void wm_task_manager_free_task(wm_task_manager_task* task) {
+void gm_task_manager_free_task(gm_task_manager_task* task) {
     if (task) {
         if (task->parameters) {
-            if ((WM_TASK_UPGRADE == task->command) || (WM_TASK_UPGRADE_CUSTOM == task->command)) {
-                wm_task_manager_free_upgrade_parameters((wm_task_manager_upgrade*)task->parameters);
-            } else if (WM_TASK_UPGRADE_GET_STATUS == task->command) {
-                wm_task_manager_free_upgrade_get_status_parameters((wm_task_manager_upgrade_get_status*)task->parameters);
-            } else if (WM_TASK_UPGRADE_UPDATE_STATUS == task->command) {
-                wm_task_manager_free_upgrade_update_status_parameters((wm_task_manager_upgrade_update_status*)task->parameters);
-            } else if (WM_TASK_UPGRADE_RESULT == task->command) {
-                wm_task_manager_free_upgrade_result_parameters((wm_task_manager_upgrade_result*)task->parameters);
-            } else if (WM_TASK_UPGRADE_CANCEL_TASKS == task->command) {
-                wm_task_manager_free_upgrade_cancel_tasks_parameters((wm_task_manager_upgrade_cancel_tasks*)task->parameters);
+            if ((GM_TASK_UPGRADE == task->command) || (GM_TASK_UPGRADE_CUSTOM == task->command)) {
+                gm_task_manager_free_upgrade_parameters((gm_task_manager_upgrade*)task->parameters);
+            } else if (GM_TASK_UPGRADE_GET_STATUS == task->command) {
+                gm_task_manager_free_upgrade_get_status_parameters((gm_task_manager_upgrade_get_status*)task->parameters);
+            } else if (GM_TASK_UPGRADE_UPDATE_STATUS == task->command) {
+                gm_task_manager_free_upgrade_update_status_parameters((gm_task_manager_upgrade_update_status*)task->parameters);
+            } else if (GM_TASK_UPGRADE_RESULT == task->command) {
+                gm_task_manager_free_upgrade_result_parameters((gm_task_manager_upgrade_result*)task->parameters);
+            } else if (GM_TASK_UPGRADE_CANCEL_TASKS == task->command) {
+                gm_task_manager_free_upgrade_cancel_tasks_parameters((gm_task_manager_upgrade_cancel_tasks*)task->parameters);
             }
         }
         os_free(task);

@@ -227,11 +227,11 @@ namespace sca
         }
 
         // LCOV_EXCL_START
-        static const std::map<std::string, int> typeMap = {{"f", WM_SCA_TYPE_FILE},
-            {"r", WM_SCA_TYPE_REGISTRY},
-            {"p", WM_SCA_TYPE_PROCESS},
-            {"d", WM_SCA_TYPE_DIR},
-            {"c", WM_SCA_TYPE_COMMAND}
+        static const std::map<std::string, int> typeMap = {{"f", GM_SCA_TYPE_FILE},
+            {"r", GM_SCA_TYPE_REGISTRY},
+            {"p", GM_SCA_TYPE_PROCESS},
+            {"d", GM_SCA_TYPE_DIR},
+            {"c", GM_SCA_TYPE_COMMAND}
         };
         // LCOV_EXCL_STOP
 

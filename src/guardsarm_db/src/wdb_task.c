@@ -31,7 +31,7 @@ int wdb_task_insert_task(wdb_t* wdb, int agent_id, const char *node, const char 
     sqlite3_bind_text(stmt, 3, module, -1, NULL);
     sqlite3_bind_text(stmt, 4, command, -1, NULL);
     sqlite3_bind_int(stmt, 5, time(0));
-    sqlite3_bind_text(stmt, 7, task_statuses[WM_TASK_PENDING], -1, NULL);
+    sqlite3_bind_text(stmt, 7, task_statuses[GM_TASK_PENDING], -1, NULL);
 
     if (result = wdb_step(stmt), result != SQLITE_DONE && result != SQLITE_CONSTRAINT) {
         merror(DB_SQL_ERROR, sqlite3_errmsg(wdb->db));
@@ -97,7 +97,7 @@ int wdb_task_get_upgrade_task_status(wdb_t* wdb, int agent_id, const char *node,
     task_node = (char*)sqlite3_column_text(stmt, 2);
     task_status = (char*)sqlite3_column_text(stmt, 7);
 
-    if (!strcmp(task_status, task_statuses[WM_TASK_PENDING]) && strcmp(task_node, node)) {
+    if (!strcmp(task_status, task_statuses[GM_TASK_PENDING]) && strcmp(task_node, node)) {
 
         // Delete old pending task
         if (wdb_stmt_cache(wdb, WDB_STMT_TASK_DELETE_TASK) < 0) {
@@ -128,10 +128,10 @@ int wdb_task_update_upgrade_task_status(wdb_t* wdb, int agent_id, const char *no
     char *old_status = NULL;
     char *old_node = NULL;
 
-    if (strcmp(status, task_statuses[WM_TASK_IN_PROGRESS]) &&
-        strcmp(status, task_statuses[WM_TASK_DONE]) &&
-        strcmp(status, task_statuses[WM_TASK_FAILED]) &&
-        strcmp(status, task_statuses[WM_TASK_LEGACY])) {
+    if (strcmp(status, task_statuses[GM_TASK_IN_PROGRESS]) &&
+        strcmp(status, task_statuses[GM_TASK_DONE]) &&
+        strcmp(status, task_statuses[GM_TASK_FAILED]) &&
+        strcmp(status, task_statuses[GM_TASK_LEGACY])) {
         return OS_INVALID;
     }
 
@@ -164,10 +164,10 @@ int wdb_task_update_upgrade_task_status(wdb_t* wdb, int agent_id, const char *no
     old_node = (char*)sqlite3_column_text(stmt, 2);
     old_status = (char *)sqlite3_column_text(stmt, 7);
 
-    if((!strcmp(status, task_statuses[WM_TASK_IN_PROGRESS]) && (strcmp(old_status, task_statuses[WM_TASK_PENDING]) || strcmp(old_node, node))) ||
-       (!strcmp(status, task_statuses[WM_TASK_LEGACY]) && (strcmp(old_status, task_statuses[WM_TASK_IN_PROGRESS]) || strcmp(old_node, node))) ||
-       (!strcmp(status, task_statuses[WM_TASK_DONE]) && strcmp(old_status, task_statuses[WM_TASK_IN_PROGRESS])) ||
-       (!strcmp(status, task_statuses[WM_TASK_FAILED]) && strcmp(old_status, task_statuses[WM_TASK_IN_PROGRESS]))) {
+    if((!strcmp(status, task_statuses[GM_TASK_IN_PROGRESS]) && (strcmp(old_status, task_statuses[GM_TASK_PENDING]) || strcmp(old_node, node))) ||
+       (!strcmp(status, task_statuses[GM_TASK_LEGACY]) && (strcmp(old_status, task_statuses[GM_TASK_IN_PROGRESS]) || strcmp(old_node, node))) ||
+       (!strcmp(status, task_statuses[GM_TASK_DONE]) && strcmp(old_status, task_statuses[GM_TASK_IN_PROGRESS])) ||
+       (!strcmp(status, task_statuses[GM_TASK_FAILED]) && strcmp(old_status, task_statuses[GM_TASK_IN_PROGRESS]))) {
         return OS_NOTFOUND;
     }
 
@@ -279,7 +279,7 @@ int wdb_task_set_timeout_status(wdb_t* wdb, time_t now, int interval, time_t *ne
 
     stmt = wdb->stmt[WDB_STMT_TASK_GET_TASK_BY_STATUS];
 
-    sqlite3_bind_text(stmt, 1, task_statuses[WM_TASK_IN_PROGRESS], -1, NULL);
+    sqlite3_bind_text(stmt, 1, task_statuses[GM_TASK_IN_PROGRESS], -1, NULL);
 
     while (result = wdb_step(stmt), result == SQLITE_ROW) {
         int task_id = sqlite3_column_int(stmt, 0);
@@ -295,7 +295,7 @@ int wdb_task_set_timeout_status(wdb_t* wdb, time_t now, int interval, time_t *ne
 
             stmt2 = wdb->stmt[WDB_STMT_TASK_UPDATE_TASK_STATUS];
 
-            sqlite3_bind_text(stmt2, 1, task_statuses[WM_TASK_TIMEOUT], -1, NULL);
+            sqlite3_bind_text(stmt2, 1, task_statuses[GM_TASK_TIMEOUT], -1, NULL);
             sqlite3_bind_int(stmt2, 2, time(0));
             sqlite3_bind_int(stmt2, 4, task_id);
 

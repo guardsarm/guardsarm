@@ -25,33 +25,33 @@
 
 extern OSHash *task_table_by_agent_id;
 
-cJSON *wm_agent_send_task_information_master(const cJSON *message_object);
-cJSON *wm_agent_send_task_information_worker(const cJSON *message_object);
+cJSON *gm_agent_send_task_information_master(const cJSON *message_object);
+cJSON *gm_agent_send_task_information_worker(const cJSON *message_object);
 
 // Setup / teardown
 
 static int setup_group(void **state) {
-    wm_agent_upgrade_init_task_map();
+    gm_agent_upgrade_init_task_map();
     test_mode = 1;
     return 0;
 }
 
 static int teardown_group(void **state) {
-    wm_agent_upgrade_destroy_task_map();
+    gm_agent_upgrade_destroy_task_map();
     test_mode = 0;
     return 0;
 }
 
 static int setup_agent_task(void **state) {
-    wm_agent_task *agent_task = NULL;
-    agent_task = wm_agent_upgrade_init_agent_task();
+    gm_agent_task *agent_task = NULL;
+    agent_task = gm_agent_upgrade_init_agent_task();
     *state = (void *)agent_task;
     return 0;
 }
 
 static int teardown_agent_task(void **state) {
-    wm_agent_task *agent_task = *state;
-    wm_agent_upgrade_free_agent_task(agent_task);
+    gm_agent_task *agent_task = *state;
+    gm_agent_upgrade_free_agent_task(agent_task);
     return 0;
 }
 
@@ -101,14 +101,14 @@ static int teardown_nodes(void **state) {
 void test_wm_agent_upgrade_create_task_entry_ok(void **state)
 {
     int agent_id = 6;
-    wm_agent_task *agent_task = *state;
+    gm_agent_task *agent_task = *state;
 
     expect_value(__wrap_OSHash_Add_ex, self, task_table_by_agent_id);
     expect_string(__wrap_OSHash_Add_ex, key, "6");
     expect_memory(__wrap_OSHash_Add_ex, data, agent_task, sizeof(agent_task));
     will_return(__wrap_OSHash_Add_ex, OSHASH_SUCCESS);
 
-    int ret = wm_agent_upgrade_create_task_entry(agent_id, agent_task);
+    int ret = gm_agent_upgrade_create_task_entry(agent_id, agent_task);
 
     assert_int_equal(ret, OSHASH_SUCCESS);
 }
@@ -116,14 +116,14 @@ void test_wm_agent_upgrade_create_task_entry_ok(void **state)
 void test_wm_agent_upgrade_create_task_entry_duplicate(void **state)
 {
     int agent_id = 6;
-    wm_agent_task *agent_task = *state;
+    gm_agent_task *agent_task = *state;
 
     expect_value(__wrap_OSHash_Add_ex, self, task_table_by_agent_id);
     expect_string(__wrap_OSHash_Add_ex, key, "6");
     expect_memory(__wrap_OSHash_Add_ex, data, agent_task, sizeof(agent_task));
     will_return(__wrap_OSHash_Add_ex, OSHASH_DUPLICATE);
 
-    int ret = wm_agent_upgrade_create_task_entry(agent_id, agent_task);
+    int ret = gm_agent_upgrade_create_task_entry(agent_id, agent_task);
 
     assert_int_equal(ret, OSHASH_DUPLICATE);
 }
@@ -131,13 +131,13 @@ void test_wm_agent_upgrade_create_task_entry_duplicate(void **state)
 void test_wm_agent_upgrade_remove_entry_ok(void **state)
 {
     int agent_id = 10;
-    wm_agent_task *agent_task = *state;
+    gm_agent_task *agent_task = *state;
 
     expect_value(__wrap_OSHash_Delete_ex, self, task_table_by_agent_id);
     expect_string(__wrap_OSHash_Delete_ex, key, "10");
     will_return(__wrap_OSHash_Delete_ex, agent_task);
 
-    wm_agent_upgrade_remove_entry(agent_id, 1);
+    gm_agent_upgrade_remove_entry(agent_id, 1);
 }
 
 void test_wm_agent_upgrade_remove_entry_err(void **state)
@@ -148,7 +148,7 @@ void test_wm_agent_upgrade_remove_entry_err(void **state)
     expect_string(__wrap_OSHash_Delete_ex, key, "10");
     will_return(__wrap_OSHash_Delete_ex, NULL);
 
-    wm_agent_upgrade_remove_entry(agent_id, 0);
+    gm_agent_upgrade_remove_entry(agent_id, 0);
 }
 
 void test_wm_agent_upgrade_get_first_node(void **state)
@@ -158,7 +158,7 @@ void test_wm_agent_upgrade_get_first_node(void **state)
     expect_value(__wrap_OSHash_Begin, self, task_table_by_agent_id);
     will_return(__wrap_OSHash_Begin, 1);
 
-    OSHashNode* ret = wm_agent_upgrade_get_first_node(&index);
+    OSHashNode* ret = gm_agent_upgrade_get_first_node(&index);
 
     assert_int_equal(ret, 1);
 }
@@ -171,7 +171,7 @@ void test_wm_agent_upgrade_get_next_node(void **state)
     expect_value(__wrap_OSHash_Next, self, task_table_by_agent_id);
     will_return(__wrap_OSHash_Next, 1);
 
-    OSHashNode* ret = wm_agent_upgrade_get_next_node(&index, node);
+    OSHashNode* ret = gm_agent_upgrade_get_next_node(&index, node);
 
     assert_int_equal(ret, 1);
 }
@@ -193,7 +193,7 @@ void test_wm_agent_upgrade_get_agent_ids_ok(void **state)
     expect_value(__wrap_OSHash_Next, self, task_table_by_agent_id);
     will_return(__wrap_OSHash_Next, NULL);
 
-    cJSON *agents_array = wm_agent_upgrade_get_agent_ids();
+    cJSON *agents_array = gm_agent_upgrade_get_agent_ids();
 
     assert_non_null(agents_array);
     assert_int_equal(cJSON_GetArraySize(agents_array), 2);
@@ -210,7 +210,7 @@ void test_wm_agent_upgrade_get_agent_ids_empty(void **state)
     expect_value(__wrap_OSHash_Begin, self, task_table_by_agent_id);
     will_return(__wrap_OSHash_Begin, NULL);
 
-    cJSON *agents_array = wm_agent_upgrade_get_agent_ids();
+    cJSON *agents_array = gm_agent_upgrade_get_agent_ids();
 
     assert_null(agents_array);
 }
@@ -284,7 +284,7 @@ void test_wm_agent_send_task_information_master_ok(void **state)
                                                                                                           "\"agent\":10,"
                                                                                                           "\"task_id\":101}]'");
 
-    cJSON *output = wm_agent_send_task_information_master(input);
+    cJSON *output = gm_agent_send_task_information_master(input);
 
     state[0] = output;
     state[1] = input;
@@ -347,7 +347,7 @@ void test_wm_agent_send_task_information_master_json_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8105): Response from task manager does not have a valid JSON format.");
 
-    cJSON *output = wm_agent_send_task_information_master(input);
+    cJSON *output = gm_agent_send_task_information_master(input);
 
     state[0] = output;
     state[1] = input;
@@ -417,7 +417,7 @@ void test_wm_agent_send_task_information_master_recv_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8111): Error in recv(): 'Success'");
 
-    cJSON *output = wm_agent_send_task_information_master(input);
+    cJSON *output = gm_agent_send_task_information_master(input);
 
     state[0] = output;
     state[1] = input;
@@ -487,7 +487,7 @@ void test_wm_agent_send_task_information_master_sockterr_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8112): Response size is bigger than expected.");
 
-    cJSON *output = wm_agent_send_task_information_master(input);
+    cJSON *output = gm_agent_send_task_information_master(input);
 
     state[0] = output;
     state[1] = input;
@@ -523,7 +523,7 @@ void test_wm_agent_send_task_information_master_connect_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8104): Cannot connect to 'queue/tasks/task'. Could not reach task manager module.");
 
-    cJSON *output = wm_agent_send_task_information_master(input);
+    cJSON *output = gm_agent_send_task_information_master(input);
 
     state[0] = output;
     state[1] = input;
@@ -601,7 +601,7 @@ void test_wm_agent_send_task_information_worker(void **state)
                                                                                                           "\"agent\":10,"
                                                                                                           "\"task_id\":101}]'");
 
-    cJSON *output = wm_agent_send_task_information_worker(input);
+    cJSON *output = gm_agent_send_task_information_worker(input);
 
     state[0] = output;
 
@@ -679,7 +679,7 @@ void test_wm_agent_upgrade_send_tasks_information_master(void **state)
                                                                                                           "\"agent\":10,"
                                                                                                           "\"task_id\":101}]'");
 
-    cJSON *output = wm_agent_upgrade_send_tasks_information(input);
+    cJSON *output = gm_agent_upgrade_send_tasks_information(input);
 
     state[0] = output;
     state[1] = input;
@@ -759,7 +759,7 @@ void test_wm_agent_upgrade_send_tasks_information_worker(void **state)
                                                                                                           "\"agent\":10,"
                                                                                                           "\"task_id\":101}]'");
 
-    cJSON *output = wm_agent_upgrade_send_tasks_information(input);
+    cJSON *output = gm_agent_upgrade_send_tasks_information(input);
 
     state[0] = output;
 

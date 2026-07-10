@@ -29,15 +29,15 @@
 #include "cJSON.h"
 #include "sha256_op.h"
 
-static void* wm_edr_main(wm_edr_t *edr);           // Module main function. It won't return
-static void wm_edr_destroy(wm_edr_t *edr);         // Destroy configuration
-static cJSON *wm_edr_dump(const wm_edr_t *edr);    // Dump current configuration
+static void* gm_edr_main(gm_edr_t *edr);           // Module main function. It won't return
+static void gm_edr_destroy(gm_edr_t *edr);         // Destroy configuration
+static cJSON *gm_edr_dump(const gm_edr_t *edr);    // Dump current configuration
 
-const wm_context WM_EDR_CONTEXT = {
-    .name = WM_EDR_CONTEXT_NAME,
-    .start = (wm_routine)wm_edr_main,
-    .destroy = (void(*)(void *))wm_edr_destroy,
-    .dump = (cJSON *(*)(const void *))wm_edr_dump,
+const gm_context GM_EDR_CONTEXT = {
+    .name = GM_EDR_CONTEXT_NAME,
+    .start = (gm_routine)gm_edr_main,
+    .destroy = (void(*)(void *))gm_edr_destroy,
+    .dump = (cJSON *(*)(const void *))gm_edr_dump,
     .sync = NULL,
     .stop = NULL,
     .query = NULL,
@@ -73,16 +73,16 @@ static const char *tcp_state(unsigned int st) {
 }
 
 // Send one JSON event to the manager queue AND mirror it to the applier log.
-static void wm_edr_emit(wm_edr_t *edr, cJSON *event) {
+static void gm_edr_emit(gm_edr_t *edr, cJSON *event) {
     char *msg = cJSON_PrintUnformatted(event);
     if (!msg) {
         return;
     }
     const int eps = edr->max_eps > 0 ? (1000000 / (int)edr->max_eps) : 0;
-    if (wm_sendmsg(eps, queue_fd, msg, WM_EDR_CONTEXT_NAME, LOCALFILE_MQ) < 0) {
-        mterror(WM_EDR_LOGTAG, "Unable to send message to '%s'", DEFAULTQUEUE);
+    if (gm_sendmsg(eps, queue_fd, msg, GM_EDR_CONTEXT_NAME, LOCALFILE_MQ) < 0) {
+        mterror(GM_EDR_LOGTAG, "Unable to send message to '%s'", DEFAULTQUEUE);
         if ((queue_fd = StartMQ(DEFAULTQUEUE, WRITE, 1)) >= 0) {
-            wm_sendmsg(eps, queue_fd, msg, WM_EDR_CONTEXT_NAME, LOCALFILE_MQ);
+            gm_sendmsg(eps, queue_fd, msg, GM_EDR_CONTEXT_NAME, LOCALFILE_MQ);
         }
     }
     if (edr_log) {
@@ -145,7 +145,7 @@ static int cmd_is_suspicious(const char *cmd) {
 }
 
 // Emit a process-exec event for a newly-seen PID.
-static void emit_process(wm_edr_t *edr, const char *pid) {
+static void emit_process(gm_edr_t *edr, const char *pid) {
     char path[256], comm[256] = "", cmdline[4096] = "", user[64] = "";
     long ppid = 0;
     unsigned long long starttime = 0;
@@ -263,11 +263,11 @@ static void emit_process(wm_edr_t *edr, const char *pid) {
         cJSON_AddBoolToObject(proc, "suspicious", 1);
     }
 
-    wm_edr_emit(edr, event);
+    gm_edr_emit(edr, event);
     cJSON_Delete(event);
 }
 
-static void scan_processes(wm_edr_t *edr) {
+static void scan_processes(gm_edr_t *edr) {
     DIR *d = opendir("/proc");
     if (!d) {
         return;
@@ -286,7 +286,7 @@ static void scan_processes(wm_edr_t *edr) {
     closedir(d);
 }
 
-static void scan_network_file(wm_edr_t *edr, const char *file, int v6) {
+static void scan_network_file(gm_edr_t *edr, const char *file, int v6) {
     FILE *f = fopen(file, "r");
     if (!f) {
         return;
@@ -338,13 +338,13 @@ static void scan_network_file(wm_edr_t *edr, const char *file, int v6) {
         cJSON_AddNumberToObject(remote, "port", rport);
         cJSON_AddStringToObject(port, "state", tcp_state(st));
 
-        wm_edr_emit(edr, event);
+        gm_edr_emit(edr, event);
         cJSON_Delete(event);
     }
     fclose(f);
 }
 
-static void scan_network(wm_edr_t *edr) {
+static void scan_network(gm_edr_t *edr) {
     scan_network_file(edr, "/proc/net/tcp", 0);
     scan_network_file(edr, "/proc/net/tcp6", 1);
     // Bound memory: reset the connection cache if it grows large.
@@ -356,7 +356,7 @@ static void scan_network(wm_edr_t *edr) {
 
 /* ---------------------------------------------------------- persistence sweep */
 
-static void emit_persistence(wm_edr_t *edr, const char *type, const char *path_val) {
+static void emit_persistence(gm_edr_t *edr, const char *type, const char *path_val) {
     if (!path_val || !path_val[0] || OSHash_Get(seen_persist, path_val)) {
         return;
     }
@@ -380,11 +380,11 @@ static void emit_persistence(wm_edr_t *edr, const char *type, const char *path_v
     cJSON_AddStringToObject(p, "type", type);
     cJSON_AddStringToObject(p, "path", path_val);
     cJSON_AddStringToObject(p, "detected", ts);
-    wm_edr_emit(edr, event);
+    gm_edr_emit(edr, event);
     cJSON_Delete(event);
 }
 
-static void scan_persistence_dir(wm_edr_t *edr, const char *dir, const char *type) {
+static void scan_persistence_dir(gm_edr_t *edr, const char *dir, const char *type) {
     DIR *d = opendir(dir);
     if (!d) {
         return;
@@ -401,7 +401,7 @@ static void scan_persistence_dir(wm_edr_t *edr, const char *dir, const char *typ
 
 // Sweep the common Linux persistence locations and emit an edr_persistence event
 // for each newly-seen entry (cron, systemd units, startup scripts, shell rc).
-static void scan_persistence(wm_edr_t *edr) {
+static void scan_persistence(gm_edr_t *edr) {
     static const char *CRON[] = {"/etc/cron.d", "/etc/cron.daily", "/etc/cron.hourly",
                                  "/etc/cron.weekly", "/etc/cron.monthly",
                                  "/var/spool/cron/crontabs", "/var/spool/cron", NULL};
@@ -418,9 +418,9 @@ static void scan_persistence(wm_edr_t *edr) {
 
 /* --------------------------------------------------------------------- main */
 
-void* wm_edr_main(wm_edr_t *edr) {
+void* gm_edr_main(gm_edr_t *edr) {
     if (!edr->flags.enabled) {
-        mtinfo(WM_EDR_LOGTAG, "Module disabled. Exiting.");
+        mtinfo(GM_EDR_LOGTAG, "Module disabled. Exiting.");
         pthread_exit(NULL);
     }
 
@@ -429,15 +429,15 @@ void* wm_edr_main(wm_edr_t *edr) {
     seen_persist = OSHash_Create();
 
     char log_path[PATH_MAX];
-    snprintf(log_path, sizeof(log_path), "%s", WM_EDR_LOG_PATH);
+    snprintf(log_path, sizeof(log_path), "%s", GM_EDR_LOG_PATH);
     edr_log = fopen(log_path, "a");
 
     if ((queue_fd = StartMQ(DEFAULTQUEUE, WRITE, INFINITE_OPENQ_ATTEMPTS)) < 0) {
-        mterror(WM_EDR_LOGTAG, "Can't connect to queue '%s'.", DEFAULTQUEUE);
+        mterror(GM_EDR_LOGTAG, "Can't connect to queue '%s'.", DEFAULTQUEUE);
     }
 
     edr->flags.running = 1;
-    mtinfo(WM_EDR_LOGTAG, "Native EDR telemetry started (interval %us, processes=%u network=%u persistence=%u).",
+    mtinfo(GM_EDR_LOGTAG, "Native EDR telemetry started (interval %us, processes=%u network=%u persistence=%u).",
            edr->interval, edr->flags.processes, edr->flags.network, edr->flags.persistence);
 
     unsigned int cycle = 0;
@@ -459,7 +459,7 @@ void* wm_edr_main(wm_edr_t *edr) {
     return NULL;
 }
 
-static void wm_edr_destroy(wm_edr_t *edr) {
+static void gm_edr_destroy(gm_edr_t *edr) {
     if (edr_log) {
         fclose(edr_log);
         edr_log = NULL;
@@ -470,16 +470,16 @@ static void wm_edr_destroy(wm_edr_t *edr) {
     free(edr);
 }
 
-static cJSON *wm_edr_dump(const wm_edr_t *edr) {
+static cJSON *gm_edr_dump(const gm_edr_t *edr) {
     cJSON *root = cJSON_CreateObject();
-    cJSON *wm_edr = cJSON_CreateObject();
-    cJSON_AddStringToObject(wm_edr, "enabled", edr->flags.enabled ? "yes" : "no");
-    cJSON_AddStringToObject(wm_edr, "processes", edr->flags.processes ? "yes" : "no");
-    cJSON_AddStringToObject(wm_edr, "network", edr->flags.network ? "yes" : "no");
-    cJSON_AddStringToObject(wm_edr, "persistence", edr->flags.persistence ? "yes" : "no");
-    cJSON_AddNumberToObject(wm_edr, "interval", edr->interval);
-    cJSON_AddNumberToObject(wm_edr, "max_eps", edr->max_eps);
-    cJSON_AddItemToObject(root, "edr", wm_edr);
+    cJSON *gm_edr = cJSON_CreateObject();
+    cJSON_AddStringToObject(gm_edr, "enabled", edr->flags.enabled ? "yes" : "no");
+    cJSON_AddStringToObject(gm_edr, "processes", edr->flags.processes ? "yes" : "no");
+    cJSON_AddStringToObject(gm_edr, "network", edr->flags.network ? "yes" : "no");
+    cJSON_AddStringToObject(gm_edr, "persistence", edr->flags.persistence ? "yes" : "no");
+    cJSON_AddNumberToObject(gm_edr, "interval", edr->interval);
+    cJSON_AddNumberToObject(gm_edr, "max_eps", edr->max_eps);
+    cJSON_AddItemToObject(root, "edr", gm_edr);
     return root;
 }
 
@@ -515,15 +515,15 @@ static cJSON *wm_edr_dump(const wm_edr_t *edr) {
 #include "cJSON.h"
 #include "sha256_op.h"
 
-static void* wm_edr_main(wm_edr_t *edr);
-static void wm_edr_destroy(wm_edr_t *edr);
-static cJSON *wm_edr_dump(const wm_edr_t *edr);
+static void* gm_edr_main(gm_edr_t *edr);
+static void gm_edr_destroy(gm_edr_t *edr);
+static cJSON *gm_edr_dump(const gm_edr_t *edr);
 
-const wm_context WM_EDR_CONTEXT = {
-    .name = WM_EDR_CONTEXT_NAME,
-    .start = (wm_routine)wm_edr_main,
-    .destroy = (void(*)(void *))wm_edr_destroy,
-    .dump = (cJSON *(*)(const void *))wm_edr_dump,
+const gm_context GM_EDR_CONTEXT = {
+    .name = GM_EDR_CONTEXT_NAME,
+    .start = (gm_routine)gm_edr_main,
+    .destroy = (void(*)(void *))gm_edr_destroy,
+    .dump = (cJSON *(*)(const void *))gm_edr_dump,
     .sync = NULL,
     .stop = NULL,
     .query = NULL,
@@ -545,16 +545,16 @@ static void now_iso(char *ts, size_t n) {
     }
 }
 
-static void wm_edr_emit(wm_edr_t *edr, cJSON *event) {
+static void gm_edr_emit(gm_edr_t *edr, cJSON *event) {
     char *msg = cJSON_PrintUnformatted(event);
     if (!msg) {
         return;
     }
     const int eps = edr->max_eps > 0 ? (1000000 / (int)edr->max_eps) : 0;
-    if (wm_sendmsg(eps, queue_fd, msg, WM_EDR_CONTEXT_NAME, LOCALFILE_MQ) < 0) {
-        mterror(WM_EDR_LOGTAG, "Unable to send message to '%s'", DEFAULTQUEUE);
+    if (gm_sendmsg(eps, queue_fd, msg, GM_EDR_CONTEXT_NAME, LOCALFILE_MQ) < 0) {
+        mterror(GM_EDR_LOGTAG, "Unable to send message to '%s'", DEFAULTQUEUE);
         if ((queue_fd = StartMQ(DEFAULTQUEUE, WRITE, 1)) >= 0) {
-            wm_sendmsg(eps, queue_fd, msg, WM_EDR_CONTEXT_NAME, LOCALFILE_MQ);
+            gm_sendmsg(eps, queue_fd, msg, GM_EDR_CONTEXT_NAME, LOCALFILE_MQ);
         }
     }
     if (edr_log) {
@@ -603,7 +603,7 @@ static void user_of_process(HANDLE hProc, char *out, size_t n) {
 }
 
 // Emit an edr_process event for a newly-seen (pid,createtime) process.
-static void emit_process_win(wm_edr_t *edr, DWORD pid, DWORD ppid, const char *name) {
+static void emit_process_win(gm_edr_t *edr, DWORD pid, DWORD ppid, const char *name) {
     if (pid == 0) {
         return;
     }
@@ -670,12 +670,12 @@ static void emit_process_win(wm_edr_t *edr, DWORD pid, DWORD ppid, const char *n
         cJSON_AddBoolToObject(proc, "is_script", 1);
     }
 
-    wm_edr_emit(edr, event);
+    gm_edr_emit(edr, event);
     cJSON_Delete(event);
     if (hProc) CloseHandle(hProc);
 }
 
-static void scan_processes(wm_edr_t *edr) {
+static void scan_processes(gm_edr_t *edr) {
     HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (snap == INVALID_HANDLE_VALUE) {
         return;
@@ -702,7 +702,7 @@ static const char *tcp_state_win(DWORD s) {
     }
 }
 
-static void emit_conn(wm_edr_t *edr, const char *proto, const char *lip, unsigned lport,
+static void emit_conn(gm_edr_t *edr, const char *proto, const char *lip, unsigned lport,
                       const char *rip, unsigned rport, const char *state, DWORD pid) {
     char key[160];
     snprintf(key, sizeof(key), "%s-%s:%u-%s:%u", proto, lip, lport, rip, rport);
@@ -725,11 +725,11 @@ static void emit_conn(wm_edr_t *edr, const char *proto, const char *lip, unsigne
     cJSON_AddStringToObject(port, "state", state);
     cJSON *proc = cJSON_AddObjectToObject(data, "process");
     cJSON_AddNumberToObject(proc, "pid", (double)pid);
-    wm_edr_emit(edr, event);
+    gm_edr_emit(edr, event);
     cJSON_Delete(event);
 }
 
-static void scan_network(wm_edr_t *edr) {
+static void scan_network(gm_edr_t *edr) {
     // IPv4 TCP with owning PID.
     DWORD sz = 0;
     GetExtendedTcpTable(NULL, &sz, FALSE, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
@@ -782,7 +782,7 @@ static void scan_network(wm_edr_t *edr) {
 
 /* ---------------------------------------------------------- persistence sweep */
 
-static void emit_persistence(wm_edr_t *edr, const char *type, const char *path_val) {
+static void emit_persistence(gm_edr_t *edr, const char *type, const char *path_val) {
     if (!path_val || !path_val[0] || OSHash_Get(seen_persist, path_val)) {
         return;
     }
@@ -802,12 +802,12 @@ static void emit_persistence(wm_edr_t *edr, const char *type, const char *path_v
     cJSON_AddStringToObject(p, "type", type);
     cJSON_AddStringToObject(p, "path", path_val);
     cJSON_AddStringToObject(p, "detected", ts);
-    wm_edr_emit(edr, event);
+    gm_edr_emit(edr, event);
     cJSON_Delete(event);
 }
 
 // Enumerate the string values of an autostart registry key (Run / RunOnce).
-static void scan_reg_run(wm_edr_t *edr, HKEY root, const char *subkey, const char *label) {
+static void scan_reg_run(gm_edr_t *edr, HKEY root, const char *subkey, const char *label) {
     HKEY hk;
     if (RegOpenKeyExA(root, subkey, 0, KEY_READ | KEY_WOW64_64KEY, &hk) != ERROR_SUCCESS) {
         return;
@@ -829,7 +829,7 @@ static void scan_reg_run(wm_edr_t *edr, HKEY root, const char *subkey, const cha
 }
 
 // Enumerate files in a Startup folder.
-static void scan_startup_dir(wm_edr_t *edr, const char *dir) {
+static void scan_startup_dir(gm_edr_t *edr, const char *dir) {
     char pattern[MAX_PATH];
     snprintf(pattern, sizeof(pattern), "%s\\*", dir);
     WIN32_FIND_DATAA fd;
@@ -848,7 +848,7 @@ static void scan_startup_dir(wm_edr_t *edr, const char *dir) {
     FindClose(h);
 }
 
-static void scan_persistence(wm_edr_t *edr) {
+static void scan_persistence(gm_edr_t *edr) {
     scan_reg_run(edr, HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", "HKLM\\...\\Run");
     scan_reg_run(edr, HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce", "HKLM\\...\\RunOnce");
     scan_reg_run(edr, HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", "HKCU\\...\\Run");
@@ -870,9 +870,9 @@ static void scan_persistence(wm_edr_t *edr) {
 
 /* --------------------------------------------------------------------- main */
 
-void* wm_edr_main(wm_edr_t *edr) {
+void* gm_edr_main(gm_edr_t *edr) {
     if (!edr->flags.enabled) {
-        mtinfo(WM_EDR_LOGTAG, "Module disabled. Exiting.");
+        mtinfo(GM_EDR_LOGTAG, "Module disabled. Exiting.");
         return NULL;
     }
 
@@ -880,14 +880,14 @@ void* wm_edr_main(wm_edr_t *edr) {
     seen_conns = OSHash_Create();
     seen_persist = OSHash_Create();
 
-    edr_log = fopen(WM_EDR_LOG_PATH, "a");
+    edr_log = fopen(GM_EDR_LOG_PATH, "a");
 
     if ((queue_fd = StartMQ(DEFAULTQUEUE, WRITE, INFINITE_OPENQ_ATTEMPTS)) < 0) {
-        mterror(WM_EDR_LOGTAG, "Can't connect to queue '%s'.", DEFAULTQUEUE);
+        mterror(GM_EDR_LOGTAG, "Can't connect to queue '%s'.", DEFAULTQUEUE);
     }
 
     edr->flags.running = 1;
-    mtinfo(WM_EDR_LOGTAG, "Native EDR telemetry started (interval %us, processes=%u network=%u persistence=%u).",
+    mtinfo(GM_EDR_LOGTAG, "Native EDR telemetry started (interval %us, processes=%u network=%u persistence=%u).",
            edr->interval, edr->flags.processes, edr->flags.network, edr->flags.persistence);
 
     unsigned int cycle = 0;
@@ -908,7 +908,7 @@ void* wm_edr_main(wm_edr_t *edr) {
     return NULL;
 }
 
-static void wm_edr_destroy(wm_edr_t *edr) {
+static void gm_edr_destroy(gm_edr_t *edr) {
     if (edr_log) {
         fclose(edr_log);
         edr_log = NULL;
@@ -919,16 +919,16 @@ static void wm_edr_destroy(wm_edr_t *edr) {
     free(edr);
 }
 
-static cJSON *wm_edr_dump(const wm_edr_t *edr) {
+static cJSON *gm_edr_dump(const gm_edr_t *edr) {
     cJSON *root = cJSON_CreateObject();
-    cJSON *wm_edr = cJSON_CreateObject();
-    cJSON_AddStringToObject(wm_edr, "enabled", edr->flags.enabled ? "yes" : "no");
-    cJSON_AddStringToObject(wm_edr, "processes", edr->flags.processes ? "yes" : "no");
-    cJSON_AddStringToObject(wm_edr, "network", edr->flags.network ? "yes" : "no");
-    cJSON_AddStringToObject(wm_edr, "persistence", edr->flags.persistence ? "yes" : "no");
-    cJSON_AddNumberToObject(wm_edr, "interval", edr->interval);
-    cJSON_AddNumberToObject(wm_edr, "max_eps", edr->max_eps);
-    cJSON_AddItemToObject(root, "edr", wm_edr);
+    cJSON *gm_edr = cJSON_CreateObject();
+    cJSON_AddStringToObject(gm_edr, "enabled", edr->flags.enabled ? "yes" : "no");
+    cJSON_AddStringToObject(gm_edr, "processes", edr->flags.processes ? "yes" : "no");
+    cJSON_AddStringToObject(gm_edr, "network", edr->flags.network ? "yes" : "no");
+    cJSON_AddStringToObject(gm_edr, "persistence", edr->flags.persistence ? "yes" : "no");
+    cJSON_AddNumberToObject(gm_edr, "interval", edr->interval);
+    cJSON_AddNumberToObject(gm_edr, "max_eps", edr->max_eps);
+    cJSON_AddItemToObject(root, "edr", gm_edr);
     return root;
 }
 

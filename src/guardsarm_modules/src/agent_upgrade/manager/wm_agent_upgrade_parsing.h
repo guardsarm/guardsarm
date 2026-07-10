@@ -5,8 +5,8 @@
  *
  * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
-#ifndef WM_AGENT_UPGRADE_PARSING_H
-#define WM_AGENT_UPGRADE_PARSING_H
+#ifndef GM_AGENT_UPGRADE_PARSING_H
+#define GM_AGENT_UPGRADE_PARSING_H
 
 #include "wm_agent_upgrade_manager.h"
 
@@ -35,7 +35,7 @@
  * @retval UPGRADE_CUSTOM if is and upgrade_custom command
  * @retval UPGRADE_RESULT if it is and upgrade_result command
  * */
-int wm_agent_upgrade_parse_message(const char* buffer, void** task, int** agent_ids, char** error);
+int gm_agent_upgrade_parse_message(const char* buffer, void** task, int** agent_ids, char** error);
 
 /**
  * Parse a data message
@@ -61,7 +61,7 @@ int wm_agent_upgrade_parse_message(const char* buffer, void** task, int** agent_
  * @param agent_id [OPTIONAL] id of the agent
  * @return data json
  * */
-cJSON* wm_agent_upgrade_parse_data_response(int error_id, const char* message, const int* agent_id);
+cJSON* gm_agent_upgrade_parse_data_response(int error_id, const char* message, const int* agent_id);
 
 /**
  * Parse a response message
@@ -90,7 +90,7 @@ cJSON* wm_agent_upgrade_parse_data_response(int error_id, const char* message, c
  * @param data [OPTIONAL] array of responses
  * @return response json
  * */
-cJSON* wm_agent_upgrade_parse_response(int error_id, cJSON *data);
+cJSON* gm_agent_upgrade_parse_response(int error_id, cJSON *data);
 
 /**
  * Parse a message to be sent to the task module
@@ -115,7 +115,7 @@ cJSON* wm_agent_upgrade_parse_response(int error_id, cJSON *data);
  * @param error optional error message
  * @return json to be sent
  * */
-cJSON* wm_agent_upgrade_parse_task_module_request(wm_upgrade_command command, cJSON *agents_array, const char* status, const char* error);
+cJSON* gm_agent_upgrade_parse_task_module_request(gm_upgrade_command command, cJSON *agents_array, const char* status, const char* error);
 
 /**
  * Parse a response message from the agent
@@ -125,7 +125,7 @@ cJSON* wm_agent_upgrade_parse_task_module_request(wm_upgrade_command command, cJ
  * @retval OS_SUCCESS on success
  * @retval OS_INVALID on errors
  * */
-int wm_agent_upgrade_parse_agent_response(const char* agent_response, char **data);
+int gm_agent_upgrade_parse_agent_response(const char* agent_response, char **data);
 
 /**
  * Parse a response message from the agent (Agent upgrade module format)
@@ -143,6 +143,6 @@ int wm_agent_upgrade_parse_agent_response(const char* agent_response, char **dat
  * @retval OS_SUCCESS on success
  * @retval OS_INVALID on errors
  * */
-int wm_agent_upgrade_parse_agent_upgrade_command_response(const char* agent_response, char **data);
+int gm_agent_upgrade_parse_agent_upgrade_command_response(const char* agent_response, char **data);
 
 #endif

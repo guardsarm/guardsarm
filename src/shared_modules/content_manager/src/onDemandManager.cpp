@@ -95,7 +95,7 @@ void OnDemandManager::stopServer()
     {
         m_serverThread.join();
     }
-    logDebug1(WM_CONTENTUPDATER, "Server stopped");
+    logDebug1(GM_CONTENTUPDATER, "Server stopped");
 }
 
 /**

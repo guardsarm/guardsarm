@@ -125,7 +125,7 @@ void test_sched_scan_init(void **state){
     assert_int_equal(scan_config.scan_wday, -1);
     assert_int_equal(scan_config.scan_day, 0);
     assert(scan_config.scan_time == NULL);
-    assert_int_equal(scan_config.interval, WM_DEF_INTERVAL);
+    assert_int_equal(scan_config.interval, GM_DEF_INTERVAL);
     assert_int_equal(scan_config.month_interval,false);
     assert_int_equal(scan_config.time_start, 0);
     assert_int_equal(scan_config.next_scheduled_scan_time, 0);
@@ -345,7 +345,7 @@ void test_sched_scan_validate_time_not_day_interval(void **state){
     scan_config->scan_time = strdup("00:00");
     scan_config->interval = 30;
     int ret = _sched_scan_validate_parameters(scan_config);
-    assert_int_equal(scan_config->interval, WM_DEF_INTERVAL);
+    assert_int_equal(scan_config->interval, GM_DEF_INTERVAL);
     assert_string_equal(scan_config->scan_time, "00:00");
     assert_int_equal(ret, 0);
 }
@@ -393,7 +393,7 @@ void test_sched_scan_dump_day(void **state) {
 
     scan_config->scan_day = 3;
     scan_config->scan_time = "08:00";
-    scan_config->interval = WM_DEF_INTERVAL;
+    scan_config->interval = GM_DEF_INTERVAL;
     sched_scan_dump(scan_config, object);
     object_str = cJSON_PrintUnformatted(object);
 

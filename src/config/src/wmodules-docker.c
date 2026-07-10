@@ -15,19 +15,19 @@ static const char *XML_DISABLED = "disabled";
 
 // Parse XML
 
-int wm_docker_read(xml_node **nodes, wmodule *module)
+int gm_docker_read(xml_node **nodes, gmodule *module)
 {
     int i = 0;
-    wm_docker_t *docker;
+    gm_docker_t *docker;
 
     // Create module
 
-    os_calloc(1, sizeof(wm_docker_t), docker);
+    os_calloc(1, sizeof(gm_docker_t), docker);
     docker->flags.enabled = 1;
     docker->attempts = 5;
     sched_scan_init(&(docker->scan_config));
-    docker->scan_config.interval = WM_DOCKER_DEF_INTERVAL;
-    module->context = &WM_DOCKER_CONTEXT;
+    docker->scan_config.interval = GM_DOCKER_DEF_INTERVAL;
+    module->context = &GM_DOCKER_CONTEXT;
     module->tag = strdup(module->context->name);
     module->data = docker;
 
@@ -46,7 +46,7 @@ int wm_docker_read(xml_node **nodes, wmodule *module)
             docker->attempts = atol(nodes[i]->content);
 
             if (docker->attempts <= 0 || docker->attempts >= INT_MAX) {
-                merror("At module '%s': Invalid content for tag '%s'.", WM_DOCKER_CONTEXT.name, XML_ATTEMPTS);
+                merror("At module '%s': Invalid content for tag '%s'.", GM_DOCKER_CONTEXT.name, XML_ATTEMPTS);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_RUN_ON_START)) {
@@ -55,7 +55,7 @@ int wm_docker_read(xml_node **nodes, wmodule *module)
             else if (!strcmp(nodes[i]->content, "no"))
                 docker->flags.run_on_start = 0;
             else {
-                merror("At module '%s': Invalid content for tag '%s'.", WM_DOCKER_CONTEXT.name, XML_RUN_ON_START);
+                merror("At module '%s': Invalid content for tag '%s'.", GM_DOCKER_CONTEXT.name, XML_RUN_ON_START);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_DISABLED)) {
@@ -64,13 +64,13 @@ int wm_docker_read(xml_node **nodes, wmodule *module)
             else if (!strcmp(nodes[i]->content, "no"))
                 docker->flags.enabled = 1;
             else {
-                merror("At module '%s': Invalid content for tag '%s'.", WM_DOCKER_CONTEXT.name, XML_DISABLED);
+                merror("At module '%s': Invalid content for tag '%s'.", GM_DOCKER_CONTEXT.name, XML_DISABLED);
                 return OS_INVALID;
             }
         } else if (is_sched_tag(nodes[i]->element)) {
             // Do nothing
         } else {
-            merror("No such tag '%s' at module '%s'.", nodes[i]->element, WM_DOCKER_CONTEXT.name);	
+            merror("No such tag '%s' at module '%s'.", nodes[i]->element, GM_DOCKER_CONTEXT.name);	
             return OS_INVALID;
         }
     }

@@ -24,13 +24,13 @@ extern "C"
 #endif
 
 // Forward declarations
-struct wm_agent_info_t;
+struct gm_agent_info_t;
 
 typedef void (*log_callback_t)(const modules_log_level_t level, const char* log, const char* tag);
 typedef int (*report_callback_t)(const char* message);
 typedef int (*query_module_callback_t)(const char* module_name, const char* query, char** response);
 
-EXPORTED void agent_info_start(const struct wm_agent_info_t* agent_info_config);
+EXPORTED void agent_info_start(const struct gm_agent_info_t* agent_info_config);
 
 EXPORTED void agent_info_stop();
 
@@ -114,7 +114,7 @@ EXPORTED void agent_info_clear_agent_groups(void);
 }
 #endif
 
-typedef void (*agent_info_start_func)(const struct wm_agent_info_t* agent_info_config);
+typedef void (*agent_info_start_func)(const struct gm_agent_info_t* agent_info_config);
 typedef void (*agent_info_stop_func)();
 typedef void (*agent_info_cleanup_func)();
 typedef void (*agent_info_set_log_function_func)(log_callback_t log_callback);

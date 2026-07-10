@@ -219,7 +219,7 @@ CommandRuleEvaluator::CommandRuleEvaluator(PolicyEvaluationContext ctx,
             {
                 return execResult;
             }
-            else if (wmExecResult == WM_ERROR_TIMEOUT)
+            else if (wmExecResult == GM_ERROR_TIMEOUT)
             {
                 execResult.TimedOut = true;
                 return execResult;
@@ -677,21 +677,21 @@ RuleEvaluatorFactory::CreateEvaluator(const std::string& input,
 
     switch (ruleType)
     {
-        case sca::WM_SCA_TYPE_FILE:
+        case sca::GM_SCA_TYPE_FILE:
             return std::make_unique<FileRuleEvaluator>(std::move(ctx), std::move(fileSystemWrapper), std::move(fileUtils));
 #ifdef _WIN32
 
-        case sca::WM_SCA_TYPE_REGISTRY:
+        case sca::GM_SCA_TYPE_REGISTRY:
             return std::make_unique<RegistryRuleEvaluator>(std::move(ctx));
 #endif
 
-        case sca::WM_SCA_TYPE_PROCESS:
+        case sca::GM_SCA_TYPE_PROCESS:
             return std::make_unique<ProcessRuleEvaluator>(std::move(ctx), std::move(fileSystemWrapper), std::move(sysInfo));
 
-        case sca::WM_SCA_TYPE_DIR:
+        case sca::GM_SCA_TYPE_DIR:
             return std::make_unique<DirRuleEvaluator>(std::move(ctx), std::move(fileSystemWrapper), std::move(fileUtils));
 
-        case sca::WM_SCA_TYPE_COMMAND:
+        case sca::GM_SCA_TYPE_COMMAND:
             return std::make_unique<CommandRuleEvaluator>(std::move(ctx), std::move(fileSystemWrapper));
 
         default:

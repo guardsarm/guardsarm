@@ -19,21 +19,21 @@
 #include "wm_agent_upgrade.h"
 #include "shared.h"
 
-void* wm_agent_upgrade_main(wm_agent_upgrade* upgrade_config);
-void wm_agent_upgrade_destroy(wm_agent_upgrade* upgrade_config);
-cJSON *wm_agent_upgrade_dump(const wm_agent_upgrade* upgrade_config);
+void* gm_agent_upgrade_main(gm_agent_upgrade* upgrade_config);
+void gm_agent_upgrade_destroy(gm_agent_upgrade* upgrade_config);
+cJSON *gm_agent_upgrade_dump(const gm_agent_upgrade* upgrade_config);
 
 // Setup / teardown
 
 static int setup_group(void **state) {
-    wm_agent_upgrade *config = NULL;
-    os_calloc(1, sizeof(wm_agent_upgrade), config);
+    gm_agent_upgrade *config = NULL;
+    os_calloc(1, sizeof(gm_agent_upgrade), config);
     *state = config;
     return 0;
 }
 
 static int teardown_group(void **state) {
-    wm_agent_upgrade *config = *state;
+    gm_agent_upgrade *config = *state;
     #ifdef TEST_SERVER
     os_free(config->manager_config.wpk_repository);
     #else
@@ -60,7 +60,7 @@ static int teardown_json(void **state) {
 
 void test_wm_agent_upgrade_dump_enabled(void **state)
 {
-    wm_agent_upgrade *config = *state;
+    gm_agent_upgrade *config = *state;
 
     config->enabled = 1;
 
@@ -75,7 +75,7 @@ void test_wm_agent_upgrade_dump_enabled(void **state)
     wcom_ca_store[1] = NULL;
     #endif
 
-    cJSON *ret = wm_agent_upgrade_dump(config);
+    cJSON *ret = gm_agent_upgrade_dump(config);
 
     state[1] = ret;
 
@@ -102,7 +102,7 @@ void test_wm_agent_upgrade_dump_enabled(void **state)
 
 void test_wm_agent_upgrade_dump_disabled(void **state)
 {
-    wm_agent_upgrade *config = *state;
+    gm_agent_upgrade *config = *state;
 
     config->enabled = 0;
 
@@ -118,7 +118,7 @@ void test_wm_agent_upgrade_dump_disabled(void **state)
     }
     #endif
 
-    cJSON *ret = wm_agent_upgrade_dump(config);
+    cJSON *ret = gm_agent_upgrade_dump(config);
 
     state[1] = ret;
 
@@ -137,8 +137,8 @@ void test_wm_agent_upgrade_dump_disabled(void **state)
 
 void test_wm_agent_upgrade_destroy(void **state)
 {
-    wm_agent_upgrade *config = NULL;
-    os_calloc(1, sizeof(wm_agent_upgrade), config);
+    gm_agent_upgrade *config = NULL;
+    os_calloc(1, sizeof(gm_agent_upgrade), config);
 
     #ifdef TEST_SERVER
     os_strdup("guardsarmsiem.com/packages", config->manager_config.wpk_repository);
@@ -151,12 +151,12 @@ void test_wm_agent_upgrade_destroy(void **state)
     #endif
     expect_string(__wrap__mtinfo, formatted_msg, "(8154): Module Agent Upgrade finished.");
 
-    wm_agent_upgrade_destroy(config);
+    gm_agent_upgrade_destroy(config);
 }
 
 void test_wm_agent_upgrade_main_ok(void **state)
 {
-    wm_agent_upgrade *config = *state;
+    gm_agent_upgrade *config = *state;
 
     config->enabled = 1;
 
@@ -168,12 +168,12 @@ void test_wm_agent_upgrade_main_ok(void **state)
     expect_value(__wrap_wm_agent_upgrade_start_agent_module, enabled, config->enabled);
     #endif
 
-    wm_agent_upgrade_main(config);
+    gm_agent_upgrade_main(config);
 }
 
 void test_wm_agent_upgrade_main_disabled(void **state)
 {
-    wm_agent_upgrade *config = *state;
+    gm_agent_upgrade *config = *state;
 
     config->enabled = 0;
 
@@ -185,7 +185,7 @@ void test_wm_agent_upgrade_main_disabled(void **state)
     expect_value(__wrap_wm_agent_upgrade_start_agent_module, enabled, config->enabled);
     #endif
 
-    wm_agent_upgrade_main(config);
+    gm_agent_upgrade_main(config);
 }
 
 int main(void) {

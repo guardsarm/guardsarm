@@ -18,13 +18,13 @@
 #include "wm_task_manager_tasks.h"
 #include "shared.h"
 
-int* wm_task_manager_parse_ids(const cJSON* ids);
-wm_task_manager_upgrade* wm_task_manager_parse_upgrade_parameters(const cJSON* origin, const cJSON* parameters);
-wm_task_manager_upgrade_get_status* wm_task_manager_parse_upgrade_get_status_parameters(const cJSON* origin, const cJSON* parameters);
-wm_task_manager_upgrade_update_status* wm_task_manager_parse_upgrade_update_status_parameters(const cJSON* origin, const cJSON* parameters);
-wm_task_manager_upgrade_result* wm_task_manager_parse_upgrade_result_parameters(const cJSON* parameters);
-wm_task_manager_upgrade_cancel_tasks* wm_task_manager_parse_upgrade_cancel_tasks_parameters(const cJSON* origin);
-const char* wm_task_manager_decode_status(char *status);
+int* gm_task_manager_parse_ids(const cJSON* ids);
+gm_task_manager_upgrade* gm_task_manager_parse_upgrade_parameters(const cJSON* origin, const cJSON* parameters);
+gm_task_manager_upgrade_get_status* gm_task_manager_parse_upgrade_get_status_parameters(const cJSON* origin, const cJSON* parameters);
+gm_task_manager_upgrade_update_status* gm_task_manager_parse_upgrade_update_status_parameters(const cJSON* origin, const cJSON* parameters);
+gm_task_manager_upgrade_result* gm_task_manager_parse_upgrade_result_parameters(const cJSON* parameters);
+gm_task_manager_upgrade_cancel_tasks* gm_task_manager_parse_upgrade_cancel_tasks_parameters(const cJSON* origin);
+const char* gm_task_manager_decode_status(char *status);
 
 // Setup / teardown
 
@@ -38,8 +38,8 @@ static int teardown_json(void **state) {
 
 static int teardown_task(void **state) {
     if (state[0]) {
-        wm_task_manager_task *task = (wm_task_manager_task*)state[0];
-        wm_task_manager_free_task(task);
+        gm_task_manager_task *task = (gm_task_manager_task*)state[0];
+        gm_task_manager_free_task(task);
     }
     return 0;
 }
@@ -62,8 +62,8 @@ static int teardown_json_upgrade_task(void **state) {
         cJSON_Delete(json);
     }
     if (state[1]) {
-        wm_task_manager_upgrade *task = (wm_task_manager_upgrade*)state[1];
-        wm_task_manager_free_upgrade_parameters(task);
+        gm_task_manager_upgrade *task = (gm_task_manager_upgrade*)state[1];
+        gm_task_manager_free_upgrade_parameters(task);
     }
     return 0;
 }
@@ -74,8 +74,8 @@ static int teardown_json_upgrade_get_status_task(void **state) {
         cJSON_Delete(json);
     }
     if (state[1]) {
-        wm_task_manager_upgrade_get_status *task = (wm_task_manager_upgrade_get_status*)state[1];
-        wm_task_manager_free_upgrade_get_status_parameters(task);
+        gm_task_manager_upgrade_get_status *task = (gm_task_manager_upgrade_get_status*)state[1];
+        gm_task_manager_free_upgrade_get_status_parameters(task);
     }
     return 0;
 }
@@ -86,8 +86,8 @@ static int teardown_json_upgrade_update_status_task(void **state) {
         cJSON_Delete(json);
     }
     if (state[1]) {
-        wm_task_manager_upgrade_update_status *task = (wm_task_manager_upgrade_update_status*)state[1];
-        wm_task_manager_free_upgrade_update_status_parameters(task);
+        gm_task_manager_upgrade_update_status *task = (gm_task_manager_upgrade_update_status*)state[1];
+        gm_task_manager_free_upgrade_update_status_parameters(task);
     }
     return 0;
 }
@@ -98,8 +98,8 @@ static int teardown_json_upgrade_result_task(void **state) {
         cJSON_Delete(json);
     }
     if (state[1]) {
-        wm_task_manager_upgrade_result *task = (wm_task_manager_upgrade_result*)state[1];
-        wm_task_manager_free_upgrade_result_parameters(task);
+        gm_task_manager_upgrade_result *task = (gm_task_manager_upgrade_result*)state[1];
+        gm_task_manager_free_upgrade_result_parameters(task);
     }
     return 0;
 }
@@ -110,8 +110,8 @@ static int teardown_json_upgrade_cancel_tasks_task(void **state) {
         cJSON_Delete(json);
     }
     if (state[1]) {
-        wm_task_manager_upgrade_cancel_tasks *task = (wm_task_manager_upgrade_cancel_tasks*)state[1];
-        wm_task_manager_free_upgrade_cancel_tasks_parameters(task);
+        gm_task_manager_upgrade_cancel_tasks *task = (gm_task_manager_upgrade_cancel_tasks*)state[1];
+        gm_task_manager_free_upgrade_cancel_tasks_parameters(task);
     }
     return 0;
 }
@@ -122,7 +122,7 @@ void test_wm_task_manager_decode_status_done(void **state)
 {
     char *status = "Done";
 
-    const char *ret = wm_task_manager_decode_status(status);
+    const char *ret = gm_task_manager_decode_status(status);
 
     assert_string_equal(ret, "Updated");
 }
@@ -131,7 +131,7 @@ void test_wm_task_manager_decode_status_pending(void **state)
 {
     char *status = "Pending";
 
-    const char *ret = wm_task_manager_decode_status(status);
+    const char *ret = gm_task_manager_decode_status(status);
 
     assert_string_equal(ret, "In queue");
 }
@@ -140,7 +140,7 @@ void test_wm_task_manager_decode_status_in_progress(void **state)
 {
     char *status = "In progress";
 
-    const char *ret = wm_task_manager_decode_status(status);
+    const char *ret = gm_task_manager_decode_status(status);
 
     assert_string_equal(ret, "Updating");
 }
@@ -149,7 +149,7 @@ void test_wm_task_manager_decode_status_failed(void **state)
 {
     char *status = "Failed";
 
-    const char *ret = wm_task_manager_decode_status(status);
+    const char *ret = gm_task_manager_decode_status(status);
 
     assert_string_equal(ret, "Error");
 }
@@ -158,7 +158,7 @@ void test_wm_task_manager_decode_status_cancelled(void **state)
 {
     char *status = "Cancelled";
 
-    const char *ret = wm_task_manager_decode_status(status);
+    const char *ret = gm_task_manager_decode_status(status);
 
     assert_string_equal(ret, "Task cancelled since the manager was restarted");
 }
@@ -167,7 +167,7 @@ void test_wm_task_manager_decode_status_timeout(void **state)
 {
     char *status = "Timeout";
 
-    const char *ret = wm_task_manager_decode_status(status);
+    const char *ret = gm_task_manager_decode_status(status);
 
     assert_string_equal(ret, "Timeout reached while waiting for the response from the agent, check the result manually on the agent for more information");
 }
@@ -176,7 +176,7 @@ void test_wm_task_manager_decode_status_legacy(void **state)
 {
     char *status = "Legacy";
 
-    const char *ret = wm_task_manager_decode_status(status);
+    const char *ret = gm_task_manager_decode_status(status);
 
     assert_string_equal(ret, "Legacy upgrade: check the result manually since the agent cannot report the result of the task");
 }
@@ -185,7 +185,7 @@ void test_wm_task_manager_decode_status_unknown(void **state)
 {
     char *status = "No status";
 
-    const char *ret = wm_task_manager_decode_status(status);
+    const char *ret = gm_task_manager_decode_status(status);
 
     assert_null(ret);
 }
@@ -197,7 +197,7 @@ void test_wm_task_manager_parse_data_response(void **state)
     int task_id = 124;
     char *status = "In progress";
 
-    cJSON *response = wm_task_manager_parse_data_response(error_code, agent_id, task_id, status);
+    cJSON *response = gm_task_manager_parse_data_response(error_code, agent_id, task_id, status);
 
     *state = response;
 
@@ -221,7 +221,7 @@ void test_wm_task_manager_parse_data_response_no_status(void **state)
     int task_id = 124;
     char *status = NULL;
 
-    cJSON *response = wm_task_manager_parse_data_response(error_code, agent_id, task_id, status);
+    cJSON *response = gm_task_manager_parse_data_response(error_code, agent_id, task_id, status);
 
     *state = response;
 
@@ -244,7 +244,7 @@ void test_wm_task_manager_parse_data_response_no_task_id(void **state)
     int task_id = OS_INVALID;
     char *status = "In progress";
 
-    cJSON *response = wm_task_manager_parse_data_response(error_code, agent_id, task_id, status);
+    cJSON *response = gm_task_manager_parse_data_response(error_code, agent_id, task_id, status);
 
     *state = response;
 
@@ -267,7 +267,7 @@ void test_wm_task_manager_parse_data_response_no_agent_id(void **state)
     int task_id = 124;
     char *status = "In progress";
 
-    cJSON *response = wm_task_manager_parse_data_response(error_code, agent_id, task_id, status);
+    cJSON *response = gm_task_manager_parse_data_response(error_code, agent_id, task_id, status);
 
     *state = response;
 
@@ -307,7 +307,7 @@ void test_wm_task_manager_parse_data_result(void **state)
     expect_value(__wrap_w_get_timestamp, time, last_update);
     will_return(__wrap_w_get_timestamp, last_update_timestamp);
 
-    wm_task_manager_parse_data_result(response, node, module, command, status, error, create_time, last_update, req_command);
+    gm_task_manager_parse_data_result(response, node, module, command, status, error, create_time, last_update, req_command);
 
     *state = response;
 
@@ -346,7 +346,7 @@ void test_wm_task_manager_parse_data_result_last_update_0(void **state)
     expect_value(__wrap_w_get_timestamp, time, create_time);
     will_return(__wrap_w_get_timestamp, create_time_timestamp);
 
-    wm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
+    gm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
 
     *state = response;
 
@@ -383,7 +383,7 @@ void test_wm_task_manager_parse_data_result_no_last_update(void **state)
     expect_value(__wrap_w_get_timestamp, time, create_time);
     will_return(__wrap_w_get_timestamp, create_time_timestamp);
 
-    wm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
+    gm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
 
     *state = response;
 
@@ -420,7 +420,7 @@ void test_wm_task_manager_parse_data_result_no_create_time(void **state)
     expect_value(__wrap_w_get_timestamp, time, last_update);
     will_return(__wrap_w_get_timestamp, last_update_timestamp);
 
-    wm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
+    gm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
 
     *state = response;
 
@@ -462,7 +462,7 @@ void test_wm_task_manager_parse_data_result_status_upgrade_result(void **state)
     expect_value(__wrap_w_get_timestamp, time, last_update);
     will_return(__wrap_w_get_timestamp, last_update_timestamp);
 
-    wm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
+    gm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
 
     *state = response;
 
@@ -505,7 +505,7 @@ void test_wm_task_manager_parse_data_result_no_status(void **state)
     expect_value(__wrap_w_get_timestamp, time, last_update);
     will_return(__wrap_w_get_timestamp, last_update_timestamp);
 
-    wm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
+    gm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
 
     *state = response;
 
@@ -547,7 +547,7 @@ void test_wm_task_manager_parse_data_result_no_command(void **state)
     expect_value(__wrap_w_get_timestamp, time, last_update);
     will_return(__wrap_w_get_timestamp, last_update_timestamp);
 
-    wm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
+    gm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
 
     *state = response;
 
@@ -589,7 +589,7 @@ void test_wm_task_manager_parse_data_result_no_module(void **state)
     expect_value(__wrap_w_get_timestamp, time, last_update);
     will_return(__wrap_w_get_timestamp, last_update_timestamp);
 
-    wm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
+    gm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
 
     *state = response;
 
@@ -631,7 +631,7 @@ void test_wm_task_manager_parse_data_result_no_node(void **state)
     expect_value(__wrap_w_get_timestamp, time, last_update);
     will_return(__wrap_w_get_timestamp, last_update_timestamp);
 
-    wm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
+    gm_task_manager_parse_data_result(response, node, module, command, status, NULL, create_time, last_update, req_command);
 
     *state = response;
 
@@ -655,7 +655,7 @@ void test_wm_task_manager_parse_response_data_array(void **state)
     int error_code = 0;
     cJSON *data = cJSON_CreateArray();
 
-    cJSON *response = wm_task_manager_parse_response(error_code, data);
+    cJSON *response = gm_task_manager_parse_response(error_code, data);
 
     *state = response;
 
@@ -672,7 +672,7 @@ void test_wm_task_manager_parse_response_data_object(void **state)
     int error_code = 0;
     cJSON *data = cJSON_CreateObject();
 
-    cJSON *response = wm_task_manager_parse_response(error_code, data);
+    cJSON *response = gm_task_manager_parse_response(error_code, data);
 
     *state = response;
 
@@ -690,7 +690,7 @@ void test_wm_task_manager_parse_upgrade_cancel_tasks_parameters_ok(void **state)
 
     cJSON_AddStringToObject(origin, "name", "node01");
 
-    wm_task_manager_upgrade_cancel_tasks* upgrade_cancel_result = wm_task_manager_parse_upgrade_cancel_tasks_parameters(origin);
+    gm_task_manager_upgrade_cancel_tasks* upgrade_cancel_result = gm_task_manager_parse_upgrade_cancel_tasks_parameters(origin);
 
     state[0] = origin;
     state[1] = upgrade_cancel_result;
@@ -707,7 +707,7 @@ void test_wm_task_manager_parse_upgrade_cancel_tasks_parameters_node_err(void **
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8259): Invalid message. 'name' not found.");
 
-    wm_task_manager_upgrade_cancel_tasks* upgrade_cancel_result = wm_task_manager_parse_upgrade_cancel_tasks_parameters(origin);
+    gm_task_manager_upgrade_cancel_tasks* upgrade_cancel_result = gm_task_manager_parse_upgrade_cancel_tasks_parameters(origin);
 
     state[0] = origin;
     state[1] = upgrade_cancel_result;
@@ -725,7 +725,7 @@ void test_wm_task_manager_parse_upgrade_result_parameters_ok(void **state)
 
     cJSON_AddItemToObject(parameters, "agents", agents);
 
-    wm_task_manager_upgrade_result* upgrade_result = wm_task_manager_parse_upgrade_result_parameters(parameters);
+    gm_task_manager_upgrade_result* upgrade_result = gm_task_manager_parse_upgrade_result_parameters(parameters);
 
     state[0] = parameters;
     state[1] = upgrade_result;
@@ -744,7 +744,7 @@ void test_wm_task_manager_parse_upgrade_result_parameters_agents_err(void **stat
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8259): Invalid message. 'agents' not found.");
 
-    wm_task_manager_upgrade_result* upgrade_result = wm_task_manager_parse_upgrade_result_parameters(parameters);
+    gm_task_manager_upgrade_result* upgrade_result = gm_task_manager_parse_upgrade_result_parameters(parameters);
 
     state[0] = parameters;
     state[1] = upgrade_result;
@@ -772,7 +772,7 @@ void test_wm_task_manager_parse_upgrade_update_status_parameters_ok(void **state
     cJSON_AddItemToObject(event, "origin", origin);
     cJSON_AddItemToObject(event, "parameters", parameters);
 
-    wm_task_manager_upgrade_update_status* upgrade_update_status = wm_task_manager_parse_upgrade_update_status_parameters(origin, parameters);
+    gm_task_manager_upgrade_update_status* upgrade_update_status = gm_task_manager_parse_upgrade_update_status_parameters(origin, parameters);
 
     state[0] = event;
     state[1] = upgrade_update_status;
@@ -806,7 +806,7 @@ void test_wm_task_manager_parse_upgrade_update_status_parameters_agents_err(void
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8259): Invalid message. 'agents' not found.");
 
-    wm_task_manager_upgrade_update_status* upgrade_update_status = wm_task_manager_parse_upgrade_update_status_parameters(origin, parameters);
+    gm_task_manager_upgrade_update_status* upgrade_update_status = gm_task_manager_parse_upgrade_update_status_parameters(origin, parameters);
 
     state[0] = event;
     state[1] = upgrade_update_status;
@@ -828,7 +828,7 @@ void test_wm_task_manager_parse_upgrade_update_status_parameters_status_err(void
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8259): Invalid message. 'status' not found.");
 
-    wm_task_manager_upgrade_update_status* upgrade_update_status = wm_task_manager_parse_upgrade_update_status_parameters(origin, parameters);
+    gm_task_manager_upgrade_update_status* upgrade_update_status = gm_task_manager_parse_upgrade_update_status_parameters(origin, parameters);
 
     state[0] = event;
     state[1] = upgrade_update_status;
@@ -848,7 +848,7 @@ void test_wm_task_manager_parse_upgrade_update_status_parameters_node_err(void *
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8259): Invalid message. 'name' not found.");
 
-    wm_task_manager_upgrade_update_status* upgrade_update_status = wm_task_manager_parse_upgrade_update_status_parameters(origin, parameters);
+    gm_task_manager_upgrade_update_status* upgrade_update_status = gm_task_manager_parse_upgrade_update_status_parameters(origin, parameters);
 
     state[0] = event;
     state[1] = upgrade_update_status;
@@ -873,7 +873,7 @@ void test_wm_task_manager_parse_upgrade_get_status_parameters_ok(void **state)
     cJSON_AddItemToObject(event, "origin", origin);
     cJSON_AddItemToObject(event, "parameters", parameters);
 
-    wm_task_manager_upgrade_get_status* upgrade_get_status = wm_task_manager_parse_upgrade_get_status_parameters(origin, parameters);
+    gm_task_manager_upgrade_get_status* upgrade_get_status = gm_task_manager_parse_upgrade_get_status_parameters(origin, parameters);
 
     state[0] = event;
     state[1] = upgrade_get_status;
@@ -901,7 +901,7 @@ void test_wm_task_manager_parse_upgrade_get_status_parameters_agents_err(void **
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8259): Invalid message. 'agents' not found.");
 
-    wm_task_manager_upgrade_get_status* upgrade_get_status = wm_task_manager_parse_upgrade_get_status_parameters(origin, parameters);
+    gm_task_manager_upgrade_get_status* upgrade_get_status = gm_task_manager_parse_upgrade_get_status_parameters(origin, parameters);
 
     state[0] = event;
     state[1] = upgrade_get_status;
@@ -921,7 +921,7 @@ void test_wm_task_manager_parse_upgrade_get_status_parameters_node_err(void **st
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8259): Invalid message. 'name' not found.");
 
-    wm_task_manager_upgrade_get_status* upgrade_get_status = wm_task_manager_parse_upgrade_get_status_parameters(origin, parameters);
+    gm_task_manager_upgrade_get_status* upgrade_get_status = gm_task_manager_parse_upgrade_get_status_parameters(origin, parameters);
 
     state[0] = event;
     state[1] = upgrade_get_status;
@@ -947,7 +947,7 @@ void test_wm_task_manager_parse_upgrade_parameters_ok(void **state)
     cJSON_AddItemToObject(event, "origin", origin);
     cJSON_AddItemToObject(event, "parameters", parameters);
 
-    wm_task_manager_upgrade* upgrade = wm_task_manager_parse_upgrade_parameters(origin, parameters);
+    gm_task_manager_upgrade* upgrade = gm_task_manager_parse_upgrade_parameters(origin, parameters);
 
     state[0] = event;
     state[1] = upgrade;
@@ -978,7 +978,7 @@ void test_wm_task_manager_parse_upgrade_parameters_agents_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8259): Invalid message. 'agents' not found.");
 
-    wm_task_manager_upgrade* upgrade = wm_task_manager_parse_upgrade_parameters(origin, parameters);
+    gm_task_manager_upgrade* upgrade = gm_task_manager_parse_upgrade_parameters(origin, parameters);
 
     state[0] = event;
     state[1] = upgrade;
@@ -1000,7 +1000,7 @@ void test_wm_task_manager_parse_upgrade_parameters_module_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8259): Invalid message. 'module' not found.");
 
-    wm_task_manager_upgrade* upgrade = wm_task_manager_parse_upgrade_parameters(origin, parameters);
+    gm_task_manager_upgrade* upgrade = gm_task_manager_parse_upgrade_parameters(origin, parameters);
 
     state[0] = event;
     state[1] = upgrade;
@@ -1020,7 +1020,7 @@ void test_wm_task_manager_parse_upgrade_parameters_node_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8259): Invalid message. 'name' not found.");
 
-    wm_task_manager_upgrade* upgrade = wm_task_manager_parse_upgrade_parameters(origin, parameters);
+    gm_task_manager_upgrade* upgrade = gm_task_manager_parse_upgrade_parameters(origin, parameters);
 
     state[0] = event;
     state[1] = upgrade;
@@ -1035,7 +1035,7 @@ void test_wm_task_manager_parse_ids_ok(void **state)
     cJSON_AddItemToArray(agents, cJSON_CreateNumber(5));
     cJSON_AddItemToArray(agents, cJSON_CreateNumber(78));
 
-    int *agents_array = wm_task_manager_parse_ids(agents);
+    int *agents_array = gm_task_manager_parse_ids(agents);
 
     state[0] = agents;
     state[1] = agents_array;
@@ -1056,7 +1056,7 @@ void test_wm_task_manager_parse_ids_agents_type_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8260): Invalid element in array.");
 
-    int *agents_array = wm_task_manager_parse_ids(agents);
+    int *agents_array = gm_task_manager_parse_ids(agents);
 
     state[0] = agents;
     state[1] = agents_array;
@@ -1068,7 +1068,7 @@ void test_wm_task_manager_parse_ids_agents_empty_err(void **state)
 {
     cJSON *agents = cJSON_CreateArray();
 
-    int *agents_array = wm_task_manager_parse_ids(agents);
+    int *agents_array = gm_task_manager_parse_ids(agents);
 
     state[0] = agents;
     state[1] = agents_array;
@@ -1089,13 +1089,13 @@ void test_wm_task_manager_parse_message_upgrade(void **state)
                     "   }"
                     "}";
 
-    wm_task_manager_task *task = wm_task_manager_parse_message(message);
+    gm_task_manager_task *task = gm_task_manager_parse_message(message);
 
     *state = task;
 
     assert_non_null(task);
-    assert_int_equal(task->command, WM_TASK_UPGRADE);
-    wm_task_manager_upgrade *parameters = (wm_task_manager_upgrade *)task->parameters;
+    assert_int_equal(task->command, GM_TASK_UPGRADE);
+    gm_task_manager_upgrade *parameters = (gm_task_manager_upgrade *)task->parameters;
     assert_non_null(parameters->node);
     assert_string_equal(parameters->node, "node05");
     assert_non_null(parameters->module);
@@ -1119,13 +1119,13 @@ void test_wm_task_manager_parse_message_upgrade_custom(void **state)
                     "   }"
                     "}";
 
-    wm_task_manager_task *task = wm_task_manager_parse_message(message);
+    gm_task_manager_task *task = gm_task_manager_parse_message(message);
 
     *state = task;
 
     assert_non_null(task);
-    assert_int_equal(task->command, WM_TASK_UPGRADE_CUSTOM);
-    wm_task_manager_upgrade *parameters = (wm_task_manager_upgrade *)task->parameters;
+    assert_int_equal(task->command, GM_TASK_UPGRADE_CUSTOM);
+    gm_task_manager_upgrade *parameters = (gm_task_manager_upgrade *)task->parameters;
     assert_non_null(parameters->node);
     assert_string_equal(parameters->node, "node05");
     assert_non_null(parameters->module);
@@ -1149,13 +1149,13 @@ void test_wm_task_manager_parse_message_upgrade_get_status(void **state)
                     "   }"
                     "}";
 
-    wm_task_manager_task *task = wm_task_manager_parse_message(message);
+    gm_task_manager_task *task = gm_task_manager_parse_message(message);
 
     *state = task;
 
     assert_non_null(task);
-    assert_int_equal(task->command, WM_TASK_UPGRADE_GET_STATUS);
-    wm_task_manager_upgrade_get_status *parameters = (wm_task_manager_upgrade_get_status *)task->parameters;
+    assert_int_equal(task->command, GM_TASK_UPGRADE_GET_STATUS);
+    gm_task_manager_upgrade_get_status *parameters = (gm_task_manager_upgrade_get_status *)task->parameters;
     assert_non_null(parameters->node);
     assert_string_equal(parameters->node, "node05");
     assert_non_null(parameters->agent_ids);
@@ -1178,13 +1178,13 @@ void test_wm_task_manager_parse_message_upgrade_update_status(void **state)
                     "   }"
                     "}";
 
-    wm_task_manager_task *task = wm_task_manager_parse_message(message);
+    gm_task_manager_task *task = gm_task_manager_parse_message(message);
 
     *state = task;
 
     assert_non_null(task);
-    assert_int_equal(task->command, WM_TASK_UPGRADE_UPDATE_STATUS);
-    wm_task_manager_upgrade_update_status *parameters = (wm_task_manager_upgrade_update_status *)task->parameters;
+    assert_int_equal(task->command, GM_TASK_UPGRADE_UPDATE_STATUS);
+    gm_task_manager_upgrade_update_status *parameters = (gm_task_manager_upgrade_update_status *)task->parameters;
     assert_non_null(parameters->node);
     assert_string_equal(parameters->node, "node05");
     assert_non_null(parameters->agent_ids);
@@ -1209,13 +1209,13 @@ void test_wm_task_manager_parse_message_upgrade_result(void **state)
                     "   }"
                     "}";
 
-    wm_task_manager_task *task = wm_task_manager_parse_message(message);
+    gm_task_manager_task *task = gm_task_manager_parse_message(message);
 
     *state = task;
 
     assert_non_null(task);
-    assert_int_equal(task->command, WM_TASK_UPGRADE_RESULT);
-    wm_task_manager_upgrade_result *parameters = (wm_task_manager_upgrade_result *)task->parameters;
+    assert_int_equal(task->command, GM_TASK_UPGRADE_RESULT);
+    gm_task_manager_upgrade_result *parameters = (gm_task_manager_upgrade_result *)task->parameters;
     assert_non_null(parameters->agent_ids);
     assert_int_equal(parameters->agent_ids[0], 1);
     assert_int_equal(parameters->agent_ids[1], 2);
@@ -1234,13 +1234,13 @@ void test_wm_task_manager_parse_message_upgrade_cancel_tasks(void **state)
                     "   }"
                     "}";
 
-    wm_task_manager_task *task = wm_task_manager_parse_message(message);
+    gm_task_manager_task *task = gm_task_manager_parse_message(message);
 
     *state = task;
 
     assert_non_null(task);
-    assert_int_equal(task->command, WM_TASK_UPGRADE_CANCEL_TASKS);
-    wm_task_manager_upgrade_cancel_tasks *parameters = (wm_task_manager_upgrade_cancel_tasks *)task->parameters;
+    assert_int_equal(task->command, GM_TASK_UPGRADE_CANCEL_TASKS);
+    gm_task_manager_upgrade_cancel_tasks *parameters = (gm_task_manager_upgrade_cancel_tasks *)task->parameters;
     assert_non_null(parameters->node);
     assert_string_equal(parameters->node, "node05");
 }
@@ -1257,12 +1257,12 @@ void test_wm_task_manager_parse_message_unknown(void **state)
                     "   }"
                     "}";
 
-    wm_task_manager_task *task = wm_task_manager_parse_message(message);
+    gm_task_manager_task *task = gm_task_manager_parse_message(message);
 
     *state = task;
 
     assert_non_null(task);
-    assert_int_equal(task->command, WM_TASK_UNKNOWN);
+    assert_int_equal(task->command, GM_TASK_UNKNOWN);
     assert_null(task->parameters);
 }
 
@@ -1281,7 +1281,7 @@ void test_wm_task_manager_parse_message_command_parameters_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8259): Invalid message. 'agents' not found.");
 
-    wm_task_manager_task *task = wm_task_manager_parse_message(message);
+    gm_task_manager_task *task = gm_task_manager_parse_message(message);
 }
 
 void test_wm_task_manager_parse_message_command_err(void **state)
@@ -1299,7 +1299,7 @@ void test_wm_task_manager_parse_message_command_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8259): Invalid message. 'command' not found.");
 
-    wm_task_manager_task *task = wm_task_manager_parse_message(message);
+    gm_task_manager_task *task = gm_task_manager_parse_message(message);
 
     assert_null(task);
 }
@@ -1316,7 +1316,7 @@ void test_wm_task_manager_parse_message_origin_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8259): Invalid message. 'origin' not found.");
 
-    wm_task_manager_task *task = wm_task_manager_parse_message(message);
+    gm_task_manager_task *task = gm_task_manager_parse_message(message);
 
     assert_null(task);
 }
@@ -1334,7 +1334,7 @@ void test_wm_task_manager_parse_message_parameters_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8259): Invalid message. 'parameters' not found.");
 
-    wm_task_manager_task *task = wm_task_manager_parse_message(message);
+    gm_task_manager_task *task = gm_task_manager_parse_message(message);
 
     assert_null(task);
 }
@@ -1346,7 +1346,7 @@ void test_wm_task_manager_parse_message_invalid_json_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8257): Error parsing JSON event: 'unknown json'");
 
-    wm_task_manager_task *task = wm_task_manager_parse_message(message);
+    gm_task_manager_task *task = gm_task_manager_parse_message(message);
 
     assert_null(task);
 }

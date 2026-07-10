@@ -29,7 +29,7 @@ static SERVICE_STATUS          ossecServiceStatus;
 static SERVICE_STATUS_HANDLE   ossecServiceStatusHandle;
 
 void WINAPI OssecServiceStart (DWORD argc, LPTSTR *argv);
-void wm_kill_children();
+void gm_kill_children();
 extern void stop_wmodules();
 
 /* Start OSSEC-HIDS service */
@@ -285,7 +285,7 @@ VOID WINAPI OssecServiceCtrlHandler(DWORD dwOpcode)
                 plain_minfo("Set pending exit signal.");
 
                 // Kill children processes spawned by modules, only in guardsarm-agent
-                wm_kill_children();
+                gm_kill_children();
                 stop_wmodules();
                 is_fim_shutdown = true;
                 fim_db_teardown();

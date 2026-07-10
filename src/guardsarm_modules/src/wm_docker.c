@@ -10,22 +10,22 @@
 
 #include "wmodules.h"
 
-static wm_docker_t *docker_conf;                               // Pointer to docker config struct
+static gm_docker_t *docker_conf;                               // Pointer to docker config struct
 
-static void* wm_docker_main(wm_docker_t *docker_conf);         // Module main function. It won't return
-static void wm_docker_setup(wm_docker_t *_docker_conf);        // Setup module
-static void wm_docker_cleanup();                               // Cleanup function, doesn't overwrite wm_cleanup
-static void wm_docker_check();                                 // Check configuration, disable flag
-static void wm_docker_destroy(wm_docker_t *docker_conf);       // Destroy data
-cJSON *wm_docker_dump(const wm_docker_t *docker_conf);         // Dump docker config to JSON
+static void* gm_docker_main(gm_docker_t *docker_conf);         // Module main function. It won't return
+static void gm_docker_setup(gm_docker_t *_docker_conf);        // Setup module
+static void gm_docker_cleanup();                               // Cleanup function, doesn't overwrite wm_cleanup
+static void gm_docker_check();                                 // Check configuration, disable flag
+static void gm_docker_destroy(gm_docker_t *docker_conf);       // Destroy data
+cJSON *gm_docker_dump(const gm_docker_t *docker_conf);         // Dump docker config to JSON
 
 // Docker module context definition
 
-const wm_context WM_DOCKER_CONTEXT = {
+const gm_context GM_DOCKER_CONTEXT = {
     .name = "docker-listener",
-    .start = (wm_routine)wm_docker_main,
-    .destroy = (void(*)(void *))wm_docker_destroy,
-    .dump = (cJSON * (*)(const void *))wm_docker_dump,
+    .start = (gm_routine)gm_docker_main,
+    .destroy = (void(*)(void *))gm_docker_destroy,
+    .dump = (cJSON * (*)(const void *))gm_docker_dump,
     .sync = NULL,
     .stop = NULL,
     .query = NULL,
@@ -33,46 +33,46 @@ const wm_context WM_DOCKER_CONTEXT = {
 
 // Module module main function. It won't return.
 
-void* wm_docker_main(wm_docker_t *docker_conf) {
+void* gm_docker_main(gm_docker_t *docker_conf) {
     int status = 0;
-    char * command = WM_DOCKER_SCRIPT_PATH;
+    char * command = GM_DOCKER_SCRIPT_PATH;
     char * timestamp = NULL;
     int attempts = 0;
 
-    wm_docker_setup(docker_conf);
-    mtinfo(WM_DOCKER_LOGTAG, "Module docker-listener started.");
+    gm_docker_setup(docker_conf);
+    mtinfo(GM_DOCKER_LOGTAG, "Module docker-listener started.");
 
     // Main
     do {
-        const time_t time_sleep = sched_scan_get_time_until_next_scan(&(docker_conf->scan_config), WM_DOCKER_LOGTAG, docker_conf->flags.run_on_start);
+        const time_t time_sleep = sched_scan_get_time_until_next_scan(&(docker_conf->scan_config), GM_DOCKER_LOGTAG, docker_conf->flags.run_on_start);
 
         if (time_sleep) {
             const int next_scan_time = sched_get_next_scan_time(docker_conf->scan_config);
             timestamp = w_get_timestamp(next_scan_time);
-            mtdebug2(WM_DOCKER_LOGTAG, "Sleeping until: %s", timestamp);
+            mtdebug2(GM_DOCKER_LOGTAG, "Sleeping until: %s", timestamp);
             os_free(timestamp);
-            wm_sleep_until_interruptible(next_scan_time);
-            if (wm_shutdown_requested) break;
+            gm_sleep_until_interruptible(next_scan_time);
+            if (gm_shutdown_requested) break;
         }
-        if (wm_shutdown_requested) break;
-        mtinfo(WM_DOCKER_LOGTAG, "Starting to listening Docker events.");
+        if (gm_shutdown_requested) break;
+        mtinfo(GM_DOCKER_LOGTAG, "Starting to listening Docker events.");
 
         // Running the docker listener script
 
-        mtdebug1(WM_DOCKER_LOGTAG, "Launching command '%s'", command);
+        mtdebug1(GM_DOCKER_LOGTAG, "Launching command '%s'", command);
 
         wfd_t * wfd = wpopenl(command, W_BIND_STDERR, command, NULL);
 
         if (wfd == NULL) {
-            mterror(WM_DOCKER_LOGTAG, "Cannot launch Docker integration due to an internal error.");
+            mterror(GM_DOCKER_LOGTAG, "Cannot launch Docker integration due to an internal error.");
             pthread_exit(NULL);
         }
 
 #ifdef WIN32
-        wm_append_handle(wfd->pinfo.hProcess);
+        gm_append_handle(wfd->pinfo.hProcess);
 #else
         if (0 <= wfd->pid) {
-            wm_append_sid(wfd->pid);
+            gm_append_sid(wfd->pid);
         }
 #endif
 
@@ -85,20 +85,20 @@ void* wm_docker_main(wm_docker_t *docker_conf) {
             }
 
             if (strncmp(buffer, "INFO ", 5) == 0) {
-                mtinfo(WM_DOCKER_LOGTAG, "%s", buffer + 5);
+                mtinfo(GM_DOCKER_LOGTAG, "%s", buffer + 5);
             } else if (strncmp(buffer, "WARN ", 5) == 0) {
-                mtwarn(WM_DOCKER_LOGTAG, "%s", buffer + 5);
+                mtwarn(GM_DOCKER_LOGTAG, "%s", buffer + 5);
             } else {
-                mterror(WM_DOCKER_LOGTAG, "%s", buffer);
+                mterror(GM_DOCKER_LOGTAG, "%s", buffer);
             }
         }
 
         // At this point, DockerListener terminated
 #ifdef WIN32
-        wm_remove_handle(wfd->pinfo.hProcess);
+        gm_remove_handle(wfd->pinfo.hProcess);
 #else
         if (0 <= wfd->pid) {
-            wm_remove_sid(wfd->pid);
+            gm_remove_sid(wfd->pid);
         }
 #endif
         status = wpclose(wfd);
@@ -106,17 +106,17 @@ void* wm_docker_main(wm_docker_t *docker_conf) {
 
         switch (exitcode) {
         case 127:
-            mterror(WM_DOCKER_LOGTAG, "Cannot launch Docker integration. Please check the file '%s'", command);
+            mterror(GM_DOCKER_LOGTAG, "Cannot launch Docker integration. Please check the file '%s'", command);
             pthread_exit(NULL);
 
         default:
             if (++attempts >= docker_conf->attempts) {
-                mterror(WM_DOCKER_LOGTAG, "Maximum attempts reached to run the listener. Exiting...");
+                mterror(GM_DOCKER_LOGTAG, "Maximum attempts reached to run the listener. Exiting...");
                 pthread_exit(NULL);
             }
-            mtwarn(WM_DOCKER_LOGTAG, "Docker-listener finished unexpectedly (code %d). Retrying to run in next scheduled time...", exitcode);
+            mtwarn(GM_DOCKER_LOGTAG, "Docker-listener finished unexpectedly (code %d). Retrying to run in next scheduled time...", exitcode);
         }
-    } while (FOREVER() && !wm_shutdown_requested);
+    } while (FOREVER() && !gm_shutdown_requested);
 
     return NULL;
 }
@@ -124,17 +124,17 @@ void* wm_docker_main(wm_docker_t *docker_conf) {
 
 // Get read data
 
-cJSON *wm_docker_dump(const wm_docker_t *docker_conf) {
+cJSON *gm_docker_dump(const gm_docker_t *docker_conf) {
 
     cJSON *root = cJSON_CreateObject();
-    cJSON *wm_docker = cJSON_CreateObject();
+    cJSON *gm_docker = cJSON_CreateObject();
 
-    sched_scan_dump(&(docker_conf->scan_config), wm_docker);
+    sched_scan_dump(&(docker_conf->scan_config), gm_docker);
 
-    if (docker_conf->flags.enabled) cJSON_AddStringToObject(wm_docker,"disabled","no"); else cJSON_AddStringToObject(wm_docker,"disabled","yes");
-    if (docker_conf->flags.run_on_start) cJSON_AddStringToObject(wm_docker,"run_on_start","yes"); else cJSON_AddStringToObject(wm_docker,"run_on_start","no");
-    cJSON_AddNumberToObject(wm_docker, "attempts", docker_conf->attempts);
-    cJSON_AddItemToObject(root,"docker-listener",wm_docker);
+    if (docker_conf->flags.enabled) cJSON_AddStringToObject(gm_docker,"disabled","no"); else cJSON_AddStringToObject(gm_docker,"disabled","yes");
+    if (docker_conf->flags.run_on_start) cJSON_AddStringToObject(gm_docker,"run_on_start","yes"); else cJSON_AddStringToObject(gm_docker,"run_on_start","no");
+    cJSON_AddNumberToObject(gm_docker, "attempts", docker_conf->attempts);
+    cJSON_AddItemToObject(root,"docker-listener",gm_docker);
 
     return root;
 }
@@ -142,44 +142,44 @@ cJSON *wm_docker_dump(const wm_docker_t *docker_conf) {
 
 // Destroy data
 
-void wm_docker_destroy(wm_docker_t *docker_conf) {
+void gm_docker_destroy(gm_docker_t *docker_conf) {
     free(docker_conf);
 }
 
 // Setup module
 
-void wm_docker_setup(wm_docker_t *_docker_conf) {
+void gm_docker_setup(gm_docker_t *_docker_conf) {
 
     docker_conf = _docker_conf;
-    wm_docker_check();
+    gm_docker_check();
 
     // Cleanup exiting
 
-    atexit(wm_docker_cleanup);
+    atexit(gm_docker_cleanup);
 }
 
 
 // Check configuration
 
-void wm_docker_check() {
+void gm_docker_check() {
     // Check if disabled
 
     if (!docker_conf->flags.enabled) {
-        mtinfo(WM_DOCKER_LOGTAG, "Module disabled. Exiting...");
+        mtinfo(GM_DOCKER_LOGTAG, "Module disabled. Exiting...");
         pthread_exit(NULL);
     }
 
     // Check if interval defined; otherwise set default
 
     if (!docker_conf->interval)
-        docker_conf->interval = WM_DOCKER_DEF_INTERVAL;
+        docker_conf->interval = GM_DOCKER_DEF_INTERVAL;
 
 }
 
 // Cleanup function, doesn't overwrite wm_cleanup
 
-void wm_docker_cleanup() {
-    mtinfo(WM_DOCKER_LOGTAG, "Module finished.");
+void gm_docker_cleanup() {
+    mtinfo(GM_DOCKER_LOGTAG, "Module finished.");
 }
 
 #endif

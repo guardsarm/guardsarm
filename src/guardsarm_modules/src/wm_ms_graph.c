@@ -19,39 +19,39 @@
 #endif
 #endif
 
-static void* wm_ms_graph_main(wm_ms_graph* ms_graph);
-static bool wm_ms_graph_setup(wm_ms_graph* ms_graph);
-static bool wm_ms_graph_check();
-static void wm_ms_graph_get_access_token(wm_ms_graph_auth* auth_config, const ssize_t curl_max_size);
-static void wm_ms_graph_scan_relationships(wm_ms_graph* ms_graph, wm_ms_graph_auth* auth_config, const bool initial_scan);
-static cJSON* wm_ms_graph_scan_apps_devices(const wm_ms_graph* ms_graph, const cJSON* app_id, const char* query_fqdn, char** headers, wm_ms_graph_auth* auth_config);
-static void wm_ms_graph_destroy(wm_ms_graph* ms_graph);
-static void wm_ms_graph_cleanup();
-cJSON* wm_ms_graph_dump(const wm_ms_graph* ms_graph);
-static bool wm_ms_graph_ensure_valid_token(wm_ms_graph_auth *auth_config, ssize_t curl_max_size, bool* token_changed);
-static curl_response* wm_ms_graph_http_get_with_retry(char** headers, const char* url, size_t curl_max_size, const char* relationship_name);
+static void* gm_ms_graph_main(gm_ms_graph* ms_graph);
+static bool gm_ms_graph_setup(gm_ms_graph* ms_graph);
+static bool gm_ms_graph_check();
+static void gm_ms_graph_get_access_token(gm_ms_graph_auth* auth_config, const ssize_t curl_max_size);
+static void gm_ms_graph_scan_relationships(gm_ms_graph* ms_graph, gm_ms_graph_auth* auth_config, const bool initial_scan);
+static cJSON* gm_ms_graph_scan_apps_devices(const gm_ms_graph* ms_graph, const cJSON* app_id, const char* query_fqdn, char** headers, gm_ms_graph_auth* auth_config);
+static void gm_ms_graph_destroy(gm_ms_graph* ms_graph);
+static void gm_ms_graph_cleanup();
+cJSON* gm_ms_graph_dump(const gm_ms_graph* ms_graph);
+static bool gm_ms_graph_ensure_valid_token(gm_ms_graph_auth *auth_config, ssize_t curl_max_size, bool* token_changed);
+static curl_response* gm_ms_graph_http_get_with_retry(char** headers, const char* url, size_t curl_max_size, const char* relationship_name);
 
 static int queue_fd; // Socket ID
 
-const wm_context WM_MS_GRAPH_CONTEXT = {
+const gm_context GM_MS_GRAPH_CONTEXT = {
     .name = MS_GRAPH_WM_NAME,
-    .start = (wm_routine)wm_ms_graph_main,
-    .destroy = (void (*)(void*))wm_ms_graph_destroy,
-    .dump = (cJSON* (*)(const void*))wm_ms_graph_dump,
+    .start = (gm_routine)gm_ms_graph_main,
+    .destroy = (void (*)(void*))gm_ms_graph_destroy,
+    .dump = (cJSON* (*)(const void*))gm_ms_graph_dump,
     .sync = NULL,
     .stop = NULL,
     .query = NULL,
 };
 
-static bool wm_ms_graph_ensure_valid_token(wm_ms_graph_auth *auth_config, ssize_t curl_max_size, bool* token_changed) {
+static bool gm_ms_graph_ensure_valid_token(gm_ms_graph_auth *auth_config, ssize_t curl_max_size, bool* token_changed) {
     // Consider the token invalid if it's missing or will expire soon (within WM_MS_GRAPH_DEFAULT_TIMEOUT seconds)
-    if (!auth_config->access_token || time(NULL) >= (auth_config->token_expiration_time - WM_MS_GRAPH_DEFAULT_TIMEOUT)) {
-        mtinfo(WM_MS_GRAPH_LOGTAG, "Access token expired or missing. Requesting new token.");
-        wm_ms_graph_get_access_token(auth_config, curl_max_size);
+    if (!auth_config->access_token || time(NULL) >= (auth_config->token_expiration_time - GM_MS_GRAPH_DEFAULT_TIMEOUT)) {
+        mtinfo(GM_MS_GRAPH_LOGTAG, "Access token expired or missing. Requesting new token.");
+        gm_ms_graph_get_access_token(auth_config, curl_max_size);
 
         // Validate new token
-        if (!auth_config->access_token || time(NULL) >= (auth_config->token_expiration_time - WM_MS_GRAPH_DEFAULT_TIMEOUT)) {
-            mtwarn(WM_MS_GRAPH_LOGTAG, "Failed to renew access token.");
+        if (!auth_config->access_token || time(NULL) >= (auth_config->token_expiration_time - GM_MS_GRAPH_DEFAULT_TIMEOUT)) {
+            mtwarn(GM_MS_GRAPH_LOGTAG, "Failed to renew access token.");
             return false;
         }
         if (token_changed) {
@@ -62,20 +62,20 @@ static bool wm_ms_graph_ensure_valid_token(wm_ms_graph_auth *auth_config, ssize_
     return true;
 }
 
-void* wm_ms_graph_main(wm_ms_graph* ms_graph) {
+void* gm_ms_graph_main(gm_ms_graph* ms_graph) {
     char* timestamp = NULL;
 
-    if (!wm_ms_graph_setup(ms_graph)) {
+    if (!gm_ms_graph_setup(ms_graph)) {
         return NULL;
     } else {
-        mtinfo(WM_MS_GRAPH_LOGTAG, "Started module.");
+        mtinfo(GM_MS_GRAPH_LOGTAG, "Started module.");
 
         bool initial = true;
         int i;
-        wm_ms_graph_auth *it;
+        gm_ms_graph_auth *it;
 
-        while (FOREVER() && !wm_shutdown_requested) {
-            const time_t time_sleep = sched_scan_get_time_until_next_scan(&ms_graph->scan_config, WM_MS_GRAPH_LOGTAG, ms_graph->run_on_start);
+        while (FOREVER() && !gm_shutdown_requested) {
+            const time_t time_sleep = sched_scan_get_time_until_next_scan(&ms_graph->scan_config, GM_MS_GRAPH_LOGTAG, ms_graph->run_on_start);
 
             if (ms_graph->state.next_time == 0) {
                 ms_graph->state.next_time = ms_graph->scan_config.time_start + time_sleep;
@@ -84,23 +84,23 @@ void* wm_ms_graph_main(wm_ms_graph* ms_graph) {
             if (time_sleep) {
                 const time_t next_scan_time = sched_get_next_scan_time(ms_graph->scan_config);
                 timestamp = w_get_timestamp(next_scan_time);
-                mtdebug1(WM_MS_GRAPH_LOGTAG, "Waiting until: %s", timestamp);
+                mtdebug1(GM_MS_GRAPH_LOGTAG, "Waiting until: %s", timestamp);
                 os_free(timestamp);
-                wm_sleep_until_interruptible(next_scan_time);
-                if (wm_shutdown_requested) break;
+                gm_sleep_until_interruptible(next_scan_time);
+                if (gm_shutdown_requested) break;
             }
 
             for (i = 0; ms_graph->auth_config[i]; i++) {
                 it = ms_graph->auth_config[i];
 
                 if (!it->access_token || time(NULL) >= it->token_expiration_time) {
-                    mtinfo(WM_MS_GRAPH_LOGTAG, "Obtaining access token.");
-                    wm_ms_graph_get_access_token(it, ms_graph->curl_max_size);
+                    mtinfo(GM_MS_GRAPH_LOGTAG, "Obtaining access token.");
+                    gm_ms_graph_get_access_token(it, ms_graph->curl_max_size);
                 }
 
                 if (it->access_token && time(NULL) < it->token_expiration_time) {
-                    mtinfo(WM_MS_GRAPH_LOGTAG, "Scanning tenant '%s'", it->tenant_id);
-                    wm_ms_graph_scan_relationships(ms_graph, it, initial);
+                    mtinfo(GM_MS_GRAPH_LOGTAG, "Scanning tenant '%s'", it->tenant_id);
+                    gm_ms_graph_scan_relationships(ms_graph, it, initial);
                     initial = false;
                 }
             }
@@ -109,20 +109,20 @@ void* wm_ms_graph_main(wm_ms_graph* ms_graph) {
     return NULL;
 }
 
-bool wm_ms_graph_setup(wm_ms_graph* ms_graph) {
+bool gm_ms_graph_setup(gm_ms_graph* ms_graph) {
 
-    if (!wm_ms_graph_check(ms_graph)) {
+    if (!gm_ms_graph_check(ms_graph)) {
         return false;
     }
 
-    if (wm_state_io(WM_MS_GRAPH_CONTEXT.name, WM_IO_READ, &ms_graph->state, sizeof(ms_graph->state)) < 0) {
+    if (gm_state_io(GM_MS_GRAPH_CONTEXT.name, GM_IO_READ, &ms_graph->state, sizeof(ms_graph->state)) < 0) {
         memset(&ms_graph->state, 0, sizeof(ms_graph->state));
     }
 
     queue_fd = StartMQ(DEFAULTQUEUE, WRITE, INFINITE_OPENQ_ATTEMPTS);
 
     if (queue_fd < 0) {
-        mterror(WM_MS_GRAPH_LOGTAG, "Unable to connect to Message Queue. Exiting...");
+        mterror(GM_MS_GRAPH_LOGTAG, "Unable to connect to Message Queue. Exiting...");
         #ifdef GUARDSARM_UNIT_TESTING
         return false;
         #else
@@ -130,22 +130,22 @@ bool wm_ms_graph_setup(wm_ms_graph* ms_graph) {
         #endif
     }
 
-    atexit(wm_ms_graph_cleanup);
+    atexit(gm_ms_graph_cleanup);
     return true;
 
 }
 
-bool wm_ms_graph_check(wm_ms_graph* ms_graph) {
+bool gm_ms_graph_check(gm_ms_graph* ms_graph) {
 
     if (!ms_graph || !ms_graph->enabled) {
-        mtinfo(WM_MS_GRAPH_LOGTAG, "Module disabled. Exiting...");
+        mtinfo(GM_MS_GRAPH_LOGTAG, "Module disabled. Exiting...");
         #ifdef GUARDSARM_UNIT_TESTING
         return false;
         #else
         pthread_exit(NULL);
         #endif
     } else if (!ms_graph->resources || ms_graph->num_resources == 0) {
-        mterror(WM_MS_GRAPH_LOGTAG, "Invalid module configuration (Missing API info, resources, relationships). Exiting...");
+        mterror(GM_MS_GRAPH_LOGTAG, "Invalid module configuration (Missing API info, resources, relationships). Exiting...");
         #ifdef GUARDSARM_UNIT_TESTING
         return false;
         #else
@@ -154,7 +154,7 @@ bool wm_ms_graph_check(wm_ms_graph* ms_graph) {
     } else {
         for (unsigned int resource = 0; resource < ms_graph->num_resources; resource++) {
             if (ms_graph->resources[resource].num_relationships == 0) {
-                mterror(WM_MS_GRAPH_LOGTAG, "Invalid module configuration (Missing API info, resources, relationships). Exiting...");
+                mterror(GM_MS_GRAPH_LOGTAG, "Invalid module configuration (Missing API info, resources, relationships). Exiting...");
                 #ifdef GUARDSARM_UNIT_TESTING
                 return false;
                 #else
@@ -166,24 +166,24 @@ bool wm_ms_graph_check(wm_ms_graph* ms_graph) {
     return true;
 }
 
-void wm_ms_graph_get_access_token(wm_ms_graph_auth* auth_config, const ssize_t curl_max_size) {
+void gm_ms_graph_get_access_token(gm_ms_graph_auth* auth_config, const ssize_t curl_max_size) {
     char url[OS_SIZE_8192] = { '\0' };
     char payload[OS_SIZE_8192] = { '\0' };
     char* headers[] = { "Content-Type: application/x-www-form-urlencoded", NULL };
     curl_response* response;
 
-    snprintf(url, OS_SIZE_8192 - 1, WM_MS_GRAPH_ACCESS_TOKEN_URL, auth_config->login_fqdn, auth_config->tenant_id);
-    mtdebug1(WM_MS_GRAPH_LOGTAG, "Microsoft Graph API Access Token URL: '%s'", url);
-    snprintf(payload, OS_SIZE_8192 - 1, WM_MS_GRAPH_ACCESS_TOKEN_PAYLOAD, auth_config->query_fqdn, auth_config->client_id, auth_config->secret_value);
+    snprintf(url, OS_SIZE_8192 - 1, GM_MS_GRAPH_ACCESS_TOKEN_URL, auth_config->login_fqdn, auth_config->tenant_id);
+    mtdebug1(GM_MS_GRAPH_LOGTAG, "Microsoft Graph API Access Token URL: '%s'", url);
+    snprintf(payload, OS_SIZE_8192 - 1, GM_MS_GRAPH_ACCESS_TOKEN_PAYLOAD, auth_config->query_fqdn, auth_config->client_id, auth_config->secret_value);
 
-    response = wurl_http_request(WURL_POST_METHOD, headers, url, payload, curl_max_size, WM_MS_GRAPH_DEFAULT_TIMEOUT, NULL, true);
+    response = wurl_http_request(WURL_POST_METHOD, headers, url, payload, curl_max_size, GM_MS_GRAPH_DEFAULT_TIMEOUT, NULL, true);
     if (response) {
         if (response->status_code != 200) {
             char status_code[4];
             snprintf(status_code, 4, "%ld", response->status_code);
-            mtwarn(WM_MS_GRAPH_LOGTAG, "Received unsuccessful status code when attempting to obtain access token: Status code was '%s' & response was '%s'", status_code, response->body);
+            mtwarn(GM_MS_GRAPH_LOGTAG, "Received unsuccessful status code when attempting to obtain access token: Status code was '%s' & response was '%s'", status_code, response->body);
         } else if (response->max_size_reached) {
-            mtwarn(WM_MS_GRAPH_LOGTAG, "Reached maximum CURL size when attempting to obtain access token. Consider increasing the value of 'curl_max_size'.");
+            mtwarn(GM_MS_GRAPH_LOGTAG, "Reached maximum CURL size when attempting to obtain access token. Consider increasing the value of 'curl_max_size'.");
         } else {
             cJSON* response_body = NULL;
             if (response_body = cJSON_Parse(response->body), response_body) {
@@ -194,40 +194,40 @@ void wm_ms_graph_get_access_token(wm_ms_graph_auth* auth_config, const ssize_t c
                     os_strdup(access_token_value->valuestring, auth_config->access_token);
                     auth_config->token_expiration_time = time(NULL) + access_token_expiration->valueint;
                 } else {
-                    mtwarn(WM_MS_GRAPH_LOGTAG, "Incomplete access token response, value or expiration time not present.");
+                    mtwarn(GM_MS_GRAPH_LOGTAG, "Incomplete access token response, value or expiration time not present.");
                 }
                 cJSON_Delete(response_body);
             } else {
-                mtwarn(WM_MS_GRAPH_LOGTAG, "Failed to parse access token JSON body.");
+                mtwarn(GM_MS_GRAPH_LOGTAG, "Failed to parse access token JSON body.");
             }
         }
         wurl_free_response(response);
     } else {
-        mtwarn(WM_MS_GRAPH_LOGTAG, "No response received when attempting to obtain access token.");
+        mtwarn(GM_MS_GRAPH_LOGTAG, "No response received when attempting to obtain access token.");
     }
 }
 
-static curl_response* wm_ms_graph_http_get_with_retry(char** headers, const char* url, size_t curl_max_size, const char* relationship_name) {
+static curl_response* gm_ms_graph_http_get_with_retry(char** headers, const char* url, size_t curl_max_size, const char* relationship_name) {
     curl_response* response = NULL;
-    for (int attempt = 0; attempt <= WM_MS_GRAPH_MAX_RETRIES; attempt++) {
-        response = wurl_http_request(WURL_GET_METHOD, headers, url, "", curl_max_size, WM_MS_GRAPH_DEFAULT_TIMEOUT, NULL, true);
-        if (response && response->status_code == 429 && attempt < WM_MS_GRAPH_MAX_RETRIES) {
-            int retry_after = WM_MS_GRAPH_MAX_RETRY_AFTER_WARN;
-            char *retry_after_str = wm_read_http_header_element(response->header, WM_MS_GRAPH_RETRY_AFTER_REGEX);
+    for (int attempt = 0; attempt <= GM_MS_GRAPH_MAX_RETRIES; attempt++) {
+        response = wurl_http_request(WURL_GET_METHOD, headers, url, "", curl_max_size, GM_MS_GRAPH_DEFAULT_TIMEOUT, NULL, true);
+        if (response && response->status_code == 429 && attempt < GM_MS_GRAPH_MAX_RETRIES) {
+            int retry_after = GM_MS_GRAPH_MAX_RETRY_AFTER_WARN;
+            char *retry_after_str = gm_read_http_header_element(response->header, GM_MS_GRAPH_RETRY_AFTER_REGEX);
             if (retry_after_str) {
                 retry_after = atoi(retry_after_str);
                 os_free(retry_after_str);
             }
-            if (retry_after > WM_MS_GRAPH_MAX_RETRY_AFTER_WARN) {
-                mtwarn(WM_MS_GRAPH_LOGTAG, "Retry-After value (%ds) for relationship '%s' exceeds (%ds).",
-                    retry_after, relationship_name, WM_MS_GRAPH_MAX_RETRY_AFTER_WARN);
+            if (retry_after > GM_MS_GRAPH_MAX_RETRY_AFTER_WARN) {
+                mtwarn(GM_MS_GRAPH_LOGTAG, "Retry-After value (%ds) for relationship '%s' exceeds (%ds).",
+                    retry_after, relationship_name, GM_MS_GRAPH_MAX_RETRY_AFTER_WARN);
             }
-            mtdebug1(WM_MS_GRAPH_LOGTAG, "Received HTTP 429 for relationship '%s'. Retrying after %ds (attempt %d/%d).",
-                relationship_name, retry_after, attempt + 1, WM_MS_GRAPH_MAX_RETRIES);
+            mtdebug1(GM_MS_GRAPH_LOGTAG, "Received HTTP 429 for relationship '%s'. Retrying after %ds (attempt %d/%d).",
+                relationship_name, retry_after, attempt + 1, GM_MS_GRAPH_MAX_RETRIES);
             wurl_free_response(response);
             response = NULL;
-            wm_sleep_until_interruptible(time(NULL) + retry_after);
-            if (wm_shutdown_requested) break;
+            gm_sleep_until_interruptible(time(NULL) + retry_after);
+            if (gm_shutdown_requested) break;
             continue;
         }
         break;
@@ -235,16 +235,16 @@ static curl_response* wm_ms_graph_http_get_with_retry(char** headers, const char
     return response;
 }
 
-void wm_ms_graph_scan_relationships(wm_ms_graph* ms_graph, wm_ms_graph_auth* auth_config, const bool initial_scan) {
+void gm_ms_graph_scan_relationships(gm_ms_graph* ms_graph, gm_ms_graph_auth* auth_config, const bool initial_scan) {
     char url[OS_SIZE_8192] = { '\0' };
     char auth_header[OS_SIZE_8192] = { '\0' };
     char* headers[] = { NULL, NULL };
     curl_response* response;
     char relationship_state_name[OS_SIZE_1024] = { '\0' };
-    char start_time_str[WM_MS_GRAPH_TIMESTAMP_SIZE_80] = { '\0' };
-    char end_time_str[WM_MS_GRAPH_TIMESTAMP_SIZE_80] = { '\0' };
+    char start_time_str[GM_MS_GRAPH_TIMESTAMP_SIZE_80] = { '\0' };
+    char end_time_str[GM_MS_GRAPH_TIMESTAMP_SIZE_80] = { '\0' };
     struct tm tm_aux = { .tm_sec = 0 };
-    wm_ms_graph_state_t relationship_state_struc;
+    gm_ms_graph_state_t relationship_state_struc;
     time_t scan_time;
     bool fail;
     bool next_page;
@@ -272,22 +272,22 @@ void wm_ms_graph_scan_relationships(wm_ms_graph* ms_graph, wm_ms_graph_auth* aut
 
             inventory = false;
             activityFilter = false;
-            if (!strcmp(ms_graph->resources[resource_num].name, WM_MS_GRAPH_RESOURCE_DEVICE_MANAGEMENT)) {
+            if (!strcmp(ms_graph->resources[resource_num].name, GM_MS_GRAPH_RESOURCE_DEVICE_MANAGEMENT)) {
                 // If not auditEvents, treat as inventory
-                if (strcmp(ms_graph->resources[resource_num].relationships[relationship_num], WM_MS_GRAPH_RELATIONSHIP_AUDIT_EVENTS)) {
+                if (strcmp(ms_graph->resources[resource_num].relationships[relationship_num], GM_MS_GRAPH_RELATIONSHIP_AUDIT_EVENTS)) {
                     inventory = true;
                 } else {
                     activityFilter = true;
                 }
-            } else if (!strcmp(ms_graph->resources[resource_num].name, WM_MS_GRAPH_RESOURCE_IDENTITY_PROTECTION)) {
-                if (!strcmp(ms_graph->resources[resource_num].relationships[relationship_num], WM_MS_GRAPH_RELATIONSHIP_RISK_DETECTIONS) ||
-                    !strcmp(ms_graph->resources[resource_num].relationships[relationship_num], WM_MS_GRAPH_RELATIONSHIP_SERVICE_PRINCIPAL_RISK_DETECTIONS)) {
+            } else if (!strcmp(ms_graph->resources[resource_num].name, GM_MS_GRAPH_RESOURCE_IDENTITY_PROTECTION)) {
+                if (!strcmp(ms_graph->resources[resource_num].relationships[relationship_num], GM_MS_GRAPH_RELATIONSHIP_RISK_DETECTIONS) ||
+                    !strcmp(ms_graph->resources[resource_num].relationships[relationship_num], GM_MS_GRAPH_RELATIONSHIP_SERVICE_PRINCIPAL_RISK_DETECTIONS)) {
                     activityFilter = true;
                 }
             }
 
             if (!inventory) {
-                snprintf(relationship_state_name, OS_SIZE_1024 -1, "%s-%s-%s-%s", WM_MS_GRAPH_CONTEXT.name,
+                snprintf(relationship_state_name, OS_SIZE_1024 -1, "%s-%s-%s-%s", GM_MS_GRAPH_CONTEXT.name,
                     auth_config->tenant_id, ms_graph->resources[resource_num].name, ms_graph->resources[resource_num].relationships[relationship_num]);
                 // Replace '/' with '-' so relationship names like "cases/eDiscoveryCases"
                 // don't create invalid subdirectory paths in the state file location.
@@ -300,7 +300,7 @@ void wm_ms_graph_scan_relationships(wm_ms_graph* ms_graph, wm_ms_graph_auth* aut
                 memset(&relationship_state_struc, 0, sizeof(relationship_state_struc));
 
                 // Load state for tenant-resource-relationship
-                if (wm_state_io(relationship_state_name, WM_IO_READ, &relationship_state_struc, sizeof(relationship_state_struc)) < 0) {
+                if (gm_state_io(relationship_state_name, GM_IO_READ, &relationship_state_struc, sizeof(relationship_state_struc)) < 0) {
                     memset(&relationship_state_struc, 0, sizeof(relationship_state_struc));
                 }
 
@@ -309,14 +309,14 @@ void wm_ms_graph_scan_relationships(wm_ms_graph* ms_graph, wm_ms_graph_auth* aut
                 if ((initial_scan && (!relationship_state_struc.next_time || ms_graph->only_future_events)) ||
                     (!initial_scan && !relationship_state_struc.next_time)) {
                     relationship_state_struc.next_time = scan_time;
-                    if (wm_state_io(relationship_state_name, WM_IO_WRITE, &relationship_state_struc, sizeof(relationship_state_struc)) < 0) {
-                        mterror(WM_MS_GRAPH_LOGTAG, "Couldn't save running state for resource '%s' and relationship '%s'. State file: '" WM_STATE_DIR "/%s'.",
+                    if (gm_state_io(relationship_state_name, GM_IO_WRITE, &relationship_state_struc, sizeof(relationship_state_struc)) < 0) {
+                        mterror(GM_MS_GRAPH_LOGTAG, "Couldn't save running state for resource '%s' and relationship '%s'. State file: '" GM_STATE_DIR "/%s'.",
                             ms_graph->resources[resource_num].name, ms_graph->resources[resource_num].relationships[relationship_num],
                             relationship_state_name);
                     } else if (isDebug()) {
                         gmtime_r(&scan_time, &tm_aux);
                         strftime(start_time_str, sizeof(start_time_str), "%Y-%m-%dT%H:%M:%SZ", &tm_aux);
-                        mtdebug1(WM_MS_GRAPH_LOGTAG, "Bookmark updated to '%s' for tenant '%s' resource '%s' and relationship '%s', waiting '%d' seconds to run first scan.",
+                        mtdebug1(GM_MS_GRAPH_LOGTAG, "Bookmark updated to '%s' for tenant '%s' resource '%s' and relationship '%s', waiting '%d' seconds to run first scan.",
                             start_time_str, auth_config->tenant_id, ms_graph->resources[resource_num].name, ms_graph->resources[resource_num].relationships[relationship_num], ms_graph->scan_config.interval);
                     }
                     continue;
@@ -333,14 +333,14 @@ void wm_ms_graph_scan_relationships(wm_ms_graph* ms_graph, wm_ms_graph_auth* aut
             os_strdup(auth_header, headers[0]);
 
             if (inventory) {
-                snprintf(url, OS_SIZE_8192 - 1, WM_MS_GRAPH_API_URL,
+                snprintf(url, OS_SIZE_8192 - 1, GM_MS_GRAPH_API_URL,
                 auth_config->query_fqdn,
                 ms_graph->version,
                 ms_graph->resources[resource_num].name,
                 ms_graph->resources[resource_num].relationships[relationship_num],
                 ms_graph->page_size);
             } else {
-                snprintf(url, OS_SIZE_8192 - 1, activityFilter ? WM_MS_GRAPH_API_URL_FILTER_ACTIVITY_DATE : WM_MS_GRAPH_API_URL_FILTER_CREATED_DATE,
+                snprintf(url, OS_SIZE_8192 - 1, activityFilter ? GM_MS_GRAPH_API_URL_FILTER_ACTIVITY_DATE : GM_MS_GRAPH_API_URL_FILTER_CREATED_DATE,
                 auth_config->query_fqdn,
                 ms_graph->version,
                 ms_graph->resources[resource_num].name,
@@ -352,13 +352,13 @@ void wm_ms_graph_scan_relationships(wm_ms_graph* ms_graph, wm_ms_graph_auth* aut
 
             next_page = true;
             while (next_page) {
-                mtdebug1(WM_MS_GRAPH_LOGTAG, "Microsoft Graph API Log URL: '%s'", url);
+                mtdebug1(GM_MS_GRAPH_LOGTAG, "Microsoft Graph API Log URL: '%s'", url);
 
                 fail = true;
 
                 bool token_changed = false;
-                if (!wm_ms_graph_ensure_valid_token(auth_config, ms_graph->curl_max_size, &token_changed)) {
-                    mtwarn(WM_MS_GRAPH_LOGTAG, "Aborting scan of '%s' for tenant '%s' due to access token error.",
+                if (!gm_ms_graph_ensure_valid_token(auth_config, ms_graph->curl_max_size, &token_changed)) {
+                    mtwarn(GM_MS_GRAPH_LOGTAG, "Aborting scan of '%s' for tenant '%s' due to access token error.",
                         ms_graph->resources[resource_num].relationships[relationship_num],
                         auth_config->tenant_id);
                     os_free(headers[0]);
@@ -372,13 +372,13 @@ void wm_ms_graph_scan_relationships(wm_ms_graph* ms_graph, wm_ms_graph_auth* aut
                 }
 
                 next_page = false;
-                response = wm_ms_graph_http_get_with_retry(headers, url, ms_graph->curl_max_size,
+                response = gm_ms_graph_http_get_with_retry(headers, url, ms_graph->curl_max_size,
                     ms_graph->resources[resource_num].relationships[relationship_num]);
                 if (response) {
                     if (response->status_code != 200) {
                         char status_code[4];
                         snprintf(status_code, 4, "%ld", response->status_code);
-                        mtwarn(WM_MS_GRAPH_LOGTAG, "Received unsuccessful status code when attempting to get relationship '%s' logs: Status code was '%s' & response was '%s'",
+                        mtwarn(GM_MS_GRAPH_LOGTAG, "Received unsuccessful status code when attempting to get relationship '%s' logs: Status code was '%s' & response was '%s'",
                         ms_graph->resources[resource_num].relationships[relationship_num],
                         status_code,
                         response->body);
@@ -386,7 +386,7 @@ void wm_ms_graph_scan_relationships(wm_ms_graph* ms_graph, wm_ms_graph_auth* aut
                             auth_config->token_expiration_time = time(NULL);
                         }
                     } else if (response->max_size_reached) {
-                        mtwarn(WM_MS_GRAPH_LOGTAG, "Reached maximum CURL size when attempting to get relationship '%s' logs. Consider increasing the value of 'curl_max_size'.",
+                        mtwarn(GM_MS_GRAPH_LOGTAG, "Reached maximum CURL size when attempting to get relationship '%s' logs. Consider increasing the value of 'curl_max_size'.",
                         ms_graph->resources[resource_num].relationships[relationship_num]);
                     } else {
                         cJSON* body_parse = NULL;
@@ -400,9 +400,9 @@ void wm_ms_graph_scan_relationships(wm_ms_graph* ms_graph, wm_ms_graph_auth* aut
                                         cJSON* full_log = cJSON_CreateObject();
                                         char* payload;
 
-                                        if (inventory && !strcmp(ms_graph->resources[resource_num].relationships[relationship_num], WM_MS_GRAPH_RELATIONSHIP_DETECTED_APPS)) {
-                                            cJSON_AddItemToObject(log, WM_MS_GRAPH_RELATIONSHIP_MANAGED_DEVICES,
-                                                wm_ms_graph_scan_apps_devices(ms_graph, cJSON_GetObjectItem(log, "id"), auth_config->query_fqdn, headers, auth_config));
+                                        if (inventory && !strcmp(ms_graph->resources[resource_num].relationships[relationship_num], GM_MS_GRAPH_RELATIONSHIP_DETECTED_APPS)) {
+                                            cJSON_AddItemToObject(log, GM_MS_GRAPH_RELATIONSHIP_MANAGED_DEVICES,
+                                                gm_ms_graph_scan_apps_devices(ms_graph, cJSON_GetObjectItem(log, "id"), auth_config->query_fqdn, headers, auth_config));
                                         }
 
                                         cJSON_AddStringToObject(log, "resource", ms_graph->resources[resource_num].name);
@@ -411,24 +411,24 @@ void wm_ms_graph_scan_relationships(wm_ms_graph* ms_graph, wm_ms_graph_auth* aut
                                         if (inventory) {
                                             cJSON_AddNumberToObject(full_log, "scan_id", id);
                                         }
-                                        cJSON_AddStringToObject(full_log, "integration", WM_MS_GRAPH_CONTEXT.name);
-                                        cJSON_AddItemToObject(full_log, WM_MS_GRAPH_CONTEXT.name, cJSON_Duplicate(log, true));
+                                        cJSON_AddStringToObject(full_log, "integration", GM_MS_GRAPH_CONTEXT.name);
+                                        cJSON_AddItemToObject(full_log, GM_MS_GRAPH_CONTEXT.name, cJSON_Duplicate(log, true));
 
                                         payload = cJSON_PrintUnformatted(full_log);
-                                        mtdebug2(WM_MS_GRAPH_LOGTAG, "Sending log: '%s'", payload);
-                                        if (wm_sendmsg(1000000 / wm_max_eps, queue_fd, payload, WM_MS_GRAPH_CONTEXT.name, LOCALFILE_MQ) < 0) {
-                                            mterror(WM_MS_GRAPH_LOGTAG, QUEUE_ERROR, DEFAULTQUEUE, strerror(errno));
+                                        mtdebug2(GM_MS_GRAPH_LOGTAG, "Sending log: '%s'", payload);
+                                        if (gm_sendmsg(1000000 / gm_max_eps, queue_fd, payload, GM_MS_GRAPH_CONTEXT.name, LOCALFILE_MQ) < 0) {
+                                            mterror(GM_MS_GRAPH_LOGTAG, QUEUE_ERROR, DEFAULTQUEUE, strerror(errno));
                                         }
 
                                         os_free(payload);
                                         cJSON_Delete(full_log);
                                     } else {
-                                        mtwarn(WM_MS_GRAPH_LOGTAG, "Failed to parse log array into singular log.");
+                                        mtwarn(GM_MS_GRAPH_LOGTAG, "Failed to parse log array into singular log.");
                                     }
                                 }
                                 fail = false;
                             } else {
-                                mtdebug2(WM_MS_GRAPH_LOGTAG, "No new logs received.");
+                                mtdebug2(GM_MS_GRAPH_LOGTAG, "No new logs received.");
                                 fail = false;
                             }
 
@@ -441,12 +441,12 @@ void wm_ms_graph_scan_relationships(wm_ms_graph* ms_graph, wm_ms_graph_auth* aut
 
                             cJSON_Delete(body_parse);
                         } else {
-                            mtwarn(WM_MS_GRAPH_LOGTAG, "Failed to parse relationship '%s' JSON body.", ms_graph->resources[resource_num].relationships[relationship_num]);
+                            mtwarn(GM_MS_GRAPH_LOGTAG, "Failed to parse relationship '%s' JSON body.", ms_graph->resources[resource_num].relationships[relationship_num]);
                         }
                     }
                     wurl_free_response(response);
                 } else {
-                    mtwarn(WM_MS_GRAPH_LOGTAG, "No response received when attempting to get relationship '%s' from resource '%s' on API version '%s'.",
+                    mtwarn(GM_MS_GRAPH_LOGTAG, "No response received when attempting to get relationship '%s' from resource '%s' on API version '%s'.",
                     ms_graph->resources[resource_num].relationships[relationship_num],
                     ms_graph->resources[resource_num].name,
                     ms_graph->version);
@@ -455,12 +455,12 @@ void wm_ms_graph_scan_relationships(wm_ms_graph* ms_graph, wm_ms_graph_auth* aut
 
             if (!inventory && !fail) {
                 relationship_state_struc.next_time = scan_time;
-                if (wm_state_io(relationship_state_name, WM_IO_WRITE, &relationship_state_struc, sizeof(relationship_state_struc)) < 0) {
-                    mterror(WM_MS_GRAPH_LOGTAG, "Couldn't save running state for resource '%s' and relationship '%s'. State file: '" WM_STATE_DIR "/%s'.",
+                if (gm_state_io(relationship_state_name, GM_IO_WRITE, &relationship_state_struc, sizeof(relationship_state_struc)) < 0) {
+                    mterror(GM_MS_GRAPH_LOGTAG, "Couldn't save running state for resource '%s' and relationship '%s'. State file: '" GM_STATE_DIR "/%s'.",
                         ms_graph->resources[resource_num].name, ms_graph->resources[resource_num].relationships[relationship_num],
                         relationship_state_name);
                 } else {
-                    mtdebug1(WM_MS_GRAPH_LOGTAG, "Bookmark updated to '%s' for tenant '%s' resource '%s' and relationship '%s', waiting '%d' seconds to run next scan.",
+                    mtdebug1(GM_MS_GRAPH_LOGTAG, "Bookmark updated to '%s' for tenant '%s' resource '%s' and relationship '%s', waiting '%d' seconds to run next scan.",
                         end_time_str, auth_config->tenant_id, ms_graph->resources[resource_num].name, ms_graph->resources[resource_num].relationships[relationship_num], ms_graph->scan_config.interval);
                 }
             }
@@ -469,7 +469,7 @@ void wm_ms_graph_scan_relationships(wm_ms_graph* ms_graph, wm_ms_graph_auth* aut
     }
 }
 
-cJSON* wm_ms_graph_scan_apps_devices(const wm_ms_graph* ms_graph, const cJSON* app_id, const char* query_fqdn, char** headers, wm_ms_graph_auth* auth_config) {
+cJSON* gm_ms_graph_scan_apps_devices(const gm_ms_graph* ms_graph, const cJSON* app_id, const char* query_fqdn, char** headers, gm_ms_graph_auth* auth_config) {
     char url[OS_SIZE_8192] = { '\0' };
     curl_response* response;
     bool next_page;
@@ -477,16 +477,16 @@ cJSON* wm_ms_graph_scan_apps_devices(const wm_ms_graph* ms_graph, const cJSON* a
     cJSON *array = cJSON_CreateArray();
 
     if (cJSON_IsString(app_id)) {
-        snprintf(url, OS_SIZE_8192 - 1, WM_MS_GRAPH_API_URL_FILTER_DEVICE_FIELDS, query_fqdn, ms_graph->version, WM_MS_GRAPH_RESOURCE_DEVICE_MANAGEMENT,
-            WM_MS_GRAPH_RELATIONSHIP_DETECTED_APPS, app_id->valuestring, WM_MS_GRAPH_RELATIONSHIP_MANAGED_DEVICES, ms_graph->page_size);
+        snprintf(url, OS_SIZE_8192 - 1, GM_MS_GRAPH_API_URL_FILTER_DEVICE_FIELDS, query_fqdn, ms_graph->version, GM_MS_GRAPH_RESOURCE_DEVICE_MANAGEMENT,
+            GM_MS_GRAPH_RELATIONSHIP_DETECTED_APPS, app_id->valuestring, GM_MS_GRAPH_RELATIONSHIP_MANAGED_DEVICES, ms_graph->page_size);
 
         next_page = true;
         while (next_page) {
-            mtdebug1(WM_MS_GRAPH_LOGTAG, "Microsoft Graph API Log URL: '%s'", url);
+            mtdebug1(GM_MS_GRAPH_LOGTAG, "Microsoft Graph API Log URL: '%s'", url);
 
             bool token_changed = false;
-            if (!wm_ms_graph_ensure_valid_token(auth_config, ms_graph->curl_max_size, &token_changed)) {
-                mtwarn(WM_MS_GRAPH_LOGTAG, "Aborting app-device scan due to access token error.");
+            if (!gm_ms_graph_ensure_valid_token(auth_config, ms_graph->curl_max_size, &token_changed)) {
+                mtwarn(GM_MS_GRAPH_LOGTAG, "Aborting app-device scan due to access token error.");
                 break;
             }
 
@@ -499,12 +499,12 @@ cJSON* wm_ms_graph_scan_apps_devices(const wm_ms_graph* ms_graph, const cJSON* a
             }
 
             next_page = false;
-            response = wm_ms_graph_http_get_with_retry(headers, url, ms_graph->curl_max_size, WM_MS_GRAPH_RELATIONSHIP_MANAGED_DEVICES);
+            response = gm_ms_graph_http_get_with_retry(headers, url, ms_graph->curl_max_size, GM_MS_GRAPH_RELATIONSHIP_MANAGED_DEVICES);
             if (response) {
                 if (response->status_code != 200) {
                     char status_code[4];
                     snprintf(status_code, 4, "%ld", response->status_code);
-                    mtwarn(WM_MS_GRAPH_LOGTAG, "Received unsuccessful status code when attempting to get managed devices for app '%s': Status code was '%s' & response was '%s'",
+                    mtwarn(GM_MS_GRAPH_LOGTAG, "Received unsuccessful status code when attempting to get managed devices for app '%s': Status code was '%s' & response was '%s'",
                         app_id->valuestring,
                         status_code,
                         response->body);
@@ -512,7 +512,7 @@ cJSON* wm_ms_graph_scan_apps_devices(const wm_ms_graph* ms_graph, const cJSON* a
                         auth_config->token_expiration_time = time(NULL);
                     }
                 } else if (response->max_size_reached) {
-                    mtwarn(WM_MS_GRAPH_LOGTAG, "Reached maximum CURL size when attempting to get managed devices for app '%s'. Consider increasing the value of 'curl_max_size'.",
+                    mtwarn(GM_MS_GRAPH_LOGTAG, "Reached maximum CURL size when attempting to get managed devices for app '%s'. Consider increasing the value of 'curl_max_size'.",
                         app_id->valuestring);
                 } else {
                     cJSON* body_parse = NULL;
@@ -546,7 +546,7 @@ cJSON* wm_ms_graph_scan_apps_devices(const wm_ms_graph* ms_graph, const cJSON* a
     return array;
 }
 
-void wm_ms_graph_destroy(wm_ms_graph* ms_graph) {
+void gm_ms_graph_destroy(gm_ms_graph* ms_graph) {
 
     for (unsigned int resource = 0; resource < ms_graph->num_resources; resource++) {
         for (unsigned int relationship = 0; relationship < ms_graph->resources[resource].num_relationships; relationship++) {
@@ -558,7 +558,7 @@ void wm_ms_graph_destroy(wm_ms_graph* ms_graph) {
     os_free(ms_graph->resources);
 
     int e;
-    wm_ms_graph_auth *it;
+    gm_ms_graph_auth *it;
 
     for (e = 0; ms_graph->auth_config && ms_graph->auth_config[e]; e++) {
         it = ms_graph->auth_config[e];
@@ -579,12 +579,12 @@ void wm_ms_graph_destroy(wm_ms_graph* ms_graph) {
     os_free(ms_graph);
 }
 
-void wm_ms_graph_cleanup() {
+void gm_ms_graph_cleanup() {
     close(queue_fd);
-    mtinfo(WM_MS_GRAPH_LOGTAG, "Module shutdown.");
+    mtinfo(GM_MS_GRAPH_LOGTAG, "Module shutdown.");
 }
 
-cJSON* wm_ms_graph_dump(const wm_ms_graph* ms_graph) {
+cJSON* gm_ms_graph_dump(const gm_ms_graph* ms_graph) {
     cJSON* root = cJSON_CreateObject();
     cJSON* ms_graph_info = cJSON_CreateObject();
     cJSON* ms_graph_auth = cJSON_CreateObject();
@@ -619,7 +619,7 @@ cJSON* wm_ms_graph_dump(const wm_ms_graph* ms_graph) {
     sched_scan_dump(&ms_graph->scan_config, ms_graph_info);
 
     int e;
-    wm_ms_graph_auth *it;
+    gm_ms_graph_auth *it;
 
     for (e = 0; ms_graph->auth_config[e]; e++) {
         it = ms_graph->auth_config[e];
@@ -634,11 +634,11 @@ cJSON* wm_ms_graph_dump(const wm_ms_graph* ms_graph) {
             cJSON_AddStringToObject(ms_graph_auth, "secret_value", it->secret_value);
         }
         // The FQDN used for querying the API is unique across types, so we can ignore the login FQDN
-        if (!strcmp(it->query_fqdn, WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN)) {
+        if (!strcmp(it->query_fqdn, GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN)) {
             cJSON_AddStringToObject(ms_graph_auth, "api_type", "global");
-        } else if (!strcmp(it->query_fqdn, WM_MS_GRAPH_GCC_HIGH_API_QUERY_FQDN)) {
+        } else if (!strcmp(it->query_fqdn, GM_MS_GRAPH_GCC_HIGH_API_QUERY_FQDN)) {
             cJSON_AddStringToObject(ms_graph_auth, "api_type", "gcc-high");
-        } else if (!strcmp(it->query_fqdn, WM_MS_GRAPH_DOD_API_QUERY_FQDN)) {
+        } else if (!strcmp(it->query_fqdn, GM_MS_GRAPH_DOD_API_QUERY_FQDN)) {
             cJSON_AddStringToObject(ms_graph_auth, "api_type", "dod");
         }
     }

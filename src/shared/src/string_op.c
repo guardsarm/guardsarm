@@ -515,7 +515,7 @@ char * wstr_delete_repeated_groups(const char * string){
 
         // If no duplicate found, append
         if (k == i) {
-            wm_strcat(&result, aux[i], MULTIGROUP_SEPARATOR);
+            gm_strcat(&result, aux[i], MULTIGROUP_SEPARATOR);
         }
     }
 
@@ -526,7 +526,7 @@ char * wstr_delete_repeated_groups(const char * string){
 
 // Concatenate strings with optional separator
 
-int wm_strcat(char **str1, const char *str2, char sep) {
+int gm_strcat(char **str1, const char *str2, char sep) {
     size_t len1;
     size_t len2;
 

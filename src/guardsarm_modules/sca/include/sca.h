@@ -37,24 +37,24 @@ extern "C"
 #define SCA_SYNC_INDEX "guardsarm-states-sca"
 
 // Forward declarations
-struct wm_sca_t;
+struct gm_sca_t;
 struct cJSON;
 
 typedef void((*log_callback_t)(const modules_log_level_t level, const char* log, const char* tag));
 
-typedef int (*wm_exec_callback_t)(char* command, char** output, int* exitcode, int secs, const char* add_path);
+typedef int (*gm_exec_callback_t)(char* command, char** output, int* exitcode, int secs, const char* add_path);
 typedef int (*push_stateless_func)(const char* message);
 typedef int (*push_stateful_func)(const char* id, Operation_t operation, const char* index, const char* message, uint64_t version);
 typedef struct cJSON* (*yaml_to_cjson_func)(const char* yaml_path);
 
-EXPORTED void sca_start(const struct wm_sca_t* sca_config);
+EXPORTED void sca_start(const struct gm_sca_t* sca_config);
 
 EXPORTED void sca_init();
 
 EXPORTED void sca_stop();
 EXPORTED void sca_release_resources();
 
-EXPORTED void sca_set_wm_exec(wm_exec_callback_t wm_exec_callback);
+EXPORTED void sca_set_wm_exec(gm_exec_callback_t gm_exec_callback);
 
 EXPORTED void sca_set_log_function(log_callback_t log_callback);
 
@@ -83,13 +83,13 @@ EXPORTED void sca_set_yaml_to_cjson_func(yaml_to_cjson_func yaml_func);
 
 typedef void (*sca_init_func)();
 
-typedef void (*sca_start_func)(const struct wm_sca_t* sca_config);
+typedef void (*sca_start_func)(const struct gm_sca_t* sca_config);
 
 typedef void (*sca_stop_func)();
 typedef void (*sca_release_resources_func)();
 
 typedef void (*sca_set_wm_exec_func)(
-    int (*wm_exec_callback)(char* command, char** output, int* exitcode, int secs, const char* add_path));
+    int (*gm_exec_callback)(char* command, char** output, int* exitcode, int secs, const char* add_path));
 
 typedef void (*sca_set_log_function_func)(log_callback_t log_callback);
 

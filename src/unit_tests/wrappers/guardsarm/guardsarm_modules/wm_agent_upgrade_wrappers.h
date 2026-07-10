@@ -4,36 +4,36 @@
  * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
-#ifndef WM_AGENT_UPGRADE_WRAPPERS_H
-#define WM_AGENT_UPGRADE_WRAPPERS_H
+#ifndef GM_AGENT_UPGRADE_WRAPPERS_H
+#define GM_AGENT_UPGRADE_WRAPPERS_H
 
 #include "shared.h"
 #include "wm_agent_upgrade_manager.h"
 #include "wmodules.h"
 
-int setup_hash_table(void(free_data_function)(wm_agent_task* agent_task));
+int setup_hash_table(void(free_data_function)(gm_agent_task* agent_task));
 
 int teardown_hash_table();
 
-int __wrap_wm_agent_upgrade_check_status(const wm_agent_configs* agent_config);
+int __wrap_wm_agent_upgrade_check_status(const gm_agent_configs* agent_config);
 
-void __wrap_wm_agent_upgrade_start_manager_module(const wm_manager_configs* manager_configs, const int enabled);
+void __wrap_wm_agent_upgrade_start_manager_module(const gm_manager_configs* manager_configs, const int enabled);
 
 int __wrap_wm_agent_upgrade_parse_message(const char* buffer, void** task, int** agent_ids, char** error);
 
 char* __wrap_wm_agent_upgrade_process_upgrade_command(const int* agent_ids,
-                                                      wm_upgrade_task* task,
-                                                      const wm_manager_configs* manager_configs);
+                                                      gm_upgrade_task* task,
+                                                      const gm_manager_configs* manager_configs);
 
 char* __wrap_wm_agent_upgrade_process_upgrade_custom_command(const int* agent_ids,
-                                                             wm_upgrade_custom_task* task,
-                                                             const wm_manager_configs* manager_configs);
+                                                             gm_upgrade_custom_task* task,
+                                                             const gm_manager_configs* manager_configs);
 
-char* __wrap_wm_agent_upgrade_process_agent_result_command(const int* agent_ids, wm_upgrade_agent_status_task* task);
+char* __wrap_wm_agent_upgrade_process_agent_result_command(const int* agent_ids, gm_upgrade_agent_status_task* task);
 
 char* __wrap_wm_agent_upgrade_process_upgrade_result_command(const int* agent_ids);
 
-cJSON* __wrap_wm_agent_upgrade_parse_task_module_request(wm_upgrade_command command,
+cJSON* __wrap_wm_agent_upgrade_parse_task_module_request(gm_upgrade_command command,
                                                          cJSON* agents_array,
                                                          const char* status,
                                                          const char* error);
@@ -61,18 +61,18 @@ int __wrap_wm_agent_upgrade_validate_system(
 
 int __wrap_wm_agent_upgrade_validate_version(const char* guardsarm_version,
                                              const char* platform,
-                                             wm_upgrade_command command,
+                                             gm_upgrade_command command,
                                              void* task);
 
-int __wrap_wm_agent_upgrade_validate_wpk_version(const wm_agent_info* agent_info,
-                                                 wm_upgrade_task* task,
+int __wrap_wm_agent_upgrade_validate_wpk_version(const gm_agent_info* agent_info,
+                                                 gm_upgrade_task* task,
                                                  const char* wpk_repository_config);
 
-int __wrap_wm_agent_upgrade_validate_wpk(const wm_upgrade_task* task);
+int __wrap_wm_agent_upgrade_validate_wpk(const gm_upgrade_task* task);
 
-int __wrap_wm_agent_upgrade_validate_wpk_custom(const wm_upgrade_custom_task* task);
+int __wrap_wm_agent_upgrade_validate_wpk_custom(const gm_upgrade_custom_task* task);
 
-int __wrap_wm_agent_upgrade_create_task_entry(int agent_id, wm_agent_task* ag_task);
+int __wrap_wm_agent_upgrade_create_task_entry(int agent_id, gm_agent_task* ag_task);
 
 int __wrap_wm_agent_upgrade_remove_entry(int agent_id, int free);
 

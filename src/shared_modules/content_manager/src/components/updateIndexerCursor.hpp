@@ -49,18 +49,18 @@ private:
 
         if (!context.data.contains("cursor"))
         {
-            logDebug2(WM_CONTENTUPDATER, "UpdateIndexerCursor: No cursor in context data, skipping persistence");
+            logDebug2(GM_CONTENTUPDATER, "UpdateIndexerCursor: No cursor in context data, skipping persistence");
             return;
         }
 
         const auto cursor = context.data.at("cursor").get<std::string>();
         if (cursor.empty())
         {
-            logDebug2(WM_CONTENTUPDATER, "UpdateIndexerCursor: Cursor is empty, skipping persistence");
+            logDebug2(GM_CONTENTUPDATER, "UpdateIndexerCursor: Cursor is empty, skipping persistence");
             return;
         }
 
-        logDebug2(WM_CONTENTUPDATER, "UpdateIndexerCursor: Persisting cursor '%s'", cursor.c_str());
+        logDebug2(GM_CONTENTUPDATER, "UpdateIndexerCursor: Persisting cursor '%s'", cursor.c_str());
 
         context.spUpdaterBaseContext->spRocksDB->put(
             Utils::getCompactTimestamp(std::time(nullptr)), cursor, Components::Columns::CURRENT_OFFSET);
@@ -75,7 +75,7 @@ public:
      */
     std::shared_ptr<UpdaterContext> handleRequest(std::shared_ptr<UpdaterContext> context) override
     {
-        logDebug1(WM_CONTENTUPDATER, "UpdateIndexerCursor - Starting process");
+        logDebug1(GM_CONTENTUPDATER, "UpdateIndexerCursor - Starting process");
 
         try
         {

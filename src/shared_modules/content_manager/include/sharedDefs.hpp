@@ -15,7 +15,7 @@
 #include <functional>
 #include <string>
 
-#define WM_CONTENTUPDATER "guardsarm-manager-modulesd:content-updater"
+#define GM_CONTENTUPDATER "guardsarm-manager-modulesd:content-updater"
 
 #include "loggerHelper.h"
 

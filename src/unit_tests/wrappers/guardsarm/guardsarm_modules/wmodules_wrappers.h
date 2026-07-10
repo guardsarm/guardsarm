@@ -5,8 +5,8 @@
  */
 
 
-#ifndef WMODULES_WRAPPERS_H
-#define WMODULES_WRAPPERS_H
+#ifndef GMODULES_WRAPPERS_H
+#define GMODULES_WRAPPERS_H
 
 #include <stddef.h>
 #include "wmodules.h"

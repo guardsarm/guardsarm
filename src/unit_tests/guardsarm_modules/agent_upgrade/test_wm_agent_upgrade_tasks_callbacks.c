@@ -44,7 +44,7 @@ void test_wm_agent_upgrade_upgrade_success_callback_ok(void **state)
     will_return(__wrap_wm_agent_upgrade_validate_task_ids_message, data);
     will_return(__wrap_wm_agent_upgrade_validate_task_ids_message, 1);
 
-    cJSON *response = wm_agent_upgrade_upgrade_success_callback(&error, input);
+    cJSON *response = gm_agent_upgrade_upgrade_success_callback(&error, input);
 
     state[0] = (void *)input;
     state[1] = (void *)response;
@@ -71,12 +71,12 @@ void test_wm_agent_upgrade_upgrade_success_callback_no_task_id(void **state)
     expect_value(__wrap_wm_agent_upgrade_remove_entry, free, 1);
     will_return(__wrap_wm_agent_upgrade_remove_entry, 0);
 
-    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, WM_UPGRADE_TASK_MANAGER_FAILURE);
+    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, GM_UPGRADE_TASK_MANAGER_FAILURE);
     expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, data);
     expect_value(__wrap_wm_agent_upgrade_parse_data_response, agent_int, agent);
     will_return(__wrap_wm_agent_upgrade_parse_data_response, error_json);
 
-    cJSON *response = wm_agent_upgrade_upgrade_success_callback(&error, input);
+    cJSON *response = gm_agent_upgrade_upgrade_success_callback(&error, input);
 
     state[0] = (void *)input;
     state[1] = (void *)response;
@@ -98,7 +98,7 @@ void test_wm_agent_upgrade_upgrade_success_callback_validate_error(void **state)
     will_return(__wrap_wm_agent_upgrade_validate_task_ids_message, data);
     will_return(__wrap_wm_agent_upgrade_validate_task_ids_message, 0);
 
-    cJSON *response = wm_agent_upgrade_upgrade_success_callback(&error, input);
+    cJSON *response = gm_agent_upgrade_upgrade_success_callback(&error, input);
 
     state[0] = (void *)input;
     state[1] = (void *)response;
@@ -119,7 +119,7 @@ void test_wm_agent_upgrade_get_status_success_callback_ok(void **state)
     will_return(__wrap_wm_agent_upgrade_validate_task_status_message, agent);
     will_return(__wrap_wm_agent_upgrade_validate_task_status_message, 1);
 
-    cJSON *response = wm_agent_upgrade_get_status_success_callback(&error, input);
+    cJSON *response = gm_agent_upgrade_get_status_success_callback(&error, input);
 
     state[0] = (void *)input;
     state[1] = (void *)response;
@@ -145,12 +145,12 @@ void test_wm_agent_upgrade_get_status_success_callback_status_pending(void **sta
     expect_value(__wrap_wm_agent_upgrade_remove_entry, free, 1);
     will_return(__wrap_wm_agent_upgrade_remove_entry, 0);
 
-    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, WM_UPGRADE_UPGRADE_ALREADY_IN_PROGRESS);
-    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[WM_UPGRADE_UPGRADE_ALREADY_IN_PROGRESS]);
+    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, GM_UPGRADE_UPGRADE_ALREADY_IN_PROGRESS);
+    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[GM_UPGRADE_UPGRADE_ALREADY_IN_PROGRESS]);
     expect_value(__wrap_wm_agent_upgrade_parse_data_response, agent_int, agent);
     will_return(__wrap_wm_agent_upgrade_parse_data_response, error_json);
 
-    cJSON *response = wm_agent_upgrade_get_status_success_callback(&error, input);
+    cJSON *response = gm_agent_upgrade_get_status_success_callback(&error, input);
 
     state[0] = (void *)input;
     state[1] = (void *)response;
@@ -176,12 +176,12 @@ void test_wm_agent_upgrade_get_status_success_callback_status_in_progress(void *
     expect_value(__wrap_wm_agent_upgrade_remove_entry, free, 1);
     will_return(__wrap_wm_agent_upgrade_remove_entry, 0);
 
-    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, WM_UPGRADE_UPGRADE_ALREADY_IN_PROGRESS);
-    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[WM_UPGRADE_UPGRADE_ALREADY_IN_PROGRESS]);
+    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, GM_UPGRADE_UPGRADE_ALREADY_IN_PROGRESS);
+    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[GM_UPGRADE_UPGRADE_ALREADY_IN_PROGRESS]);
     expect_value(__wrap_wm_agent_upgrade_parse_data_response, agent_int, agent);
     will_return(__wrap_wm_agent_upgrade_parse_data_response, error_json);
 
-    cJSON *response = wm_agent_upgrade_get_status_success_callback(&error, input);
+    cJSON *response = gm_agent_upgrade_get_status_success_callback(&error, input);
 
     state[0] = (void *)input;
     state[1] = (void *)response;
@@ -202,7 +202,7 @@ void test_wm_agent_upgrade_get_status_success_callback_validate_error(void **sta
     will_return(__wrap_wm_agent_upgrade_validate_task_status_message, agent);
     will_return(__wrap_wm_agent_upgrade_validate_task_status_message, 0);
 
-    cJSON *response = wm_agent_upgrade_get_status_success_callback(&error, input);
+    cJSON *response = gm_agent_upgrade_get_status_success_callback(&error, input);
 
     state[0] = (void *)input;
     state[1] = (void *)response;
@@ -236,7 +236,7 @@ void test_wm_agent_upgrade_update_status_success_callback_ok(void **state)
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8167): Upgrade result file has been successfully erased from the agent.");
 
-    cJSON *result = wm_agent_upgrade_update_status_success_callback(&error, input);
+    cJSON *result = gm_agent_upgrade_update_status_success_callback(&error, input);
 
     state[0] = (void *)input;
     state[1] = (void *)result;
@@ -267,7 +267,7 @@ void test_wm_agent_upgrade_update_status_success_callback_delete_error(void **st
     expect_string(__wrap_wm_agent_upgrade_parse_agent_upgrade_command_response, agent_response, agent_res);
     will_return(__wrap_wm_agent_upgrade_parse_agent_upgrade_command_response, OS_INVALID);
 
-    cJSON *result = wm_agent_upgrade_update_status_success_callback(&error, input);
+    cJSON *result = gm_agent_upgrade_update_status_success_callback(&error, input);
 
     state[0] = (void *)input;
     state[1] = (void *)result;
@@ -286,7 +286,7 @@ void test_wm_agent_upgrade_update_status_success_validate_error(void **state)
     will_return(__wrap_wm_agent_upgrade_validate_task_status_message, agent);
     will_return(__wrap_wm_agent_upgrade_validate_task_status_message, 1);
 
-    cJSON *result = wm_agent_upgrade_update_status_success_callback(&error, input);
+    cJSON *result = gm_agent_upgrade_update_status_success_callback(&error, input);
 
     state[0] = (void *)input;
     state[1] = (void *)result;
@@ -334,7 +334,7 @@ void test_wm_agent_upgrade_task_module_callback_no_callbacks_ok(void **state)
     expect_memory(__wrap_wm_agent_upgrade_send_tasks_information, message_object, input, sizeof(input));
     will_return(__wrap_wm_agent_upgrade_send_tasks_information, task_response);
 
-    int result = wm_agent_upgrade_task_module_callback(output, input, NULL, NULL);
+    int result = gm_agent_upgrade_task_module_callback(output, input, NULL, NULL);
 
     state[0] = (void *)input;
     state[1] = (void *)output;
@@ -418,12 +418,12 @@ void test_wm_agent_upgrade_task_module_callback_success_callback_ok(void **state
     expect_value(__wrap_wm_agent_upgrade_remove_entry, free, 1);
     will_return(__wrap_wm_agent_upgrade_remove_entry, 0);
 
-    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, WM_UPGRADE_TASK_MANAGER_FAILURE);
+    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, GM_UPGRADE_TASK_MANAGER_FAILURE);
     expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, "Error");
     expect_value(__wrap_wm_agent_upgrade_parse_data_response, agent_int, 10);
     will_return(__wrap_wm_agent_upgrade_parse_data_response, error_json);
 
-    int result = wm_agent_upgrade_task_module_callback(output, input, wm_agent_upgrade_upgrade_success_callback, NULL);
+    int result = gm_agent_upgrade_task_module_callback(output, input, gm_agent_upgrade_upgrade_success_callback, NULL);
 
     state[0] = (void *)input;
     state[1] = (void *)output;
@@ -477,31 +477,31 @@ void test_wm_agent_upgrade_task_module_callback_no_callbacks_error(void **state)
     cJSON *error1 = cJSON_CreateObject();
     cJSON *error2 = cJSON_CreateObject();
 
-    cJSON_AddNumberToObject(error1, "error", WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
-    cJSON_AddStringToObject(error1, "message", upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    cJSON_AddNumberToObject(error1, "error", GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    cJSON_AddStringToObject(error1, "message", upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     cJSON_AddNumberToObject(error1, "agent", 12);
 
-    cJSON_AddNumberToObject(error2, "error", WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
-    cJSON_AddStringToObject(error2, "message", upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    cJSON_AddNumberToObject(error2, "error", GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    cJSON_AddStringToObject(error2, "message", upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     cJSON_AddNumberToObject(error2, "agent", 10);
 
     expect_memory(__wrap_wm_agent_upgrade_send_tasks_information, message_object, input, sizeof(input));
     will_return(__wrap_wm_agent_upgrade_send_tasks_information, task_response);
 
-    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
-    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     expect_value(__wrap_wm_agent_upgrade_parse_data_response, agent_int, 12);
     will_return(__wrap_wm_agent_upgrade_parse_data_response, error1);
 
-    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
-    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     expect_value(__wrap_wm_agent_upgrade_parse_data_response, agent_int, 10);
     will_return(__wrap_wm_agent_upgrade_parse_data_response, error2);
 
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8123): There has been an error executing the request in the tasks manager.");
 
-    int result = wm_agent_upgrade_task_module_callback(output, input, NULL, NULL);
+    int result = gm_agent_upgrade_task_module_callback(output, input, NULL, NULL);
 
     state[0] = (void *)input;
     state[1] = (void *)output;
@@ -510,16 +510,16 @@ void test_wm_agent_upgrade_task_module_callback_no_callbacks_error(void **state)
     assert_int_equal(cJSON_GetArraySize(output), 2);
     cJSON *out1 = cJSON_GetArrayItem(output, 0);
     assert_non_null(cJSON_GetObjectItem(out1, "error"));
-    assert_int_equal(cJSON_GetObjectItem(out1, "error")->valueint, WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    assert_int_equal(cJSON_GetObjectItem(out1, "error")->valueint, GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
     assert_non_null(cJSON_GetObjectItem(out1, "message"));
-    assert_string_equal(cJSON_GetObjectItem(out1, "message")->valuestring, upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    assert_string_equal(cJSON_GetObjectItem(out1, "message")->valuestring, upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     assert_non_null(cJSON_GetObjectItem(out1, "agent"));
     assert_int_equal(cJSON_GetObjectItem(out1, "agent")->valueint, 12);
     cJSON *out2 = cJSON_GetArrayItem(output, 1);
     assert_non_null(cJSON_GetObjectItem(out2, "error"));
-    assert_int_equal(cJSON_GetObjectItem(out2, "error")->valueint, WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    assert_int_equal(cJSON_GetObjectItem(out2, "error")->valueint, GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
     assert_non_null(cJSON_GetObjectItem(out2, "message"));
-    assert_string_equal(cJSON_GetObjectItem(out2, "message")->valuestring, upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    assert_string_equal(cJSON_GetObjectItem(out2, "message")->valuestring, upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     assert_non_null(cJSON_GetObjectItem(out2, "agent"));
     assert_int_equal(cJSON_GetObjectItem(out2, "agent")->valueint, 10);
     assert_null(cJSON_GetArrayItem(output, 2));
@@ -552,12 +552,12 @@ void test_wm_agent_upgrade_task_module_callback_error_callback_error(void **stat
     cJSON *error1 = cJSON_CreateObject();
     cJSON *error2 = cJSON_CreateObject();
 
-    cJSON_AddNumberToObject(error1, "error", WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
-    cJSON_AddStringToObject(error1, "message", upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    cJSON_AddNumberToObject(error1, "error", GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    cJSON_AddStringToObject(error1, "message", upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     cJSON_AddNumberToObject(error1, "agent", 12);
 
-    cJSON_AddNumberToObject(error2, "error", WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
-    cJSON_AddStringToObject(error2, "message", upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    cJSON_AddNumberToObject(error2, "error", GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    cJSON_AddStringToObject(error2, "message", upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     cJSON_AddNumberToObject(error2, "agent", 10);
 
     expect_memory(__wrap_wm_agent_upgrade_send_tasks_information, message_object, input, sizeof(input));
@@ -567,8 +567,8 @@ void test_wm_agent_upgrade_task_module_callback_error_callback_error(void **stat
     expect_value(__wrap_wm_agent_upgrade_remove_entry, free, 1);
     will_return(__wrap_wm_agent_upgrade_remove_entry, 0);
 
-    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
-    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     expect_value(__wrap_wm_agent_upgrade_parse_data_response, agent_int, 12);
     will_return(__wrap_wm_agent_upgrade_parse_data_response, error1);
 
@@ -576,15 +576,15 @@ void test_wm_agent_upgrade_task_module_callback_error_callback_error(void **stat
     expect_value(__wrap_wm_agent_upgrade_remove_entry, free, 1);
     will_return(__wrap_wm_agent_upgrade_remove_entry, 0);
 
-    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
-    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     expect_value(__wrap_wm_agent_upgrade_parse_data_response, agent_int, 10);
     will_return(__wrap_wm_agent_upgrade_parse_data_response, error2);
 
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8123): There has been an error executing the request in the tasks manager.");
 
-    int result = wm_agent_upgrade_task_module_callback(output, input, NULL, wm_agent_upgrade_remove_entry);
+    int result = gm_agent_upgrade_task_module_callback(output, input, NULL, gm_agent_upgrade_remove_entry);
 
     state[0] = (void *)input;
     state[1] = (void *)output;
@@ -593,16 +593,16 @@ void test_wm_agent_upgrade_task_module_callback_error_callback_error(void **stat
     assert_int_equal(cJSON_GetArraySize(output), 2);
     cJSON *out1 = cJSON_GetArrayItem(output, 0);
     assert_non_null(cJSON_GetObjectItem(out1, "error"));
-    assert_int_equal(cJSON_GetObjectItem(out1, "error")->valueint, WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    assert_int_equal(cJSON_GetObjectItem(out1, "error")->valueint, GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
     assert_non_null(cJSON_GetObjectItem(out1, "message"));
-    assert_string_equal(cJSON_GetObjectItem(out1, "message")->valuestring, upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    assert_string_equal(cJSON_GetObjectItem(out1, "message")->valuestring, upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     assert_non_null(cJSON_GetObjectItem(out1, "agent"));
     assert_int_equal(cJSON_GetObjectItem(out1, "agent")->valueint, 12);
     cJSON *out2 = cJSON_GetArrayItem(output, 1);
     assert_non_null(cJSON_GetObjectItem(out2, "error"));
-    assert_int_equal(cJSON_GetObjectItem(out2, "error")->valueint, WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    assert_int_equal(cJSON_GetObjectItem(out2, "error")->valueint, GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
     assert_non_null(cJSON_GetObjectItem(out2, "message"));
-    assert_string_equal(cJSON_GetObjectItem(out2, "message")->valuestring, upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    assert_string_equal(cJSON_GetObjectItem(out2, "message")->valuestring, upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     assert_non_null(cJSON_GetObjectItem(out2, "agent"));
     assert_int_equal(cJSON_GetObjectItem(out2, "agent")->valueint, 10);
     assert_null(cJSON_GetArrayItem(output, 2));
@@ -649,12 +649,12 @@ void test_wm_agent_upgrade_task_module_callback_success_error_callback_error(voi
     cJSON *error1 = cJSON_CreateObject();
     cJSON *error2 = cJSON_CreateObject();
 
-    cJSON_AddNumberToObject(error1, "error", WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
-    cJSON_AddStringToObject(error1, "message", upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    cJSON_AddNumberToObject(error1, "error", GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    cJSON_AddStringToObject(error1, "message", upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     cJSON_AddNumberToObject(error1, "agent", 12);
 
-    cJSON_AddNumberToObject(error2, "error", WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
-    cJSON_AddStringToObject(error2, "message", upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    cJSON_AddNumberToObject(error2, "error", GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    cJSON_AddStringToObject(error2, "message", upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     cJSON_AddNumberToObject(error2, "agent", 10);
 
     expect_memory(__wrap_wm_agent_upgrade_send_tasks_information, message_object, input, sizeof(input));
@@ -674,8 +674,8 @@ void test_wm_agent_upgrade_task_module_callback_success_error_callback_error(voi
     expect_value(__wrap_wm_agent_upgrade_remove_entry, free, 1);
     will_return(__wrap_wm_agent_upgrade_remove_entry, 0);
 
-    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
-    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     expect_value(__wrap_wm_agent_upgrade_parse_data_response, agent_int, 12);
     will_return(__wrap_wm_agent_upgrade_parse_data_response, error1);
 
@@ -683,15 +683,15 @@ void test_wm_agent_upgrade_task_module_callback_success_error_callback_error(voi
     expect_value(__wrap_wm_agent_upgrade_remove_entry, free, 1);
     will_return(__wrap_wm_agent_upgrade_remove_entry, 0);
 
-    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
-    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    expect_value(__wrap_wm_agent_upgrade_parse_data_response, error_id, GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    expect_string(__wrap_wm_agent_upgrade_parse_data_response, message, upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     expect_value(__wrap_wm_agent_upgrade_parse_data_response, agent_int, 10);
     will_return(__wrap_wm_agent_upgrade_parse_data_response, error2);
 
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8123): There has been an error executing the request in the tasks manager.");
 
-    int result = wm_agent_upgrade_task_module_callback(output, input, wm_agent_upgrade_upgrade_success_callback, wm_agent_upgrade_remove_entry);
+    int result = gm_agent_upgrade_task_module_callback(output, input, gm_agent_upgrade_upgrade_success_callback, gm_agent_upgrade_remove_entry);
 
     state[0] = (void *)input;
     state[1] = (void *)output;
@@ -700,16 +700,16 @@ void test_wm_agent_upgrade_task_module_callback_success_error_callback_error(voi
     assert_int_equal(cJSON_GetArraySize(output), 2);
     cJSON *out1 = cJSON_GetArrayItem(output, 0);
     assert_non_null(cJSON_GetObjectItem(out1, "error"));
-    assert_int_equal(cJSON_GetObjectItem(out1, "error")->valueint, WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    assert_int_equal(cJSON_GetObjectItem(out1, "error")->valueint, GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
     assert_non_null(cJSON_GetObjectItem(out1, "message"));
-    assert_string_equal(cJSON_GetObjectItem(out1, "message")->valuestring, upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    assert_string_equal(cJSON_GetObjectItem(out1, "message")->valuestring, upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     assert_non_null(cJSON_GetObjectItem(out1, "agent"));
     assert_int_equal(cJSON_GetObjectItem(out1, "agent")->valueint, 12);
     cJSON *out2 = cJSON_GetArrayItem(output, 1);
     assert_non_null(cJSON_GetObjectItem(out2, "error"));
-    assert_int_equal(cJSON_GetObjectItem(out2, "error")->valueint, WM_UPGRADE_TASK_MANAGER_COMMUNICATION);
+    assert_int_equal(cJSON_GetObjectItem(out2, "error")->valueint, GM_UPGRADE_TASK_MANAGER_COMMUNICATION);
     assert_non_null(cJSON_GetObjectItem(out2, "message"));
-    assert_string_equal(cJSON_GetObjectItem(out2, "message")->valuestring, upgrade_error_codes[WM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
+    assert_string_equal(cJSON_GetObjectItem(out2, "message")->valuestring, upgrade_error_codes[GM_UPGRADE_TASK_MANAGER_COMMUNICATION]);
     assert_non_null(cJSON_GetObjectItem(out2, "agent"));
     assert_int_equal(cJSON_GetObjectItem(out2, "agent")->valueint, 10);
     assert_null(cJSON_GetArrayItem(output, 2));

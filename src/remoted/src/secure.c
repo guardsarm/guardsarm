@@ -287,10 +287,10 @@ void HandleSecure()
     {
         char *_protocol = NULL;
         if (logr.proto & REMOTED_NET_PROTOCOL_TCP) {
-            wm_strcat(&_protocol, REMOTED_NET_PROTOCOL_TCP_STR, 0);
+            gm_strcat(&_protocol, REMOTED_NET_PROTOCOL_TCP_STR, 0);
         }
         if (logr.proto & REMOTED_NET_PROTOCOL_UDP) {
-            wm_strcat(&_protocol, REMOTED_NET_PROTOCOL_UDP_STR, _protocol ? ',' : 0);
+            gm_strcat(&_protocol, REMOTED_NET_PROTOCOL_UDP_STR, _protocol ? ',' : 0);
         }
         minfo(STARTUP_MSG " Listening on port %d/%s (secure).",
             (int)getpid(),

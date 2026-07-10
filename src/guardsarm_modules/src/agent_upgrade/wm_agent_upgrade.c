@@ -27,35 +27,35 @@
  * Module main function. It won't return
  * */
 #ifdef WIN32
-STATIC DWORD WINAPI wm_agent_upgrade_main(void *arg);
+STATIC DWORD WINAPI gm_agent_upgrade_main(void *arg);
 #else
-STATIC void* wm_agent_upgrade_main(wm_agent_upgrade* upgrade_config);
+STATIC void* gm_agent_upgrade_main(gm_agent_upgrade* upgrade_config);
 #endif
-STATIC void wm_agent_upgrade_destroy(wm_agent_upgrade* upgrade_config);
-STATIC cJSON *wm_agent_upgrade_dump(const wm_agent_upgrade* upgrade_config);
-STATIC void wm_agent_upgrade_stop(wm_agent_upgrade* upgrade_config);
+STATIC void gm_agent_upgrade_destroy(gm_agent_upgrade* upgrade_config);
+STATIC cJSON *gm_agent_upgrade_dump(const gm_agent_upgrade* upgrade_config);
+STATIC void gm_agent_upgrade_stop(gm_agent_upgrade* upgrade_config);
 
 /* Context definition */
-const wm_context WM_AGENT_UPGRADE_CONTEXT = {
+const gm_context GM_AGENT_UPGRADE_CONTEXT = {
     .name = AGENT_UPGRADE_WM_NAME,
-    .start = (wm_routine)wm_agent_upgrade_main,
-    .destroy = (void(*)(void *))wm_agent_upgrade_destroy,
-    .dump = (cJSON * (*)(const void *))wm_agent_upgrade_dump,
+    .start = (gm_routine)gm_agent_upgrade_main,
+    .destroy = (void(*)(void *))gm_agent_upgrade_destroy,
+    .dump = (cJSON * (*)(const void *))gm_agent_upgrade_dump,
     .sync = NULL,
-    .stop = (void(*)(void *))wm_agent_upgrade_stop,
+    .stop = (void(*)(void *))gm_agent_upgrade_stop,
     .query = NULL,
 };
 
 #ifdef WIN32
-STATIC DWORD WINAPI wm_agent_upgrade_main(void *arg) {
-    wm_agent_upgrade* upgrade_config = (wm_agent_upgrade *)arg;
+STATIC DWORD WINAPI gm_agent_upgrade_main(void *arg) {
+    gm_agent_upgrade* upgrade_config = (gm_agent_upgrade *)arg;
 #else
-STATIC void *wm_agent_upgrade_main(wm_agent_upgrade* upgrade_config) {
+STATIC void *gm_agent_upgrade_main(gm_agent_upgrade* upgrade_config) {
 #endif
     #ifdef CLIENT
-        wm_agent_upgrade_start_agent_module(&upgrade_config->agent_config, upgrade_config->enabled);
+        gm_agent_upgrade_start_agent_module(&upgrade_config->agent_config, upgrade_config->enabled);
     #else
-        wm_agent_upgrade_start_manager_module(&upgrade_config->manager_config, upgrade_config->enabled);
+        gm_agent_upgrade_start_manager_module(&upgrade_config->manager_config, upgrade_config->enabled);
     #endif
 
 #ifdef WIN32
@@ -65,50 +65,50 @@ STATIC void *wm_agent_upgrade_main(wm_agent_upgrade* upgrade_config) {
 #endif
 }
 
-STATIC void wm_agent_upgrade_stop(wm_agent_upgrade* upgrade_config) {
+STATIC void gm_agent_upgrade_stop(gm_agent_upgrade* upgrade_config) {
     (void)upgrade_config;
 #ifndef CLIENT
-    wm_agent_upgrade_stop_dispatch();
+    gm_agent_upgrade_stop_dispatch();
 #endif
 }
 
-STATIC void wm_agent_upgrade_destroy(wm_agent_upgrade* upgrade_config) {
-    mtinfo(WM_AGENT_UPGRADE_LOGTAG, WM_UPGRADE_MODULE_FINISHED);
+STATIC void gm_agent_upgrade_destroy(gm_agent_upgrade* upgrade_config) {
+    mtinfo(GM_AGENT_UPGRADE_LOGTAG, GM_UPGRADE_MODULE_FINISHED);
     #ifndef CLIENT
     os_free(upgrade_config->manager_config.wpk_repository);
     #endif
     os_free(upgrade_config);
 }
 
-STATIC cJSON *wm_agent_upgrade_dump(const wm_agent_upgrade* upgrade_config){
+STATIC cJSON *gm_agent_upgrade_dump(const gm_agent_upgrade* upgrade_config){
     cJSON *root = cJSON_CreateObject();
-    cJSON *wm_info = cJSON_CreateObject();
+    cJSON *gm_info = cJSON_CreateObject();
 
     if (upgrade_config->enabled) {
-        cJSON_AddStringToObject(wm_info,"enabled","yes");
+        cJSON_AddStringToObject(gm_info,"enabled","yes");
     } else {
-        cJSON_AddStringToObject(wm_info,"enabled","no");
+        cJSON_AddStringToObject(gm_info,"enabled","no");
     }
     #ifndef CLIENT
-    cJSON_AddNumberToObject(wm_info, "max_threads", upgrade_config->manager_config.max_threads);
-    cJSON_AddNumberToObject(wm_info, "chunk_size", upgrade_config->manager_config.chunk_size);
+    cJSON_AddNumberToObject(gm_info, "max_threads", upgrade_config->manager_config.max_threads);
+    cJSON_AddNumberToObject(gm_info, "chunk_size", upgrade_config->manager_config.chunk_size);
     if (upgrade_config->manager_config.wpk_repository) {
-        cJSON_AddStringToObject(wm_info, "wpk_repository", upgrade_config->manager_config.wpk_repository);
+        cJSON_AddStringToObject(gm_info, "wpk_repository", upgrade_config->manager_config.wpk_repository);
     }
     #else
     if (upgrade_config->agent_config.enable_ca_verification) {
-        cJSON_AddStringToObject(wm_info,"ca_verification","yes");
+        cJSON_AddStringToObject(gm_info,"ca_verification","yes");
     } else {
-        cJSON_AddStringToObject(wm_info,"ca_verification","no");
+        cJSON_AddStringToObject(gm_info,"ca_verification","no");
     }
     if (wcom_ca_store) {
         cJSON *calist = cJSON_CreateArray();
         for (int i=0; wcom_ca_store[i]; i++) {
             cJSON_AddItemToArray(calist,cJSON_CreateString(wcom_ca_store[i]));
         }
-        cJSON_AddItemToObject(wm_info,"ca_store",calist);
+        cJSON_AddItemToObject(gm_info,"ca_store",calist);
     }
     #endif
-    cJSON_AddItemToObject(root,"agent-upgrade",wm_info);
+    cJSON_AddItemToObject(root,"agent-upgrade",gm_info);
     return root;
 }

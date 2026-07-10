@@ -6,8 +6,8 @@
  * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
-#ifndef WM_AGENT_UPGRADE_UPGRADES_H
-#define WM_AGENT_UPGRADE_UPGRADES_H
+#ifndef GM_AGENT_UPGRADE_UPGRADES_H
+#define GM_AGENT_UPGRADE_UPGRADES_H
 
 #include "wm_agent_upgrade_manager.h"
 #include <semaphore.h>
@@ -18,28 +18,28 @@
  * upgrade_queue is non-NULL.
  * @param max_threads Maximum number of concurrent upgrade threads
  * */
-void wm_agent_upgrade_init_upgrade_queue(int max_threads);
+void gm_agent_upgrade_init_upgrade_queue(int max_threads);
 
 /**
  * Upgrade queue destructor
  * */
-void wm_agent_upgrade_destroy_upgrade_queue();
+void gm_agent_upgrade_destroy_upgrade_queue();
 
 /**
  * Insert the agents ready to be upgraded into the upgrade queue
  * */
-void wm_agent_upgrade_prepare_upgrades();
+void gm_agent_upgrade_prepare_upgrades();
 
 /**
  * Dispatcher of upgrade tasks
  * @param arg Module configuration
  * */
-void* wm_agent_upgrade_dispatch_upgrades(void *arg) __attribute__((nonnull));
+void* gm_agent_upgrade_dispatch_upgrades(void *arg) __attribute__((nonnull));
 
 /**
  * Signal the dispatch loop to stop
  * */
-void wm_agent_upgrade_stop_dispatch(void);
+void gm_agent_upgrade_stop_dispatch(void);
 
 /**
  * Send a command to the agent and return the response
@@ -47,6 +47,6 @@ void wm_agent_upgrade_stop_dispatch(void);
  * @param command_size size of the command
  * @return response from agent
  * */
-char* wm_agent_upgrade_send_command_to_agent(const char *command, const size_t command_size) __attribute__((nonnull));
+char* gm_agent_upgrade_send_command_to_agent(const char *command, const size_t command_size) __attribute__((nonnull));
 
 #endif

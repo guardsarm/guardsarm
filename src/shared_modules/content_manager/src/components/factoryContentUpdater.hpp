@@ -45,7 +45,7 @@ public:
      */
     static std::shared_ptr<AbstractHandler<std::shared_ptr<UpdaterContext>>> create(nlohmann::json& config)
     {
-        logDebug1(WM_CONTENTUPDATER, "FactoryContentUpdater - Starting process");
+        logDebug1(GM_CONTENTUPDATER, "FactoryContentUpdater - Starting process");
 
         auto indexerDownloader = std::make_shared<IndexerDownloader>(config);
         auto cursorUpdater = std::make_shared<UpdateIndexerCursor>();

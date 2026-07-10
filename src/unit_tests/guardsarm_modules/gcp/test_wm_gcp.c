@@ -21,15 +21,15 @@
 #include "../../wrappers/guardsarm/guardsarm_modules/wm_exec_wrappers.h"
 
 
-void wm_gcp_pubsub_run(const wm_gcp_pubsub *data);
-cJSON *wm_gcp_pubsub_dump(const wm_gcp_pubsub *data);
-void wm_gcp_pubsub_destroy(wm_gcp_pubsub * data);
-void* wm_gcp_pubsub_main(wm_gcp_pubsub *data);
+void gm_gcp_pubsub_run(const gm_gcp_pubsub *data);
+cJSON *gm_gcp_pubsub_dump(const gm_gcp_pubsub *data);
+void gm_gcp_pubsub_destroy(gm_gcp_pubsub * data);
+void* gm_gcp_pubsub_main(gm_gcp_pubsub *data);
 
-void wm_gcp_bucket_run(wm_gcp_bucket *exec_bucket);
-cJSON *wm_gcp_bucket_dump(const wm_gcp_bucket_base *data);
-void wm_gcp_bucket_destroy(wm_gcp_bucket_base *data);
-void* wm_gcp_bucket_main(wm_gcp_bucket_base *data);
+void gm_gcp_bucket_run(gm_gcp_bucket *exec_bucket);
+cJSON *gm_gcp_bucket_dump(const gm_gcp_bucket_base *data);
+void gm_gcp_bucket_destroy(gm_gcp_bucket_base *data);
+void* gm_gcp_bucket_main(gm_gcp_bucket_base *data);
 
 /* Generic setup/teardown */
 static int group_setup(void ** state) {
@@ -44,10 +44,10 @@ static int group_teardown(void ** state) {
 
 /* Auxiliar structs for pubsub*/
 typedef struct __gcp_pubsub_dump_s {
-    wm_gcp_pubsub *config;
+    gm_gcp_pubsub *config;
     cJSON *dump;
     cJSON *root;
-    cJSON *wm_wd;
+    cJSON *gm_wd;
 }gcp_pubsub_dump_t;
 
 /* wraps */
@@ -57,8 +57,8 @@ int __wrap_isDebug() {
 
 /* setup/teardown for pubsub*/
 static int setup_group_pubsub(void **state) {
-    wm_gcp_pubsub *gcp_config;
-    os_calloc(1, sizeof(wm_gcp_pubsub), gcp_config);
+    gm_gcp_pubsub *gcp_config;
+    os_calloc(1, sizeof(gm_gcp_pubsub), gcp_config);
 
     if(gcp_config == NULL)
         return -1;
@@ -80,7 +80,7 @@ static int setup_group_pubsub(void **state) {
 }
 
 static int teardown_group_pubsub(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     if (gcp_config->project_id) os_free(gcp_config->project_id);
     if (gcp_config->subscription_name) os_free(gcp_config->subscription_name);
@@ -102,7 +102,7 @@ static int setup_gcp_pubsub_dump(void **state) {
     if(dump_data->root = __real_cJSON_CreateObject(), dump_data->root == NULL)
         return -1;
 
-    if(dump_data->wm_wd = __real_cJSON_CreateObject(), dump_data->wm_wd == NULL)
+    if(dump_data->gm_wd = __real_cJSON_CreateObject(), dump_data->gm_wd == NULL)
         return -1;
 
     // Move some pointers around in order to add some info for these tests
@@ -130,16 +130,16 @@ static int teardown_gcp_pubsub_dump(void **state) {
 static int setup_gcp_pubsub_destroy(void **state) {
     setup_group_pubsub(state);
 
-    wm_gcp_pubsub **gcp_config;
+    gm_gcp_pubsub **gcp_config;
 
-    if(gcp_config = calloc(2, sizeof(wm_gcp_pubsub*)), gcp_config == NULL)
+    if(gcp_config = calloc(2, sizeof(gm_gcp_pubsub*)), gcp_config == NULL)
         return -1;
 
     // Save the globally used gcp_config
     gcp_config[1] = *state;
 
     // And create a new one to be destroyed by tests
-    if(gcp_config[0] = calloc(1, sizeof(wm_gcp_pubsub)), gcp_config[0] == NULL)
+    if(gcp_config[0] = calloc(1, sizeof(gm_gcp_pubsub)), gcp_config[0] == NULL)
         return -1;
 
     if(gcp_config[0]->project_id = calloc(OS_SIZE_1024, sizeof(char)), gcp_config[0]->project_id == NULL)
@@ -157,7 +157,7 @@ static int setup_gcp_pubsub_destroy(void **state) {
 }
 
 static int teardown_gcp_pubsub_destroy(void **state) {
-    wm_gcp_pubsub **gcp_config;
+    gm_gcp_pubsub **gcp_config;
 
     gcp_config = *state;
 
@@ -173,20 +173,20 @@ static int teardown_gcp_pubsub_destroy(void **state) {
 
 /* Auxiliar structs for buckets*/
 typedef struct __gcp_bucket_dump_s {
-    wm_gcp_bucket_base *config;
+    gm_gcp_bucket_base *config;
     cJSON *dump;
     cJSON *root;
-    cJSON *wm_wd;
+    cJSON *gm_wd;
     cJSON *cur_bucket;
 }gcp_bucket_dump_t;
 
 /* setup/teardown for buckets*/
 static int setup_group_bucket(void **state) {
-    wm_gcp_bucket_base *gcp_config;
-    wm_gcp_bucket *gcp_bucket;
+    gm_gcp_bucket_base *gcp_config;
+    gm_gcp_bucket *gcp_bucket;
 
-    os_calloc(OS_SIZE_1024, sizeof(wm_gcp_bucket_base), gcp_config);
-    os_calloc(OS_SIZE_1024, sizeof(wm_gcp_bucket), gcp_bucket);
+    os_calloc(OS_SIZE_1024, sizeof(gm_gcp_bucket_base), gcp_config);
+    os_calloc(OS_SIZE_1024, sizeof(gm_gcp_bucket), gcp_bucket);
 
     if(gcp_config == NULL)
         return -1;
@@ -223,8 +223,8 @@ static int setup_group_bucket(void **state) {
 }
 
 static int teardown_group_bucket(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *gcp_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *gcp_bucket = gcp_config->buckets;
 
     if (gcp_bucket->bucket) os_free(gcp_bucket->bucket);
     if (gcp_bucket->type) os_free(gcp_bucket->type);
@@ -250,7 +250,7 @@ static int setup_gcp_bucket_dump(void **state) {
     if(dump_data->root = __real_cJSON_CreateObject(), dump_data->root == NULL)
         return -1;
 
-    if(dump_data->wm_wd = __real_cJSON_CreateObject(), dump_data->wm_wd == NULL)
+    if(dump_data->gm_wd = __real_cJSON_CreateObject(), dump_data->gm_wd == NULL)
         return -1;
 
     if(dump_data->cur_bucket = __real_cJSON_CreateObject(), dump_data->cur_bucket == NULL)
@@ -280,11 +280,11 @@ static int teardown_gcp_bucket_dump(void **state) {
 
 static int setup_gcp_bucket_destroy(void **state) {
     setup_group_bucket(state);
-    wm_gcp_bucket_base **gcp_config;
-    wm_gcp_bucket *gcp_bucket;
+    gm_gcp_bucket_base **gcp_config;
+    gm_gcp_bucket *gcp_bucket;
 
-    os_calloc(OS_SIZE_1024, sizeof(wm_gcp_bucket_base*), gcp_config);
-    os_calloc(OS_SIZE_1024, sizeof(wm_gcp_bucket), gcp_bucket);
+    os_calloc(OS_SIZE_1024, sizeof(gm_gcp_bucket_base*), gcp_config);
+    os_calloc(OS_SIZE_1024, sizeof(gm_gcp_bucket), gcp_bucket);
 
     if(gcp_config == NULL)
         return -1;
@@ -296,7 +296,7 @@ static int setup_gcp_bucket_destroy(void **state) {
     gcp_config[1] = *state;
 
     // And create a new one to be destroyed by tests
-    os_calloc(1, sizeof(wm_gcp_bucket_base), gcp_config[0]);
+    os_calloc(1, sizeof(gm_gcp_bucket_base), gcp_config[0]);
     if(gcp_config[0] == NULL)
         return -1;
 
@@ -329,7 +329,7 @@ static int setup_gcp_bucket_destroy(void **state) {
 }
 
 static int teardown_gcp_bucket_destroy(void **state) {
-    wm_gcp_bucket_base **gcp_config;
+    gm_gcp_bucket_base **gcp_config;
 
     gcp_config = *state;
 
@@ -347,7 +347,7 @@ static int teardown_gcp_bucket_destroy(void **state) {
 /* tests */
 /* wm_gcp_pubsub_run */
 static void test_wm_gcp_pubsub_run_error_running_command(void **state)  {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -356,9 +356,9 @@ static void test_wm_gcp_pubsub_run_error_running_command(void **state)  {
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
@@ -375,14 +375,14 @@ static void test_wm_gcp_pubsub_run_error_running_command(void **state)  {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_wm_exec, 1);
 
-    expect_string(__wrap__mterror, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "Internal error. Exiting...");
 
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_unknown_error(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -391,9 +391,9 @@ static void test_wm_gcp_pubsub_run_unknown_error(void **state) {
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
@@ -410,16 +410,16 @@ static void test_wm_gcp_pubsub_run_unknown_error(void **state) {
     will_return(__wrap_wm_exec, 1);
     will_return(__wrap_wm_exec, 0);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Command returned exit code 1");
 
     will_return(__wrap_isDebug, 1);
 
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_unknown_error_no_description(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -428,10 +428,10 @@ static void test_wm_gcp_pubsub_run_unknown_error_no_description(void **state) {
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
@@ -448,15 +448,15 @@ static void test_wm_gcp_pubsub_run_unknown_error_no_description(void **state) {
     will_return(__wrap_wm_exec, 1);
     will_return(__wrap_wm_exec, 0);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Command returned exit code 1");
 
     will_return(__wrap_isDebug, 1);
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_error_parsing_args(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -465,10 +465,10 @@ static void test_wm_gcp_pubsub_run_error_parsing_args(void **state) {
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
@@ -485,15 +485,15 @@ static void test_wm_gcp_pubsub_run_error_parsing_args(void **state) {
     will_return(__wrap_wm_exec, 2);
     will_return(__wrap_wm_exec, 0);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Command returned exit code 2");
 
     will_return(__wrap_isDebug, 1);
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_error_parsing_args_no_description(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -502,13 +502,13 @@ static void test_wm_gcp_pubsub_run_error_parsing_args_no_description(void **stat
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2 --log_level 1");
@@ -523,16 +523,16 @@ static void test_wm_gcp_pubsub_run_error_parsing_args_no_description(void **stat
     will_return(__wrap_wm_exec, 2);
     will_return(__wrap_wm_exec, 0);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Command returned exit code 2");
 
     will_return(__wrap_isDebug, 1);
 
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_generic_error(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -541,11 +541,11 @@ static void test_wm_gcp_pubsub_run_generic_error(void **state) {
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2");
@@ -560,16 +560,16 @@ static void test_wm_gcp_pubsub_run_generic_error(void **state) {
     will_return(__wrap_wm_exec, 3);
     will_return(__wrap_wm_exec, 0);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Command returned exit code 3");
 
     will_return(__wrap_isDebug, 0);
 
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_generic_error_no_description(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -578,11 +578,11 @@ static void test_wm_gcp_pubsub_run_generic_error_no_description(void **state) {
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2");
@@ -598,14 +598,14 @@ static void test_wm_gcp_pubsub_run_generic_error_no_description(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Command returned exit code 3");
 
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_logging_warning_message_warning(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -614,11 +614,11 @@ static void test_wm_gcp_pubsub_run_logging_warning_message_warning(void **state)
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2");
@@ -634,14 +634,14 @@ static void test_wm_gcp_pubsub_run_logging_warning_message_warning(void **state)
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "This is a warning message");
 
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_logging_debug_message_not_debug_discarded(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -650,12 +650,12 @@ static void test_wm_gcp_pubsub_run_logging_debug_message_not_debug_discarded(voi
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 2);
     will_return(__wrap_isDebug, 2);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2 --log_level 2");
@@ -671,12 +671,12 @@ static void test_wm_gcp_pubsub_run_logging_debug_message_not_debug_discarded(voi
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 2);
 
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 
 static void test_wm_gcp_pubsub_run_logging_debug_message_not_debug(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -685,12 +685,12 @@ static void test_wm_gcp_pubsub_run_logging_debug_message_not_debug(void **state)
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 2);
     will_return(__wrap_isDebug, 2);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2 --log_level 2");
@@ -706,14 +706,14 @@ static void test_wm_gcp_pubsub_run_logging_debug_message_not_debug(void **state)
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 2);
 
-    expect_string(__wrap__mtinfo, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "This is an info message");
 
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_logging_info_message_info(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -722,12 +722,12 @@ static void test_wm_gcp_pubsub_run_logging_info_message_info(void **state) {
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2 --log_level 1");
@@ -743,14 +743,14 @@ static void test_wm_gcp_pubsub_run_logging_info_message_info(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mtinfo, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "This is an info message");
 
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_logging_info_message_debug(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -759,12 +759,12 @@ static void test_wm_gcp_pubsub_run_logging_info_message_debug(void **state) {
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2 --log_level 1");
@@ -780,11 +780,11 @@ static void test_wm_gcp_pubsub_run_logging_info_message_debug(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 1);
 
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_logging_info_message_warning(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -793,12 +793,12 @@ static void test_wm_gcp_pubsub_run_logging_info_message_warning(void **state) {
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2 --log_level 1");
@@ -814,13 +814,13 @@ static void test_wm_gcp_pubsub_run_logging_info_message_warning(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "This is a warning message");
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_logging_warning_message_error(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -829,11 +829,11 @@ static void test_wm_gcp_pubsub_run_logging_warning_message_error(void **state) {
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2");
@@ -849,13 +849,13 @@ static void test_wm_gcp_pubsub_run_logging_warning_message_error(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mterror, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "This is an error message");
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_logging_warning_multiline_message_error(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -864,11 +864,11 @@ static void test_wm_gcp_pubsub_run_logging_warning_multiline_message_error(void 
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2");
@@ -884,13 +884,13 @@ static void test_wm_gcp_pubsub_run_logging_warning_multiline_message_error(void 
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mterror, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "This is a \nmultiline\nerror message");
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_logging_warning_multimessage_message_error(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -899,11 +899,11 @@ static void test_wm_gcp_pubsub_run_logging_warning_multimessage_message_error(vo
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2");
@@ -921,17 +921,17 @@ static void test_wm_gcp_pubsub_run_logging_warning_multimessage_message_error(vo
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mterror, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "This is a \nmultiline\nerror message");
-    expect_string(__wrap__mterror, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "This is the second message");
-    expect_string(__wrap__mterror, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "This is a critical message");
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_run_logging_default_message_debug(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     snprintf(gcp_config->project_id, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(gcp_config->subscription_name, OS_SIZE_1024, "guardsarm-subscription-test");
@@ -940,10 +940,10 @@ static void test_wm_gcp_pubsub_run_logging_default_message_debug(void **state) {
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2 --log_level 6");
@@ -958,7 +958,7 @@ static void test_wm_gcp_pubsub_run_logging_default_message_debug(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_wm_exec, 0);
 
-    wm_gcp_pubsub_run(gcp_config);
+    gm_gcp_pubsub_run(gcp_config);
 }
 
 /* wm_gcp_pubsub_dump */
@@ -975,13 +975,13 @@ static void test_wm_gcp_pubsub_dump_success_logging_debug(void **state) {
     snprintf(gcp_pubsub_dump_data->config->credentials_file, OS_SIZE_1024, "/guardsarm/credentials/test.json");
 
     will_return(__wrap_cJSON_CreateObject, gcp_pubsub_dump_data->root);
-    will_return(__wrap_cJSON_CreateObject, gcp_pubsub_dump_data->wm_wd);
+    will_return(__wrap_cJSON_CreateObject, gcp_pubsub_dump_data->gm_wd);
 
     expect_value(__wrap_sched_scan_dump, scan_config, &gcp_pubsub_dump_data->config->scan_config);
-    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_pubsub_dump_data->wm_wd);
+    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_pubsub_dump_data->gm_wd);
     will_return(__wrap_isDebug, 2);
 
-    gcp_pubsub_dump_data->dump = wm_gcp_pubsub_dump(gcp_pubsub_dump_data->config);
+    gcp_pubsub_dump_data->dump = gm_gcp_pubsub_dump(gcp_pubsub_dump_data->config);
 
     assert_non_null(gcp_pubsub_dump_data->dump);
     assert_ptr_equal(gcp_pubsub_dump_data->dump, gcp_pubsub_dump_data->root);
@@ -1023,13 +1023,13 @@ static void test_wm_gcp_pubsub_dump_success_logging_info(void **state) {
     snprintf(gcp_pubsub_dump_data->config->credentials_file, OS_SIZE_1024, "/guardsarm/credentials/test.json");
 
     will_return(__wrap_cJSON_CreateObject, gcp_pubsub_dump_data->root);
-    will_return(__wrap_cJSON_CreateObject, gcp_pubsub_dump_data->wm_wd);
+    will_return(__wrap_cJSON_CreateObject, gcp_pubsub_dump_data->gm_wd);
 
     expect_value(__wrap_sched_scan_dump, scan_config, &gcp_pubsub_dump_data->config->scan_config);
-    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_pubsub_dump_data->wm_wd);
+    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_pubsub_dump_data->gm_wd);
     will_return(__wrap_isDebug, 1);
 
-    gcp_pubsub_dump_data->dump = wm_gcp_pubsub_dump(gcp_pubsub_dump_data->config);
+    gcp_pubsub_dump_data->dump = gm_gcp_pubsub_dump(gcp_pubsub_dump_data->config);
 
     assert_non_null(gcp_pubsub_dump_data->dump);
     assert_ptr_equal(gcp_pubsub_dump_data->dump, gcp_pubsub_dump_data->root);
@@ -1070,13 +1070,13 @@ static void test_wm_gcp_pubsub_dump_success_logging_warning(void **state) {
     snprintf(gcp_pubsub_dump_data->config->credentials_file, OS_SIZE_1024, "/guardsarm/credentials/test.json");
 
     will_return(__wrap_cJSON_CreateObject, gcp_pubsub_dump_data->root);
-    will_return(__wrap_cJSON_CreateObject, gcp_pubsub_dump_data->wm_wd);
+    will_return(__wrap_cJSON_CreateObject, gcp_pubsub_dump_data->gm_wd);
 
     expect_value(__wrap_sched_scan_dump, scan_config, &gcp_pubsub_dump_data->config->scan_config);
-    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_pubsub_dump_data->wm_wd);
+    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_pubsub_dump_data->gm_wd);
     will_return(__wrap_isDebug, 0);
 
-    gcp_pubsub_dump_data->dump = wm_gcp_pubsub_dump(gcp_pubsub_dump_data->config);
+    gcp_pubsub_dump_data->dump = gm_gcp_pubsub_dump(gcp_pubsub_dump_data->config);
 
     assert_non_null(gcp_pubsub_dump_data->dump);
     assert_ptr_equal(gcp_pubsub_dump_data->dump, gcp_pubsub_dump_data->root);
@@ -1117,8 +1117,8 @@ static void test_wm_gcp_pubsub_dump_error_allocating_wm_wd(void **state) {
     snprintf(gcp_pubsub_dump_data->config->credentials_file, OS_SIZE_1024, "/guardsarm/credentials/test.json");
 
     // Since we won't use wm_wd, we can just free it to prevent memory leaks.
-    os_free(gcp_pubsub_dump_data->wm_wd);
-    gcp_pubsub_dump_data->wm_wd = NULL;
+    os_free(gcp_pubsub_dump_data->gm_wd);
+    gcp_pubsub_dump_data->gm_wd = NULL;
 
     will_return(__wrap_cJSON_CreateObject, gcp_pubsub_dump_data->root);
     will_return(__wrap_cJSON_CreateObject, NULL);
@@ -1127,7 +1127,7 @@ static void test_wm_gcp_pubsub_dump_error_allocating_wm_wd(void **state) {
     expect_value(__wrap_sched_scan_dump, cjson_object, NULL);
     will_return(__wrap_isDebug, 0);
 
-    gcp_pubsub_dump_data->dump = wm_gcp_pubsub_dump(gcp_pubsub_dump_data->config);
+    gcp_pubsub_dump_data->dump = gm_gcp_pubsub_dump(gcp_pubsub_dump_data->config);
 
     assert_non_null(gcp_pubsub_dump_data->dump);
     assert_ptr_equal(gcp_pubsub_dump_data->dump, gcp_pubsub_dump_data->root);
@@ -1146,8 +1146,8 @@ static void test_wm_gcp_pubsub_dump_error_allocating_root(void **state) {
     snprintf(gcp_pubsub_dump_data->config->credentials_file, OS_SIZE_1024, "/guardsarm/credentials/test.json");
 
     // Since we won't use wm_wd or root, we can just free them to prevent memory leaks.
-    os_free(gcp_pubsub_dump_data->wm_wd);
-    gcp_pubsub_dump_data->wm_wd = NULL;
+    os_free(gcp_pubsub_dump_data->gm_wd);
+    gcp_pubsub_dump_data->gm_wd = NULL;
 
     os_free(gcp_pubsub_dump_data->root);
     gcp_pubsub_dump_data->root = NULL;
@@ -1159,35 +1159,35 @@ static void test_wm_gcp_pubsub_dump_error_allocating_root(void **state) {
     expect_value(__wrap_sched_scan_dump, cjson_object, NULL);
     will_return(__wrap_isDebug, 0);
 
-    gcp_pubsub_dump_data->dump = wm_gcp_pubsub_dump(gcp_pubsub_dump_data->config);
+    gcp_pubsub_dump_data->dump = gm_gcp_pubsub_dump(gcp_pubsub_dump_data->config);
 
     assert_null(gcp_pubsub_dump_data->dump);
 }
 
 /* wm_gcp_pubsub_destroy */
 static void test_wm_gcp_pubsub_destroy(void **state) {
-    wm_gcp_pubsub **gcp_config = *state;
+    gm_gcp_pubsub **gcp_config = *state;
 
     // gcp_config[0] is to be destroyed by the test
-    wm_gcp_pubsub_destroy(gcp_config[0]);
+    gm_gcp_pubsub_destroy(gcp_config[0]);
 
     // No assertions are possible on this test, it's meant to be used along valgrind to check memory leaks.
 }
 
 /* wm_gcp_pubsub_main */
 static void test_wm_gcp_pubsub_main_disabled(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
 
     gcp_config->enabled = 0;
 
-    expect_string(__wrap__mtinfo, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Module disabled. Exiting.");
 
-    wm_gcp_pubsub_main(gcp_config);
+    gm_gcp_pubsub_main(gcp_config);
 }
 
 static void test_wm_gcp_pubsub_main_pull_on_start(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
     void *ret;
 
     gcp_config->enabled = 1;
@@ -1200,22 +1200,22 @@ static void test_wm_gcp_pubsub_main_pull_on_start(void **state) {
     gcp_config->max_messages = 10;
     gcp_config->num_threads = 2;
 
-    expect_string(__wrap__mtinfo, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Module started.");
 
     expect_value(__wrap_sched_scan_get_time_until_next_scan, config, &gcp_config->scan_config);
-    expect_string(__wrap_sched_scan_get_time_until_next_scan, MODULE_TAG, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap_sched_scan_get_time_until_next_scan, MODULE_TAG, GM_GCP_PUBSUB_LOGTAG);
     expect_value(__wrap_sched_scan_get_time_until_next_scan, run_on_start, 1);
     will_return(__wrap_sched_scan_get_time_until_next_scan, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Starting fetching of logs.");
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2 --log_level 1");
@@ -1230,19 +1230,19 @@ static void test_wm_gcp_pubsub_main_pull_on_start(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_wm_exec, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Fetching logs finished.");
 
     will_return(__wrap_FOREVER, 0);
     will_return(__wrap_isDebug, 1);
 
-    ret = wm_gcp_pubsub_main(gcp_config);
+    ret = gm_gcp_pubsub_main(gcp_config);
 
     assert_null(ret);
 }
 
 static void test_wm_gcp_pubsub_main_sleep_then_run(void **state) {
-    wm_gcp_pubsub *gcp_config = *state;
+    gm_gcp_pubsub *gcp_config = *state;
     void *ret;
 
     gcp_config->enabled = 1;
@@ -1261,30 +1261,30 @@ static void test_wm_gcp_pubsub_main_sleep_then_run(void **state) {
     char *create_time_timestamp = NULL;
     os_strdup("20/10/21 15:35:48.111", create_time_timestamp);
 
-    expect_string(__wrap__mtinfo, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Module started.");
 
     expect_value(__wrap_sched_scan_get_time_until_next_scan, config, &gcp_config->scan_config);
-    expect_string(__wrap_sched_scan_get_time_until_next_scan, MODULE_TAG, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap_sched_scan_get_time_until_next_scan, MODULE_TAG, GM_GCP_PUBSUB_LOGTAG);
     expect_value(__wrap_sched_scan_get_time_until_next_scan, run_on_start, 1);
     will_return(__wrap_sched_scan_get_time_until_next_scan, create_time);
 
     expect_value(__wrap_w_get_timestamp, time, create_time);
     will_return(__wrap_w_get_timestamp, create_time_timestamp);
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Sleeping until: 20/10/21 15:35:48.111");
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Starting fetching of logs.");
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
     will_return(__wrap_isDebug, 2);
     will_return(__wrap_isDebug, 2);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type pubsub --project guardsarm-gcp-test --subscription_id guardsarm-subscription-test "
         "--credentials_file /guardsarm/credentials/test.json --max_messages 10 --num_threads 2 --log_level 2");
@@ -1299,21 +1299,21 @@ static void test_wm_gcp_pubsub_main_sleep_then_run(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_wm_exec, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_PUBSUB_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_PUBSUB_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Fetching logs finished.");
 
     will_return(__wrap_FOREVER, 0);
     will_return(__wrap_isDebug, 2);
 
-    ret = wm_gcp_pubsub_main(gcp_config);
+    ret = gm_gcp_pubsub_main(gcp_config);
 
     assert_null(ret);
 }
 
 /* wm_gcp_bucket_run */
 static void test_wm_gcp_bucket_run_success(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1323,11 +1323,11 @@ static void test_wm_gcp_bucket_run_success(void **state) {
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test "
         "--credentials_file /guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove");
@@ -1343,12 +1343,12 @@ static void test_wm_gcp_bucket_run_success(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 0);
 
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_error_running_command(void **state)  {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1358,12 +1358,12 @@ static void test_wm_gcp_bucket_run_error_running_command(void **state)  {
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test "
         "--credentials_file /guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove");
@@ -1378,15 +1378,15 @@ static void test_wm_gcp_bucket_run_error_running_command(void **state)  {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_wm_exec, 1);
 
-    expect_string(__wrap__mterror, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "Internal error. Exiting...");
 
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_error(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1396,12 +1396,12 @@ static void test_wm_gcp_bucket_run_error(void **state) {
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test "
         "--credentials_file /guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove");
@@ -1417,15 +1417,15 @@ static void test_wm_gcp_bucket_run_error(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Command returned exit code 1");
 
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_error_no_description(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1435,11 +1435,11 @@ static void test_wm_gcp_bucket_run_error_no_description(void **state) {
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test "
         "--credentials_file /guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove");
@@ -1455,15 +1455,15 @@ static void test_wm_gcp_bucket_run_error_no_description(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Command returned exit code 1");
 
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_error_parsing_args(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1473,12 +1473,12 @@ static void test_wm_gcp_bucket_run_error_parsing_args(void **state) {
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test "
         "--credentials_file /guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove");
@@ -1494,15 +1494,15 @@ static void test_wm_gcp_bucket_run_error_parsing_args(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Command returned exit code 2");
 
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_error_parsing_args_no_description(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1512,12 +1512,12 @@ static void test_wm_gcp_bucket_run_error_parsing_args_no_description(void **stat
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test "
         "--credentials_file /guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove");
@@ -1533,15 +1533,15 @@ static void test_wm_gcp_bucket_run_error_parsing_args_no_description(void **stat
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Command returned exit code 2");
 
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_generic_error(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1551,10 +1551,10 @@ static void test_wm_gcp_bucket_run_generic_error(void **state) {
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 0);
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test "
         "--credentials_file /guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove");
@@ -1569,17 +1569,17 @@ static void test_wm_gcp_bucket_run_generic_error(void **state) {
     will_return(__wrap_wm_exec, 3);
     will_return(__wrap_wm_exec, 0);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Command returned exit code 3");
 
     will_return(__wrap_isDebug, 0);
 
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_generic_error_no_description(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1589,11 +1589,11 @@ static void test_wm_gcp_bucket_run_generic_error_no_description(void **state) {
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test "
         "--credentials_file /guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove");
@@ -1608,17 +1608,17 @@ static void test_wm_gcp_bucket_run_generic_error_no_description(void **state) {
     will_return(__wrap_wm_exec, 3);
     will_return(__wrap_wm_exec, 0);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Command returned exit code 3");
 
     will_return(__wrap_isDebug, 0);
 
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_logging_debug_message_debug(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1628,13 +1628,13 @@ static void test_wm_gcp_bucket_run_logging_debug_message_debug(void **state) {
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
     will_return(__wrap_isDebug, 2);
     will_return(__wrap_isDebug, 2);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test --credentials_file "
         "/guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove --log_level 2");
@@ -1650,15 +1650,15 @@ static void test_wm_gcp_bucket_run_logging_debug_message_debug(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 2);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "This is a debug message");
 
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_logging_debug_message_not_debug_discarded(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1668,11 +1668,11 @@ static void test_wm_gcp_bucket_run_logging_debug_message_not_debug_discarded(voi
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 2);
     will_return(__wrap_isDebug, 2);
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test --credentials_file "
         "/guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove --log_level 2");
@@ -1688,12 +1688,12 @@ static void test_wm_gcp_bucket_run_logging_debug_message_not_debug_discarded(voi
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 2);
 
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_logging_debug_message_not_debug(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1703,11 +1703,11 @@ static void test_wm_gcp_bucket_run_logging_debug_message_not_debug(void **state)
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 2);
     will_return(__wrap_isDebug, 2);
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test --credentials_file "
         "/guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove --log_level 2");
@@ -1723,14 +1723,14 @@ static void test_wm_gcp_bucket_run_logging_debug_message_not_debug(void **state)
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 2);
 
-    expect_string(__wrap__mtinfo, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "This is an info message");
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_logging_info_message_info(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1740,11 +1740,11 @@ static void test_wm_gcp_bucket_run_logging_info_message_info(void **state) {
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test --credentials_file "
         "/guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove --log_level 1");
@@ -1760,15 +1760,15 @@ static void test_wm_gcp_bucket_run_logging_info_message_info(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mtinfo, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "This is an info message");
 
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_logging_info_message_debug(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1778,13 +1778,13 @@ static void test_wm_gcp_bucket_run_logging_info_message_debug(void **state) {
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test --credentials_file "
         "/guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove --log_level 1");
@@ -1800,12 +1800,12 @@ static void test_wm_gcp_bucket_run_logging_info_message_debug(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 1);
 
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_logging_info_message_warning(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1815,11 +1815,11 @@ static void test_wm_gcp_bucket_run_logging_info_message_warning(void **state) {
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test --credentials_file "
         "/guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove --log_level 1");
@@ -1835,15 +1835,15 @@ static void test_wm_gcp_bucket_run_logging_info_message_warning(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "This is a warning message");
 
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_logging_warning_message_warning(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1853,10 +1853,10 @@ static void test_wm_gcp_bucket_run_logging_warning_message_warning(void **state)
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 0);
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test --credentials_file "
         "/guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove");
@@ -1871,15 +1871,15 @@ static void test_wm_gcp_bucket_run_logging_warning_message_warning(void **state)
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_wm_exec, 0);
 
-    expect_string(__wrap__mtwarn, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "This is a warning message");
     will_return(__wrap_isDebug, 1);
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_logging_warning_message_debug(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1889,10 +1889,10 @@ static void test_wm_gcp_bucket_run_logging_warning_message_debug(void **state) {
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
     will_return(__wrap_isDebug, 0);
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test --credentials_file "
         "/guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove");
@@ -1908,12 +1908,12 @@ static void test_wm_gcp_bucket_run_logging_warning_message_debug(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 0);
 
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_logging_warning_message_error(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1923,12 +1923,12 @@ static void test_wm_gcp_bucket_run_logging_warning_message_error(void **state) {
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test --credentials_file "
         "/guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove");
@@ -1944,14 +1944,14 @@ static void test_wm_gcp_bucket_run_logging_warning_message_error(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mterror, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "This is an error message");
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_logging_warning_multiline_message_error(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1961,12 +1961,12 @@ static void test_wm_gcp_bucket_run_logging_warning_multiline_message_error(void 
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test --credentials_file "
         "/guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove");
@@ -1982,14 +1982,14 @@ static void test_wm_gcp_bucket_run_logging_warning_multiline_message_error(void 
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 0);
 
-    expect_string(__wrap__mterror, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "This is a\nmultiline\n error message");
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 static void test_wm_gcp_bucket_run_logging_warning_multimessage_message_error(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
     snprintf(cur_bucket->type, OS_SIZE_1024, "access_logs");
@@ -1999,13 +1999,13 @@ static void test_wm_gcp_bucket_run_logging_warning_multimessage_message_error(vo
 
     cur_bucket->remove_from_bucket = 1; // enabled
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test --credentials_file "
         "/guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove --log_level 1");
@@ -2023,20 +2023,20 @@ static void test_wm_gcp_bucket_run_logging_warning_multimessage_message_error(vo
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mterror, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "This is a\nmultimessage\n error message");
-    expect_string(__wrap__mterror, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "This is another error message");
-    expect_string(__wrap__mtinfo, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "This is a test info message");
-    wm_gcp_bucket_run(cur_bucket);
+    gm_gcp_bucket_run(cur_bucket);
 }
 
 /* wm_gcp_bucket_dump */
 
 static void test_wm_gcp_bucket_dump_success_logging_debug(void **state) {
     gcp_bucket_dump_t *gcp_bucket_dump_data = *state;
-    wm_gcp_bucket *cur_bucket = gcp_bucket_dump_data->config->buckets;
+    gm_gcp_bucket *cur_bucket = gcp_bucket_dump_data->config->buckets;
 
     gcp_bucket_dump_data->config->enabled = 0;
     gcp_bucket_dump_data->config->run_on_start = 0;
@@ -2048,13 +2048,13 @@ static void test_wm_gcp_bucket_dump_success_logging_debug(void **state) {
     snprintf(cur_bucket->only_logs_after, OS_SIZE_1024, "2021-JAN-01");
 
     will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->root);
-    will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->wm_wd);
+    will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->gm_wd);
     will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->cur_bucket);
 
     expect_value(__wrap_sched_scan_dump, scan_config, &gcp_bucket_dump_data->config->scan_config);
-    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_bucket_dump_data->wm_wd);
+    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_bucket_dump_data->gm_wd);
 
-    gcp_bucket_dump_data->dump = wm_gcp_bucket_dump(gcp_bucket_dump_data->config);
+    gcp_bucket_dump_data->dump = gm_gcp_bucket_dump(gcp_bucket_dump_data->config);
 
     assert_non_null(gcp_bucket_dump_data->dump);
     assert_ptr_equal(gcp_bucket_dump_data->dump, gcp_bucket_dump_data->root);
@@ -2079,7 +2079,7 @@ static void test_wm_gcp_bucket_dump_success_logging_debug(void **state) {
 
 static void test_wm_gcp_bucket_dump_success_logging_info(void **state) {
     gcp_bucket_dump_t *gcp_bucket_dump_data = *state;
-    wm_gcp_bucket *cur_bucket = gcp_bucket_dump_data->config->buckets;
+    gm_gcp_bucket *cur_bucket = gcp_bucket_dump_data->config->buckets;
 
     gcp_bucket_dump_data->config->enabled = 1;
     gcp_bucket_dump_data->config->run_on_start = 0;
@@ -2091,13 +2091,13 @@ static void test_wm_gcp_bucket_dump_success_logging_info(void **state) {
     snprintf(cur_bucket->only_logs_after, OS_SIZE_1024, "2021-JAN-01");
 
     will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->root);
-    will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->wm_wd);
+    will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->gm_wd);
     will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->cur_bucket);
 
     expect_value(__wrap_sched_scan_dump, scan_config, &gcp_bucket_dump_data->config->scan_config);
-    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_bucket_dump_data->wm_wd);
+    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_bucket_dump_data->gm_wd);
 
-    gcp_bucket_dump_data->dump = wm_gcp_bucket_dump(gcp_bucket_dump_data->config);
+    gcp_bucket_dump_data->dump = gm_gcp_bucket_dump(gcp_bucket_dump_data->config);
 
     assert_non_null(gcp_bucket_dump_data->dump);
     assert_ptr_equal(gcp_bucket_dump_data->dump, gcp_bucket_dump_data->root);
@@ -2124,7 +2124,7 @@ static void test_wm_gcp_bucket_dump_success_logging_info(void **state) {
 
 static void test_wm_gcp_bucket_dump_success(void **state) {
     gcp_bucket_dump_t *gcp_bucket_dump_data = *state;
-    wm_gcp_bucket *cur_bucket = gcp_bucket_dump_data->config->buckets;
+    gm_gcp_bucket *cur_bucket = gcp_bucket_dump_data->config->buckets;
 
     gcp_bucket_dump_data->config->enabled = 0;
     gcp_bucket_dump_data->config->run_on_start = 1;
@@ -2136,15 +2136,15 @@ static void test_wm_gcp_bucket_dump_success(void **state) {
     snprintf(cur_bucket->only_logs_after, OS_SIZE_1024, "2021-JAN-01");
 
     will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->root);
-    will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->wm_wd);
+    will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->gm_wd);
     will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->cur_bucket);
 
     expect_value(__wrap_sched_scan_dump, scan_config, &gcp_bucket_dump_data->config->scan_config);
-    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_bucket_dump_data->wm_wd);
+    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_bucket_dump_data->gm_wd);
 
     will_return(__wrap_isDebug, 0);
 
-    gcp_bucket_dump_data->dump = wm_gcp_bucket_dump(gcp_bucket_dump_data->config);
+    gcp_bucket_dump_data->dump = gm_gcp_bucket_dump(gcp_bucket_dump_data->config);
 
     assert_non_null(gcp_bucket_dump_data->dump);
     assert_ptr_equal(gcp_bucket_dump_data->dump, gcp_bucket_dump_data->root);
@@ -2170,7 +2170,7 @@ static void test_wm_gcp_bucket_dump_success(void **state) {
 
 static void test_wm_gcp_bucket_dump_success_logging_critical(void **state) {
     gcp_bucket_dump_t *gcp_bucket_dump_data = *state;
-    wm_gcp_bucket *cur_bucket = gcp_bucket_dump_data->config->buckets;
+    gm_gcp_bucket *cur_bucket = gcp_bucket_dump_data->config->buckets;
 
     gcp_bucket_dump_data->config->enabled = 0;
     gcp_bucket_dump_data->config->run_on_start = 0;
@@ -2182,13 +2182,13 @@ static void test_wm_gcp_bucket_dump_success_logging_critical(void **state) {
     snprintf(cur_bucket->only_logs_after, OS_SIZE_1024, "2021-JAN-01");
 
     will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->root);
-    will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->wm_wd);
+    will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->gm_wd);
     will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->cur_bucket);
 
     expect_value(__wrap_sched_scan_dump, scan_config, &gcp_bucket_dump_data->config->scan_config);
-    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_bucket_dump_data->wm_wd);
+    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_bucket_dump_data->gm_wd);
 
-    gcp_bucket_dump_data->dump = wm_gcp_bucket_dump(gcp_bucket_dump_data->config);
+    gcp_bucket_dump_data->dump = gm_gcp_bucket_dump(gcp_bucket_dump_data->config);
 
     assert_non_null(gcp_bucket_dump_data->dump);
     assert_ptr_equal(gcp_bucket_dump_data->dump, gcp_bucket_dump_data->root);
@@ -2214,7 +2214,7 @@ static void test_wm_gcp_bucket_dump_success_logging_critical(void **state) {
 
 static void test_wm_gcp_bucket_dump_success_logging_default(void **state) {
     gcp_bucket_dump_t *gcp_bucket_dump_data = *state;
-    wm_gcp_bucket *cur_bucket = gcp_bucket_dump_data->config->buckets;
+    gm_gcp_bucket *cur_bucket = gcp_bucket_dump_data->config->buckets;
 
     gcp_bucket_dump_data->config->enabled = 0;
     gcp_bucket_dump_data->config->run_on_start = 0;
@@ -2226,13 +2226,13 @@ static void test_wm_gcp_bucket_dump_success_logging_default(void **state) {
     snprintf(cur_bucket->only_logs_after, OS_SIZE_1024, "2021-JAN-01");
 
     will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->root);
-    will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->wm_wd);
+    will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->gm_wd);
     will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->cur_bucket);
 
     expect_value(__wrap_sched_scan_dump, scan_config, &gcp_bucket_dump_data->config->scan_config);
-    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_bucket_dump_data->wm_wd);
+    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_bucket_dump_data->gm_wd);
 
-    gcp_bucket_dump_data->dump = wm_gcp_bucket_dump(gcp_bucket_dump_data->config);
+    gcp_bucket_dump_data->dump = gm_gcp_bucket_dump(gcp_bucket_dump_data->config);
 
     assert_non_null(gcp_bucket_dump_data->dump);
     assert_ptr_equal(gcp_bucket_dump_data->dump, gcp_bucket_dump_data->root);
@@ -2258,7 +2258,7 @@ static void test_wm_gcp_bucket_dump_success_logging_default(void **state) {
 
 static void test_wm_gcp_bucket_dump_error_allocating_wm_wd(void **state) {
     gcp_bucket_dump_t *gcp_bucket_dump_data = *state;
-    wm_gcp_bucket *cur_bucket = gcp_bucket_dump_data->config->buckets;
+    gm_gcp_bucket *cur_bucket = gcp_bucket_dump_data->config->buckets;
 
     gcp_bucket_dump_data->config->enabled = 0;
     gcp_bucket_dump_data->config->run_on_start = 0;
@@ -2270,14 +2270,14 @@ static void test_wm_gcp_bucket_dump_error_allocating_wm_wd(void **state) {
     snprintf(cur_bucket->only_logs_after, OS_SIZE_1024, "2021-JAN-01");
 
     will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->root);
-    will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->wm_wd);
+    will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->gm_wd);
     will_return(__wrap_cJSON_CreateObject, gcp_bucket_dump_data->cur_bucket);
 
     expect_value(__wrap_sched_scan_dump, scan_config, &gcp_bucket_dump_data->config->scan_config);
-    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_bucket_dump_data->wm_wd);
+    expect_value(__wrap_sched_scan_dump, cjson_object, gcp_bucket_dump_data->gm_wd);
 
     will_return(__wrap_isDebug, 1);
-    gcp_bucket_dump_data->dump = wm_gcp_bucket_dump(gcp_bucket_dump_data->config);
+    gcp_bucket_dump_data->dump = gm_gcp_bucket_dump(gcp_bucket_dump_data->config);
 
     assert_non_null(gcp_bucket_dump_data->dump);
     assert_ptr_equal(gcp_bucket_dump_data->dump, gcp_bucket_dump_data->root);
@@ -2286,7 +2286,7 @@ static void test_wm_gcp_bucket_dump_error_allocating_wm_wd(void **state) {
 
 static void test_wm_gcp_bucket_dump_error_allocating_root(void **state) {
     gcp_bucket_dump_t *gcp_bucket_dump_data = *state;
-    wm_gcp_bucket *cur_bucket = gcp_bucket_dump_data->config->buckets;
+    gm_gcp_bucket *cur_bucket = gcp_bucket_dump_data->config->buckets;
 
     gcp_bucket_dump_data->config->enabled = 0;
     gcp_bucket_dump_data->config->run_on_start = 0;
@@ -2298,8 +2298,8 @@ static void test_wm_gcp_bucket_dump_error_allocating_root(void **state) {
     snprintf(cur_bucket->only_logs_after, OS_SIZE_1024, "2021-JAN-01");
 
     // Since we won't use wm_wd or root, we can just free them to prevent memory leaks.
-    os_free(gcp_bucket_dump_data->wm_wd);
-    gcp_bucket_dump_data->wm_wd = NULL;
+    os_free(gcp_bucket_dump_data->gm_wd);
+    gcp_bucket_dump_data->gm_wd = NULL;
 
     os_free(gcp_bucket_dump_data->root);
     gcp_bucket_dump_data->root = NULL;
@@ -2315,36 +2315,36 @@ static void test_wm_gcp_bucket_dump_error_allocating_root(void **state) {
     expect_value(__wrap_sched_scan_dump, cjson_object, NULL);
 
     will_return(__wrap_isDebug, 1);
-    gcp_bucket_dump_data->dump = wm_gcp_bucket_dump(gcp_bucket_dump_data->config);
+    gcp_bucket_dump_data->dump = gm_gcp_bucket_dump(gcp_bucket_dump_data->config);
 
     assert_null(gcp_bucket_dump_data->dump);
 }
 
 /* wm_gcp_bucket_destroy */
 static void test_wm_gcp_bucket_destroy(void **state) {
-    wm_gcp_bucket_base **gcp_config = *state;
+    gm_gcp_bucket_base **gcp_config = *state;
 
     // gcp_config[0] is to be destroyed by the test
-    wm_gcp_bucket_destroy(gcp_config[0]);
+    gm_gcp_bucket_destroy(gcp_config[0]);
 
     // No assertions are possible on this test, it's meant to be used along valgrind to check memory leaks.
 }
 
 /* wm_gcp_bucket_main */
 static void test_wm_gcp_bucket_main_disabled(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket_base *gcp_config = *state;
 
     gcp_config->enabled = 0;
 
-    expect_string(__wrap__mtinfo, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Module disabled. Exiting.");
 
-    wm_gcp_bucket_main(gcp_config);
+    gm_gcp_bucket_main(gcp_config);
 }
 
 static void test_wm_gcp_bucket_main_run_on_start(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
     void *ret;
 
     snprintf(cur_bucket->bucket, OS_SIZE_1024, "guardsarm-gcp-test");
@@ -2357,24 +2357,24 @@ static void test_wm_gcp_bucket_main_run_on_start(void **state) {
     gcp_config->enabled = 1;
     gcp_config->run_on_start = 1;
 
-    expect_string(__wrap__mtinfo, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Module started.");
 
     expect_value(__wrap_sched_scan_get_time_until_next_scan, config, &gcp_config->scan_config);
-    expect_string(__wrap_sched_scan_get_time_until_next_scan, MODULE_TAG, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap_sched_scan_get_time_until_next_scan, MODULE_TAG, GM_GCP_BUCKET_LOGTAG);
     expect_value(__wrap_sched_scan_get_time_until_next_scan, run_on_start, 1);
     will_return(__wrap_sched_scan_get_time_until_next_scan, 0);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Starting fetching of logs.");
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name guardsarm-gcp-test --credentials_file "
         "/guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove --log_level 1");
@@ -2390,24 +2390,24 @@ static void test_wm_gcp_bucket_main_run_on_start(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mtinfo, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Executing Bucket Analysis: (Bucket: guardsarm-gcp-test, "
         "Path: access_logs/, Type: access_logs, Credentials file: /guardsarm/credentials/test.json)");
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Fetching logs finished.");
 
     will_return(__wrap_FOREVER, 0);
     
 
-    ret = wm_gcp_bucket_main(gcp_config);
+    ret = gm_gcp_bucket_main(gcp_config);
 
     assert_null(ret);
 }
 
 static void test_wm_gcp_bucket_main_sleep_then_run(void **state) {
-    wm_gcp_bucket_base *gcp_config = *state;
-    wm_gcp_bucket *cur_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = *state;
+    gm_gcp_bucket *cur_bucket = gcp_config->buckets;
     void *ret;
 
     os_free(cur_bucket->bucket);
@@ -2426,30 +2426,30 @@ static void test_wm_gcp_bucket_main_sleep_then_run(void **state) {
     char *create_time_timestamp = NULL;
     os_strdup("20/10/21 15:35:48.111", create_time_timestamp);
 
-    expect_string(__wrap__mtinfo, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Module started.");
 
     expect_value(__wrap_sched_scan_get_time_until_next_scan, config, &gcp_config->scan_config);
-    expect_string(__wrap_sched_scan_get_time_until_next_scan, MODULE_TAG, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap_sched_scan_get_time_until_next_scan, MODULE_TAG, GM_GCP_BUCKET_LOGTAG);
     expect_value(__wrap_sched_scan_get_time_until_next_scan, run_on_start, 1);
     will_return(__wrap_sched_scan_get_time_until_next_scan, create_time);
 
     expect_value(__wrap_w_get_timestamp, time, create_time);
     will_return(__wrap_w_get_timestamp, create_time_timestamp);
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Sleeping until: 20/10/21 15:35:48.111");
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Starting fetching of logs.");
 
-    expect_string(__wrap__mtdebug2, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Create argument list");
 
     will_return(__wrap_isDebug, 1);
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Launching command: "
         "wodles/gcloud/gcloud --integration_type access_logs --bucket_name --credentials_file "
         "/guardsarm/credentials/test.json --prefix access_logs/ --only_logs_after 2021-JAN-01 --remove --log_level 1");
@@ -2464,18 +2464,18 @@ static void test_wm_gcp_bucket_main_sleep_then_run(void **state) {
     will_return(__wrap_wm_exec, 0);
     will_return(__wrap_wm_exec, 0);
 
-    expect_string(__wrap__mtinfo, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Executing Bucket Analysis: (Bucket: unknown_bucket, "
         "Path: access_logs/, Type: access_logs, Credentials file: /guardsarm/credentials/test.json)");
 
     will_return(__wrap_isDebug, 1);
 
-    expect_string(__wrap__mtdebug1, tag, WM_GCP_BUCKET_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_GCP_BUCKET_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Fetching logs finished.");
 
     will_return(__wrap_FOREVER, 0);
 
-    ret = wm_gcp_bucket_main(gcp_config);
+    ret = gm_gcp_bucket_main(gcp_config);
 
     assert_null(ret);
 }

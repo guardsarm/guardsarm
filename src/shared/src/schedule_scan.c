@@ -34,7 +34,7 @@ void sched_scan_init(sched_scan_config *scan_config){
     scan_config->scan_wday = -1;
     scan_config->scan_day = 0;
     scan_config->scan_time = NULL;
-    scan_config->interval = WM_DEF_INTERVAL;
+    scan_config->interval = GM_DEF_INTERVAL;
     scan_config->month_interval = false;
     scan_config->time_start = 0;
     scan_config->next_scheduled_scan_time = 0;
@@ -188,7 +188,7 @@ static int _sched_scan_validate_parameters(sched_scan_config *scan_config) {
             scan_config->scan_time = strdup("00:00");
     } else if (scan_config->scan_time) {
         if (w_validate_interval(scan_config->interval, 0) != 0) {
-            scan_config->interval = WM_DEF_INTERVAL;  // 1 day
+            scan_config->interval = GM_DEF_INTERVAL;  // 1 day
             mwarn("Interval must be a multiple of one day. New interval value: 1d");
         }
     } else if (scan_config->month_interval) {

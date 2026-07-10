@@ -5,8 +5,8 @@
  */
 
 
-#ifndef WM_EXEC_WRAPPERS_H
-#define WM_EXEC_WRAPPERS_H
+#ifndef GM_EXEC_WRAPPERS_H
+#define GM_EXEC_WRAPPERS_H
 
 int __wrap_wm_exec(char *command, char **output, int *exitcode, int secs, const char * add_path);
 void expect_wm_exec(char *command, int sec, const char * add_path, char *output_command, int exitcode, int return_code);

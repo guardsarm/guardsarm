@@ -56,11 +56,11 @@ void ContentModuleFacade::startScheduling(const std::string& name, size_t interv
             providerIt->second->startActionScheduler(interval);
             return;
         }
-        logDebug1(WM_CONTENTUPDATER, "Couldn't start scheduled action: Provider '%s' not found.", name.c_str());
+        logDebug1(GM_CONTENTUPDATER, "Couldn't start scheduled action: Provider '%s' not found.", name.c_str());
     }
     catch (const std::exception& e)
     {
-        logError(WM_CONTENTUPDATER, "Couldn't start scheduled action: %s.", e.what());
+        logError(GM_CONTENTUPDATER, "Couldn't start scheduled action: %s.", e.what());
     }
 }
 void ContentModuleFacade::startOndemand(const std::string& name)
@@ -73,11 +73,11 @@ void ContentModuleFacade::startOndemand(const std::string& name)
             providerIt->second->startOnDemandAction();
             return;
         }
-        logDebug1(WM_CONTENTUPDATER, "Couldn't start on-demand action: Provider '%s' not found.", name.c_str());
+        logDebug1(GM_CONTENTUPDATER, "Couldn't start on-demand action: Provider '%s' not found.", name.c_str());
     }
     catch (const std::exception& e)
     {
-        logError(WM_CONTENTUPDATER, "Couldn't start on-demand action: %s.", e.what());
+        logError(GM_CONTENTUPDATER, "Couldn't start on-demand action: %s.", e.what());
     }
 }
 
@@ -91,10 +91,10 @@ void ContentModuleFacade::changeSchedulerInterval(const std::string& name, const
             providerIt->second->changeSchedulerInterval(interval);
             return;
         }
-        logDebug1(WM_CONTENTUPDATER, "Couldn't change scheduled interval: Provider '%s' not found.", name.c_str());
+        logDebug1(GM_CONTENTUPDATER, "Couldn't change scheduled interval: Provider '%s' not found.", name.c_str());
     }
     catch (const std::exception& e)
     {
-        logError(WM_CONTENTUPDATER, "Couldn't change scheduled interval: %s.", e.what());
+        logError(GM_CONTENTUPDATER, "Couldn't change scheduled interval: %s.", e.what());
     }
 }

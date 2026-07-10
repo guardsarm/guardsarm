@@ -25,101 +25,101 @@ extern void mock_assert(const int result, const char* const expression,
 #endif
 
 
-STATIC int wm_task_manager_init(wm_task_manager *task_config) __attribute__((nonnull));
-STATIC void* wm_task_manager_main(wm_task_manager* task_config);    // Module main function. It won't return
-STATIC void wm_task_manager_destroy(wm_task_manager* task_config);
-STATIC void wm_task_manager_stop(wm_task_manager* task_config);
-STATIC cJSON* wm_task_manager_dump(const wm_task_manager* task_config);
+STATIC int gm_task_manager_init(gm_task_manager *task_config) __attribute__((nonnull));
+STATIC void* gm_task_manager_main(gm_task_manager* task_config);    // Module main function. It won't return
+STATIC void gm_task_manager_destroy(gm_task_manager* task_config);
+STATIC void gm_task_manager_stop(gm_task_manager* task_config);
+STATIC cJSON* gm_task_manager_dump(const gm_task_manager* task_config);
 
 /* Context definition */
-const wm_context WM_TASK_MANAGER_CONTEXT = {
+const gm_context GM_TASK_MANAGER_CONTEXT = {
     .name = TASK_MANAGER_WM_NAME,
-    .start = (wm_routine)wm_task_manager_main,
-    .destroy = (void (*)(void *))wm_task_manager_destroy,
-    .dump = (cJSON * (*)(const void *))wm_task_manager_dump,
+    .start = (gm_routine)gm_task_manager_main,
+    .destroy = (void (*)(void *))gm_task_manager_destroy,
+    .dump = (cJSON * (*)(const void *))gm_task_manager_dump,
     .sync = NULL,
-    .stop = (void (*)(void *))wm_task_manager_stop,
+    .stop = (void (*)(void *))gm_task_manager_stop,
     .query = NULL,
 };
 
-size_t wm_task_manager_dispatch(const char *msg, char **response) {
-    wm_task_manager_task *task = NULL;
+size_t gm_task_manager_dispatch(const char *msg, char **response) {
+    gm_task_manager_task *task = NULL;
     cJSON *json_response = NULL;
     cJSON *data_array = NULL;
-    int error_code = WM_TASK_SUCCESS;
+    int error_code = GM_TASK_SUCCESS;
 
-    mtdebug1(WM_TASK_MANAGER_LOGTAG, MOD_TASK_INCOMMING_MESSAGE, msg);
+    mtdebug1(GM_TASK_MANAGER_LOGTAG, MOD_TASK_INCOMMING_MESSAGE, msg);
 
     // Parse message
-    if (task = wm_task_manager_parse_message(msg), !task) {
-        cJSON* parse_error = wm_task_manager_parse_data_response(WM_TASK_INVALID_MESSAGE, OS_INVALID, OS_INVALID, NULL);
-        json_response = wm_task_manager_parse_response(WM_TASK_INVALID_MESSAGE, parse_error);
+    if (task = gm_task_manager_parse_message(msg), !task) {
+        cJSON* parse_error = gm_task_manager_parse_data_response(GM_TASK_INVALID_MESSAGE, OS_INVALID, OS_INVALID, NULL);
+        json_response = gm_task_manager_parse_response(GM_TASK_INVALID_MESSAGE, parse_error);
         *response = cJSON_PrintUnformatted(json_response);
         cJSON_Delete(json_response);
         return strlen(*response);
     }
 
     // Analyze task, update tasks DB and generate JSON response
-    data_array = wm_task_manager_process_task(task, &error_code);
+    data_array = gm_task_manager_process_task(task, &error_code);
 
     switch (error_code) {
-    case WM_TASK_INVALID_COMMAND:
-        mterror(WM_TASK_MANAGER_LOGTAG, MOD_TASK_UNDEFINED_ACTION_ERRROR);
+    case GM_TASK_INVALID_COMMAND:
+        mterror(GM_TASK_MANAGER_LOGTAG, MOD_TASK_UNDEFINED_ACTION_ERRROR);
         cJSON_Delete(data_array);
-        data_array = wm_task_manager_parse_data_response(WM_TASK_INVALID_COMMAND, OS_INVALID, OS_INVALID, NULL);
+        data_array = gm_task_manager_parse_data_response(GM_TASK_INVALID_COMMAND, OS_INVALID, OS_INVALID, NULL);
         break;
-    case WM_TASK_DATABASE_ERROR:
-        mterror(WM_TASK_MANAGER_LOGTAG, MOD_TASK_DB_ERROR);
+    case GM_TASK_DATABASE_ERROR:
+        mterror(GM_TASK_MANAGER_LOGTAG, MOD_TASK_DB_ERROR);
         cJSON_Delete(data_array);
-        data_array = wm_task_manager_parse_data_response(WM_TASK_DATABASE_ERROR, OS_INVALID, OS_INVALID, NULL);
+        data_array = gm_task_manager_parse_data_response(GM_TASK_DATABASE_ERROR, OS_INVALID, OS_INVALID, NULL);
         break;
-    case WM_TASK_DATABASE_PARSE_ERROR:
-        mterror(WM_TASK_MANAGER_LOGTAG, MOD_TASK_DB_ERROR);
+    case GM_TASK_DATABASE_PARSE_ERROR:
+        mterror(GM_TASK_MANAGER_LOGTAG, MOD_TASK_DB_ERROR);
         cJSON_Delete(data_array);
-        data_array = wm_task_manager_parse_data_response(WM_TASK_DATABASE_PARSE_ERROR, OS_INVALID, OS_INVALID, NULL);
+        data_array = gm_task_manager_parse_data_response(GM_TASK_DATABASE_PARSE_ERROR, OS_INVALID, OS_INVALID, NULL);
         break;
-    case WM_TASK_DATABASE_REQUEST_ERROR:
-        mterror(WM_TASK_MANAGER_LOGTAG, MOD_TASK_DB_ERROR);
+    case GM_TASK_DATABASE_REQUEST_ERROR:
+        mterror(GM_TASK_MANAGER_LOGTAG, MOD_TASK_DB_ERROR);
         cJSON_Delete(data_array);
-        data_array = wm_task_manager_parse_data_response(WM_TASK_DATABASE_REQUEST_ERROR, OS_INVALID, OS_INVALID, NULL);
+        data_array = gm_task_manager_parse_data_response(GM_TASK_DATABASE_REQUEST_ERROR, OS_INVALID, OS_INVALID, NULL);
         break;
     default:
         break;
     }
 
-    json_response = wm_task_manager_parse_response(error_code, data_array);
+    json_response = gm_task_manager_parse_response(error_code, data_array);
     *response = cJSON_PrintUnformatted(json_response);
 
-    mtdebug1(WM_TASK_MANAGER_LOGTAG, MOD_TASK_RESPONSE_MESSAGE, *response);
+    mtdebug1(GM_TASK_MANAGER_LOGTAG, MOD_TASK_RESPONSE_MESSAGE, *response);
 
-    wm_task_manager_free_task(task);
+    gm_task_manager_free_task(task);
     cJSON_Delete(json_response);
 
     return strlen(*response);
 }
 
-STATIC int wm_task_manager_init(wm_task_manager *task_config) {
+STATIC int gm_task_manager_init(gm_task_manager *task_config) {
     int sock = 0;
 
     // Check if module is enabled
     if (!task_config->enabled) {
-        mtinfo(WM_TASK_MANAGER_LOGTAG, MOD_TASK_DISABLED);
+        mtinfo(GM_TASK_MANAGER_LOGTAG, MOD_TASK_DISABLED);
         pthread_exit(NULL);
     }
 
     // Start clean tasks thread
-    w_create_thread(wm_task_manager_clean_tasks, task_config);
+    w_create_thread(gm_task_manager_clean_tasks, task_config);
 
     /* Set the queue */
-    if (sock = OS_BindUnixDomainWithPerms(TASK_QUEUE, SOCK_STREAM, OS_MAXSTR, getuid(), wm_getGroupID(), 0660), sock < 0) {
-        mterror(WM_TASK_MANAGER_LOGTAG, MOD_TASK_CREATE_SOCK_ERROR, TASK_QUEUE, strerror(errno)); // LCOV_EXCL_LINE
+    if (sock = OS_BindUnixDomainWithPerms(TASK_QUEUE, SOCK_STREAM, OS_MAXSTR, getuid(), gm_getGroupID(), 0660), sock < 0) {
+        mterror(GM_TASK_MANAGER_LOGTAG, MOD_TASK_CREATE_SOCK_ERROR, TASK_QUEUE, strerror(errno)); // LCOV_EXCL_LINE
         pthread_exit(NULL);
     }
 
     return sock;
 }
 
-STATIC void* wm_task_manager_main(wm_task_manager* task_config) {
+STATIC void* gm_task_manager_main(gm_task_manager* task_config) {
     int sock;
     int peer;
     char *buffer = NULL;
@@ -128,20 +128,20 @@ STATIC void* wm_task_manager_main(wm_task_manager* task_config) {
     fd_set fdset;
 
     if (w_is_worker()) {
-        mtinfo(WM_TASK_MANAGER_LOGTAG, MOD_TASK_DISABLED_WORKER);
+        mtinfo(GM_TASK_MANAGER_LOGTAG, MOD_TASK_DISABLED_WORKER);
         return NULL;
     }
 
     // Initial configuration
-    sock = wm_task_manager_init(task_config);
+    sock = gm_task_manager_init(task_config);
 
-    mtinfo(WM_TASK_MANAGER_LOGTAG, STARTUP_MSG, (int)getpid());
+    mtinfo(GM_TASK_MANAGER_LOGTAG, STARTUP_MSG, (int)getpid());
 
-    while (!wm_shutdown_requested) {
+    while (!gm_shutdown_requested) {
 
-        switch (wm_select_interruptible(sock, &fdset)) {
+        switch (gm_select_interruptible(sock, &fdset)) {
         case -1:
-            mterror(WM_TASK_MANAGER_LOGTAG, MOD_TASK_SELECT_ERROR, strerror(errno));
+            mterror(GM_TASK_MANAGER_LOGTAG, MOD_TASK_SELECT_ERROR, strerror(errno));
             pthread_exit(NULL);
             break;
         case 0:
@@ -153,7 +153,7 @@ STATIC void* wm_task_manager_main(wm_task_manager* task_config) {
         // Accept incomming connection
         if (peer = accept(sock, NULL, NULL), peer < 0) {
             if (errno != EINTR) {
-                mterror(WM_TASK_MANAGER_LOGTAG, MOD_TASK_ACCEPT_ERROR, strerror(errno));
+                mterror(GM_TASK_MANAGER_LOGTAG, MOD_TASK_ACCEPT_ERROR, strerror(errno));
             }
             continue;
         }
@@ -162,21 +162,21 @@ STATIC void* wm_task_manager_main(wm_task_manager* task_config) {
         os_calloc(OS_MAXSTR, sizeof(char), buffer);
         switch (length = OS_RecvSecureTCP(peer, buffer, OS_MAXSTR), length) {
         case OS_SOCKTERR:
-            mterror(WM_TASK_MANAGER_LOGTAG, MOD_TASK_SOCKTERR_ERROR);
+            mterror(GM_TASK_MANAGER_LOGTAG, MOD_TASK_SOCKTERR_ERROR);
             break;
         case -1:
-            mterror(WM_TASK_MANAGER_LOGTAG, MOD_TASK_RECV_ERROR, strerror(errno));
+            mterror(GM_TASK_MANAGER_LOGTAG, MOD_TASK_RECV_ERROR, strerror(errno));
             break;
         case 0:
-            mtdebug1(WM_TASK_MANAGER_LOGTAG, MOD_TASK_EMPTY_MESSAGE);
+            mtdebug1(GM_TASK_MANAGER_LOGTAG, MOD_TASK_EMPTY_MESSAGE);
             close(peer);
             break;
         case OS_MAXLEN:
-            mterror(WM_TASK_MANAGER_LOGTAG, MOD_TASK_LENGTH_ERROR, MAX_DYN_STR);
+            mterror(GM_TASK_MANAGER_LOGTAG, MOD_TASK_LENGTH_ERROR, MAX_DYN_STR);
             close(peer);
             break;
         default:
-            length = wm_task_manager_dispatch(buffer, &response);
+            length = gm_task_manager_dispatch(buffer, &response);
             // Send message to connection
             OS_SendSecureTCP(peer, length, response);
             os_free(response);
@@ -193,25 +193,25 @@ STATIC void* wm_task_manager_main(wm_task_manager* task_config) {
     return NULL;
 }
 
-STATIC void wm_task_manager_stop(__attribute__((unused)) wm_task_manager* task_config) {
-    wm_shutdown_requested = 1;
+STATIC void gm_task_manager_stop(__attribute__((unused)) gm_task_manager* task_config) {
+    gm_shutdown_requested = 1;
 }
 
-STATIC void wm_task_manager_destroy(wm_task_manager* task_config) {
-    mtinfo(WM_TASK_MANAGER_LOGTAG, MOD_TASK_FINISH);
+STATIC void gm_task_manager_destroy(gm_task_manager* task_config) {
+    mtinfo(GM_TASK_MANAGER_LOGTAG, MOD_TASK_FINISH);
     os_free(task_config);
 }
 
-STATIC cJSON* wm_task_manager_dump(const wm_task_manager* task_config){
+STATIC cJSON* gm_task_manager_dump(const gm_task_manager* task_config){
     cJSON *root = cJSON_CreateObject();
-    cJSON *wm_info = cJSON_CreateObject();
+    cJSON *gm_info = cJSON_CreateObject();
 
     if (task_config->enabled) {
-        cJSON_AddStringToObject(wm_info, "enabled", "yes");
+        cJSON_AddStringToObject(gm_info, "enabled", "yes");
     } else {
-        cJSON_AddStringToObject(wm_info, "enabled", "no");
+        cJSON_AddStringToObject(gm_info, "enabled", "no");
     }
-    cJSON_AddItemToObject(root, "task-manager", wm_info);
+    cJSON_AddItemToObject(root, "task-manager", gm_info);
 
     return root;
 }

@@ -19,30 +19,30 @@
 size_t syscom_dispatch(char* command, size_t command_len, char** output);
 #endif
 
-wmodule *wmodules = NULL;   // Config: linked list of all modules.
-int wm_task_nice = 0;       // Nice value for tasks.
-static gid_t wm_gid;               // Group ID.
-int wm_max_eps;             // Maximum events per second
-int wm_kill_timeout;        // Time for a process to quit before killing it
-int wm_debug_level;
-volatile sig_atomic_t wm_shutdown_requested = 0;
+gmodule *gmodules = NULL;   // Config: linked list of all modules.
+int gm_task_nice = 0;       // Nice value for tasks.
+static gid_t gm_gid;               // Group ID.
+int gm_max_eps;             // Maximum events per second
+int gm_kill_timeout;        // Time for a process to quit before killing it
+int gm_debug_level;
+volatile sig_atomic_t gm_shutdown_requested = 0;
 
-void wm_sleep_interruptible(int seconds) {
-    for (int i = 0; i < seconds && !wm_shutdown_requested; i++) {
+void gm_sleep_interruptible(int seconds) {
+    for (int i = 0; i < seconds && !gm_shutdown_requested; i++) {
         sleep(1);
     }
 }
 
-void wm_sleep_until_interruptible(time_t abs_time) {
-    while (time(NULL) < abs_time && !wm_shutdown_requested) {
+void gm_sleep_until_interruptible(time_t abs_time) {
+    while (time(NULL) < abs_time && !gm_shutdown_requested) {
         sleep(1);
     }
 }
 
-int wm_select_interruptible(int sock, fd_set *fdset) {
+int gm_select_interruptible(int sock, fd_set *fdset) {
     struct timeval tv;
     int r;
-    while (!wm_shutdown_requested) {
+    while (!gm_shutdown_requested) {
         FD_ZERO(fdset);
         FD_SET(sock, fdset);
         tv = (struct timeval){ .tv_sec = 1, .tv_usec = 0 };
@@ -59,11 +59,11 @@ int wm_select_interruptible(int sock, fd_set *fdset) {
  * last position should be NULL
  * */
 static const void *default_modules[] = {
-    wm_agent_upgrade_read,
+    gm_agent_upgrade_read,
 #ifndef CLIENT
-    wm_task_manager_read,
+    gm_task_manager_read,
 #else
-    wm_agent_info_read,
+    gm_agent_info_read,
 #endif
 
     NULL
@@ -77,76 +77,76 @@ static const void *default_modules[] = {
  * @retval OS_SUCCESS if all reading methods are executed successfully
  * @retval OS_INVALID if there is an error
  * */
-static int wm_initialize_default_modules(wmodule **wmodules);
+static int gm_initialize_default_modules(gmodule **gmodules);
 
 // Read XML configuration and internal options
 
-gid_t wm_getGroupID(void)
+gid_t gm_getGroupID(void)
 {
-    return wm_gid;
+    return gm_gid;
 }
 
-void wm_setGroupID(const gid_t gid)
+void gm_setGroupID(const gid_t gid)
 {
-    wm_gid = gid;
+    gm_gid = gid;
 }
 
-int wm_config() {
+int gm_config() {
 
     int agent_cfg = 0;
 
     // Get defined values from internal_options
 
 #ifdef CLIENT
-    wm_task_nice = getDefine_Int("guardsarm_modules", "task_nice", -20, 19);
-    wm_max_eps = getDefine_Int("guardsarm_modules", "max_eps", 1, 1000);
-    wm_kill_timeout = getDefine_Int("guardsarm_modules", "kill_timeout", 0, 3600);
+    gm_task_nice = getDefine_Int("guardsarm_modules", "task_nice", -20, 19);
+    gm_max_eps = getDefine_Int("guardsarm_modules", "max_eps", 1, 1000);
+    gm_kill_timeout = getDefine_Int("guardsarm_modules", "kill_timeout", 0, 3600);
 #else
-    wm_task_nice = getDefine_Int_default("guardsarm_modules", "task_nice", -20, 19, 10);
-    wm_max_eps = getDefine_Int_default("guardsarm_modules", "max_eps", 1, 1000, 100);
-    wm_kill_timeout = getDefine_Int_default("guardsarm_modules", "kill_timeout", 0, 3600, 10);
+    gm_task_nice = getDefine_Int_default("guardsarm_modules", "task_nice", -20, 19, 10);
+    gm_max_eps = getDefine_Int_default("guardsarm_modules", "max_eps", 1, 1000, 100);
+    gm_kill_timeout = getDefine_Int_default("guardsarm_modules", "kill_timeout", 0, 3600, 10);
 #endif
 
-    if(wm_initialize_default_modules(&wmodules) < 0) {
+    if(gm_initialize_default_modules(&gmodules) < 0) {
         return OS_INVALID;
     }
 
 
     // Read configuration
 
-    if (ReadConfig(CWMODULE, GUARDSARMCONF, &wmodules, &agent_cfg) < 0) {
+    if (ReadConfig(CWMODULE, GUARDSARMCONF, &gmodules, &agent_cfg) < 0) {
         return -1;
     }
 
 #ifdef CLIENT
     // Read configuration: agent.conf
     agent_cfg = 1;
-    ReadConfig(CWMODULE | CAGENT_CONFIG, AGENTCONFIG, &wmodules, &agent_cfg);
+    ReadConfig(CWMODULE | CAGENT_CONFIG, AGENTCONFIG, &gmodules, &agent_cfg);
 #else
-    wmodule *module;
+    gmodule *module;
 
-    if ((module = wm_router_read())) {
-        wm_add(module);
+    if ((module = gm_router_read())) {
+        gm_add(module);
     }
 
-    if ((module = wm_content_manager_read())) {
-        wm_add(module);
+    if ((module = gm_content_manager_read())) {
+        gm_add(module);
     }
 
     // Inventory sync
-    if ((module = wm_inventory_sync_read()))
-        wm_add(module);
+    if ((module = gm_inventory_sync_read()))
+        gm_add(module);
 
     // The database module won't be available on agents
-    if ((module = wm_database_read()))
-        wm_add(module);
+    if ((module = gm_database_read()))
+        gm_add(module);
 
 #endif
 
 #if defined(__linux__) || defined(__MACH__) || defined(FreeBSD) || defined(OpenBSD)
-    wmodule * control_module;
-    control_module = wm_control_read();
-    wm_add(control_module);
+    gmodule * control_module;
+    control_module = gm_control_read();
+    gm_add(control_module);
 #endif
 
     return 0;
@@ -154,23 +154,23 @@ int wm_config() {
 
 // Add module to the global list
 
-void wm_add(wmodule *module) {
-    wmodule *current;
+void gm_add(gmodule *module) {
+    gmodule *current;
 
-    if (wmodules) {
-        for (current = wmodules; current->next; current = current->next);
+    if (gmodules) {
+        for (current = gmodules; current->next; current = current->next);
         current->next = module;
     } else
-        wmodules = module;
+        gmodules = module;
 }
 
 // Check general configuration
 
-int wm_check() {
-    wmodule *i = wmodules;
-    wmodule *j;
-    wmodule *next;
-    wmodule *prev = wmodules;
+int gm_check() {
+    gmodule *i = gmodules;
+    gmodule *j;
+    gmodule *next;
+    gmodule *prev = gmodules;
 
     // Discard empty configurations
 
@@ -182,8 +182,8 @@ int wm_check() {
             next = i->next;
             free(i);
 
-            if (i == wmodules) {
-                wmodules = next;
+            if (i == gmodules) {
+                gmodules = next;
             } else {
                 prev->next = next;
             }
@@ -194,27 +194,27 @@ int wm_check() {
 
     // Check that a configuration exists
 
-    if (!wmodules) {
+    if (!gmodules) {
         return -1;
     }
 
     // Get the last module of the same type
 
 #ifndef __clang_analyzer__
-    for (i = wmodules->next; i; i = i->next) {
-        for (j = prev = wmodules; j != i; j = next) {
+    for (i = gmodules->next; i; i = i->next) {
+        for (j = prev = gmodules; j != i; j = next) {
             next = j->next;
 
             if (i->tag && j->tag && !strcmp(i->tag, j->tag)) {
 
                 mdebug1("Deleting repeated module '%s'.", j->tag);
 
-                if (j == wmodules) {
-                    wmodules = prev = next;
+                if (j == gmodules) {
+                    gmodules = prev = next;
                 } else {
                     prev->next = next;
                 }
-                wm_module_free(j);
+                gm_module_free(j);
 
             } else {
                 prev = j;
@@ -228,35 +228,35 @@ int wm_check() {
 
 // Destroy configuration data
 
-void wm_destroy() {
-    wm_free(wmodules);
+void gm_destroy() {
+    gm_free(gmodules);
 }
 
 // Load or save the running state
 
-int wm_state_io(const char * tag, int op, void *state, size_t size) {
+int gm_state_io(const char * tag, int op, void *state, size_t size) {
     char path[PATH_MAX] = { '\0' };
     size_t nmemb;
     FILE *file;
 
     #ifdef WIN32
-    snprintf(path, PATH_MAX, "%s\\%s", WM_DIR_WIN, tag);
+    snprintf(path, PATH_MAX, "%s\\%s", GM_DIR_WIN, tag);
     #else
-    snprintf(path, PATH_MAX, "%s/%s", WM_STATE_DIR, tag);
+    snprintf(path, PATH_MAX, "%s/%s", GM_STATE_DIR, tag);
     #endif
 
-    if (!(file = wfopen(path, op == WM_IO_WRITE ? "wb" : "rb"))) {
+    if (!(file = wfopen(path, op == GM_IO_WRITE ? "wb" : "rb"))) {
         return -1;
     }
     w_file_cloexec(file);
 
-    nmemb = (op == WM_IO_WRITE) ? fwrite(state, size, 1, file) : fread(state, size, 1, file);
+    nmemb = (op == GM_IO_WRITE) ? fwrite(state, size, 1, file) : fread(state, size, 1, file);
     fclose(file);
 
     return nmemb - 1;
 }
 
-char* wm_read_http_header_element(char *header, char *regex) {
+char* gm_read_http_header_element(char *header, char *regex) {
     char *element = NULL;
     OSRegex os_regex;
 
@@ -294,19 +294,19 @@ char* wm_read_http_header_element(char *header, char *regex) {
     return element;
 }
 
-void wm_free(wmodule * config) {
-    wmodule *cur_module;
-    wmodule *next_module;
+void gm_free(gmodule * config) {
+    gmodule *cur_module;
+    gmodule *next_module;
 
     for (cur_module = config; cur_module; cur_module = next_module) {
         next_module = cur_module->next;
 
-        wm_module_free(cur_module);
+        gm_module_free(cur_module);
     }
 }
 
 
-void wm_module_free(wmodule * config){
+void gm_module_free(gmodule * config){
     if (config->context && config->context->destroy)
             config->context->destroy(config->data);
 
@@ -318,22 +318,22 @@ void wm_module_free(wmodule * config){
 // Get read data
 cJSON *getModulesConfig(void) {
 
-    wmodule *cur_module;
+    gmodule *cur_module;
 
     cJSON *root = cJSON_CreateObject();
-    cJSON *wm_mod = cJSON_CreateArray();
+    cJSON *gm_mod = cJSON_CreateArray();
 
-    for (cur_module = wmodules; cur_module; cur_module = cur_module->next) {
+    for (cur_module = gmodules; cur_module; cur_module = cur_module->next) {
         if (cur_module->context->dump) {
             cJSON * item = cur_module->context->dump(cur_module->data);
 
             if (item) {
-                cJSON_AddItemToArray(wm_mod, item);
+                cJSON_AddItemToArray(gm_mod, item);
             }
         }
     }
 
-    cJSON_AddItemToObject(root,"wmodules",wm_mod);
+    cJSON_AddItemToObject(root,"wmodules",gm_mod);
 
     return root;
 }
@@ -341,16 +341,16 @@ cJSON *getModulesConfig(void) {
 // sync data
 int modulesSync(char* args, size_t length) {
     int ret = -1;
-    wmodule *cur_module = NULL;
+    gmodule *cur_module = NULL;
     int retry = 0;
 
     do {
         if (retry > 0) {
-            usleep(retry * WM_MAX_WAIT);
+            usleep(retry * GM_MAX_WAIT);
             mdebug1("WModules is not ready. Retry %d", retry);
         }
 
-        for (cur_module = wmodules; cur_module; cur_module = cur_module->next) {
+        for (cur_module = gmodules; cur_module; cur_module = cur_module->next) {
             if (strstr(args, cur_module->context->name)) {
                 ret = 0;
                 if (strstr(args, "_sync ") && cur_module->context->sync != NULL) {
@@ -362,7 +362,7 @@ int modulesSync(char* args, size_t length) {
 
         ++retry;
 
-        if (retry > WM_MAX_ATTEMPTS) {
+        if (retry > GM_MAX_ATTEMPTS) {
             break;
         }
     } while (ret != 0);
@@ -375,8 +375,8 @@ int modulesSync(char* args, size_t length) {
 
 // Find a module
 
-wmodule * wm_find_module(const char * name) {
-    for (wmodule * module = wmodules; module != NULL; module = module->next) {
+gmodule * gm_find_module(const char * name) {
+    for (gmodule * module = gmodules; module != NULL; module = module->next) {
         if (strcmp(module->context->name, name) == 0) {
             return module;
         }
@@ -387,7 +387,7 @@ wmodule * wm_find_module(const char * name) {
 
 // Run a query in a module
 
-size_t wm_module_query(char * query, char ** output) {
+size_t gm_module_query(char * query, char ** output) {
     char * module_name = query;
     char * args = strchr(query, ' ');
 
@@ -398,7 +398,7 @@ size_t wm_module_query(char * query, char ** output) {
 
     *args++ = '\0';
 
-    wmodule * module = wm_find_module(module_name);
+    gmodule * module = gm_find_module(module_name);
     if (module == NULL) {
         os_strdup("err {\"error\":2,\"message\":\"Module not found or not configured\"}", *output);
         return strlen(*output);
@@ -414,7 +414,7 @@ size_t wm_module_query(char * query, char ** output) {
 
 // Query module with JSON format
 // Internal implementation that accepts module_name directly
-static size_t wm_module_query_json_internal(const char* module_name, const char* json_command, char** output) {
+static size_t gm_module_query_json_internal(const char* module_name, const char* json_command, char** output) {
     cJSON *json_obj = NULL;
     cJSON *command_item = NULL;
     char error_msg[512];
@@ -443,7 +443,7 @@ static size_t wm_module_query_json_internal(const char* module_name, const char*
     }
 
     // Find the module
-    wmodule * module = wm_find_module(module_name);
+    gmodule * module = gm_find_module(module_name);
     if (module == NULL) {
         cJSON_Delete(json_obj);
         snprintf(error_msg, sizeof(error_msg), "{\"error\":%d,\"message\":\"%s\"}",
@@ -473,12 +473,12 @@ static size_t wm_module_query_json_internal(const char* module_name, const char*
 }
 
 // New external interface that accepts module_name as parameter
-size_t wm_module_query_json_ex(const char* module_name, const char* json_command, char** output) {
-    return wm_module_query_json_internal(module_name, json_command, output);
+size_t gm_module_query_json_ex(const char* module_name, const char* json_command, char** output) {
+    return gm_module_query_json_internal(module_name, json_command, output);
 }
 
 // Query FIM module directly via syscom socket with JSON format
-size_t wm_fim_query_json(const char* command, char** response) {
+size_t gm_fim_query_json(const char* command, char** response) {
     char error_msg[512];
 
     if (!command || !response) {
@@ -580,10 +580,10 @@ cJSON *getModulesInternalOptions(void) {
     cJSON *root = cJSON_CreateObject();
     cJSON *internals = cJSON_CreateObject();
 
-    cJSON_AddNumberToObject(internals,"guardsarm_modules.task_nice",wm_task_nice);
-    cJSON_AddNumberToObject(internals,"guardsarm_modules.max_eps",wm_max_eps);
-    cJSON_AddNumberToObject(internals,"guardsarm_modules.kill_timeout",wm_kill_timeout);
-    cJSON_AddNumberToObject(internals,"guardsarm_modules.debug",wm_debug_level);
+    cJSON_AddNumberToObject(internals,"guardsarm_modules.task_nice",gm_task_nice);
+    cJSON_AddNumberToObject(internals,"guardsarm_modules.max_eps",gm_max_eps);
+    cJSON_AddNumberToObject(internals,"guardsarm_modules.kill_timeout",gm_kill_timeout);
+    cJSON_AddNumberToObject(internals,"guardsarm_modules.debug",gm_debug_level);
 
     cJSON_AddItemToObject(root,"internal_options",internals);
 
@@ -591,7 +591,7 @@ cJSON *getModulesInternalOptions(void) {
 }
 
 // Send message to a queue waiting for a specific delay
-int wm_sendmsg(int usec, int queue, const char *message, const char *locmsg, char loc) {
+int gm_sendmsg(int usec, int queue, const char *message, const char *locmsg, char loc) {
 
 #ifdef WIN32
     int msec = usec / 1000;
@@ -610,7 +610,7 @@ int wm_sendmsg(int usec, int queue, const char *message, const char *locmsg, cha
 }
 
 // Send message to a queue waiting for a specific delay
-int wm_sendmsg_ex(int usec, int queue, const char *message, const char *locmsg, char loc, bool (*fn_prd)()) {
+int gm_sendmsg_ex(int usec, int queue, const char *message, const char *locmsg, char loc, bool (*fn_prd)()) {
 
 #ifdef WIN32
     int msec = usec / 1000;
@@ -634,7 +634,7 @@ int wm_sendmsg_ex(int usec, int queue, const char *message, const char *locmsg, 
      1 if the binary matches with the specified digest, 0 if not.
     -1 invalid parameters.
 */
-int wm_validate_command(const char *command, const char *digest, crypto_type ctype) {
+int gm_validate_command(const char *command, const char *digest, crypto_type ctype) {
 
     os_md5 md5_binary;
     os_sha1 sha1_binary;
@@ -680,14 +680,14 @@ int wm_validate_command(const char *command, const char *digest, crypto_type cty
     return match;
 }
 
-static int wm_initialize_default_modules(wmodule **wmodules) {
-    wmodule *cur_wmodule = *wmodules;
+static int gm_initialize_default_modules(gmodule **gmodules) {
+    gmodule *cur_wmodule = *gmodules;
     int i=0;
     while (default_modules[i]) {
         if(!cur_wmodule) {
-            *wmodules = cur_wmodule = calloc(1, sizeof(wmodule));
+            *gmodules = cur_wmodule = calloc(1, sizeof(gmodule));
         } else {
-            os_calloc(1, sizeof(wmodule), cur_wmodule->next);
+            os_calloc(1, sizeof(gmodule), cur_wmodule->next);
             cur_wmodule = cur_wmodule->next;
             if (!cur_wmodule) {
                 merror(MEM_ERROR, errno, strerror(errno));
@@ -695,7 +695,7 @@ static int wm_initialize_default_modules(wmodule **wmodules) {
             }
         }
         // Point to read function
-        int (*function_ptr)(const OS_XML *xml, xml_node **nodes, wmodule *module) = default_modules[i];
+        int (*function_ptr)(const OS_XML *xml, xml_node **nodes, gmodule *module) = default_modules[i];
 
         if(function_ptr(NULL, NULL, cur_wmodule) == OS_INVALID) {
             return OS_INVALID;

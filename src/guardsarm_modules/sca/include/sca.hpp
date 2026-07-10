@@ -57,7 +57,7 @@ class EXPORTED SCA final
         ///
         /// @param sca_config Pointer to the SCA configuration structure containing
         ///                   scan settings, policies, and other module parameters
-        void setup(const struct wm_sca_t* sca_config);
+        void setup(const struct gm_sca_t* sca_config);
 
         /// @brief Starts the SCA module execution.
         ///

@@ -38,33 +38,33 @@ static int get_max_queued_events();
 static int set_max_queued_events(int size);
 
 // Setup inotify reader
-static void wm_inotify_setup(wm_database * data);
+static void gm_inotify_setup(gm_database * data);
 
 // Real time inotify reader thread
-static void * wm_inotify_start(void * args);
+static void * gm_inotify_start(void * args);
 
 // Insert request into internal structure
-void wm_inotify_push(const char * dirname, const char * fname);
+void gm_inotify_push(const char * dirname, const char * fname);
 
 // Extract enqueued path from internal structure
-char * wm_inotify_pop();
+char * gm_inotify_pop();
 
 #endif // INOTIFY_ENABLED
 
-wm_database *module;
+gm_database *module;
 int is_worker;
 int wdb_wmdb_sock = -1;
 
 // Module main function. It won't return
-static void* wm_database_main(wm_database *data);
+static void* gm_database_main(gm_database *data);
 // Stop module
-static void wm_database_stop(wm_database *data);
+static void gm_database_stop(gm_database *data);
 // Destroy data
-static void wm_database_destroy(wm_database *data);
+static void gm_database_destroy(gm_database *data);
 // Read config
-cJSON *wm_database_dump(const wm_database *data);
+cJSON *gm_database_dump(const gm_database *data);
 
-static void wm_check_agents();
+static void gm_check_agents();
 
 /**
  * @brief Method to synchronize 'client.keys' and 'global.db'. All new agents found
@@ -73,27 +73,27 @@ static void wm_check_agents();
  *        This method will also create and remove the agents artifacts according to
  *        the action taken in the database with the agent.
  */
-static void wm_sync_agents();
+static void gm_sync_agents();
 
-static int wm_sync_shared_group(const char *fname);
-static int wm_sync_file(const char *dirname, const char *path);
+static int gm_sync_shared_group(const char *fname);
+static int gm_sync_file(const char *dirname, const char *path);
 
 // Database module context definition
-const wm_context WM_DATABASE_CONTEXT = {
+const gm_context GM_DATABASE_CONTEXT = {
     .name = "database",
-    .start = (wm_routine)wm_database_main,
-    .destroy = (void(*)(void *))wm_database_destroy,
-    .dump = (cJSON * (*)(const void *))wm_database_dump,
+    .start = (gm_routine)gm_database_main,
+    .destroy = (void(*)(void *))gm_database_destroy,
+    .dump = (cJSON * (*)(const void *))gm_database_dump,
     .sync = NULL,
-    .stop = (void(*)(void *))wm_database_stop,
+    .stop = (void(*)(void *))gm_database_stop,
     .query = NULL,
 };
 
 // Module main function. It won't return
-void* wm_database_main(wm_database *data) {
+void* gm_database_main(gm_database *data) {
     module = data;
 
-    mtinfo(WM_DATABASE_LOGTAG, STARTUP_MSG, (int)getpid());
+    mtinfo(GM_DATABASE_LOGTAG, STARTUP_MSG, (int)getpid());
 
     // Check if it is a worker node
     is_worker = w_is_worker();
@@ -105,9 +105,9 @@ void* wm_database_main(wm_database *data) {
     // in the master.
 
     // Wait for inventory_sync to subscribe to router before sending deletion messages
-    wm_sleep_interruptible(5);
-    if (wm_shutdown_requested) return NULL;
-    wm_sync_agents();
+    gm_sleep_interruptible(5);
+    if (gm_shutdown_requested) return NULL;
+    gm_sync_agents();
 
     // Groups synchronization with the database
     wdb_update_groups(SHAREDCFG_DIR, &wdb_wmdb_sock);
@@ -117,25 +117,25 @@ void* wm_database_main(wm_database *data) {
         char * path;
         char * file;
 
-        wm_inotify_setup(data);
+        gm_inotify_setup(data);
 
-        while (!wm_shutdown_requested) {
-            path = wm_inotify_pop();
+        while (!gm_shutdown_requested) {
+            path = gm_inotify_pop();
 
             if (!path) break;
 
             if (!strcmp(path, KEYS_FILE)) {
                 // The syncronization with client.keys only happens in worker nodes
                 if (is_worker) {
-                    wm_sync_agents();
+                    gm_sync_agents();
                 }
             }
             else {
                 if (file = strrchr(path, '/'), file) {
                     *(file++) = '\0';
-                    wm_sync_file(path, file);
+                    gm_sync_file(path, file);
                 } else {
-                    mterror(WM_DATABASE_LOGTAG, "Couldn't extract file name from '%s'", path);
+                    mterror(GM_DATABASE_LOGTAG, "Couldn't extract file name from '%s'", path);
                 }
             }
 
@@ -153,26 +153,26 @@ void* wm_database_main(wm_database *data) {
         struct timespec spec1;
 
         // Initial wait
-        wm_sleep_interruptible(data->interval);
+        gm_sleep_interruptible(data->interval);
 
-        while (!wm_shutdown_requested) {
+        while (!gm_shutdown_requested) {
             tstart = (long long) time(NULL);
             cstart = clock();
             gettime(&spec0);
 
             if (data->sync_agents) {
-                wm_check_agents();
+                gm_check_agents();
                 wdb_update_groups(SHAREDCFG_DIR, &wdb_wmdb_sock);
             }
 
             gettime(&spec1);
             time_sub(&spec1, &spec0);
-            mtdebug1(WM_DATABASE_LOGTAG, "Cycle completed: %.3lf ms (%.3f clock ms).", spec1.tv_sec * 1000 + spec1.tv_nsec / 1000000.0, (double)(clock() - cstart) / CLOCKS_PER_SEC * 1000);
+            mtdebug1(GM_DATABASE_LOGTAG, "Cycle completed: %.3lf ms (%.3f clock ms).", spec1.tv_sec * 1000 + spec1.tv_nsec / 1000000.0, (double)(clock() - cstart) / CLOCKS_PER_SEC * 1000);
 
             if (tsleep = tstart + (long long) data->interval - (long long) time(NULL), tsleep >= 0) {
-                wm_sleep_interruptible((int)tsleep);
+                gm_sleep_interruptible((int)tsleep);
             } else {
-                mtwarn(WM_DATABASE_LOGTAG, "Time interval exceeded by %lld seconds.", -tsleep);
+                mtwarn(GM_DATABASE_LOGTAG, "Time interval exceeded by %lld seconds.", -tsleep);
             }
         }
 #ifdef INOTIFY_ENABLED
@@ -182,18 +182,18 @@ void* wm_database_main(wm_database *data) {
     return NULL;
 }
 
-void wm_check_agents() {
+void gm_check_agents() {
     static time_t timestamp = 0;
     static ino_t inode = 0;
     struct stat buffer;
 
     if (w_stat(KEYS_FILE, &buffer) < 0) {
-        mterror(WM_DATABASE_LOGTAG, "Couldn't get client.keys stat: %s.", strerror(errno));
+        mterror(GM_DATABASE_LOGTAG, "Couldn't get client.keys stat: %s.", strerror(errno));
     } else {
         if (buffer.st_mtime != timestamp || buffer.st_ino != inode) {
             /* Synchronize */
             if (is_worker) {
-                wm_sync_agents();
+                gm_sync_agents();
             }
             timestamp = buffer.st_mtime;
             inode = buffer.st_ino;
@@ -202,7 +202,7 @@ void wm_check_agents() {
 }
 
 // Synchronize agents
-void wm_sync_agents() {
+void gm_sync_agents() {
     keystore keys = KEYSTORE_INITIALIZER;
     clock_t clock0 = clock();
     struct timespec spec0;
@@ -210,17 +210,17 @@ void wm_sync_agents() {
 
     gettime(&spec0);
 
-    mtdebug1(WM_DATABASE_LOGTAG, "Synchronizing agents.");
+    mtdebug1(GM_DATABASE_LOGTAG, "Synchronizing agents.");
     OS_PassEmptyKeyfile();
     OS_ReadKeys(&keys, W_RAW_KEY, 0);
 
     sync_keys_with_wdb(&keys);
 
     OS_FreeKeys(&keys);
-    mtdebug1(WM_DATABASE_LOGTAG, "Agents synchronization completed.");
+    mtdebug1(GM_DATABASE_LOGTAG, "Agents synchronization completed.");
     gettime(&spec1);
     time_sub(&spec1, &spec0);
-    mtdebug1(WM_DATABASE_LOGTAG, "wm_sync_agents(): %.3f ms (%.3f clock ms).", spec1.tv_sec * 1000 + spec1.tv_nsec / 1000000.0, (double)(clock() - clock0) / CLOCKS_PER_SEC * 1000);
+    mtdebug1(GM_DATABASE_LOGTAG, "wm_sync_agents(): %.3f ms (%.3f clock ms).", spec1.tv_sec * 1000 + spec1.tv_nsec / 1000000.0, (double)(clock() - clock0) / CLOCKS_PER_SEC * 1000);
 }
 
 static router_provider_create_func router_provider_create_ptr = NULL;
@@ -238,12 +238,12 @@ static bool initialize_router_functions(void) {
         router_provider_create_ptr = so_get_function_sym(router_module, "router_provider_create");
         router_provider_send_ptr = so_get_function_sym(router_module, "router_provider_send");
     } else {
-        mtdebug2(WM_DATABASE_LOGTAG, "Unable to load router module.");
+        mtdebug2(GM_DATABASE_LOGTAG, "Unable to load router module.");
         return false;
     }
 
     if (!router_provider_create_ptr || !router_provider_send_ptr) {
-        mtdebug2(WM_DATABASE_LOGTAG, "Unable to load router provider functions.");
+        mtdebug2(GM_DATABASE_LOGTAG, "Unable to load router provider functions.");
         return false;
     }
 
@@ -275,7 +275,7 @@ static void send_agent_delete_to_inventory_sync(const char *agent_id) {
     if (!router_inventory_handle) {
         router_inventory_handle = router_provider_create_ptr("inventory-states", false);
         if (!router_inventory_handle) {
-            mtdebug2(WM_DATABASE_LOGTAG, "Router not available for inventory-states topic, skipping agent deletion notification");
+            mtdebug2(GM_DATABASE_LOGTAG, "Router not available for inventory-states topic, skipping agent deletion notification");
             return;
         }
     }
@@ -283,7 +283,7 @@ static void send_agent_delete_to_inventory_sync(const char *agent_id) {
     // Build JSON message: {"command": "delete_agent", "agent_id": "001"}
     cJSON *json_msg = cJSON_CreateObject();
     if (!json_msg) {
-        mterror(WM_DATABASE_LOGTAG, "Failed to create JSON message for agent deletion");
+        mterror(GM_DATABASE_LOGTAG, "Failed to create JSON message for agent deletion");
         return;
     }
 
@@ -294,16 +294,16 @@ static void send_agent_delete_to_inventory_sync(const char *agent_id) {
     cJSON_Delete(json_msg);
 
     if (!json_str) {
-        mterror(WM_DATABASE_LOGTAG, "Failed to serialize JSON message for agent deletion");
+        mterror(GM_DATABASE_LOGTAG, "Failed to serialize JSON message for agent deletion");
         return;
     }
 
     // Send message to router
     int result = router_provider_send_ptr(router_inventory_handle, json_str, strlen(json_str) + 1);
     if (result != 0) {
-        mtdebug1(WM_DATABASE_LOGTAG, "Failed to send agent deletion message for agent '%s' to inventory-sync", agent_id);
+        mtdebug1(GM_DATABASE_LOGTAG, "Failed to send agent deletion message for agent '%s' to inventory-sync", agent_id);
     } else {
-        mtinfo(WM_DATABASE_LOGTAG, "Sent agent deletion request for agent '%s' to inventory-sync", agent_id);
+        mtinfo(GM_DATABASE_LOGTAG, "Sent agent deletion request for agent '%s' to inventory-sync", agent_id);
     }
 
     cJSON_free(json_str);
@@ -326,7 +326,7 @@ void sync_keys_with_wdb(keystore *keys) {
     agents = wdb_get_all_agents_rbtree(&wdb_wmdb_sock);
 
     if (agents == NULL) {
-        mterror(WM_DATABASE_LOGTAG, "Couldn't synchronize the keystore with the DB.");
+        mterror(GM_DATABASE_LOGTAG, "Couldn't synchronize the keystore with the DB.");
         return;
     }
 
@@ -338,11 +338,11 @@ void sync_keys_with_wdb(keystore *keys) {
         if (agent_id && (rbtree_get(agents, entry->id) == NULL)) {
             char agent_cidr[IPSIZE + 1];
 
-            mtdebug2(WM_DATABASE_LOGTAG, "Synchronizing agent %s '%s'.", entry->id, entry->name);
+            mtdebug2(GM_DATABASE_LOGTAG, "Synchronizing agent %s '%s'.", entry->id, entry->name);
 
             if (wdb_insert_agent(agent_id, entry->name, NULL, OS_CIDRtoStr(entry->ip, agent_cidr, IPSIZE) ?
                                 entry->ip->ip : agent_cidr, entry->raw_key, NULL, 1, &wdb_wmdb_sock)) {
-                mtdebug1(WM_DATABASE_LOGTAG, "Couldn't insert agent '%s' in the database.", entry->id);
+                mtdebug1(GM_DATABASE_LOGTAG, "Couldn't insert agent '%s' in the database.", entry->id);
             }
         }
     }
@@ -357,7 +357,7 @@ void sync_keys_with_wdb(keystore *keys) {
             char *agent_name = wdb_get_agent_name(agent_id, &wdb_wmdb_sock);
 
             if (wdb_remove_agent(agent_id, &wdb_wmdb_sock) < 0) {
-                mtdebug1(WM_DATABASE_LOGTAG, "Couldn't remove agent '%s' from the database.", ids[i]);
+                mtdebug1(GM_DATABASE_LOGTAG, "Couldn't remove agent '%s' from the database.", ids[i]);
                 os_free(agent_name);
                 continue;
             }
@@ -380,7 +380,7 @@ void sync_keys_with_wdb(keystore *keys) {
     rbtree_destroy(agents);
 }
 
-int wm_sync_shared_group(const char *fname) {
+int gm_sync_shared_group(const char *fname) {
     char path[PATH_MAX];
     DIR *dp = NULL;
     clock_t clock0 = clock();
@@ -399,26 +399,26 @@ int wm_sync_shared_group(const char *fname) {
         closedir(dp);
     }
 
-    mtdebug2(WM_DATABASE_LOGTAG, "wm_sync_shared_group(): %.3f ms.", (double)(clock() - clock0) / CLOCKS_PER_SEC * 1000);
+    mtdebug2(GM_DATABASE_LOGTAG, "wm_sync_shared_group(): %.3f ms.", (double)(clock() - clock0) / CLOCKS_PER_SEC * 1000);
 
     return OS_SUCCESS;
 }
 
-int wm_sync_file(const char *dirname, const char *fname) {
+int gm_sync_file(const char *dirname, const char *fname) {
     char path[PATH_MAX] = "";
     int result = OS_INVALID;
 
-    mtdebug2(WM_DATABASE_LOGTAG, "Synchronizing file '%s/%s'", dirname, fname);
+    mtdebug2(GM_DATABASE_LOGTAG, "Synchronizing file '%s/%s'", dirname, fname);
 
     if (snprintf(path, PATH_MAX, "%s/%s", dirname, fname) >= PATH_MAX) {
-        mterror(WM_DATABASE_LOGTAG, "At wm_sync_file(): Path '%s/%s' exceeded length limit.", dirname, fname);
+        mterror(GM_DATABASE_LOGTAG, "At wm_sync_file(): Path '%s/%s' exceeded length limit.", dirname, fname);
         return result;
     }
 
     if (!strcmp(dirname, SHAREDCFG_DIR)) {
-        result = wm_sync_shared_group(fname);
+        result = gm_sync_shared_group(fname);
     } else {
-        mterror(WM_DATABASE_LOGTAG, "Directory name '%s' not recognized.", dirname);
+        mterror(GM_DATABASE_LOGTAG, "Directory name '%s' not recognized.", dirname);
         return result;
     }
 
@@ -427,27 +427,27 @@ int wm_sync_file(const char *dirname, const char *fname) {
 
 // Get read data
 
-cJSON *wm_database_dump(const wm_database *data) {
+cJSON *gm_database_dump(const gm_database *data) {
 
     cJSON *root = cJSON_CreateObject();
-    cJSON *wm_db = cJSON_CreateObject();
+    cJSON *gm_db = cJSON_CreateObject();
 
-    if (data->sync_agents) cJSON_AddStringToObject(wm_db,"sync_agents","yes"); else cJSON_AddStringToObject(wm_db,"sync_agents","no");
-    if (data->real_time) cJSON_AddStringToObject(wm_db,"real_time","yes"); else cJSON_AddStringToObject(wm_db,"real_time","no");
-    cJSON_AddNumberToObject(wm_db,"interval",data->interval);
-    cJSON_AddNumberToObject(wm_db,"max_queued_events",data->max_queued_events);
+    if (data->sync_agents) cJSON_AddStringToObject(gm_db,"sync_agents","yes"); else cJSON_AddStringToObject(gm_db,"sync_agents","no");
+    if (data->real_time) cJSON_AddStringToObject(gm_db,"real_time","yes"); else cJSON_AddStringToObject(gm_db,"real_time","no");
+    cJSON_AddNumberToObject(gm_db,"interval",data->interval);
+    cJSON_AddNumberToObject(gm_db,"max_queued_events",data->max_queued_events);
 
-    cJSON_AddItemToObject(root,"database",wm_db);
+    cJSON_AddItemToObject(root,"database",gm_db);
 
     return root;
 }
 
 // Destroy data
-void wm_database_destroy(wm_database *data) {
+void gm_database_destroy(gm_database *data) {
     free(data);
 }
 
-static void wm_database_stop(wm_database *data) {
+static void gm_database_stop(gm_database *data) {
     (void)data;
 #ifdef INOTIFY_ENABLED
     w_mutex_lock(&mutex_queue);
@@ -457,9 +457,9 @@ static void wm_database_stop(wm_database *data) {
 }
 
 // Read configuration and return a module (if enabled) or NULL (if disabled)
-wmodule* wm_database_read() {
-    wm_database data;
-    wmodule *module = NULL;
+gmodule* gm_database_read() {
+    gm_database data;
+    gmodule *module = NULL;
 
 #ifdef CLIENT
     data.sync_agents = getDefine_Int("guardsarm_database", "sync_agents", 0, 1);
@@ -474,10 +474,10 @@ wmodule* wm_database_read() {
 #endif
 
     if (data.sync_agents) {
-        os_calloc(1, sizeof(wmodule), module);
-        os_calloc(1, sizeof(wm_database), module->data);
-        module->context = &WM_DATABASE_CONTEXT;
-        memcpy(module->data, &data, sizeof(wm_database));
+        os_calloc(1, sizeof(gmodule), module);
+        os_calloc(1, sizeof(gm_database), module->data);
+        module->context = &GM_DATABASE_CONTEXT;
+        memcpy(module->data, &data, sizeof(gm_database));
         module->tag = strdup(module->context->name);
     }
 
@@ -493,7 +493,7 @@ int get_max_queued_events() {
     FILE *fp;
 
     if (!(fp = wfopen(MAX_QUEUED_EVENTS_PATH, "r"))) {
-        mterror(WM_DATABASE_LOGTAG, FOPEN_ERROR, MAX_QUEUED_EVENTS_PATH, errno, strerror(errno));
+        mterror(GM_DATABASE_LOGTAG, FOPEN_ERROR, MAX_QUEUED_EVENTS_PATH, errno, strerror(errno));
         return -1;
     }
 
@@ -512,7 +512,7 @@ int set_max_queued_events(int size) {
     FILE *fp;
 
     if (!(fp = wfopen(MAX_QUEUED_EVENTS_PATH, "w"))) {
-        mterror(WM_DATABASE_LOGTAG, FOPEN_ERROR, MAX_QUEUED_EVENTS_PATH, errno, strerror(errno));
+        mterror(GM_DATABASE_LOGTAG, FOPEN_ERROR, MAX_QUEUED_EVENTS_PATH, errno, strerror(errno));
         return -1;
     }
 
@@ -522,7 +522,7 @@ int set_max_queued_events(int size) {
 }
 
 // Setup inotify reader
-void wm_inotify_setup(wm_database * data) {
+void gm_inotify_setup(gm_database * data) {
     int old_max_queued_events = -1;
 
     if (ptable = OSHash_Create(), !ptable) {
@@ -537,7 +537,7 @@ void wm_inotify_setup(wm_database * data) {
         old_max_queued_events = get_max_queued_events();
 
         if (old_max_queued_events >= 0 && old_max_queued_events != data->max_queued_events) {
-            mtdebug1(WM_DATABASE_LOGTAG, "Setting inotify queued events limit to '%d'", data->max_queued_events);
+            mtdebug1(GM_DATABASE_LOGTAG, "Setting inotify queued events limit to '%d'", data->max_queued_events);
 
             if (set_max_queued_events(data->max_queued_events) < 0) {
                 // Error: do not reset then
@@ -548,17 +548,17 @@ void wm_inotify_setup(wm_database * data) {
 
     // Start inotify
     if (inotify_fd = inotify_init1(IN_CLOEXEC), inotify_fd < 0) {
-        mterror_exit(WM_DATABASE_LOGTAG, "Couldn't init inotify: %s.", strerror(errno));
+        mterror_exit(GM_DATABASE_LOGTAG, "Couldn't init inotify: %s.", strerror(errno));
     }
 
     // Reset inotify queued events limit
     if (old_max_queued_events >= 0 && old_max_queued_events != data->max_queued_events) {
-        mtdebug2(WM_DATABASE_LOGTAG, "Restoring inotify queued events limit to '%d'", old_max_queued_events);
+        mtdebug2(GM_DATABASE_LOGTAG, "Restoring inotify queued events limit to '%d'", old_max_queued_events);
         set_max_queued_events(old_max_queued_events);
     }
 
     // Run thread
-    w_create_thread(wm_inotify_start, NULL);
+    w_create_thread(gm_inotify_start, NULL);
 
     // First synchronization and add watch for client.keys, Syscheck and Rootcheck directories
     char keysfile_path[PATH_MAX] = KEYS_FILE;
@@ -566,21 +566,21 @@ void wm_inotify_setup(wm_database * data) {
 
     if (data->sync_agents) {
         if ((wd_agents = inotify_add_watch(inotify_fd, keysfile_dir, IN_CLOSE_WRITE | IN_MOVED_TO)) < 0) {
-            mterror(WM_DATABASE_LOGTAG, "Couldn't watch client.keys file: %s.", strerror(errno));
+            mterror(GM_DATABASE_LOGTAG, "Couldn't watch client.keys file: %s.", strerror(errno));
         }
 
-        mtdebug2(WM_DATABASE_LOGTAG, "wd_agents='%d'", wd_agents);
+        mtdebug2(GM_DATABASE_LOGTAG, "wd_agents='%d'", wd_agents);
 
         if ((wd_shared_groups = inotify_add_watch(inotify_fd, SHAREDCFG_DIR, IN_CLOSE_WRITE | IN_MOVED_TO | IN_MOVED_FROM | IN_CREATE | IN_DELETE)) < 0) {
-            mterror(WM_DATABASE_LOGTAG, "Couldn't watch the shared groups directory: %s.", strerror(errno));
+            mterror(GM_DATABASE_LOGTAG, "Couldn't watch the shared groups directory: %s.", strerror(errno));
         }
 
-        mtdebug2(WM_DATABASE_LOGTAG, "wd_shared_groups='%d'", wd_shared_groups);
+        mtdebug2(GM_DATABASE_LOGTAG, "wd_shared_groups='%d'", wd_shared_groups);
     }
 }
 
 // Real time inotify reader thread
-static void * wm_inotify_start(__attribute__((unused)) void * args) {
+static void * gm_inotify_start(__attribute__((unused)) void * args) {
     char buffer[IN_BUFFER_SIZE];
     char keysfile_dir[PATH_MAX] = KEYS_FILE;
     char * keysfile;
@@ -589,7 +589,7 @@ static void * wm_inotify_start(__attribute__((unused)) void * args) {
     size_t i;
 
     if (!(keysfile = strrchr(keysfile_dir, '/'))) {
-        mterror_exit(WM_DATABASE_LOGTAG, "Couldn't decode keys file path '%s'.", keysfile_dir);
+        mterror_exit(GM_DATABASE_LOGTAG, "Couldn't decode keys file path '%s'.", keysfile_dir);
     }
 
     *(keysfile++) = '\0';
@@ -597,12 +597,12 @@ static void * wm_inotify_start(__attribute__((unused)) void * args) {
     while (1) {
         // Wait for changes
 
-        mtdebug1(WM_DATABASE_LOGTAG, "Waiting for event notification...");
+        mtdebug1(GM_DATABASE_LOGTAG, "Waiting for event notification...");
 
         do {
             if (count = read(inotify_fd, buffer, IN_BUFFER_SIZE), count < 0) {
                 if (errno != EAGAIN)
-                    mterror(WM_DATABASE_LOGTAG, "read(): %s.", strerror(errno));
+                    mterror(GM_DATABASE_LOGTAG, "read(): %s.", strerror(errno));
 
                 break;
             }
@@ -613,10 +613,10 @@ static void * wm_inotify_start(__attribute__((unused)) void * args) {
                 char * dirname = NULL;
                 char path[PATH_MAX + 1] = {0};
                 event = (struct inotify_event*)&buffer[i];
-                mtdebug2(WM_DATABASE_LOGTAG, "inotify: i='%zu', name='%s', mask='%u', wd='%d'", i, event->name, event->mask, event->wd);
+                mtdebug2(GM_DATABASE_LOGTAG, "inotify: i='%zu', name='%s', mask='%u', wd='%d'", i, event->name, event->mask, event->wd);
 
                 if (event->len > IN_BUFFER_SIZE) {
-                    mterror(WM_DATABASE_LOGTAG, "Inotify event too large (%u)", event->len);
+                    mterror(GM_DATABASE_LOGTAG, "Inotify event too large (%u)", event->len);
                     break;
                 }
 
@@ -629,21 +629,21 @@ static void * wm_inotify_start(__attribute__((unused)) void * args) {
                 } else if (event->wd == wd_shared_groups) {
                     dirname = SHAREDCFG_DIR;
                 } else if (event->wd == -1 && event->mask == IN_Q_OVERFLOW) {
-                    mterror(WM_DATABASE_LOGTAG, "Inotify event queue overflowed.");
+                    mterror(GM_DATABASE_LOGTAG, "Inotify event queue overflowed.");
                     continue;
                 } else {
-                    mterror(WM_DATABASE_LOGTAG, "Unknown watch descriptor '%d', mask='%u'.", event->wd, event->mask);
+                    mterror(GM_DATABASE_LOGTAG, "Unknown watch descriptor '%d', mask='%u'.", event->wd, event->mask);
                     continue;
                 }
 
                 snprintf(path, PATH_MAX, "%s/%s", dirname, event->name);
 
                 if (event->name[0] == '.' && IsDir(path)) {
-                    mtdebug2(WM_DATABASE_LOGTAG, "Discarding hidden file.");
+                    mtdebug2(GM_DATABASE_LOGTAG, "Discarding hidden file.");
                     continue;
                 }
 
-                wm_inotify_push(dirname, event->name);
+                gm_inotify_push(dirname, event->name);
             }
         } while (count > 0);
     }
@@ -652,37 +652,37 @@ static void * wm_inotify_start(__attribute__((unused)) void * args) {
 }
 
 // Insert request into internal structure
-void wm_inotify_push(const char * dirname, const char * fname) {
+void gm_inotify_push(const char * dirname, const char * fname) {
     char path[PATH_MAX + 1];
     char * dup;
 
     if (snprintf(path, sizeof(path), "%s/%s", dirname, fname) >= (int)sizeof(path)) {
-        mterror(WM_DATABASE_LOGTAG, "At wm_inotify_push(): Path too long: '%s'/'%s'", dirname, fname);
+        mterror(GM_DATABASE_LOGTAG, "At wm_inotify_push(): Path too long: '%s'/'%s'", dirname, fname);
         return;
     }
 
     w_mutex_lock(&mutex_queue);
 
     if (queue_full(queue)) {
-        mterror(WM_DATABASE_LOGTAG, "Internal queue is full (%zu).", queue->size);
+        mterror(GM_DATABASE_LOGTAG, "Internal queue is full (%zu).", queue->size);
         goto end;
     }
 
     switch (OSHash_Add(ptable, path, (void *)1)) {
     case 0:
-        mterror(WM_DATABASE_LOGTAG, "Couldn't insert key into table.");
+        mterror(GM_DATABASE_LOGTAG, "Couldn't insert key into table.");
         break;
 
     case 1:
-        mtdebug2(WM_DATABASE_LOGTAG, "Adding '%s': file already exists at path table.", path);
+        mtdebug2(GM_DATABASE_LOGTAG, "Adding '%s': file already exists at path table.", path);
         break;
 
     case 2:
         os_strdup(path, dup);
-        mtdebug2(WM_DATABASE_LOGTAG, "Adding '%s' to path table.", path);
+        mtdebug2(GM_DATABASE_LOGTAG, "Adding '%s' to path table.", path);
 
         if (queue_push(queue, dup) < 0) {
-            mterror(WM_DATABASE_LOGTAG, "Couldn't insert key into queue.");
+            mterror(GM_DATABASE_LOGTAG, "Couldn't insert key into queue.");
             free(dup);
         }
 
@@ -694,16 +694,16 @@ end:
 }
 
 // Extract enqueued path from internal structure
-char * wm_inotify_pop() {
+char * gm_inotify_pop() {
     char * path;
 
     w_mutex_lock(&mutex_queue);
 
-    while (queue_empty(queue) && !wm_shutdown_requested) {
+    while (queue_empty(queue) && !gm_shutdown_requested) {
         w_cond_wait(&cond_pending, &mutex_queue);
     }
 
-    if (wm_shutdown_requested) {
+    if (gm_shutdown_requested) {
         w_mutex_unlock(&mutex_queue);
         return NULL;
     }
@@ -711,11 +711,11 @@ char * wm_inotify_pop() {
     path = queue_pop(queue);
 
     if (!OSHash_Delete(ptable, path)) {
-        mterror(WM_DATABASE_LOGTAG, "Couldn't delete key '%s' from path table.", path);
+        mterror(GM_DATABASE_LOGTAG, "Couldn't delete key '%s' from path table.", path);
     }
 
     w_mutex_unlock(&mutex_queue);
-    mtdebug2(WM_DATABASE_LOGTAG, "Taking '%s' from path table.", path);
+    mtdebug2(GM_DATABASE_LOGTAG, "Taking '%s' from path table.", path);
     return path;
 }
 

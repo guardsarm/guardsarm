@@ -21,15 +21,15 @@ static size_t echo(void * module, char * query, char ** output) {
 }
 
 static int setup_modules(void ** state) {
-    static wm_context CONTEXTS[] = {
+    static gm_context CONTEXTS[] = {
         { .name = "A", .query = echo },
         { .name = "B", .query = NULL },
     };
 
-    wmodules = calloc(1, sizeof(wmodule));
-    wmodules->context = &CONTEXTS[0];
-    wmodules->next = calloc(1, sizeof(wmodule));
-    wmodules->next->context = &CONTEXTS[1];
+    gmodules = calloc(1, sizeof(gmodule));
+    gmodules->context = &CONTEXTS[0];
+    gmodules->next = calloc(1, sizeof(gmodule));
+    gmodules->next->context = &CONTEXTS[1];
 
     *state = NULL;
     return 0;
@@ -37,8 +37,8 @@ static int setup_modules(void ** state) {
 
 static int teardown_modules(void ** state) {
     free(*state);
-    free(wmodules->next);
-    free(wmodules);
+    free(gmodules->next);
+    free(gmodules);
 
     return 0;
 }
@@ -46,12 +46,12 @@ static int teardown_modules(void ** state) {
 static void test_find_module_found(void ** state) {
     (void)state;
 
-    wmodule * m = wm_find_module("A");
+    gmodule * m = gm_find_module("A");
 
     assert_non_null(m);
     assert_string_equal(m->context->name, "A");
 
-    m = wm_find_module("B");
+    m = gm_find_module("B");
 
     assert_non_null(m);
     assert_string_equal(m->context->name, "B");
@@ -60,7 +60,7 @@ static void test_find_module_found(void ** state) {
 static void test_find_module_not_found(void ** state) {
     (void)state;
 
-    wmodule * m = wm_find_module("C");
+    gmodule * m = gm_find_module("C");
 
     assert_null(m);
 }
@@ -69,7 +69,7 @@ static void test_module_query_no_args(void ** state) {
     char input[] = "none";
     const char EXPECTED_OUTPUT[] = "err {\"error\":1,\"message\":\"Module query needs arguments\"}";
 
-    size_t n = wm_module_query(input, (char **)state);
+    size_t n = gm_module_query(input, (char **)state);
 
     assert_string_equal(*state, EXPECTED_OUTPUT);
     assert_int_equal(n, strlen(EXPECTED_OUTPUT));
@@ -79,7 +79,7 @@ static void test_module_query_no_module(void ** state) {
     char input[] = "C some-command";
     const char EXPECTED_OUTPUT[] = "err {\"error\":2,\"message\":\"Module not found or not configured\"}";
 
-    size_t n = wm_module_query(input, (char **)state);
+    size_t n = gm_module_query(input, (char **)state);
 
     assert_string_equal(*state, EXPECTED_OUTPUT);
     assert_int_equal(n, strlen(EXPECTED_OUTPUT));
@@ -89,7 +89,7 @@ static void test_module_query_no_queries(void ** state) {
     char input[] = "B some-command";
     const char EXPECTED_OUTPUT[] = "err {\"error\":3,\"message\":\"This module does not support queries\"}";
 
-    size_t n = wm_module_query(input, (char **)state);
+    size_t n = gm_module_query(input, (char **)state);
 
     assert_string_equal(*state, EXPECTED_OUTPUT);
     assert_int_equal(n, strlen(EXPECTED_OUTPUT));
@@ -98,7 +98,7 @@ static void test_module_query_no_queries(void ** state) {
 static void test_module_query_echo(void ** state) {
     char input[] = "A echo";
 
-    size_t n = wm_module_query(input, (char **)state);
+    size_t n = gm_module_query(input, (char **)state);
 
     assert_string_equal(*state, "echo");
     assert_int_equal(n, 4);

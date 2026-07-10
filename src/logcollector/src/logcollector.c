@@ -2468,7 +2468,7 @@ static void check_pattern_expand_excluded() {
                     }
 
                     /* Add $ at the end of the regex */
-                    wm_strcat(&regex, "$", 0);
+                    gm_strcat(&regex, "$", 0);
 
                     if(!OS_Regex(regex,dirent->d_name)) {
                         mdebug2("Regex %s doesn't match with file '%s'",regex,dirent->d_name);

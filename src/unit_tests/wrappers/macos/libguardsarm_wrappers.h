@@ -16,8 +16,8 @@
 #define mtdebug1 wrap_mtdebug1
 #undef mtdebug2
 #define mtdebug2 wrap_mtdebug2
-#undef wm_sendmsg
-#define wm_sendmsg wrap_wm_sendmsg
+#undef gm_sendmsg
+#define gm_sendmsg wrap_wm_sendmsg
 
 void wrap_mterror(const char *tag, const char *msg, ...);
 void wrap_mtwarn(const char *tag, const char *msg, ...);

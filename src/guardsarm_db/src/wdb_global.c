@@ -993,7 +993,7 @@ char* wdb_global_calculate_agent_group_csv(wdb_t *wdb, int id) {
             mdebug1("The agent's groups exceed the socket maximum response size.");
             break;
         }
-        wm_strcat(&result, group_hash, MULTIGROUP_SEPARATOR);
+        gm_strcat(&result, group_hash, MULTIGROUP_SEPARATOR);
     }
 
     if (SQLITE_DONE != _status) {

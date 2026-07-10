@@ -18,10 +18,10 @@
 #include "wm_agent_upgrade_tasks.h"
 #include "shared.h"
 
-int* wm_agent_upgrade_parse_agents(const cJSON* agents, char** error_message);
-wm_upgrade_task* wm_agent_upgrade_parse_upgrade_command(const cJSON* params, char** error_message);
-wm_upgrade_custom_task* wm_agent_upgrade_parse_upgrade_custom_command(const cJSON* params, char** error_message);
-wm_upgrade_agent_status_task* wm_agent_upgrade_parse_upgrade_agent_status(const cJSON* params, char** error_message);
+int* gm_agent_upgrade_parse_agents(const cJSON* agents, char** error_message);
+gm_upgrade_task* gm_agent_upgrade_parse_upgrade_command(const cJSON* params, char** error_message);
+gm_upgrade_custom_task* gm_agent_upgrade_parse_upgrade_custom_command(const cJSON* params, char** error_message);
+gm_upgrade_agent_status_task* gm_agent_upgrade_parse_upgrade_agent_status(const cJSON* params, char** error_message);
 
 // Wrappers
 
@@ -71,8 +71,8 @@ static int teardown_parse_upgrade(void **state) {
         os_free(error);
     }
     if (state[1]) {
-        wm_upgrade_task *task = (wm_upgrade_task*)state[1];
-        wm_agent_upgrade_free_upgrade_task(task);
+        gm_upgrade_task *task = (gm_upgrade_task*)state[1];
+        gm_agent_upgrade_free_upgrade_task(task);
     }
     return 0;
 }
@@ -83,8 +83,8 @@ static int teardown_parse_upgrade_custom(void **state) {
         os_free(error);
     }
     if (state[1]) {
-        wm_upgrade_custom_task *task = (wm_upgrade_custom_task*)state[1];
-        wm_agent_upgrade_free_upgrade_custom_task(task);
+        gm_upgrade_custom_task *task = (gm_upgrade_custom_task*)state[1];
+        gm_agent_upgrade_free_upgrade_custom_task(task);
     }
     return 0;
 }
@@ -95,8 +95,8 @@ static int teardown_parse_upgrade_agent_status(void **state) {
         os_free(error);
     }
     if (state[1]) {
-        wm_upgrade_agent_status_task *task = (wm_upgrade_agent_status_task*)state[1];
-        wm_agent_upgrade_free_agent_status_task(task);
+        gm_upgrade_agent_status_task *task = (gm_upgrade_agent_status_task*)state[1];
+        gm_agent_upgrade_free_agent_status_task(task);
     }
     return 0;
 }
@@ -109,7 +109,7 @@ void test_wm_agent_upgrade_parse_data_response_complete(void **state)
     char *message = "Error code invalid data.";
     int agent_id = 10;
 
-    cJSON *response = wm_agent_upgrade_parse_data_response(error_code, message, &agent_id);
+    cJSON *response = gm_agent_upgrade_parse_data_response(error_code, message, &agent_id);
 
     *state = response;
 
@@ -126,7 +126,7 @@ void test_wm_agent_upgrade_parse_data_response_without_agent_id(void **state)
     int error_code = 5;
     char *message = "Error code invalid data.";
 
-    cJSON *response = wm_agent_upgrade_parse_data_response(error_code, message, NULL);
+    cJSON *response = gm_agent_upgrade_parse_data_response(error_code, message, NULL);
 
     *state = response;
 
@@ -141,7 +141,7 @@ void test_wm_agent_upgrade_parse_response_data_array(void **state) {
     int error_code = 0;
     cJSON *data = cJSON_CreateArray();
 
-    cJSON *response = wm_agent_upgrade_parse_response(error_code, data);
+    cJSON *response = gm_agent_upgrade_parse_response(error_code, data);
 
     *state = response;
 
@@ -157,7 +157,7 @@ void test_wm_agent_upgrade_parse_response_data_object(void **state) {
     int error_code = 0;
     cJSON *data = cJSON_CreateObject();
 
-    cJSON *response = wm_agent_upgrade_parse_response(error_code, data);
+    cJSON *response = gm_agent_upgrade_parse_response(error_code, data);
 
     *state = response;
 
@@ -186,7 +186,7 @@ void test_wm_agent_upgrade_parse_task_module_request_complete(void **state)
 
     will_return(__wrap_OS_GetOneContentforElement, node);
 
-    cJSON *response = wm_agent_upgrade_parse_task_module_request(command, agent_array, status, error);
+    cJSON *response = gm_agent_upgrade_parse_task_module_request(command, agent_array, status, error);
 
     *state = response;
 
@@ -225,7 +225,7 @@ void test_wm_agent_upgrade_parse_task_module_request_without_status_and_error(vo
 
     will_return(__wrap_OS_GetOneContentforElement, node);
 
-    cJSON *response = wm_agent_upgrade_parse_task_module_request(command, agent_array, NULL, NULL);
+    cJSON *response = gm_agent_upgrade_parse_task_module_request(command, agent_array, NULL, NULL);
 
     *state = response;
 
@@ -257,7 +257,7 @@ void test_wm_agent_upgrade_parse_task_module_request_xml_error(void **state)
 
     will_return(__wrap_OS_ReadXML, -1);
 
-    cJSON *response = wm_agent_upgrade_parse_task_module_request(command, agent_array, NULL, NULL);
+    cJSON *response = gm_agent_upgrade_parse_task_module_request(command, agent_array, NULL, NULL);
 
     *state = response;
 
@@ -285,7 +285,7 @@ void test_wm_agent_upgrade_parse_agent_response_ok_with_data(void **state)
     char *response = "ok 1234567890";
     char *data = NULL;
 
-    int ret = wm_agent_upgrade_parse_agent_response(response, &data);
+    int ret = gm_agent_upgrade_parse_agent_response(response, &data);
 
     *state = data;
 
@@ -299,7 +299,7 @@ void test_wm_agent_upgrade_parse_agent_response_ok_without_data(void **state)
     char *response = "ok ";
     char *data = NULL;
 
-    int ret = wm_agent_upgrade_parse_agent_response(response, &data);
+    int ret = gm_agent_upgrade_parse_agent_response(response, &data);
 
     *state = data;
 
@@ -312,7 +312,7 @@ void test_wm_agent_upgrade_parse_agent_response_ok_null_data(void **state)
     (void) state;
     char *response = "ok 1234567890";
 
-    int ret = wm_agent_upgrade_parse_agent_response(response, NULL);
+    int ret = gm_agent_upgrade_parse_agent_response(response, NULL);
 
     assert_int_equal(ret, 0);
 }
@@ -326,7 +326,7 @@ void test_wm_agent_upgrade_parse_agent_response_err_with_data(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8116): Error response from agent: 'invalid request'");
 
-    int ret = wm_agent_upgrade_parse_agent_response(response, &data);
+    int ret = gm_agent_upgrade_parse_agent_response(response, &data);
 
     assert_int_equal(ret, -1);
     assert_null(data);
@@ -341,7 +341,7 @@ void test_wm_agent_upgrade_parse_agent_response_err_without_data(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8116): Error response from agent: ''");
 
-    int ret = wm_agent_upgrade_parse_agent_response(response, &data);
+    int ret = gm_agent_upgrade_parse_agent_response(response, &data);
 
     assert_int_equal(ret, -1);
     assert_null(data);
@@ -353,7 +353,7 @@ void test_wm_agent_upgrade_parse_agent_response_unknown_response(void **state)
     char *response = "unknown";
     char *data = NULL;
 
-    int ret = wm_agent_upgrade_parse_agent_response(response, &data);
+    int ret = gm_agent_upgrade_parse_agent_response(response, &data);
 
     assert_int_equal(ret, -1);
     assert_null(data);
@@ -364,7 +364,7 @@ void test_wm_agent_upgrade_parse_agent_response_invalid_response(void **state)
     (void) state;
     char *data = NULL;
 
-    int ret = wm_agent_upgrade_parse_agent_response(NULL, &data);
+    int ret = gm_agent_upgrade_parse_agent_response(NULL, &data);
 
     assert_int_equal(ret, -1);
     assert_null(data);
@@ -379,7 +379,7 @@ void test_wm_agent_upgrade_parse_agent_upgrade_command_response_ok_with_data(voi
                      "}";
     char *data = NULL;
 
-    int ret = wm_agent_upgrade_parse_agent_upgrade_command_response(response, &data);
+    int ret = gm_agent_upgrade_parse_agent_upgrade_command_response(response, &data);
 
     *state = data;
 
@@ -396,7 +396,7 @@ void test_wm_agent_upgrade_parse_agent_upgrade_command_response_ok_without_data(
                      "}";
     char *data = NULL;
 
-    int ret = wm_agent_upgrade_parse_agent_upgrade_command_response(response, &data);
+    int ret = gm_agent_upgrade_parse_agent_upgrade_command_response(response, &data);
 
     *state = data;
 
@@ -412,7 +412,7 @@ void test_wm_agent_upgrade_parse_agent_upgrade_command_response_ok_null_data(voi
                      "    \"message\":\"1234567890\""
                      "}";
 
-    int ret = wm_agent_upgrade_parse_agent_upgrade_command_response(response, NULL);
+    int ret = gm_agent_upgrade_parse_agent_upgrade_command_response(response, NULL);
 
     assert_int_equal(ret, 0);
 }
@@ -429,7 +429,7 @@ void test_wm_agent_upgrade_parse_agent_upgrade_command_response_err_with_data(vo
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8116): Error response from agent: 'invalid request'");
 
-    int ret = wm_agent_upgrade_parse_agent_upgrade_command_response(response, &data);
+    int ret = gm_agent_upgrade_parse_agent_upgrade_command_response(response, &data);
 
     assert_int_equal(ret, 1);
     assert_null(data);
@@ -447,7 +447,7 @@ void test_wm_agent_upgrade_parse_agent_upgrade_command_response_err_without_data
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8116): Error response from agent: ''");
 
-    int ret = wm_agent_upgrade_parse_agent_upgrade_command_response(response, &data);
+    int ret = gm_agent_upgrade_parse_agent_upgrade_command_response(response, &data);
 
     assert_int_equal(ret, 1);
     assert_null(data);
@@ -464,7 +464,7 @@ void test_wm_agent_upgrade_parse_agent_upgrade_command_response_unknown_response
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8117): Unknown error from agent.");
 
-    int ret = wm_agent_upgrade_parse_agent_upgrade_command_response(response, &data);
+    int ret = gm_agent_upgrade_parse_agent_upgrade_command_response(response, &data);
 
     assert_int_equal(ret, -1);
     assert_null(data);
@@ -478,7 +478,7 @@ void test_wm_agent_upgrade_parse_agent_upgrade_command_response_invalid_response
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8117): Unknown error from agent.");
 
-    int ret = wm_agent_upgrade_parse_agent_upgrade_command_response(NULL, &data);
+    int ret = gm_agent_upgrade_parse_agent_upgrade_command_response(NULL, &data);
 
     assert_int_equal(ret, -1);
     assert_null(data);
@@ -496,7 +496,7 @@ void test_wm_agent_upgrade_parse_agents_success(void **state)
     cJSON_AddItemToArray(agents, agent2);
     cJSON_AddItemToArray(agents, agent3);
 
-    int* agent_ids = wm_agent_upgrade_parse_agents(agents, &error);
+    int* agent_ids = gm_agent_upgrade_parse_agents(agents, &error);
 
     cJSON_Delete(agents);
 
@@ -527,7 +527,7 @@ void test_wm_agent_upgrade_parse_agents_type_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Agent id not recognized'");
 
-    int* agent_ids = wm_agent_upgrade_parse_agents(agents, &error);
+    int* agent_ids = gm_agent_upgrade_parse_agents(agents, &error);
 
     cJSON_Delete(agents);
 
@@ -543,7 +543,7 @@ void test_wm_agent_upgrade_parse_agents_empty(void **state)
 
     cJSON *agents = cJSON_CreateArray();
 
-    int* agent_ids = wm_agent_upgrade_parse_agents(agents, &error);
+    int* agent_ids = gm_agent_upgrade_parse_agents(agents, &error);
 
     cJSON_Delete(agents);
 
@@ -570,7 +570,7 @@ void test_wm_agent_upgrade_parse_upgrade_command_success(void **state)
     cJSON_AddTrueToObject(params, "force_upgrade");
     cJSON_AddStringToObject(params, "package_type", package_type);
 
-    wm_upgrade_task* upgrade_task = wm_agent_upgrade_parse_upgrade_command(params, &error);
+    gm_upgrade_task* upgrade_task = gm_agent_upgrade_parse_upgrade_command(params, &error);
 
     cJSON_Delete(params);
 
@@ -595,7 +595,7 @@ void test_wm_agent_upgrade_parse_upgrade_command_default(void **state)
 
     cJSON *params = cJSON_CreateObject();
 
-    wm_upgrade_task* upgrade_task = wm_agent_upgrade_parse_upgrade_command(params, &error);
+    gm_upgrade_task* upgrade_task = gm_agent_upgrade_parse_upgrade_command(params, &error);
 
     cJSON_Delete(params);
 
@@ -626,7 +626,7 @@ void test_wm_agent_upgrade_parse_upgrade_command_invalid_repo_type(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Parameter \"wpk_repo\" should be a string'");
 
-    wm_upgrade_task* upgrade_task = wm_agent_upgrade_parse_upgrade_command(params, &error);
+    gm_upgrade_task* upgrade_task = gm_agent_upgrade_parse_upgrade_command(params, &error);
 
     cJSON_Delete(params);
 
@@ -649,7 +649,7 @@ void test_wm_agent_upgrade_parse_upgrade_command_invalid_version_type(void **sta
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Parameter \"version\" should be a string'");
 
-    wm_upgrade_task* upgrade_task = wm_agent_upgrade_parse_upgrade_command(params, &error);
+    gm_upgrade_task* upgrade_task = gm_agent_upgrade_parse_upgrade_command(params, &error);
 
     cJSON_Delete(params);
 
@@ -670,7 +670,7 @@ void test_wm_agent_upgrade_parse_upgrade_command_invalid_http(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Parameter \"use_http\" should be true or false'");
 
-    wm_upgrade_task* upgrade_task = wm_agent_upgrade_parse_upgrade_command(params, &error);
+    gm_upgrade_task* upgrade_task = gm_agent_upgrade_parse_upgrade_command(params, &error);
 
     cJSON_Delete(params);
 
@@ -691,7 +691,7 @@ void test_wm_agent_upgrade_parse_upgrade_command_invalid_force(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Parameter \"force_upgrade\" should be true or false'");
 
-    wm_upgrade_task* upgrade_task = wm_agent_upgrade_parse_upgrade_command(params, &error);
+    gm_upgrade_task* upgrade_task = gm_agent_upgrade_parse_upgrade_command(params, &error);
 
     cJSON_Delete(params);
 
@@ -712,7 +712,7 @@ void test_wm_agent_upgrade_parse_upgrade_command_invalid_package_type(void **sta
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Parameter \"package_type\" should be a string'");
 
-    wm_upgrade_task* upgrade_task = wm_agent_upgrade_parse_upgrade_command(params, &error);
+    gm_upgrade_task* upgrade_task = gm_agent_upgrade_parse_upgrade_command(params, &error);
 
     cJSON_Delete(params);
 
@@ -734,7 +734,7 @@ void test_wm_agent_upgrade_parse_upgrade_command_invalid_package_type_value(void
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Invalid parameter \"package_type\", value should be \"rpm\" or \"deb\"'");
 
-    wm_upgrade_task* upgrade_task = wm_agent_upgrade_parse_upgrade_command(params, &error);
+    gm_upgrade_task* upgrade_task = gm_agent_upgrade_parse_upgrade_command(params, &error);
 
     cJSON_Delete(params);
 
@@ -770,7 +770,7 @@ void test_wm_agent_upgrade_parse_upgrade_command_invalid_json(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Invalid JSON type'");
 
-    wm_upgrade_task* upgrade_task = wm_agent_upgrade_parse_upgrade_command(params, &error);
+    gm_upgrade_task* upgrade_task = gm_agent_upgrade_parse_upgrade_command(params, &error);
 
     cJSON_Delete(params);
 
@@ -791,7 +791,7 @@ void test_wm_agent_upgrade_parse_upgrade_custom_command_success(void **state)
     cJSON_AddStringToObject(params, "file_path", file);
     cJSON_AddStringToObject(params, "installer", exe);
 
-    wm_upgrade_custom_task* upgrade_custom_task = wm_agent_upgrade_parse_upgrade_custom_command(params, &error);
+    gm_upgrade_custom_task* upgrade_custom_task = gm_agent_upgrade_parse_upgrade_custom_command(params, &error);
 
     cJSON_Delete(params);
 
@@ -811,7 +811,7 @@ void test_wm_agent_upgrade_parse_upgrade_custom_command_default(void **state)
 
     cJSON *params = cJSON_CreateObject();
 
-    wm_upgrade_custom_task* upgrade_custom_task = wm_agent_upgrade_parse_upgrade_custom_command(params, &error);
+    gm_upgrade_custom_task* upgrade_custom_task = gm_agent_upgrade_parse_upgrade_custom_command(params, &error);
 
     cJSON_Delete(params);
 
@@ -835,7 +835,7 @@ void test_wm_agent_upgrade_parse_upgrade_custom_command_invalid_file_type(void *
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Parameter \"file_path\" should be a string'");
 
-    wm_upgrade_custom_task* upgrade_custom_task = wm_agent_upgrade_parse_upgrade_custom_command(params, &error);
+    gm_upgrade_custom_task* upgrade_custom_task = gm_agent_upgrade_parse_upgrade_custom_command(params, &error);
 
     cJSON_Delete(params);
 
@@ -856,7 +856,7 @@ void test_wm_agent_upgrade_parse_upgrade_custom_command_invalid_installer_type(v
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Parameter \"installer\" should be a string'");
 
-    wm_upgrade_custom_task* upgrade_custom_task = wm_agent_upgrade_parse_upgrade_custom_command(params, &error);
+    gm_upgrade_custom_task* upgrade_custom_task = gm_agent_upgrade_parse_upgrade_custom_command(params, &error);
 
     cJSON_Delete(params);
 
@@ -884,7 +884,7 @@ void test_wm_agent_upgrade_parse_upgrade_custom_command_invalid_json(void **stat
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Invalid JSON type'");
 
-    wm_upgrade_custom_task* upgrade_custom_task = wm_agent_upgrade_parse_upgrade_custom_command(params, &error);
+    gm_upgrade_custom_task* upgrade_custom_task = gm_agent_upgrade_parse_upgrade_custom_command(params, &error);
 
     cJSON_Delete(params);
 
@@ -907,7 +907,7 @@ void test_wm_agent_upgrade_parse_upgrade_agent_status_success(void **state)
     cJSON_AddStringToObject(params, "message", data);
     cJSON_AddStringToObject(params, "status", status);
 
-    wm_upgrade_agent_status_task* agent_status_task = wm_agent_upgrade_parse_upgrade_agent_status(params, &error);
+    gm_upgrade_agent_status_task* agent_status_task = gm_agent_upgrade_parse_upgrade_agent_status(params, &error);
 
     cJSON_Delete(params);
 
@@ -928,7 +928,7 @@ void test_wm_agent_upgrade_parse_upgrade_agent_status_default(void **state)
 
     cJSON *params = cJSON_CreateObject();
 
-    wm_upgrade_agent_status_task* agent_status_task = wm_agent_upgrade_parse_upgrade_agent_status(params, &error);
+    gm_upgrade_agent_status_task* agent_status_task = gm_agent_upgrade_parse_upgrade_agent_status(params, &error);
 
     cJSON_Delete(params);
 
@@ -953,7 +953,7 @@ void test_wm_agent_upgrade_parse_upgrade_agent_status_invalid_code_type(void **s
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Parameter \"error\" should be a number'");
 
-    wm_upgrade_agent_status_task* agent_status_task = wm_agent_upgrade_parse_upgrade_agent_status(params, &error);
+    gm_upgrade_agent_status_task* agent_status_task = gm_agent_upgrade_parse_upgrade_agent_status(params, &error);
 
     cJSON_Delete(params);
 
@@ -974,7 +974,7 @@ void test_wm_agent_upgrade_parse_upgrade_agent_status_invalid_data_type(void **s
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Parameter \"message\" should be a string'");
 
-    wm_upgrade_agent_status_task* agent_status_task = wm_agent_upgrade_parse_upgrade_agent_status(params, &error);
+    gm_upgrade_agent_status_task* agent_status_task = gm_agent_upgrade_parse_upgrade_agent_status(params, &error);
 
     cJSON_Delete(params);
 
@@ -995,7 +995,7 @@ void test_wm_agent_upgrade_parse_upgrade_agent_status_invalid_status_type(void *
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Parameter \"status\" should be a string'");
 
-    wm_upgrade_agent_status_task* agent_status_task = wm_agent_upgrade_parse_upgrade_agent_status(params, &error);
+    gm_upgrade_agent_status_task* agent_status_task = gm_agent_upgrade_parse_upgrade_agent_status(params, &error);
 
     cJSON_Delete(params);
 
@@ -1023,7 +1023,7 @@ void test_wm_agent_upgrade_parse_upgrade_agent_status_invalid_json(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Invalid JSON type'");
 
-    wm_upgrade_agent_status_task* agent_status_task = wm_agent_upgrade_parse_upgrade_agent_status(params, &error);
+    gm_upgrade_agent_status_task* agent_status_task = gm_agent_upgrade_parse_upgrade_agent_status(params, &error);
 
     cJSON_Delete(params);
 
@@ -1038,7 +1038,7 @@ void test_wm_agent_upgrade_parse_message_upgrade_success(void **state)
 {
     char *error = NULL;
     int* agent_ids = NULL;
-    wm_upgrade_task* upgrade_task = NULL;
+    gm_upgrade_task* upgrade_task = NULL;
     char *buffer = "{"
                    "   \"command\": \"upgrade\","
                    "   \"parameters\": {"
@@ -1050,13 +1050,13 @@ void test_wm_agent_upgrade_parse_message_upgrade_success(void **state)
                    "    }"
                    "}";
 
-    int command = wm_agent_upgrade_parse_message(buffer, (void*)&upgrade_task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, (void*)&upgrade_task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;
     state[2] = NULL;
 
-    assert_int_equal(command, WM_UPGRADE_UPGRADE);
+    assert_int_equal(command, GM_UPGRADE_UPGRADE);
     assert_non_null(agent_ids);
     assert_int_equal(agent_ids[0], 1);
     assert_int_equal(agent_ids[1], 15);
@@ -1071,14 +1071,14 @@ void test_wm_agent_upgrade_parse_message_upgrade_success(void **state)
     assert_null(upgrade_task->wpk_sha1);
     assert_null(error);
 
-    wm_agent_upgrade_free_upgrade_task(upgrade_task);
+    gm_agent_upgrade_free_upgrade_task(upgrade_task);
 }
 
 void test_wm_agent_upgrade_parse_message_upgrade_agent_error(void **state)
 {
     char *error = NULL;
     int* agent_ids = NULL;
-    wm_upgrade_task* upgrade_task = NULL;
+    gm_upgrade_task* upgrade_task = NULL;
     char *buffer = "{"
                    "   \"command\": \"upgrade\","
                    "   \"parameters\": {"
@@ -1093,7 +1093,7 @@ void test_wm_agent_upgrade_parse_message_upgrade_agent_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Agent id not recognized'");
 
-    int command = wm_agent_upgrade_parse_message(buffer, (void*)&upgrade_task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, (void*)&upgrade_task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;
@@ -1110,7 +1110,7 @@ void test_wm_agent_upgrade_parse_message_upgrade_task_error(void **state)
 {
     char *error = NULL;
     int* agent_ids = NULL;
-    wm_upgrade_task* upgrade_task = NULL;
+    gm_upgrade_task* upgrade_task = NULL;
     char *buffer = "{"
                    "   \"command\": \"upgrade\","
                    "   \"parameters\": {"
@@ -1125,7 +1125,7 @@ void test_wm_agent_upgrade_parse_message_upgrade_task_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Parameter \"use_http\" should be true or false'");
 
-    int command = wm_agent_upgrade_parse_message(buffer, (void*)&upgrade_task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, (void*)&upgrade_task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;
@@ -1145,7 +1145,7 @@ void test_wm_agent_upgrade_parse_message_upgrade_custom_success(void **state)
 {
     char *error = NULL;
     int* agent_ids = NULL;
-    wm_upgrade_custom_task* upgrade_custom_task = NULL;
+    gm_upgrade_custom_task* upgrade_custom_task = NULL;
     char *buffer = "{"
                    "   \"command\": \"upgrade_custom\","
                    "   \"parameters\": {"
@@ -1155,13 +1155,13 @@ void test_wm_agent_upgrade_parse_message_upgrade_custom_success(void **state)
                    "    }"
                    "}";
 
-    int command = wm_agent_upgrade_parse_message(buffer, (void*)&upgrade_custom_task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, (void*)&upgrade_custom_task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;
     state[2] = NULL;
 
-    assert_int_equal(command, WM_UPGRADE_UPGRADE_CUSTOM);
+    assert_int_equal(command, GM_UPGRADE_UPGRADE_CUSTOM);
     assert_non_null(agent_ids);
     assert_int_equal(agent_ids[0], 1);
     assert_int_equal(agent_ids[1], 15);
@@ -1172,14 +1172,14 @@ void test_wm_agent_upgrade_parse_message_upgrade_custom_success(void **state)
     assert_string_equal(upgrade_custom_task->custom_installer, "install.sh");
     assert_null(error);
 
-    wm_agent_upgrade_free_upgrade_custom_task(upgrade_custom_task);
+    gm_agent_upgrade_free_upgrade_custom_task(upgrade_custom_task);
 }
 
 void test_wm_agent_upgrade_parse_message_upgrade_custom_agent_error(void **state)
 {
     char *error = NULL;
     int* agent_ids = NULL;
-    wm_upgrade_custom_task* upgrade_custom_task = NULL;
+    gm_upgrade_custom_task* upgrade_custom_task = NULL;
     char *buffer = "{"
                    "   \"command\": \"upgrade_custom\","
                    "   \"parameters\": {"
@@ -1192,7 +1192,7 @@ void test_wm_agent_upgrade_parse_message_upgrade_custom_agent_error(void **state
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Agent id not recognized'");
 
-    int command = wm_agent_upgrade_parse_message(buffer, (void*)&upgrade_custom_task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, (void*)&upgrade_custom_task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;
@@ -1209,7 +1209,7 @@ void test_wm_agent_upgrade_parse_message_upgrade_custom_task_error(void **state)
 {
     char *error = NULL;
     int* agent_ids = NULL;
-    wm_upgrade_custom_task* upgrade_custom_task = NULL;
+    gm_upgrade_custom_task* upgrade_custom_task = NULL;
     char *buffer = "{"
                    "   \"command\": \"upgrade_custom\","
                    "   \"parameters\": {"
@@ -1222,7 +1222,7 @@ void test_wm_agent_upgrade_parse_message_upgrade_custom_task_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Parameter \"installer\" should be a string'");
 
-    int command = wm_agent_upgrade_parse_message(buffer, (void*)&upgrade_custom_task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, (void*)&upgrade_custom_task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;
@@ -1242,7 +1242,7 @@ void test_wm_agent_upgrade_parse_message_upgrade_agent_status_success(void **sta
 {
     char *error = NULL;
     int* agent_ids = NULL;
-    wm_upgrade_agent_status_task* upgrade_agent_status_task = NULL;
+    gm_upgrade_agent_status_task* upgrade_agent_status_task = NULL;
     char *buffer = "{"
                    "   \"command\": \"upgrade_update_status\","
                    "   \"parameters\": {"
@@ -1253,13 +1253,13 @@ void test_wm_agent_upgrade_parse_message_upgrade_agent_status_success(void **sta
                    "    }"
                    "}";
 
-    int command = wm_agent_upgrade_parse_message(buffer, (void*)&upgrade_agent_status_task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, (void*)&upgrade_agent_status_task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;
     state[2] = NULL;
 
-    assert_int_equal(command, WM_UPGRADE_AGENT_UPDATE_STATUS);
+    assert_int_equal(command, GM_UPGRADE_AGENT_UPDATE_STATUS);
     assert_non_null(agent_ids);
     assert_int_equal(agent_ids[0], 10);
     assert_int_equal(agent_ids[1], -1);
@@ -1269,14 +1269,14 @@ void test_wm_agent_upgrade_parse_message_upgrade_agent_status_success(void **sta
     assert_string_equal(upgrade_agent_status_task->status, "Done");
     assert_null(error);
 
-    wm_agent_upgrade_free_agent_status_task(upgrade_agent_status_task);
+    gm_agent_upgrade_free_agent_status_task(upgrade_agent_status_task);
 }
 
 void test_wm_agent_upgrade_parse_message_upgrade_agent_status_agent_error(void **state)
 {
     char *error = NULL;
     int* agent_ids = NULL;
-    wm_upgrade_agent_status_task* upgrade_agent_status_task = NULL;
+    gm_upgrade_agent_status_task* upgrade_agent_status_task = NULL;
     char *buffer = "{"
                    "   \"command\": \"upgrade_update_status\","
                    "   \"parameters\": {"
@@ -1290,7 +1290,7 @@ void test_wm_agent_upgrade_parse_message_upgrade_agent_status_agent_error(void *
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Agent id not recognized'");
 
-    int command = wm_agent_upgrade_parse_message(buffer, (void*)&upgrade_agent_status_task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, (void*)&upgrade_agent_status_task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;
@@ -1307,7 +1307,7 @@ void test_wm_agent_upgrade_parse_message_upgrade_agent_status_task_error(void **
 {
     char *error = NULL;
     int* agent_ids = NULL;
-    wm_upgrade_agent_status_task* upgrade_agent_status_task = NULL;
+    gm_upgrade_agent_status_task* upgrade_agent_status_task = NULL;
     char *buffer = "{"
                    "   \"command\": \"upgrade_update_status\","
                    "   \"parameters\": {"
@@ -1321,7 +1321,7 @@ void test_wm_agent_upgrade_parse_message_upgrade_agent_status_task_error(void **
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Parameter \"message\" should be a string'");
 
-    int command = wm_agent_upgrade_parse_message(buffer, (void*)&upgrade_agent_status_task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, (void*)&upgrade_agent_status_task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;
@@ -1347,13 +1347,13 @@ void test_wm_agent_upgrade_parse_message_upgrade_result_success(void **state)
                    "    }"
                    "}";
 
-    int command = wm_agent_upgrade_parse_message(buffer, &task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, &task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;
     state[2] = NULL;
 
-    assert_int_equal(command, WM_UPGRADE_RESULT);
+    assert_int_equal(command, GM_UPGRADE_RESULT);
     assert_non_null(agent_ids);
     assert_int_equal(agent_ids[0], 10);
     assert_int_equal(agent_ids[1], 11);
@@ -1380,7 +1380,7 @@ void test_wm_agent_upgrade_parse_message_upgrade_result_agent_error(void **state
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8103): Error parsing command: 'Agent id not recognized'");
 
-    int command = wm_agent_upgrade_parse_message(buffer, &task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, &task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;
@@ -1408,7 +1408,7 @@ void test_wm_agent_upgrade_parse_message_invalid_command(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8102): No action defined for command: 'unknown'");
 
-    int command = wm_agent_upgrade_parse_message(buffer, &task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, &task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;
@@ -1436,7 +1436,7 @@ void test_wm_agent_upgrade_parse_message_invalid_agents(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8107): Required parameters in message are missing.");
 
-    int command = wm_agent_upgrade_parse_message(buffer, &task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, &task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;
@@ -1459,7 +1459,7 @@ void test_wm_agent_upgrade_parse_message_invalid_json(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8101): Cannot parse JSON: 'unknown'");
 
-    int command = wm_agent_upgrade_parse_message(buffer, &task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, &task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;
@@ -1482,7 +1482,7 @@ void test_wm_agent_upgrade_parse_message_missing_required(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8107): Required parameters in message are missing.");
 
-    int command = wm_agent_upgrade_parse_message(buffer, &task, &agent_ids, &error);
+    int command = gm_agent_upgrade_parse_message(buffer, &task, &agent_ids, &error);
 
     state[0] = (void*)error;
     state[1] = (void*)agent_ids;

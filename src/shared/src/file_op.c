@@ -1764,11 +1764,11 @@ char **expand_win32_wildcards(const char *path) {
                 }
 
                 os_strdup(parent_path, expanded_paths[expanded_index]);
-                wm_strcat(&expanded_paths[expanded_index], utf8_name, PATH_SEP);
+                gm_strcat(&expanded_paths[expanded_index], utf8_name, PATH_SEP);
                 os_free(utf8_name);
 
                 if (next_glob != NULL) {
-                    wm_strcat(&expanded_paths[expanded_index], next_glob, PATH_SEP);
+                    gm_strcat(&expanded_paths[expanded_index], next_glob, PATH_SEP);
                 }
 
                 os_realloc(expanded_paths, (expanded_index + 2) * sizeof(char *), expanded_paths);

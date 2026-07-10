@@ -221,7 +221,7 @@ size_t syscom_getconfig(const char * section, char ** output) {
         if (cfg = getSyscheckConfig(), cfg) {
             os_strdup("ok", *output);
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
@@ -232,7 +232,7 @@ size_t syscom_getconfig(const char * section, char ** output) {
         if (cfg = getRootcheckConfig(), cfg) {
             os_strdup("ok", *output);
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
@@ -243,7 +243,7 @@ size_t syscom_getconfig(const char * section, char ** output) {
         if (cfg = getSyscheckInternalOptions(), cfg) {
             os_strdup("ok", *output);
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
