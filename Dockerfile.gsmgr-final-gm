@@ -1,0 +1,139 @@
+# Final GuardSarm manager image, built FROM the already-compiled debug base
+# (guardsarm-mgr-base:dbg) so there is zero recompile — just the dependency-alias
+# shim + full install + runtime entrypoint.
+FROM guardsarm-mgr-base:2.0.0-gm
+
+# Compat shim (GuardSarm dependency-mirror workaround): the full Wazuh->GuardSarm
+# rename produced libguardsarmext.so, but the upstream precompiled CPython that
+# `make deps` fetched still links the old soname libwazuhext.so. ABI is identical, so
+# alias it and expose the bundled libpython, so install-time schema generation can
+# load the interpreter.
+RUN cp /build/guardsarm/src/build/lib/libguardsarmext.so /build/guardsarm/src/build/lib/libwazuhext.so \
+ && tar xzf /build/guardsarm/src/external/cpython.tar.gz -C /tmp \
+ && cp /tmp/*/lib/libpython3.12.so.1.0 /build/guardsarm/src/build/lib/ 2>/dev/null || true
+
+# The Windows git checkout (autocrlf) left CRLF line endings on the shell scripts,
+# which dash/sh cannot execute (user creation + install steps silently fail).
+# Normalize every shell script to LF before installing.
+RUN find /build/guardsarm -name '*.sh' -exec sed -i 's/\r$//' {} + \
+ && sed -i 's/\r$//' /build/guardsarm/install.sh
+
+WORKDIR /build/guardsarm
+ENV LD_LIBRARY_PATH=/build/guardsarm/src/build/lib:/build/guardsarm/src/external/jemalloc/lib:/var/guardsarm-manager/lib:/var/guardsarm-manager/framework/python/lib
+
+# --- ENGINE FIX: the full wazuh->guardsarm rename corrupted the checked-in generated
+# protobuf .pb.cc (they embed length-prefixed serialized FileDescriptorProto bytes, so
+# changing 'wazuh'(5) -> 'guardsarm'(9) breaks the length prefixes). Result:
+# guardsarm-manager-analysisd aborts at startup with a libprotobuf "Invalid file
+# descriptor data / CHECK failed" FATAL. Regenerate the descriptors from the .proto with
+# the bundled protoc, then rebuild the engine so install.sh copies the fixed binary.
+# Also rebrand the indexer-plugin schema JSONs (upstream wazuh-states-* keys) so the
+# manager's compiled libschema_validator.so carries guardsarm-states-* keys; otherwise
+# the manager discards the agent's guardsarm-states-* writes. The `make` below recompiles
+# both the engine (from the regenerated protos) and schema_validator (from these JSONs).
+RUN sed -i 's/wazuh/guardsarm/g' /build/guardsarm/src/external/indexer-plugins/*.json \
+ && cd /build/guardsarm/src/engine/source/proto/src \
+ && /build/guardsarm/src/external/protobuf/build/protoc \
+      --proto_path=. --proto_path=/build/guardsarm/src/external/protobuf/src \
+      --cpp_out=/build/guardsarm/src/engine/source/proto/include/eMessages *.proto \
+ && cd /build/guardsarm/src/build && make -j"$(nproc)" 2>&1 | tail -3
+
+RUN USER_LANGUAGE=en USER_NO_STOP=y USER_INSTALL_TYPE=server USER_DIR=/var/guardsarm-manager \
+    USER_ENABLE_EMAIL=n USER_ENABLE_SYSCHECK=y USER_ENABLE_ROOTCHECK=y \
+    USER_ENABLE_ACTIVE_RESPONSE=y USER_ENABLE_SYSLOG=n USER_ENABLE_AUTHD=y \
+    USER_AUTO_START=n USER_BINARYINSTALL=yes \
+    bash install.sh \
+ && echo "=== install OK ===" \
+ && ls -la /var/guardsarm-manager/bin/guardsarm-manager-authd /var/guardsarm-manager/bin/guardsarm-manager-apid 2>&1 | head
+
+# Persist required libs into the installed tree so daemons/API resolve them at runtime.
+RUN ln -sf libguardsarmext.so /var/guardsarm-manager/lib/libwazuhext.so 2>/dev/null || true; \
+    cp -a /build/guardsarm/src/external/jemalloc/lib/libjemalloc.so.2 /var/guardsarm-manager/lib/ 2>/dev/null || true; \
+    cp -a /build/guardsarm/src/build/lib/libpython3.12.so.1.0 /var/guardsarm-manager/lib/ 2>/dev/null || true
+
+# --- RUNTIME FIX 1: framework indexer client must speak plain HTTP to OpenSearch.
+# The local OpenSearch runs with security DISABLED (plain HTTP, no auth), but the
+# framework indexer client defaults to use_ssl=True/verify_certs=True and then fails
+# every query with an SSL handshake error. Flip both to False in the INSTALLED copy.
+# (Proper fix = drive this from the <indexer><ssl> config; until then, patch it here
+# so a rebuild does not reintroduce the HTTPS bug.)
+RUN sed -i \
+      -e 's/^\(\s*\)use_ssl=True,/\1use_ssl=False,/' \
+      -e 's/^\(\s*\)verify_certs=True,/\1verify_certs=False,/' \
+      /var/guardsarm-manager/framework/python/lib/python3.12/site-packages/guardsarm/core/indexer/indexer.py \
+ && grep -n 'use_ssl=\|verify_certs=' \
+      /var/guardsarm-manager/framework/python/lib/python3.12/site-packages/guardsarm/core/indexer/indexer.py
+
+# --- RUNTIME FIX 2: point the engine's indexer connector at the host OpenSearch.
+# install.sh ships https://localhost:9200; from inside the container the indexer is
+# reachable at http://host.docker.internal:7500. Rewrite the <host> line.
+RUN sed -i \
+      's#<host>https\?://[^<]*</host>#<host>http://host.docker.internal:7500</host>#' \
+      /var/guardsarm-manager/etc/guardsarm-manager.conf \
+ && grep -n '<host>' /var/guardsarm-manager/etc/guardsarm-manager.conf
+
+# --- RUNTIME FIX 3: seed indexer credentials into the manager keystore (RocksDB).
+# The framework/engine read the indexer user/pass from the keystore. Security is
+# disabled so the values are effectively unused, but the entries must EXIST or the
+# keystore lookup errors. Values match the working live setup (admin/admin).
+RUN /var/guardsarm-manager/bin/guardsarm-manager-keystore -f indexer -k username -v admin \
+ && /var/guardsarm-manager/bin/guardsarm-manager-keystore -f indexer -k password -v admin
+
+# --- RUNTIME FIX 4: the <indexer><ssl> block references etc/certs/*.pem for config
+# validation even over plain HTTP; install.sh never creates them, so modulesd aborts
+# ("File 'etc/certs/root-ca.pem' not found") and takes the whole manager down at start.
+# Generate a self-signed set so config validation passes.
+RUN mkdir -p /var/guardsarm-manager/etc/certs \
+ && openssl req -x509 -newkey rsa:2048 -days 3650 -nodes \
+      -keyout /var/guardsarm-manager/etc/certs/manager-key.pem -out /var/guardsarm-manager/etc/certs/manager.pem \
+      -subj "/CN=guardsarm.manager/O=GuardSarm/C=US" >/dev/null 2>&1 \
+ && cp /var/guardsarm-manager/etc/certs/manager.pem /var/guardsarm-manager/etc/certs/root-ca.pem \
+ && chown -R guardsarm-manager:guardsarm-manager /var/guardsarm-manager/etc/certs \
+ && chmod 640 /var/guardsarm-manager/etc/certs/*
+
+# --- RUNTIME FIX 5: mirror the frozen wazuh.integration.* WCS fields as
+# guardsarm.integration.* in the engine store schema. The engine's AssetBuilder writes
+# guardsarm.integration.category on every event and the default indexer output requires
+# it, but install generates the store schema from the (unpatched, base-image) source that
+# only defines wazuh.integration.* -> policies can't build -> routes never activate.
+# Add the guardsarm.integration.* keyword fields so a default route can be created.
+RUN python3 - <<'PYEOF'
+import json,glob
+for p in glob.glob('/var/guardsarm-manager/data/store/schema/engine-schema/*'):
+    try: d=json.load(open(p))
+    except Exception: continue
+    f=d.get('fields')
+    if not isinstance(f,dict): continue
+    for k in list(f):
+        if k.startswith('wazuh.integration.'):
+            gk='guardsarm.'+k[len('wazuh.'):]
+            f.setdefault(gk,f[k])
+    json.dump(d,open(p,'w'))
+    print('patched',p)
+PYEOF
+
+EXPOSE 7514 7515 7516 7550
+# Branded manager home: w_homedir() honors GUARDSARM_MANAGER_HOME before falling back
+# to resolving /proc/self/exe, so daemons/framework/engine all root at the branded path.
+ENV GUARDSARM_MANAGER_HOME=/var/guardsarm-manager
+ENV LD_LIBRARY_PATH=/var/guardsarm-manager/lib:/var/guardsarm-manager/framework/python/lib
+
+# Bake the local route activator so a FRESH container self-heals its default route.
+# The active route persists in the container FS (data/store/router) and survives daemon
+# and `docker restart`, but a `docker rm`+`run` starts from the image with no route; this
+# lets startup re-create it automatically (idempotent — only when the router table is empty).
+COPY activate_routes.py /var/guardsarm-manager/bin/activate_routes.py
+
+# reset ENTRYPOINT (the gm base was docker-committed from a sleep-infinity
+# container, which baked ENTRYPOINT ["sh"] and mangles the shell-form CMD).
+ENTRYPOINT []
+CMD bash -c '\
+  ( /var/guardsarm-manager/bin/guardsarm-manager-control start || true ); \
+  for i in $(seq 1 40); do [ -S /var/guardsarm-manager/queue/sockets/analysis ] && break; sleep 2; done; \
+  sleep 5; \
+  if ! curl -s --unix-socket /var/guardsarm-manager/queue/sockets/analysis -H "Content-Type: text/plain" -X POST -d "{}" http://localhost/_internal/router/table/get 2>/dev/null | grep -q "\"name\""; then \
+    echo "[self-heal] no active route -> activating local default route"; \
+    python3 /var/guardsarm-manager/bin/activate_routes.py 2>&1 | tail -3; \
+  else echo "[self-heal] route already active"; fi; \
+  echo "=== GuardSarm daemons ==="; /var/guardsarm-manager/bin/guardsarm-manager-control status 2>/dev/null || ps -e; \
+  touch /var/guardsarm-manager/logs/guardsarm-manager.log; tail -f /var/guardsarm-manager/logs/guardsarm-manager.log'
