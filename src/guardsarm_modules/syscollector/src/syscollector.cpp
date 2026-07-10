@@ -59,7 +59,7 @@ void syscollector_init(const unsigned int inverval,
     {
         [callbackLog](const modules_log_level_t level, const std::string & data)
         {
-            callbackLog(level, data.c_str(), WM_SYS_LOGTAG);
+            callbackLog(level, data.c_str(), GM_SYS_LOGTAG);
         }
     };
 
@@ -67,7 +67,7 @@ void syscollector_init(const unsigned int inverval,
     {
         [callbackLog](const std::string & data)
         {
-            callbackLog(LOG_ERROR, data.c_str(), WM_SYS_LOGTAG);
+            callbackLog(LOG_ERROR, data.c_str(), GM_SYS_LOGTAG);
         }
     };
 
@@ -100,7 +100,7 @@ void syscollector_init(const unsigned int inverval,
     }
     catch (const std::exception& ex)
     {
-        callbackLog(LOG_ERROR, ex.what(), WM_SYS_LOGTAG);
+        callbackLog(LOG_ERROR, ex.what(), GM_SYS_LOGTAG);
         // DO NOT re-throw - this is called from C code which cannot catch C++ exceptions
         // The module will be in a failed state and subsequent calls will be no-ops
     }

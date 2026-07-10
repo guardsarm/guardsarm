@@ -118,7 +118,7 @@ void monitor_agents_deletion(){
 
                         char *agent_name_ip = NULL;
                         os_strdup(j_agent_name->valuestring, agent_name_ip);
-                        wm_strcat(&agent_name_ip, j_agent_ip->valuestring, '-');
+                        gm_strcat(&agent_name_ip, j_agent_ip->valuestring, '-');
                         if(!delete_old_agent(agent_name_ip)){
                             minfo(OS_AG_REMOVED, agents_array[i], j_agent_name->valuestring);
                         }

@@ -1083,8 +1083,8 @@ time_t get_agent_date_added(int agent_id) {
             }
 
             /* Date is 3 and 4 */
-            wm_strcat(&date,data[3], ' ');
-            wm_strcat(&date,data[4], ' ');
+            gm_strcat(&date,data[3], ' ');
+            gm_strcat(&date,data[4], ' ');
 
             if(date == NULL) {
                 fclose(fp);

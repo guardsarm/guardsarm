@@ -48,7 +48,7 @@ size_t agcom_dispatch(char * command, char ** output){
         if (cfg) {
             os_strdup("ok", *output);
             char *json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             os_free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
@@ -73,7 +73,7 @@ size_t agcom_getconfig(const char * section, char ** output) {
         if (cfg = getClientConfig(), cfg) {
             *output = strdup("ok");
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
@@ -84,7 +84,7 @@ size_t agcom_getconfig(const char * section, char ** output) {
         if (cfg = getBufferConfig(), cfg) {
             *output = strdup("ok");
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
@@ -95,7 +95,7 @@ size_t agcom_getconfig(const char * section, char ** output) {
         if (cfg = getAgentInternalOptions(), cfg) {
             *output = strdup("ok");
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
@@ -107,7 +107,7 @@ size_t agcom_getconfig(const char * section, char ** output) {
         if (cfg = getAntiTamperingConfig(), cfg) {
             os_strdup("ok", *output);
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             os_free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
@@ -199,7 +199,7 @@ size_t agcom_getstartupgate(char **output) {
     }
 
     os_strdup("ok", *output);
-    wm_strcat(output, json_str, ' ');
+    gm_strcat(output, json_str, ' ');
     os_free(json_str);
 
     return strlen(*output);

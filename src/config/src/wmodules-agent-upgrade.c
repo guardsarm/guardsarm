@@ -25,32 +25,32 @@ static const char *XML_MAX_THREADS = "max_threads";
 #endif
 
 #ifdef CLIENT
-static int wm_agent_upgrade_read_ca_verification(xml_node **nodes, unsigned int *verification_flag);
-static int wm_agent_upgrade_read_ca_verification_old(unsigned int *verification_flag);
+static int gm_agent_upgrade_read_ca_verification(xml_node **nodes, unsigned int *verification_flag);
+static int gm_agent_upgrade_read_ca_verification_old(unsigned int *verification_flag);
 #endif
 
 #ifdef CLIENT
-int wm_agent_upgrade_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
+int gm_agent_upgrade_read(const OS_XML *xml, xml_node **nodes, gmodule *module) {
 #else
-int wm_agent_upgrade_read(__attribute__((unused)) const OS_XML *xml, xml_node **nodes, wmodule *module) {
+int gm_agent_upgrade_read(__attribute__((unused)) const OS_XML *xml, xml_node **nodes, gmodule *module) {
 #endif
-    wm_agent_upgrade* data = NULL;
+    gm_agent_upgrade* data = NULL;
 
     if (!module->data) {
         // Default initialization
-        module->context = &WM_AGENT_UPGRADE_CONTEXT;
+        module->context = &GM_AGENT_UPGRADE_CONTEXT;
         module->tag = strdup(module->context->name);
-        os_calloc(1, sizeof(wm_agent_upgrade), data);
+        os_calloc(1, sizeof(gm_agent_upgrade), data);
         #ifdef CLIENT
         data->enabled = 1;
-        data->agent_config.upgrade_wait_start = WM_UPGRADE_WAIT_START;
-        data->agent_config.upgrade_wait_max = WM_UPGRADE_WAIT_MAX;
-        data->agent_config.upgrade_wait_factor_increase = WM_UPGRADE_WAIT_FACTOR_INCREASE;
+        data->agent_config.upgrade_wait_start = GM_UPGRADE_WAIT_START;
+        data->agent_config.upgrade_wait_max = GM_UPGRADE_WAIT_MAX;
+        data->agent_config.upgrade_wait_factor_increase = GM_UPGRADE_WAIT_FACTOR_INCREASE;
         data->agent_config.enable_ca_verification = 1;
         #else
         data->enabled = 1;
-        data->manager_config.max_threads = WM_UPGRADE_MAX_THREADS;
-        data->manager_config.chunk_size = WM_UPGRADE_CHUNK_SIZE;
+        data->manager_config.max_threads = GM_UPGRADE_MAX_THREADS;
+        data->manager_config.chunk_size = GM_UPGRADE_CHUNK_SIZE;
         data->manager_config.wpk_repository = NULL;
         #endif
         module->data = data;
@@ -61,7 +61,7 @@ int wm_agent_upgrade_read(__attribute__((unused)) const OS_XML *xml, xml_node **
     #ifdef CLIENT
     // Read deprecated CA configuration
     if (!wcom_ca_store) {
-        if (wm_agent_upgrade_read_ca_verification_old(&data->agent_config.enable_ca_verification)) {
+        if (gm_agent_upgrade_read_ca_verification_old(&data->agent_config.enable_ca_verification)) {
             return OS_INVALID;
         }
     }
@@ -81,7 +81,7 @@ int wm_agent_upgrade_read(__attribute__((unused)) const OS_XML *xml, xml_node **
             else if (!strcmp(nodes[i]->content, "no"))
                 data->enabled = 0;
             else {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_ENABLED, WM_AGENT_UPGRADE_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_ENABLED, GM_AGENT_UPGRADE_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_WAIT_START)) {
@@ -89,7 +89,7 @@ int wm_agent_upgrade_read(__attribute__((unused)) const OS_XML *xml, xml_node **
             data->agent_config.upgrade_wait_start = strtol(nodes[i]->content,  &endptr, 0);
 
             if (data->agent_config.upgrade_wait_start == 0 || data->agent_config.upgrade_wait_start == INT_MAX) {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_WAIT_START, WM_AGENT_UPGRADE_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_WAIT_START, GM_AGENT_UPGRADE_CONTEXT.name);
                 return OS_INVALID;
             }
 
@@ -104,14 +104,14 @@ int wm_agent_upgrade_read(__attribute__((unused)) const OS_XML *xml, xml_node **
             case '\0':
                 break;
             default:
-                merror("Invalid %s at module '%s'", XML_WAIT_START, WM_AGENT_UPGRADE_CONTEXT.name);
+                merror("Invalid %s at module '%s'", XML_WAIT_START, GM_AGENT_UPGRADE_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_WAIT_MAX)) {
             char *endptr;
             data->agent_config.upgrade_wait_max = strtol(nodes[i]->content, &endptr, 0);
             if (data->agent_config.upgrade_wait_max == 0 || data->agent_config.upgrade_wait_max == INT_MAX) {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_WAIT_MAX, WM_AGENT_UPGRADE_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_WAIT_MAX, GM_AGENT_UPGRADE_CONTEXT.name);
                 return OS_INVALID;
             }
 
@@ -126,7 +126,7 @@ int wm_agent_upgrade_read(__attribute__((unused)) const OS_XML *xml, xml_node **
             case '\0':
                 break;
             default:
-                merror("Invalid content for tag '%s' at module '%s'", XML_WAIT_MAX, WM_AGENT_UPGRADE_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'", XML_WAIT_MAX, GM_AGENT_UPGRADE_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_WAIT_FACTOR)) {
@@ -134,12 +134,12 @@ int wm_agent_upgrade_read(__attribute__((unused)) const OS_XML *xml, xml_node **
             if (wait_factor > 1.0) {
                 data->agent_config.upgrade_wait_factor_increase = wait_factor;
             } else {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_WAIT_FACTOR, WM_AGENT_UPGRADE_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_WAIT_FACTOR, GM_AGENT_UPGRADE_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_CA_VERIFICATION)) {
             XML_NODE childs = OS_GetElementsbyNode(xml, nodes[i]);
-            if (!childs || wm_agent_upgrade_read_ca_verification(childs, &data->agent_config.enable_ca_verification)) {
+            if (!childs || gm_agent_upgrade_read_ca_verification(childs, &data->agent_config.enable_ca_verification)) {
                 OS_ClearNode(childs);
                 return OS_INVALID;
             }
@@ -152,18 +152,18 @@ int wm_agent_upgrade_read(__attribute__((unused)) const OS_XML *xml, xml_node **
             else if (!strcmp(nodes[i]->content, "no"))
                 data->enabled = 0;
             else {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_ENABLED, WM_AGENT_UPGRADE_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_ENABLED, GM_AGENT_UPGRADE_CONTEXT.name);
                 return OS_INVALID;
             }
         }
         else if (!strcmp(nodes[i]->element, XML_CHUNK_SIZE)) {
             if (!OS_StrIsNum(nodes[i]->content)) {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_CHUNK_SIZE, WM_AGENT_UPGRADE_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_CHUNK_SIZE, GM_AGENT_UPGRADE_CONTEXT.name);
                 return (OS_INVALID);
             }
             int chunk;
-            if (chunk = atoi(nodes[i]->content), chunk < WM_UPGRADE_CHUNK_SIZE_MIN || chunk > WM_UPGRADE_CHUNK_SIZE_MAX) {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_CHUNK_SIZE, WM_AGENT_UPGRADE_CONTEXT.name);
+            if (chunk = atoi(nodes[i]->content), chunk < GM_UPGRADE_CHUNK_SIZE_MIN || chunk > GM_UPGRADE_CHUNK_SIZE_MAX) {
+                merror("Invalid content for tag '%s' at module '%s'.", XML_CHUNK_SIZE, GM_AGENT_UPGRADE_CONTEXT.name);
                 return (OS_INVALID);
             }
 
@@ -171,7 +171,7 @@ int wm_agent_upgrade_read(__attribute__((unused)) const OS_XML *xml, xml_node **
 
         } else if (!strcmp(nodes[i]->element, XML_MAX_THREADS)) {
             if (!OS_StrIsNum(nodes[i]->content)) {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_MAX_THREADS, WM_AGENT_UPGRADE_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_MAX_THREADS, GM_AGENT_UPGRADE_CONTEXT.name);
                 return (OS_INVALID);
             }
             int max_threads = atoi(nodes[i]->content);
@@ -181,7 +181,7 @@ int wm_agent_upgrade_read(__attribute__((unused)) const OS_XML *xml, xml_node **
             } else if (max_threads <= 256) {
                 data->manager_config.max_threads = max_threads;
             } else {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_MAX_THREADS, WM_AGENT_UPGRADE_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_MAX_THREADS, GM_AGENT_UPGRADE_CONTEXT.name);
                 return (OS_INVALID);
             }
 
@@ -191,7 +191,7 @@ int wm_agent_upgrade_read(__attribute__((unused)) const OS_XML *xml, xml_node **
         }
         #endif
         else {
-            mwarn("No such tag <%s> at module '%s'.", nodes[i]->element, WM_AGENT_UPGRADE_CONTEXT.name);
+            mwarn("No such tag <%s> at module '%s'.", nodes[i]->element, GM_AGENT_UPGRADE_CONTEXT.name);
         }
     }
 
@@ -217,7 +217,7 @@ int wm_agent_upgrade_read(__attribute__((unused)) const OS_XML *xml, xml_node **
 }
 
 #ifdef CLIENT
-static int wm_agent_upgrade_read_ca_verification(xml_node **nodes, unsigned int *verification_flag) {
+static int gm_agent_upgrade_read_ca_verification(xml_node **nodes, unsigned int *verification_flag) {
     int ca_store_count = 0;
 
     if (wcom_ca_store) {
@@ -249,7 +249,7 @@ static int wm_agent_upgrade_read_ca_verification(xml_node **nodes, unsigned int 
     return 0;
 }
 
-static int wm_agent_upgrade_read_ca_verification_old(unsigned int *verification_flag) {
+static int gm_agent_upgrade_read_ca_verification_old(unsigned int *verification_flag) {
     // Read CA deprecated configuration
     const char *(caverify[]) = {GUARDSARMCONFIG, "active-response", "ca_verification", NULL};
     const char *(castore[]) = {GUARDSARMCONFIG, "active-response", "ca_store", NULL};

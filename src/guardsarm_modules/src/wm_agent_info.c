@@ -34,11 +34,11 @@
 #undef mdebug1
 #undef mdebug2
 
-#define minfo(msg, ...)   _mtinfo(WM_AGENT_INFO_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
-#define mwarn(msg, ...)   _mtwarn(WM_AGENT_INFO_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
-#define merror(msg, ...)  _mterror(WM_AGENT_INFO_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
-#define mdebug1(msg, ...) _mtdebug1(WM_AGENT_INFO_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
-#define mdebug2(msg, ...) _mtdebug2(WM_AGENT_INFO_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
+#define minfo(msg, ...)   _mtinfo(GM_AGENT_INFO_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
+#define mwarn(msg, ...)   _mtwarn(GM_AGENT_INFO_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
+#define merror(msg, ...)  _mterror(GM_AGENT_INFO_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
+#define mdebug1(msg, ...) _mtdebug1(GM_AGENT_INFO_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
+#define mdebug2(msg, ...) _mtdebug2(GM_AGENT_INFO_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
 
 // XML configuration constants
 static const char* XML_INTERVAL = "interval";
@@ -71,22 +71,22 @@ static agent_info_parse_response_func agent_info_parse_response_ptr = NULL;
 
 // Forward declarations (needed for WM_AGENT_INFO_CONTEXT)
 #ifdef WIN32
-DWORD WINAPI wm_agent_info_main(void* arg);
+DWORD WINAPI gm_agent_info_main(void* arg);
 #else
-void* wm_agent_info_main(wm_agent_info_t* agent_info);
+void* gm_agent_info_main(gm_agent_info_t* agent_info);
 #endif
-void wm_agent_info_destroy(wm_agent_info_t* agent_info);
-cJSON* wm_agent_info_dump(const wm_agent_info_t* agent_info);
-int wm_agent_info_sync_message(const char* command, size_t command_len);
-void wm_agent_info_stop(void);
+void gm_agent_info_destroy(gm_agent_info_t* agent_info);
+cJSON* gm_agent_info_dump(const gm_agent_info_t* agent_info);
+int gm_agent_info_sync_message(const char* command, size_t command_len);
+void gm_agent_info_stop(void);
 
 // Module context
-const wm_context WM_AGENT_INFO_CONTEXT = {.name = AGENT_INFO_WM_NAME,
-                                          .start = (wm_routine)wm_agent_info_main,
-                                          .destroy = (void (*)(void*))wm_agent_info_destroy,
-                                          .dump = (cJSON * (*)(const void*)) wm_agent_info_dump,
-                                          .sync = (int (*)(const char*, size_t))wm_agent_info_sync_message,
-                                          .stop = (void (*)(void*))wm_agent_info_stop,
+const gm_context GM_AGENT_INFO_CONTEXT = {.name = AGENT_INFO_WM_NAME,
+                                          .start = (gm_routine)gm_agent_info_main,
+                                          .destroy = (void (*)(void*))gm_agent_info_destroy,
+                                          .dump = (cJSON * (*)(const void*)) gm_agent_info_dump,
+                                          .sync = (int (*)(const char*, size_t))gm_agent_info_sync_message,
+                                          .stop = (void (*)(void*))gm_agent_info_stop,
                                           .query = NULL};
 
 // ==============================================================================
@@ -94,7 +94,7 @@ const wm_context WM_AGENT_INFO_CONTEXT = {.name = AGENT_INFO_WM_NAME,
 // ==============================================================================
 
 // Synchronization parsing function
-static void wm_agent_info_parse_synchronization(wm_agent_info_t* agent_info, xml_node** node)
+static void gm_agent_info_parse_synchronization(gm_agent_info_t* agent_info, xml_node** node)
 {
     const char* XML_DB_SYNC_ENABLED = "enabled";
     const char* XML_DB_SYNC_END_DELAY = "sync_end_delay";
@@ -195,27 +195,27 @@ agent_info_log_callback(const modules_log_level_t level, const char* log, __attr
 
 // True once a shutdown is requested. Checks both flags: wm_shutdown_requested
 // is set first, g_shutting_down later.
-static bool wm_agent_info_is_shutting_down()
+static bool gm_agent_info_is_shutting_down()
 {
-    return g_shutting_down || wm_shutdown_requested;
+    return g_shutting_down || gm_shutdown_requested;
 }
 
 // Open the queue. StartMQPredicated re-checks the shutdown predicate during its
 // (now interruptible) backoff, so both finite and infinite attempts honor
 // shutdown within ~1 s; delegate directly.
-static int wm_agent_info_startmq(const char* key, short type, short attempts)
+static int gm_agent_info_startmq(const char* key, short type, short attempts)
 {
-    return StartMQPredicated(key, type, attempts, wm_agent_info_is_shutting_down);
+    return StartMQPredicated(key, type, attempts, gm_agent_info_is_shutting_down);
 }
 
 static int
-wm_agent_info_send_binary_msg(int queue, const void* message, size_t message_len, const char* locmsg, char loc)
+gm_agent_info_send_binary_msg(int queue, const void* message, size_t message_len, const char* locmsg, char loc)
 {
     return SendBinaryMSG(queue, message, message_len, locmsg, loc);
 }
 
 // Wrapper function to adapt wm_module_query signature to the expected callback type
-static int wm_agent_info_query_module_wrapper(const char* module_name, const char* json_query, char** response)
+static int gm_agent_info_query_module_wrapper(const char* module_name, const char* json_query, char** response)
 {
     if (!module_name || !json_query || !response)
     {
@@ -227,7 +227,7 @@ static int wm_agent_info_query_module_wrapper(const char* module_name, const cha
     // Check if this is a request for FIM module (separate process)
     if (strcmp(module_name, FIM_NAME) == 0)
     {
-        size_t result_len = wm_fim_query_json(json_query, response);
+        size_t result_len = gm_fim_query_json(json_query, response);
 
         if (result_len > 0 && *response)
         {
@@ -250,7 +250,7 @@ static int wm_agent_info_query_module_wrapper(const char* module_name, const cha
 
     // For SCA, Syscollector and other wm_modules
     // Use wm_module_query_json_ex which accepts module_name directly (more efficient)
-    size_t result_len = wm_module_query_json_ex(module_name, json_query, response);
+    size_t result_len = gm_module_query_json_ex(module_name, json_query, response);
 
     if (result_len > 0 && *response)
     {
@@ -280,7 +280,7 @@ extern size_t agcom_dispatch(char* command, char** output);
 // Query agentd for handshake data via agcom
 // On Windows: calls agcom_dispatch directly (same process)
 // On Unix: connects to agcom socket (AG_LOCAL_SOCK)
-static bool wm_agent_info_query_agentd_handshake(char* cluster_name,
+static bool gm_agent_info_query_agentd_handshake(char* cluster_name,
                                                  size_t cluster_name_size,
                                                  char* cluster_node,
                                                  size_t cluster_node_size,
@@ -396,9 +396,9 @@ static bool wm_agent_info_query_agentd_handshake(char* cluster_name,
 }
 
 // Callback to send stateless messages
-static int wm_agent_info_send_stateless(const char* message)
+static int gm_agent_info_send_stateless(const char* message)
 {
-    if (wm_agent_info_is_shutting_down())
+    if (gm_agent_info_is_shutting_down())
     {
         return -1;
     }
@@ -411,10 +411,10 @@ static int wm_agent_info_send_stateless(const char* message)
     mdebug1("Sending agent-info event: %s", message);
 
     if (SendMSGPredicated(
-            g_agent_info_queue, message, WM_AGENT_INFO_LOGTAG, LOCALFILE_MQ, wm_agent_info_is_shutting_down) < 0)
+            g_agent_info_queue, message, GM_AGENT_INFO_LOGTAG, LOCALFILE_MQ, gm_agent_info_is_shutting_down) < 0)
     {
         // Aborted by shutdown: exit quietly.
-        if (wm_agent_info_is_shutting_down())
+        if (gm_agent_info_is_shutting_down())
         {
             return -1;
         }
@@ -422,16 +422,16 @@ static int wm_agent_info_send_stateless(const char* message)
         merror("Error sending message to queue");
 
         // A negative result here means shutdown, so exit quietly.
-        if ((g_agent_info_queue = wm_agent_info_startmq(DEFAULTQUEUE, WRITE, INFINITE_OPENQ_ATTEMPTS)) < 0)
+        if ((g_agent_info_queue = gm_agent_info_startmq(DEFAULTQUEUE, WRITE, INFINITE_OPENQ_ATTEMPTS)) < 0)
         {
             return -1;
         }
 
         // Try to send it again
         if (SendMSGPredicated(
-                g_agent_info_queue, message, WM_AGENT_INFO_LOGTAG, LOCALFILE_MQ, wm_agent_info_is_shutting_down) < 0)
+                g_agent_info_queue, message, GM_AGENT_INFO_LOGTAG, LOCALFILE_MQ, gm_agent_info_is_shutting_down) < 0)
         {
-            if (!wm_agent_info_is_shutting_down())
+            if (!gm_agent_info_is_shutting_down())
             {
                 merror("Error sending message to queue after reconnection");
             }
@@ -447,10 +447,10 @@ static int wm_agent_info_send_stateless(const char* message)
 // ==============================================================================
 
 // Reading function
-int wm_agent_info_read(__attribute__((unused)) const OS_XML* xml, xml_node** nodes, wmodule* module)
+int gm_agent_info_read(__attribute__((unused)) const OS_XML* xml, xml_node** nodes, gmodule* module)
 {
     unsigned int i;
-    wm_agent_info_t* agent_info;
+    gm_agent_info_t* agent_info;
 
     if (module->data)
     {
@@ -458,7 +458,7 @@ int wm_agent_info_read(__attribute__((unused)) const OS_XML* xml, xml_node** nod
     }
     else
     {
-        os_calloc(1, sizeof(wm_agent_info_t), agent_info);
+        os_calloc(1, sizeof(gm_agent_info_t), agent_info);
     }
 
     // Set default configuration values
@@ -472,7 +472,7 @@ int wm_agent_info_read(__attribute__((unused)) const OS_XML* xml, xml_node** nod
     agent_info->sync.sync_retries = 3;
     agent_info->sync.sync_max_eps = 50;
 
-    module->context = &WM_AGENT_INFO_CONTEXT;
+    module->context = &GM_AGENT_INFO_CONTEXT;
     module->tag = strdup(module->context->name);
     module->data = agent_info;
 
@@ -496,7 +496,7 @@ int wm_agent_info_read(__attribute__((unused)) const OS_XML* xml, xml_node** nod
             if (value < 60 || value > DAY_SEC || *end)
             {
                 mwarn("Invalid interval time at module '%s'. Value must be between 60 and %d.",
-                      WM_AGENT_INFO_CONTEXT.name,
+                      GM_AGENT_INFO_CONTEXT.name,
                       DAY_SEC);
             }
             else
@@ -513,7 +513,7 @@ int wm_agent_info_read(__attribute__((unused)) const OS_XML* xml, xml_node** nod
             {
                 mwarn("Invalid integrity_interval time at module '%s'. Value must be between 60 (1 minute) and %d (7 "
                       "days).",
-                      WM_AGENT_INFO_CONTEXT.name,
+                      GM_AGENT_INFO_CONTEXT.name,
                       7 * DAY_SEC);
             }
             else
@@ -528,7 +528,7 @@ int wm_agent_info_read(__attribute__((unused)) const OS_XML* xml, xml_node** nod
 
             if (children)
             {
-                wm_agent_info_parse_synchronization(agent_info, children);
+                gm_agent_info_parse_synchronization(agent_info, children);
                 OS_ClearNode(children);
             }
         }
@@ -542,7 +542,7 @@ int wm_agent_info_read(__attribute__((unused)) const OS_XML* xml, xml_node** nod
 }
 
 // Stop function
-void wm_agent_info_stop()
+void gm_agent_info_stop()
 {
     g_shutting_down = 1;
 
@@ -553,7 +553,7 @@ void wm_agent_info_stop()
 }
 
 // Sync message function
-int wm_agent_info_sync_message(const char* command, size_t command_len)
+int gm_agent_info_sync_message(const char* command, size_t command_len)
 {
     if (agent_info_enable_synchronization && agent_info_parse_response_ptr)
     {
@@ -580,11 +580,11 @@ int wm_agent_info_sync_message(const char* command, size_t command_len)
 
 // Main module function
 #ifdef WIN32
-DWORD WINAPI wm_agent_info_main(void* arg)
+DWORD WINAPI gm_agent_info_main(void* arg)
 {
-    wm_agent_info_t* agent_info = (wm_agent_info_t*)arg;
+    gm_agent_info_t* agent_info = (gm_agent_info_t*)arg;
 #else
-void* wm_agent_info_main(wm_agent_info_t* agent_info)
+void* gm_agent_info_main(gm_agent_info_t* agent_info)
 {
 #endif
     g_shutting_down = 0;
@@ -598,12 +598,12 @@ void* wm_agent_info_main(wm_agent_info_t* agent_info)
     }
 
     // Initialize message queue
-    g_agent_info_queue = wm_agent_info_startmq(DEFAULTQUEUE, WRITE, INFINITE_OPENQ_ATTEMPTS);
+    g_agent_info_queue = gm_agent_info_startmq(DEFAULTQUEUE, WRITE, INFINITE_OPENQ_ATTEMPTS);
 
     if (g_agent_info_queue < 0)
     {
         // A negative result here means shutdown, so don't log an error.
-        if (!wm_agent_info_is_shutting_down())
+        if (!gm_agent_info_is_shutting_down())
         {
             merror("Cannot initialize agent-info message queue.");
         }
@@ -643,13 +643,13 @@ void* wm_agent_info_main(wm_agent_info_t* agent_info)
         // Set the push functions for message handling (report and persist)
         if (agent_info_set_report_function_ptr)
         {
-            agent_info_set_report_function_ptr(wm_agent_info_send_stateless);
+            agent_info_set_report_function_ptr(gm_agent_info_send_stateless);
         }
 
         // Set the query module function for inter-module communication
         if (agent_info_set_query_module_function_ptr)
         {
-            agent_info_set_query_module_function_ptr(wm_agent_info_query_module_wrapper);
+            agent_info_set_query_module_function_ptr(gm_agent_info_query_module_wrapper);
         }
     }
     else
@@ -660,7 +660,7 @@ void* wm_agent_info_main(wm_agent_info_t* agent_info)
 
     if (agent_info_init_sync_protocol_ptr)
     {
-        MQ_Functions mq_funcs = {.start = wm_agent_info_startmq, .send_binary = wm_agent_info_send_binary_msg};
+        MQ_Functions mq_funcs = {.start = gm_agent_info_startmq, .send_binary = gm_agent_info_send_binary_msg};
         agent_info_init_sync_protocol_ptr(AGENT_INFO_WM_NAME, &mq_funcs);
     }
 
@@ -670,9 +670,9 @@ void* wm_agent_info_main(wm_agent_info_t* agent_info)
     char agent_groups[OS_SIZE_65536] = {0};
     bool handshake_success = false;
 
-    while (!handshake_success && !wm_agent_info_is_shutting_down())
+    while (!handshake_success && !gm_agent_info_is_shutting_down())
     {
-        if (wm_agent_info_query_agentd_handshake(cluster_name,
+        if (gm_agent_info_query_agentd_handshake(cluster_name,
                                                  sizeof(cluster_name),
                                                  cluster_node,
                                                  sizeof(cluster_node),
@@ -699,11 +699,11 @@ void* wm_agent_info_main(wm_agent_info_t* agent_info)
         else
         {
             mdebug1("Handshake data not available yet, retrying in 1 second...");
-            wm_sleep_interruptible(1);
+            gm_sleep_interruptible(1);
         }
     }
 
-    if (wm_agent_info_is_shutting_down())
+    if (gm_agent_info_is_shutting_down())
     {
         mdebug1("Shutdown requested during handshake wait, exiting.");
         return NULL;
@@ -728,7 +728,7 @@ void* wm_agent_info_main(wm_agent_info_t* agent_info)
 }
 
 // Destroy function
-void wm_agent_info_destroy(wm_agent_info_t* agent_info)
+void gm_agent_info_destroy(gm_agent_info_t* agent_info)
 {
     minfo("Destroying agent-info module.");
 
@@ -751,15 +751,15 @@ void wm_agent_info_destroy(wm_agent_info_t* agent_info)
 }
 
 // Dump configuration function
-cJSON* wm_agent_info_dump(const wm_agent_info_t* agent_info)
+cJSON* gm_agent_info_dump(const gm_agent_info_t* agent_info)
 {
     cJSON* root = cJSON_CreateObject();
-    cJSON* wm_agent_info = cJSON_CreateObject();
+    cJSON* gm_agent_info = cJSON_CreateObject();
 
     if (agent_info)
     {
-        cJSON_AddNumberToObject(wm_agent_info, "interval", agent_info->interval);
-        cJSON_AddNumberToObject(wm_agent_info, "integrity_interval", agent_info->integrity_interval);
+        cJSON_AddNumberToObject(gm_agent_info, "interval", agent_info->interval);
+        cJSON_AddNumberToObject(gm_agent_info, "integrity_interval", agent_info->integrity_interval);
 
         // Database synchronization values
         cJSON* synchronization = cJSON_CreateObject();
@@ -769,9 +769,9 @@ cJSON* wm_agent_info_dump(const wm_agent_info_t* agent_info)
         cJSON_AddNumberToObject(synchronization, "retries", agent_info->sync.sync_retries);
         cJSON_AddNumberToObject(synchronization, "max_eps", agent_info->sync.sync_max_eps);
 
-        cJSON_AddItemToObject(wm_agent_info, "synchronization", synchronization);
+        cJSON_AddItemToObject(gm_agent_info, "synchronization", synchronization);
     }
 
-    cJSON_AddItemToObject(root, "agent-info", wm_agent_info);
+    cJSON_AddItemToObject(root, "agent-info", gm_agent_info);
     return root;
 }

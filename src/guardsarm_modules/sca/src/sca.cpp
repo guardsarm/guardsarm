@@ -83,7 +83,7 @@ void sca_set_sync_parameters(const char* module_name, const char* sync_db_path, 
 ///
 /// @param sca_config Pointer to the SCA configuration structure containing
 ///                   module settings, policies, and scan parameters
-void sca_start(const struct wm_sca_t* sca_config)
+void sca_start(const struct gm_sca_t* sca_config)
 {
     try
     {
@@ -137,7 +137,7 @@ void sca_set_log_function(log_callback_t log_callback)
     {
         [log_callback](const modules_log_level_t level, const std::string & data)
         {
-            log_callback(level, data.c_str(), WM_SCA_LOGTAG);
+            log_callback(level, data.c_str(), GM_SCA_LOGTAG);
         }
     };
 
@@ -151,9 +151,9 @@ void sca_set_log_function(log_callback_t log_callback)
 /// policy checks that require command execution.
 ///
 /// @param wm_exec_callback Function pointer to the command execution callback
-void sca_set_wm_exec(wm_exec_callback_t wm_exec_callback)
+void sca_set_wm_exec(gm_exec_callback_t gm_exec_callback)
 {
-    SecurityConfigurationAssessment::SetGlobalWmExecFunction(wm_exec_callback);
+    SecurityConfigurationAssessment::SetGlobalWmExecFunction(gm_exec_callback);
 }
 
 /// @brief Sets the YAML to cJSON conversion function for the SCA module.
@@ -296,7 +296,7 @@ void SCA::init()
     }
 }
 
-void SCA::setup(const struct wm_sca_t* sca_config)
+void SCA::setup(const struct gm_sca_t* sca_config)
 {
     if (m_sca && sca_config)
     {
@@ -318,7 +318,7 @@ void SCA::setup(const struct wm_sca_t* sca_config)
         {
             for (int i = 0; sca_config->policies[i] != nullptr; i++)
             {
-                wm_sca_policy_t* policy = sca_config->policies[i];
+                gm_sca_policy_t* policy = sca_config->policies[i];
 
                 if (policy->policy_path)
                 {

@@ -25,50 +25,50 @@ STATIC OSHash *task_table_by_agent_id;
 /**
  * Sends the task information locally to the task module queue
  * */
-STATIC cJSON* wm_agent_send_task_information_master(const cJSON *message_object) __attribute__((nonnull));
+STATIC cJSON* gm_agent_send_task_information_master(const cJSON *message_object) __attribute__((nonnull));
 
 /**
  * Sends a `send_sync` message into clusterd that will be received by the master node
  * */
-STATIC cJSON* wm_agent_send_task_information_worker(const cJSON *message_object) __attribute__((nonnull));
+STATIC cJSON* gm_agent_send_task_information_worker(const cJSON *message_object) __attribute__((nonnull));
 
-wm_upgrade_task* wm_agent_upgrade_init_upgrade_task() {
-    wm_upgrade_task *task;
-    os_calloc(1, sizeof(wm_upgrade_task), task);
+gm_upgrade_task* gm_agent_upgrade_init_upgrade_task() {
+    gm_upgrade_task *task;
+    os_calloc(1, sizeof(gm_upgrade_task), task);
     return task;
 }
 
-wm_upgrade_custom_task* wm_agent_upgrade_init_upgrade_custom_task() {
-    wm_upgrade_custom_task *task;
-    os_calloc(1, sizeof(wm_upgrade_custom_task), task);
+gm_upgrade_custom_task* gm_agent_upgrade_init_upgrade_custom_task() {
+    gm_upgrade_custom_task *task;
+    os_calloc(1, sizeof(gm_upgrade_custom_task), task);
     return task;
 }
 
-wm_task_info* wm_agent_upgrade_init_task_info() {
-    wm_task_info *task_info = NULL;
-    os_calloc(1, sizeof(wm_task_info), task_info);
+gm_task_info* gm_agent_upgrade_init_task_info() {
+    gm_task_info *task_info = NULL;
+    os_calloc(1, sizeof(gm_task_info), task_info);
     return task_info;
 }
 
-wm_agent_info* wm_agent_upgrade_init_agent_info() {
-    wm_agent_info *agent_info = NULL;
-    os_calloc(1, sizeof(wm_agent_info), agent_info);
+gm_agent_info* gm_agent_upgrade_init_agent_info() {
+    gm_agent_info *agent_info = NULL;
+    os_calloc(1, sizeof(gm_agent_info), agent_info);
     return agent_info;
 }
 
-wm_agent_task* wm_agent_upgrade_init_agent_task() {
-    wm_agent_task *agent_task = NULL;
-    os_calloc(1, sizeof(wm_agent_task), agent_task);
+gm_agent_task* gm_agent_upgrade_init_agent_task() {
+    gm_agent_task *agent_task = NULL;
+    os_calloc(1, sizeof(gm_agent_task), agent_task);
     return agent_task;
 }
 
-wm_upgrade_agent_status_task* wm_agent_upgrade_init_agent_status_task() {
-    wm_upgrade_agent_status_task *task = NULL;
-    os_calloc(1, sizeof(wm_upgrade_agent_status_task), task);
+gm_upgrade_agent_status_task* gm_agent_upgrade_init_agent_status_task() {
+    gm_upgrade_agent_status_task *task = NULL;
+    os_calloc(1, sizeof(gm_upgrade_agent_status_task), task);
     return task;
 }
 
-void wm_agent_upgrade_free_upgrade_task(wm_upgrade_task* upgrade_task) {
+void gm_agent_upgrade_free_upgrade_task(gm_upgrade_task* upgrade_task) {
     if (upgrade_task) {
         os_free(upgrade_task->custom_version);
         os_free(upgrade_task->wpk_repository);
@@ -80,7 +80,7 @@ void wm_agent_upgrade_free_upgrade_task(wm_upgrade_task* upgrade_task) {
     }
 }
 
-void wm_agent_upgrade_free_upgrade_custom_task(wm_upgrade_custom_task* upgrade_custom_task) {
+void gm_agent_upgrade_free_upgrade_custom_task(gm_upgrade_custom_task* upgrade_custom_task) {
     if (upgrade_custom_task) {
         os_free(upgrade_custom_task->custom_file_path);
         os_free(upgrade_custom_task->custom_installer);
@@ -88,20 +88,20 @@ void wm_agent_upgrade_free_upgrade_custom_task(wm_upgrade_custom_task* upgrade_c
     }
 }
 
-void wm_agent_upgrade_free_task_info(wm_task_info* task_info) {
+void gm_agent_upgrade_free_task_info(gm_task_info* task_info) {
     if (task_info) {
         if (task_info->task) {
-            if (WM_UPGRADE_UPGRADE == task_info->command) {
-                wm_agent_upgrade_free_upgrade_task((wm_upgrade_task*)task_info->task);
-            } else if (WM_UPGRADE_UPGRADE_CUSTOM == task_info->command) {
-                wm_agent_upgrade_free_upgrade_custom_task((wm_upgrade_custom_task*)task_info->task);
+            if (GM_UPGRADE_UPGRADE == task_info->command) {
+                gm_agent_upgrade_free_upgrade_task((gm_upgrade_task*)task_info->task);
+            } else if (GM_UPGRADE_UPGRADE_CUSTOM == task_info->command) {
+                gm_agent_upgrade_free_upgrade_custom_task((gm_upgrade_custom_task*)task_info->task);
             }
         }
         os_free(task_info);
     }
 }
 
-void wm_agent_upgrade_free_agent_info(wm_agent_info* agent_info) {
+void gm_agent_upgrade_free_agent_info(gm_agent_info* agent_info) {
     if (agent_info) {
         os_free(agent_info->platform);
         os_free(agent_info->major_version);
@@ -114,19 +114,19 @@ void wm_agent_upgrade_free_agent_info(wm_agent_info* agent_info) {
     }
 }
 
-void wm_agent_upgrade_free_agent_task(wm_agent_task* agent_task) {
+void gm_agent_upgrade_free_agent_task(gm_agent_task* agent_task) {
     if (agent_task) {
         if (agent_task->agent_info) {
-            wm_agent_upgrade_free_agent_info(agent_task->agent_info);
+            gm_agent_upgrade_free_agent_info(agent_task->agent_info);
         }
         if (agent_task->task_info) {
-            wm_agent_upgrade_free_task_info(agent_task->task_info);
+            gm_agent_upgrade_free_task_info(agent_task->task_info);
         }
         os_free(agent_task);
     }
 }
 
-void wm_agent_upgrade_free_agent_status_task(wm_upgrade_agent_status_task* task) {
+void gm_agent_upgrade_free_agent_status_task(gm_upgrade_agent_status_task* task) {
     if (task) {
         if (task->message) {
             os_free(task->message);
@@ -138,38 +138,38 @@ void wm_agent_upgrade_free_agent_status_task(wm_upgrade_agent_status_task* task)
     }
 }
 
-void wm_agent_upgrade_init_task_map() {
+void gm_agent_upgrade_init_task_map() {
     task_table_by_agent_id = OSHash_Create();
 }
 
-void wm_agent_upgrade_destroy_task_map() {
+void gm_agent_upgrade_destroy_task_map() {
     OSHash_Free(task_table_by_agent_id);
 }
 
-int wm_agent_upgrade_create_task_entry(int agent_id, wm_agent_task* agent_task) {
+int gm_agent_upgrade_create_task_entry(int agent_id, gm_agent_task* agent_task) {
     char agent_id_string[128];
     sprintf(agent_id_string, "%d", agent_id);
     return OSHash_Add_ex(task_table_by_agent_id, agent_id_string, agent_task);
 }
 
-void wm_agent_upgrade_remove_entry(int agent_id, int free) {
+void gm_agent_upgrade_remove_entry(int agent_id, int free) {
     char agent_id_string[128];
     sprintf(agent_id_string, "%d", agent_id);
-    wm_agent_task *agent_task = (wm_agent_task *)OSHash_Delete_ex(task_table_by_agent_id, agent_id_string);
+    gm_agent_task *agent_task = (gm_agent_task *)OSHash_Delete_ex(task_table_by_agent_id, agent_id_string);
     if (free) {
-        wm_agent_upgrade_free_agent_task(agent_task);
+        gm_agent_upgrade_free_agent_task(agent_task);
     }
 }
 
-OSHashNode* wm_agent_upgrade_get_first_node(unsigned int *index) {
+OSHashNode* gm_agent_upgrade_get_first_node(unsigned int *index) {
     return OSHash_Begin(task_table_by_agent_id, index);
 }
 
-OSHashNode* wm_agent_upgrade_get_next_node(unsigned int *index, OSHashNode *current) {
+OSHashNode* gm_agent_upgrade_get_next_node(unsigned int *index, OSHashNode *current) {
     return OSHash_Next(task_table_by_agent_id, index, current);
 }
 
-cJSON* wm_agent_upgrade_get_agent_ids() {
+cJSON* gm_agent_upgrade_get_agent_ids() {
     OSHashNode *hash_node;
     unsigned int index = 0;
     cJSON *agents_array = cJSON_CreateArray();
@@ -188,26 +188,26 @@ cJSON* wm_agent_upgrade_get_agent_ids() {
     return agents_array;
 }
 
-cJSON* wm_agent_upgrade_send_tasks_information(const cJSON *message_object) {
+cJSON* gm_agent_upgrade_send_tasks_information(const cJSON *message_object) {
     if (w_is_worker()) {
-        return wm_agent_send_task_information_worker(message_object);
+        return gm_agent_send_task_information_worker(message_object);
     } else {
-        return wm_agent_send_task_information_master(message_object);
+        return gm_agent_send_task_information_master(message_object);
     }
 }
 
-STATIC cJSON *wm_agent_send_task_information_master(const cJSON *message_object) {
+STATIC cJSON *gm_agent_send_task_information_master(const cJSON *message_object) {
     cJSON* response = NULL;
 
-    int sock = OS_ConnectUnixDomain(WM_TASK_MODULE_SOCK, SOCK_STREAM, OS_MAXSTR);
+    int sock = OS_ConnectUnixDomain(GM_TASK_MODULE_SOCK, SOCK_STREAM, OS_MAXSTR);
 
     if (sock == OS_SOCKTERR) {
-        mterror(WM_AGENT_UPGRADE_LOGTAG, WM_UPGRADE_UNREACHEABLE_TASK_MANAGER, WM_TASK_MODULE_SOCK);
+        mterror(GM_AGENT_UPGRADE_LOGTAG, GM_UPGRADE_UNREACHEABLE_TASK_MANAGER, GM_TASK_MODULE_SOCK);
     } else {
         char *buffer = NULL;
         int length;
         char *message = cJSON_PrintUnformatted(message_object);
-        mtdebug1(WM_AGENT_UPGRADE_LOGTAG, WM_UPGRADE_TASK_SEND_MESSAGE, message);
+        mtdebug1(GM_AGENT_UPGRADE_LOGTAG, GM_UPGRADE_TASK_SEND_MESSAGE, message);
 
         OS_SendSecureTCP(sock, strlen(message), message);
         os_free(message);
@@ -215,17 +215,17 @@ STATIC cJSON *wm_agent_send_task_information_master(const cJSON *message_object)
 
         switch (length = OS_RecvSecureTCP(sock, buffer, OS_MAXSTR), length) {
             case OS_SOCKTERR:
-                mterror(WM_AGENT_UPGRADE_LOGTAG, WM_UPGRADE_SOCKTERR_ERROR);
+                mterror(GM_AGENT_UPGRADE_LOGTAG, GM_UPGRADE_SOCKTERR_ERROR);
                 break;
             case -1:
-                mterror(WM_AGENT_UPGRADE_LOGTAG, WM_UPGRADE_RECV_ERROR, strerror(errno));
+                mterror(GM_AGENT_UPGRADE_LOGTAG, GM_UPGRADE_RECV_ERROR, strerror(errno));
                 break;
             default:
                 response = cJSON_Parse(buffer);
                 if (!response) {
-                    mterror(WM_AGENT_UPGRADE_LOGTAG, WM_UPGRADE_INVALID_TASK_MAN_JSON);
+                    mterror(GM_AGENT_UPGRADE_LOGTAG, GM_UPGRADE_INVALID_TASK_MAN_JSON);
                 } else {
-                    mtdebug1(WM_AGENT_UPGRADE_LOGTAG, WM_UPGRADE_TASK_RECEIVE_MESSAGE, buffer);
+                    mtdebug1(GM_AGENT_UPGRADE_LOGTAG, GM_UPGRADE_TASK_RECEIVE_MESSAGE, buffer);
                 }
                 break;
         }
@@ -237,7 +237,7 @@ STATIC cJSON *wm_agent_send_task_information_master(const cJSON *message_object)
     return response;
 }
 
-STATIC cJSON *wm_agent_send_task_information_worker(const cJSON *message_object) {
+STATIC cJSON *gm_agent_send_task_information_worker(const cJSON *message_object) {
     char response[OS_MAXSTR] = "";
     cJSON *message_duplicate = cJSON_Duplicate(message_object, 1);
 
@@ -245,12 +245,12 @@ STATIC cJSON *wm_agent_send_task_information_worker(const cJSON *message_object)
 
     char *message = cJSON_PrintUnformatted(payload);
 
-    mtdebug1(WM_AGENT_UPGRADE_LOGTAG, WM_UPGRADE_TASK_SEND_CLUSTER_MESSAGE, message);
+    mtdebug1(GM_AGENT_UPGRADE_LOGTAG, GM_UPGRADE_TASK_SEND_CLUSTER_MESSAGE, message);
 
     w_send_clustered_message("sendsync", message, response);
 
     if (response[0]) {
-        mtdebug1(WM_AGENT_UPGRADE_LOGTAG, WM_UPGRADE_TASK_RECEIVE_MESSAGE, response);
+        mtdebug1(GM_AGENT_UPGRADE_LOGTAG, GM_UPGRADE_TASK_RECEIVE_MESSAGE, response);
     }
 
     os_free(message);

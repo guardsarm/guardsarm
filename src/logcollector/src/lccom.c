@@ -457,7 +457,7 @@ size_t lccom_getconfig(const char * section, char ** output) {
         if (cfg = getLocalfileConfig(), cfg) {
             os_strdup("ok", *output);
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
@@ -468,7 +468,7 @@ size_t lccom_getconfig(const char * section, char ** output) {
         if (cfg = getSocketConfig(), cfg) {
             os_strdup("ok", *output);
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
@@ -479,7 +479,7 @@ size_t lccom_getconfig(const char * section, char ** output) {
         if (cfg = getLogcollectorInternalOptions(), cfg) {
             os_strdup("ok", *output);
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);

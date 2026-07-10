@@ -32,7 +32,7 @@ sysinfo_free_result_func sysinfo_free_result_ptr = NULL;
 int Start_win32_Syscheck();
 
 typedef struct win_module_start_ctx {
-    wm_routine routine;
+    gm_routine routine;
     void *data;
     char name[OS_SIZE_128];
 } win_module_start_ctx_t;
@@ -101,8 +101,8 @@ void *win_module_thread(void *arg)
 
 void stop_wmodules()
 {
-    wmodule * cur_module;
-    for (cur_module = wmodules; cur_module; cur_module = cur_module->next) {
+    gmodule * cur_module;
+    for (cur_module = gmodules; cur_module; cur_module = cur_module->next) {
         if (cur_module->context->stop) {
             cur_module->context->stop(cur_module->data);
         }
@@ -280,18 +280,18 @@ int local_start()
                      (LPDWORD)&threadID);
 
     /* Initialize children pool */
-    wm_children_pool_init();
+    gm_children_pool_init();
 
     /* Read wodle configuration */
-    if (wm_config() < 0) {
+    if (gm_config() < 0) {
         mlerror_exit(LOGLEVEL_ERROR, CONFIG_ERROR, cfg);
     }
 
     /* Start modules */
-    if (!wm_check()) {
-        wmodule * cur_module;
+    if (!gm_check()) {
+        gmodule * cur_module;
 
-        for (cur_module = wmodules; cur_module; cur_module = cur_module->next) {
+        for (cur_module = gmodules; cur_module; cur_module = cur_module->next) {
             win_module_start_ctx_t *start_ctx = NULL;
             const char *module_name = NULL;
 

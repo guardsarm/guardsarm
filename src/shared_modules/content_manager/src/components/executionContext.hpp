@@ -123,7 +123,7 @@ private:
         {
             if (!context.spRocksDB->columnExists(columnName))
             {
-                logDebug1(WM_CONTENTUPDATER, "Column '%s' doesn't exist so it will be created", columnName.c_str());
+                logDebug1(GM_CONTENTUPDATER, "Column '%s' doesn't exist so it will be created", columnName.c_str());
                 context.spRocksDB->createColumn(columnName);
             }
         }
@@ -174,12 +174,12 @@ private:
         if (std::filesystem::exists(outputFolderPath))
         {
             // Delete the output folder to avoid conflicts.
-            logDebug2(WM_CONTENTUPDATER, "Removing previous output folder '%s'", outputFolderPath.string().c_str());
+            logDebug2(GM_CONTENTUPDATER, "Removing previous output folder '%s'", outputFolderPath.string().c_str());
             std::filesystem::remove_all(outputFolderPath);
         }
 
         // Create the folders.
-        logDebug2(WM_CONTENTUPDATER, "Creating output folders at '%s'", outputFolderPath.string().c_str());
+        logDebug2(GM_CONTENTUPDATER, "Creating output folders at '%s'", outputFolderPath.string().c_str());
         std::filesystem::create_directories(outputFolderPath);
         std::filesystem::create_directories(outputFolderPath / DOWNLOAD_FOLDER);
         std::filesystem::create_directories(outputFolderPath / CONTENTS_FOLDER);
@@ -212,7 +212,7 @@ public:
      */
     std::shared_ptr<UpdaterBaseContext> handleRequest(std::shared_ptr<UpdaterBaseContext> context) override
     {
-        logDebug1(WM_CONTENTUPDATER, "ExecutionContext - Starting process");
+        logDebug1(GM_CONTENTUPDATER, "ExecutionContext - Starting process");
 
         // Check if the database path is given and not empty.
         if (context->configData.contains("databasePath") &&

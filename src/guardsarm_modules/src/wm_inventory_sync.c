@@ -16,41 +16,41 @@
  #define HOST_NAME_MAX 255
  #endif
 
- static void* wm_inventory_sync_main(wm_inventory_sync_t* data);
- static void wm_inventory_sync_destroy(wm_inventory_sync_t* data);
- static void wm_inventory_sync_stop(wm_inventory_sync_t* data);
- cJSON* wm_inventory_sync_dump(wm_inventory_sync_t* data);
+ static void* gm_inventory_sync_main(gm_inventory_sync_t* data);
+ static void gm_inventory_sync_destroy(gm_inventory_sync_t* data);
+ static void gm_inventory_sync_stop(gm_inventory_sync_t* data);
+ cJSON* gm_inventory_sync_dump(gm_inventory_sync_t* data);
 
  void* inventory_sync_module = NULL;
  inventory_sync_start_func inventory_sync_start_ptr = NULL;
  inventory_sync_stop_func inventory_sync_stop_ptr = NULL;
 
- const wm_context WM_INVENTORY_SYNC_CONTEXT = {
+ const gm_context GM_INVENTORY_SYNC_CONTEXT = {
      .name = "inventory_sync",
-     .start = (wm_routine)wm_inventory_sync_main,
-     .destroy = (void (*)(void*))wm_inventory_sync_destroy,
-     .dump = (cJSON * (*)(const void*)) wm_inventory_sync_dump,
+     .start = (gm_routine)gm_inventory_sync_main,
+     .destroy = (void (*)(void*))gm_inventory_sync_destroy,
+     .dump = (cJSON * (*)(const void*)) gm_inventory_sync_dump,
      .sync = NULL,
-     .stop = (void (*)(void*))wm_inventory_sync_stop,
+     .stop = (void (*)(void*))gm_inventory_sync_stop,
      .query = NULL,
  };
 
- static void wm_inventory_sync_log_config(cJSON* config_json)
+ static void gm_inventory_sync_log_config(cJSON* config_json)
  {
      if (config_json)
      {
          char* config_str = cJSON_PrintUnformatted(config_json);
          if (config_str)
          {
-             mtdebug1(WM_INVENTORY_SYNC_LOGTAG, "%s", config_str);
+             mtdebug1(GM_INVENTORY_SYNC_LOGTAG, "%s", config_str);
              cJSON_free(config_str);
          }
      }
  }
 
- void* wm_inventory_sync_main(__attribute__((unused))wm_inventory_sync_t* data)
+ void* gm_inventory_sync_main(__attribute__((unused))gm_inventory_sync_t* data)
  {
-     mtinfo(WM_INVENTORY_SYNC_LOGTAG, STARTUP_MSG, (int)getpid());
+     mtinfo(GM_INVENTORY_SYNC_LOGTAG, STARTUP_MSG, (int)getpid());
      if (inventory_sync_module = so_get_module_handle("inventory_sync"), inventory_sync_module)
      {
         inventory_sync_start_ptr = so_get_function_sym(inventory_sync_module, "inventory_sync_start");
@@ -90,55 +90,55 @@
              int data_value_quota = getDefine_Int_default("guardsarm_modules", "inventory_sync_data_value_quota", 1, 1000000000, 500000);
              cJSON_AddNumberToObject(config_json, "dataValueQuota", data_value_quota);
 
-             wm_inventory_sync_log_config(config_json);
+             gm_inventory_sync_log_config(config_json);
              inventory_sync_start_ptr(mtLoggingFunctionsWrapper, config_json);
              cJSON_Delete(config_json);
          }
          else
          {
-             mtwarn(WM_INVENTORY_SYNC_LOGTAG, "Unable to start inventory_sync module.");
+             mtwarn(GM_INVENTORY_SYNC_LOGTAG, "Unable to start inventory_sync module.");
              return NULL;
          }
      }
      else
      {
-         mtwarn(WM_INVENTORY_SYNC_LOGTAG, "Unable to load inventory_sync module.");
+         mtwarn(GM_INVENTORY_SYNC_LOGTAG, "Unable to load inventory_sync module.");
          return NULL;
      }
 
      return NULL;
  }
 
- void wm_inventory_sync_destroy(wm_inventory_sync_t* data)
+ void gm_inventory_sync_destroy(gm_inventory_sync_t* data)
  {
      free(data);
  }
 
- void wm_inventory_sync_stop(__attribute__((unused)) wm_inventory_sync_t* data)
+ void gm_inventory_sync_stop(__attribute__((unused)) gm_inventory_sync_t* data)
  {
-     mtinfo(WM_INVENTORY_SYNC_LOGTAG, "Module finished.");
+     mtinfo(GM_INVENTORY_SYNC_LOGTAG, "Module finished.");
      if (inventory_sync_stop_ptr)
      {
          inventory_sync_stop_ptr();
      }
      else
      {
-         mtwarn(WM_INVENTORY_SYNC_LOGTAG, "Unable to stop inventory_sync module.");
+         mtwarn(GM_INVENTORY_SYNC_LOGTAG, "Unable to stop inventory_sync module.");
      }
  }
 
- wmodule* wm_inventory_sync_read()
+ gmodule* gm_inventory_sync_read()
  {
-     wmodule* module;
+     gmodule* module;
 
-     os_calloc(1, sizeof(wmodule), module);
-     module->context = &WM_INVENTORY_SYNC_CONTEXT;
+     os_calloc(1, sizeof(gmodule), module);
+     module->context = &GM_INVENTORY_SYNC_CONTEXT;
      module->tag = strdup(module->context->name);
-     mtdebug1(WM_INVENTORY_SYNC_LOGTAG, "Loaded Inventory sync module.");
+     mtdebug1(GM_INVENTORY_SYNC_LOGTAG, "Loaded Inventory sync module.");
      return module;
  }
 
- cJSON* wm_inventory_sync_dump(__attribute__((unused)) wm_inventory_sync_t* data)
+ cJSON* gm_inventory_sync_dump(__attribute__((unused)) gm_inventory_sync_t* data)
  {
      cJSON* root = cJSON_CreateObject();
 

@@ -42,7 +42,7 @@ static const char *ACCESS_LOGS_BUCKET_TYPE = "access_logs";
 typedef struct __group_data_s {
     OS_XML *xml;
     xml_node **nodes;
-    wmodule *module;
+    gmodule *module;
 } group_data_t;
 
 /* Auxiliar functions */
@@ -139,7 +139,7 @@ static int setup_group(void **state) {
     if(data == NULL)
         return -1;
 
-    if(os_calloc(1, sizeof(wmodule), data->module), data->module == NULL)
+    if(os_calloc(1, sizeof(gmodule), data->module), data->module == NULL)
         return -1;
 
     if(os_calloc(1, sizeof(OS_XML), data->xml), data->xml == NULL)
@@ -248,7 +248,7 @@ static int setup_test_pubsub_no_credentials_file(void **state) {
 
 static int teardown_test_pubsub(void **state) {
     group_data_t *data = *state;
-    wm_gcp_pubsub *gcp = data->module->data;
+    gm_gcp_pubsub *gcp = data->module->data;
 
     os_free(data->module->tag);
 
@@ -494,8 +494,8 @@ static int setup_test_bucket_no_remove(void **state) {
 
 static int teardown_test_bucket(void **state) {
     group_data_t *data = *state;
-    wm_gcp_bucket_base *gcp_config = data->module->data;;
-    wm_gcp_bucket *gcp_bucket = gcp_config->buckets;
+    gm_gcp_bucket_base *gcp_config = data->module->data;;
+    gm_gcp_bucket *gcp_bucket = gcp_config->buckets;
 
     os_free(data->module->tag);
 
@@ -532,7 +532,7 @@ static int teardown_test_bucket(void **state) {
 /* wm_gcp_pubsub_read */
 static void test_wm_gcp_pubsub_read_full_configuration(void **state) {
     group_data_t *data = *state;
-    wm_gcp_pubsub *gcp;
+    gm_gcp_pubsub *gcp;
     int ret;
 
     expect_string(__wrap_realpath, path, "credentials.json");
@@ -545,7 +545,7 @@ static void test_wm_gcp_pubsub_read_full_configuration(void **state) {
     expect_string(__wrap_sched_scan_read, MODULE_NAME, GCP_PUBSUB_WM_NAME);
     will_return(__wrap_sched_scan_read, 0);
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, 0);
 
@@ -560,13 +560,13 @@ static void test_wm_gcp_pubsub_read_full_configuration(void **state) {
     assert_int_equal(gcp->max_messages, 100);
     assert_int_equal(gcp->num_threads, 2);
 
-    assert_ptr_equal(data->module->context, &WM_GCP_PUBSUB_CONTEXT);
+    assert_ptr_equal(data->module->context, &GM_GCP_PUBSUB_CONTEXT);
     assert_string_equal(data->module->tag, GCP_PUBSUB_WM_NAME);
 }
 
 static void test_wm_gcp_pubsub_read_sched_read_invalid(void **state) {
     group_data_t *data = *state;
-    wm_gcp_pubsub *gcp;
+    gm_gcp_pubsub *gcp;
     int ret;
 
     expect_string(__wrap_realpath, path, "credentials.json");
@@ -579,7 +579,7 @@ static void test_wm_gcp_pubsub_read_sched_read_invalid(void **state) {
     expect_string(__wrap_sched_scan_read, MODULE_NAME, GCP_PUBSUB_WM_NAME);
     will_return(__wrap_sched_scan_read, -1);
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, -1);
 }
@@ -593,7 +593,7 @@ static void test_wm_gcp_pubsub_read_enabled_tag_invalid(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Invalid content for tag 'enabled'");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -607,7 +607,7 @@ static void test_wm_gcp_pubsub_read_project_id_tag_invalid(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'project_id' at module 'gcp-pubsub'");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -628,7 +628,7 @@ static void test_wm_gcp_pubsub_read_no_project_id_tag(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "No value defined for tag 'project_id' in module 'gcp-pubsub'");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -642,7 +642,7 @@ static void test_wm_gcp_pubsub_read_subscription_name_tag_invalid(void **state) 
 
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'subscription_name' at module 'gcp-pubsub'");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -663,14 +663,14 @@ static void test_wm_gcp_pubsub_read_no_subscription_name_tag(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "No value defined for tag 'subscription_name' in module 'gcp-pubsub'");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
 
 static void test_wm_gcp_pubsub_read_credentials_file_full_path(void **state) {
     group_data_t *data = *state;
-    wm_gcp_pubsub *gcp;
+    gm_gcp_pubsub *gcp;
     int ret;
 
     if(replace_configuration_value(data->nodes, XML_CREDENTIALS_FILE, "/some/path/credentials.json") != 0)
@@ -683,7 +683,7 @@ static void test_wm_gcp_pubsub_read_credentials_file_full_path(void **state) {
     expect_string(__wrap_sched_scan_read, MODULE_NAME, GCP_PUBSUB_WM_NAME);
     will_return(__wrap_sched_scan_read, 0);
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, 0);
 
@@ -698,7 +698,7 @@ static void test_wm_gcp_pubsub_read_credentials_file_full_path(void **state) {
     assert_int_equal(gcp->max_messages, 100);
     assert_int_equal(gcp->num_threads, 2);
 
-    assert_ptr_equal(data->module->context, &WM_GCP_PUBSUB_CONTEXT);
+    assert_ptr_equal(data->module->context, &GM_GCP_PUBSUB_CONTEXT);
     assert_string_equal(data->module->tag, GCP_PUBSUB_WM_NAME);
 }
 
@@ -711,7 +711,7 @@ static void test_wm_gcp_pubsub_read_credentials_file_tag_empty(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'credentials_file' at module 'gcp-pubsub'");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -730,7 +730,7 @@ static void test_wm_gcp_pubsub_read_credentials_file_tag_too_long(void **state) 
     snprintf(buffer, OS_MAXSTR, "File path is too long. Max path length is %d.", PATH_MAX);
     expect_string(__wrap__merror, formatted_msg, buffer);
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -745,7 +745,7 @@ static void test_wm_gcp_pubsub_read_credentials_file_tag_realpath_error(void **s
 
     expect_string(__wrap__merror, formatted_msg, "File '' from tag 'credentials_file' not found.");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -762,7 +762,7 @@ static void test_wm_gcp_pubsub_read_credentials_file_tag_file_not_found(void **s
 
     expect_string(__wrap__merror, formatted_msg, "File 'credentials.json' not found. Check your configuration.");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -777,7 +777,7 @@ static void test_wm_gcp_pubsub_read_no_credentials_file_tag(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "No value defined for tag 'credentials_file' in module 'gcp-pubsub'");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -797,7 +797,7 @@ static void test_wm_gcp_pubsub_read_max_messages_tag_empty(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'max_messages'");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -817,7 +817,7 @@ static void test_wm_gcp_pubsub_read_max_messages_tag_not_digit(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Tag 'max_messages' from the 'gcp-pubsub' module should not have an alphabetic character.");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -837,7 +837,7 @@ static void test_wm_gcp_pubsub_read_num_threads_tag_empty(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'num_threads'");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -857,7 +857,7 @@ static void test_wm_gcp_pubsub_read_num_threads_tag_not_digit(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Tag 'num_threads' from the 'gcp-pubsub' module should not have an alphabetic character.");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -871,7 +871,7 @@ static void test_wm_gcp_pubsub_read_pull_on_start_tag_invalid(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Invalid content for tag 'pull_on_start'");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -888,7 +888,7 @@ static void test_wm_gcp_pubsub_read_invalid_tag(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "No such tag 'invalid' at module 'gcp-pubsub'.");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, -1);
 }
@@ -903,7 +903,7 @@ static void test_wm_gcp_pubsub_read_invalid_element(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "(1231): Invalid NULL element in the configuration.");
 
-    ret = wm_gcp_pubsub_read(data->nodes, data->module);
+    ret = gm_gcp_pubsub_read(data->nodes, data->module);
 
     assert_int_equal(ret, -1);
 }
@@ -914,7 +914,7 @@ static void test_wm_gcp_pubsub_read_invalid_nodes(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Empty configuration at module 'gcp-pubsub'.");
 
-    ret = wm_gcp_pubsub_read(NULL, data->module);
+    ret = gm_gcp_pubsub_read(NULL, data->module);
 
     assert_int_equal(ret, -1);
 }
@@ -926,7 +926,7 @@ static void test_wm_gcp_bucket_read_full_configuration(void **state) {
     expect_any_always(__wrap__mtdebug2, formatted_msg);
 
     group_data_t *data = *state;
-    wm_gcp_bucket_base *gcp;
+    gm_gcp_bucket_base *gcp;
 
     int ret;
 
@@ -942,7 +942,7 @@ static void test_wm_gcp_bucket_read_full_configuration(void **state) {
 
 
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, 0);
 
@@ -957,7 +957,7 @@ static void test_wm_gcp_bucket_read_full_configuration(void **state) {
     assert_string_equal(gcp->buckets->prefix, "access_logs/");
     assert_int_equal(gcp->buckets->remove_from_bucket, 0);
 
-    assert_ptr_equal(data->module->context, &WM_GCP_BUCKET_CONTEXT);
+    assert_ptr_equal(data->module->context, &GM_GCP_BUCKET_CONTEXT);
     assert_string_equal(data->module->tag, GCP_BUCKET_WM_NAME);
 }
 
@@ -965,7 +965,7 @@ static void test_wm_gcp_bucket_read_sched_read_invalid(void **state) {
     expect_any_always(__wrap__mtdebug2, tag);
     expect_any_always(__wrap__mtdebug2, formatted_msg);
     group_data_t *data = *state;
-    wm_gcp_bucket_base *gcp;
+    gm_gcp_bucket_base *gcp;
 
     int ret;
 
@@ -979,7 +979,7 @@ static void test_wm_gcp_bucket_read_sched_read_invalid(void **state) {
     expect_string(__wrap_sched_scan_read, MODULE_NAME, GCP_BUCKET_WM_NAME);
     will_return(__wrap_sched_scan_read, -1);
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, -1);
 }
@@ -993,7 +993,7 @@ static void test_wm_gcp_bucket_read_enabled_tag_invalid(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Invalid content for tag 'enabled'");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1008,7 +1008,7 @@ static void test_wm_gcp_bucket_read_no_bucket(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "No buckets or services definitions found at module 'gcp-bucket'.");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1021,7 +1021,7 @@ static void test_wm_gcp_bucket_read_no_bucket_type(void **state) {
     expect_any_always(__wrap__mtdebug2, formatted_msg);
     expect_string(__wrap__merror, formatted_msg, "No bucket type was specified. The valid one is 'access_logs'.");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1039,7 +1039,7 @@ static void test_wm_gcp_bucket_read_bucket_type_invalid(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Invalid bucket type ''. The valid one is 'access_logs'");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1052,7 +1052,7 @@ static void test_wm_gcp_bucket_read_bucket_element_invalid(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "No such child tag 'invalid' of bucket at module 'gcp-bucket'.");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1065,7 +1065,7 @@ static void test_wm_gcp_bucket_read_bucket_attribute_invalid(void **state) {
     expect_any_always(__wrap__mtdebug2, formatted_msg);
     expect_string(__wrap__merror, formatted_msg, "Attribute name 'invalid' is not valid. The valid one is 'type'.");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1082,7 +1082,7 @@ static void test_wm_gcp_bucket_read_bucket_tag_invalid(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'name' at module 'gcp-bucket'.");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1102,7 +1102,7 @@ static void test_wm_gcp_bucket_read_no_bucket_tag(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "No value defined for tag 'name' in module 'gcp-bucket'.");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1125,7 +1125,7 @@ static void test_wm_gcp_bucket_read_remove_from_bucket_tag_invalid(void **state)
 
     expect_string(__wrap__merror, formatted_msg, "Invalid content for tag 'remove_from_bucket' at module 'gcp-bucket'.");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1148,7 +1148,7 @@ static void test_wm_gcp_bucket_read_path_tag_invalid(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'path' at module 'gcp-bucket'");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1171,14 +1171,14 @@ static void test_wm_gcp_bucket_read_only_logs_after_tag_invalid(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'only_logs_after' at module 'gcp-bucket'");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
 
 static void test_wm_gcp_bucket_read_credentials_file_full_path(void **state) {
     group_data_t *data = *state;
-    wm_gcp_bucket_base *gcp;
+    gm_gcp_bucket_base *gcp;
     int ret;
 
     expect_any_always(__wrap__mtdebug2, tag);
@@ -1200,7 +1200,7 @@ static void test_wm_gcp_bucket_read_credentials_file_full_path(void **state) {
     expect_string(__wrap_sched_scan_read, MODULE_NAME, GCP_BUCKET_WM_NAME);
     will_return(__wrap_sched_scan_read, 0);
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, 0);
 
@@ -1215,7 +1215,7 @@ static void test_wm_gcp_bucket_read_credentials_file_full_path(void **state) {
     assert_string_equal(gcp->buckets->prefix, "access_logs/");
     assert_int_equal(gcp->buckets->remove_from_bucket, 0);
 
-    assert_ptr_equal(data->module->context, &WM_GCP_BUCKET_CONTEXT);
+    assert_ptr_equal(data->module->context, &GM_GCP_BUCKET_CONTEXT);
     assert_string_equal(data->module->tag, GCP_BUCKET_WM_NAME);
 }
 
@@ -1231,7 +1231,7 @@ static void test_wm_gcp_bucket_read_credentials_file_tag_empty(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'credentials_file' at module 'gcp-bucket'");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1252,7 +1252,7 @@ static void test_wm_gcp_bucket_read_credentials_file_tag_too_long(void **state) 
     snprintf(buffer, OS_MAXSTR, "File path is too long. Max path length is %d.", PATH_MAX);
     expect_string(__wrap__merror, formatted_msg, buffer);
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1270,7 +1270,7 @@ static void test_wm_gcp_bucket_read_credentials_file_tag_realpath_error(void **s
 
     expect_string(__wrap__merror, formatted_msg, "File '' from tag 'credentials_file' not found.");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1290,7 +1290,7 @@ static void test_wm_gcp_bucket_read_credentials_file_tag_file_not_found(void **s
 
     expect_string(__wrap__merror, formatted_msg, "File 'credentials.json' not found. Check your configuration.");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1310,7 +1310,7 @@ static void test_wm_gcp_bucket_read_no_credentials_file_tag(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "No value defined for tag 'credentials_file' in module 'gcp-bucket'.");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1325,7 +1325,7 @@ static void test_wm_gcp_bucket_read_run_on_start_tag_invalid(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Invalid content for tag 'run_on_start'");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, OS_INVALID);
 }
@@ -1342,7 +1342,7 @@ static void test_wm_gcp_bucket_read_invalid_tag(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "No such tag 'invalid' at module 'gcp-bucket'.");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, -1);
 }
@@ -1357,7 +1357,7 @@ static void test_wm_gcp_bucket_read_invalid_element(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "(1231): Invalid NULL element in the configuration.");
 
-    ret = wm_gcp_bucket_read(data->xml, data->nodes, data->module);
+    ret = gm_gcp_bucket_read(data->xml, data->nodes, data->module);
 
     assert_int_equal(ret, -1);
 }
@@ -1368,7 +1368,7 @@ static void test_wm_gcp_bucket_read_invalid_nodes(void **state) {
 
     expect_string(__wrap__merror, formatted_msg, "Empty configuration at module 'gcp-bucket'.");
 
-    ret = wm_gcp_bucket_read(data->xml, NULL, data->module);
+    ret = gm_gcp_bucket_read(data->xml, NULL, data->module);
 
     assert_int_equal(ret, -1);
 }

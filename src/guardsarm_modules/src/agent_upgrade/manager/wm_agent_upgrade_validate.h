@@ -5,8 +5,8 @@
  *
  * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
-#ifndef WM_AGENT_UPGRADE_VALIDATE_H
-#define WM_AGENT_UPGRADE_VALIDATE_H
+#ifndef GM_AGENT_UPGRADE_VALIDATE_H
+#define GM_AGENT_UPGRADE_VALIDATE_H
 
 #include "wm_agent_upgrade_manager.h"
 
@@ -17,7 +17,7 @@
  * @retval WM_UPGRADE_SUCCESS
  * @retval WM_UPGRADE_UPGRADE_ERROR
  * */
-int wm_agent_upgrade_validate_id(int agent_id);
+int gm_agent_upgrade_validate_id(int agent_id);
 
 /**
  * Check if agent status is active
@@ -26,7 +26,7 @@ int wm_agent_upgrade_validate_id(int agent_id);
  * @retval WM_UPGRADE_SUCCESS
  * @retval WM_UPGRADE_AGENT_IS_NOT_ACTIVE
  * */
-int wm_agent_upgrade_validate_status(const char* connection_status);
+int gm_agent_upgrade_validate_status(const char* connection_status);
 
 /**
  * Check if WPK exists for this agent
@@ -40,7 +40,7 @@ int wm_agent_upgrade_validate_status(const char* connection_status);
  * @retval WM_UPGRADE_SYSTEM_NOT_SUPPORTED
  * @retval WM_UPGRADE_GLOBAL_DB_FAILURE
  * */
-int wm_agent_upgrade_validate_system(const char *platform, const char *os_major, const char *os_minor, const char *arch, char **package_type);
+int gm_agent_upgrade_validate_system(const char *platform, const char *os_major, const char *os_minor, const char *arch, char **package_type);
 
 /**
  * Check if agent is valid to upgrade
@@ -55,7 +55,7 @@ int wm_agent_upgrade_validate_system(const char *platform, const char *os_major,
  * @retval WM_UPGRADE_NEW_VERSION_GREATER_MASTER
  * @retval WM_UPGRADE_GLOBAL_DB_FAILURE
  * */
-int wm_agent_upgrade_validate_version(const char *guardsarm_version, const char *platform, wm_upgrade_command command, void *task)  __attribute__((nonnull(4)));
+int gm_agent_upgrade_validate_version(const char *guardsarm_version, const char *platform, gm_upgrade_command command, void *task)  __attribute__((nonnull(4)));
 
 /**
  * Translate architecture based on platform and package type if necessary
@@ -64,7 +64,7 @@ int wm_agent_upgrade_validate_version(const char *guardsarm_version, const char 
  * @param arch Agent architecture
  * @return Translated architecture
 */
-char *wm_agent_upgrade_translate_arch(const char *platform, const char *package_type, char *arch);
+char *gm_agent_upgrade_translate_arch(const char *platform, const char *package_type, char *arch);
 
 /**
  * Check if a WPK exist for the upgrade version
@@ -77,7 +77,7 @@ char *wm_agent_upgrade_translate_arch(const char *platform, const char *package_
  * @retval WM_UPGRADE_WPK_VERSION_DOES_NOT_EXIST
  * @retval WM_UPGRADE_SYSTEM_NOT_SUPPORTED
  * */
-int wm_agent_upgrade_validate_wpk_version(wm_agent_info *agent_info, wm_upgrade_task *task, const char *wpk_repository_config) __attribute__((nonnull(1, 2)));
+int gm_agent_upgrade_validate_wpk_version(gm_agent_info *agent_info, gm_upgrade_task *task, const char *wpk_repository_config) __attribute__((nonnull(1, 2)));
 
 /**
  * Check if WPK file exist or download it
@@ -87,7 +87,7 @@ int wm_agent_upgrade_validate_wpk_version(wm_agent_info *agent_info, wm_upgrade_
  * @retval WM_UPGRADE_WPK_FILE_DOES_NOT_EXIST
  * @retval WM_UPGRADE_WPK_SHA1_DOES_NOT_MATCH
  * */
-int wm_agent_upgrade_validate_wpk(const wm_upgrade_task *task) __attribute__((nonnull));
+int gm_agent_upgrade_validate_wpk(const gm_upgrade_task *task) __attribute__((nonnull));
 
 /**
  * Check if WPK custom file exist
@@ -96,7 +96,7 @@ int wm_agent_upgrade_validate_wpk(const wm_upgrade_task *task) __attribute__((no
  * @retval WM_UPGRADE_SUCCESS
  * @retval WM_UPGRADE_WPK_FILE_DOES_NOT_EXIST
  * */
-int wm_agent_upgrade_validate_wpk_custom(const wm_upgrade_custom_task *task) __attribute__((nonnull));
+int gm_agent_upgrade_validate_wpk_custom(const gm_upgrade_custom_task *task) __attribute__((nonnull));
 
 /**
  * Validate a status response from the task manager module
@@ -117,7 +117,7 @@ int wm_agent_upgrade_validate_wpk_custom(const wm_upgrade_custom_task *task) __a
  *      "status": "Done"
  *  }
  * */
-bool wm_agent_upgrade_validate_task_status_message(const cJSON *input_json, char **status, int *agent_id);
+bool gm_agent_upgrade_validate_task_status_message(const cJSON *input_json, char **status, int *agent_id);
 
 /**
  * Validate an upgrade response from the task manager module
@@ -136,6 +136,6 @@ bool wm_agent_upgrade_validate_task_status_message(const cJSON *input_json, char
  *      "task_id": 201
  *  }
  * */
-bool wm_agent_upgrade_validate_task_ids_message(const cJSON *input_json, int *agent_id, int *task_id, char** data);
+bool gm_agent_upgrade_validate_task_ids_message(const cJSON *input_json, int *agent_id, int *task_id, char** data);
 
 #endif

@@ -6,17 +6,17 @@
  * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
-#ifndef WM_COMMAND_H
-#define WM_COMMAND_H
+#ifndef GM_COMMAND_H
+#define GM_COMMAND_H
 
-#define WM_COMMAND_LOGTAG ARGV0 ":command"
-#define WM_COMMAND_DEFAULT_INTERVAL 2
+#define GM_COMMAND_LOGTAG ARGV0 ":command"
+#define GM_COMMAND_DEFAULT_INTERVAL 2
 
-typedef struct wm_command_state_t {
+typedef struct gm_command_state_t {
     time_t next_time;               // Absolute time for next scan
-} wm_command_state_t;
+} gm_command_state_t;
 
-typedef struct wm_command_t {
+typedef struct gm_command_t {
     char * tag;
     char * command;
     char * full_command;
@@ -24,7 +24,7 @@ typedef struct wm_command_t {
     char *sha1_hash;
     char *sha256_hash;
     int queue_fd;
-    wm_command_state_t state;
+    gm_command_state_t state;
     unsigned int enabled:1;
     unsigned int run_on_start:1;
     unsigned int ignore_output:1;
@@ -32,14 +32,14 @@ typedef struct wm_command_t {
     unsigned int skip_verification:1;
     int timeout;
     sched_scan_config scan_config;
-} wm_command_t;
+} gm_command_t;
 
-extern const wm_context WM_COMMAND_CONTEXT;   // Context
+extern const gm_context GM_COMMAND_CONTEXT;   // Context
 
 // Parse XML
-int wm_command_read(xml_node **nodes, wmodule *module, int agent_cfg);
+int gm_command_read(xml_node **nodes, gmodule *module, int agent_cfg);
 
 // Validate checksums
-int validate_command_checksums(wm_command_t * command, const char * full_path);
+int validate_command_checksums(gm_command_t * command, const char * full_path);
 
 #endif // WM_COMMAND_H

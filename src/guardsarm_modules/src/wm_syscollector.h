@@ -9,15 +9,15 @@
 #include "wmodules_def.h"
 #include "os_xml.h"
 
-#ifndef WM_SYSCOLLECTOR
-#define WM_SYSCOLLECTOR
+#ifndef GM_SYSCOLLECTOR
+#define GM_SYSCOLLECTOR
 
-extern const wm_context WM_SYS_CONTEXT;     // Context
+extern const gm_context GM_SYS_CONTEXT;     // Context
 
-#define WM_SYS_LOGTAG ARGV0 ":syscollector" // Tag for log messages
-#define WM_SYSCOLLECTOR_DEFAULT_INTERVAL W_HOUR_SECONDS
+#define GM_SYS_LOGTAG ARGV0 ":syscollector" // Tag for log messages
+#define GM_SYSCOLLECTOR_DEFAULT_INTERVAL W_HOUR_SECONDS
 
-typedef struct wm_sys_flags_t {
+typedef struct gm_sys_flags_t {
     unsigned int enabled:1;                 // Main switch
     unsigned int scan_on_start:1;           // Scan always on start
     unsigned int notify_first_scan:1;       // Notify the first scan
@@ -34,31 +34,31 @@ typedef struct wm_sys_flags_t {
     unsigned int users:1;                   // Users inventory
     unsigned int services:1;                // Services inventory
     unsigned int browser_extensions:1;      // Browser extensions inventory
-} wm_sys_flags_t;
+} gm_sys_flags_t;
 
-typedef struct wm_sys_state_t {
+typedef struct gm_sys_state_t {
     time_t next_time;                       // Absolute time for next scan
-} wm_sys_state_t;
+} gm_sys_state_t;
 
-typedef struct wm_sys_db_sync_flags_t {
+typedef struct gm_sys_db_sync_flags_t {
     unsigned int enable_synchronization:1;  // Enable database synchronization
     uint32_t sync_interval;                 // Synchronization interval
     uint32_t sync_end_delay;                // Delay for synchronization end message
     uint32_t sync_response_timeout;         // Minimum interval for the synchronization process
     long sync_max_eps;                      // Maximum events per second for synchronization messages.
     uint32_t integrity_interval;            // Integrity check interval (0 = disabled)
-} wm_sys_db_sync_flags_t;
+} gm_sys_db_sync_flags_t;
 
-typedef struct wm_sys_t {
+typedef struct gm_sys_t {
     unsigned int interval;                  // Time interval between cycles (seconds)
-    wm_sys_flags_t flags;                   // Flag bitfield
-    wm_sys_state_t state;                   // Running state
-    wm_sys_db_sync_flags_t sync;            // Database synchronization value
+    gm_sys_flags_t flags;                   // Flag bitfield
+    gm_sys_state_t state;                   // Running state
+    gm_sys_db_sync_flags_t sync;            // Database synchronization value
     int max_eps;                            // Maximum events per second.
-} wm_sys_t;
+} gm_sys_t;
 
 // Parse XML configuration
-int wm_syscollector_read(const OS_XML *xml, XML_NODE node, wmodule *module);
+int gm_syscollector_read(const OS_XML *xml, XML_NODE node, gmodule *module);
 
 // Query function type for agentd communication (cross-platform)
 // Fills output_buffer with JSON response on success
@@ -68,7 +68,7 @@ typedef bool (*agentd_query_func_t)(const char* command, char* output_buffer, si
 // Query agentd with a command and fill output_buffer with JSON response
 // Returns true on success (output_buffer contains JSON), false on error
 // Works on both Unix/Linux (socket) and Windows (agcom_dispatch)
-bool wm_sys_query_agentd(const char* command, char* output_buffer, size_t buffer_size);
+bool gm_sys_query_agentd(const char* command, char* output_buffer, size_t buffer_size);
 
 // Set agentd query function (must be called before syscollector_start)
 void syscollector_set_agentd_query_func(agentd_query_func_t queryFunc);

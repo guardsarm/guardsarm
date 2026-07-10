@@ -34,17 +34,17 @@ extern size_t agcom_dispatch(char* command, char** output);
 static volatile int sync_module_running = 0;
 
 #ifdef WIN32
-static DWORD WINAPI wm_sys_main(void* arg);         // Module main function. It won't return
-static DWORD WINAPI wm_sync_module(__attribute__((unused)) void* args);
+static DWORD WINAPI gm_sys_main(void* arg);         // Module main function. It won't return
+static DWORD WINAPI gm_sync_module(__attribute__((unused)) void* args);
 #else
-static void* wm_sys_main(wm_sys_t* sys);        // Module main function. It won't return
-static void* wm_sync_module(__attribute__((unused)) void* args);
+static void* gm_sys_main(gm_sys_t* sys);        // Module main function. It won't return
+static void* gm_sync_module(__attribute__((unused)) void* args);
 #endif
-static void wm_sys_destroy(wm_sys_t* data);      // Destroy data
-static void wm_sys_stop(wm_sys_t* sys);         // Module stopper
-const char* WM_SYS_LOCATION = "syscollector";   // Location field for event sending
-cJSON* wm_sys_dump(const wm_sys_t* sys);
-int wm_sync_message(const char* command, size_t command_len);
+static void gm_sys_destroy(gm_sys_t* data);      // Destroy data
+static void gm_sys_stop(gm_sys_t* sys);         // Module stopper
+const char* GM_SYS_LOCATION = "syscollector";   // Location field for event sending
+cJSON* gm_sys_dump(const gm_sys_t* sys);
+int gm_sync_message(const char* command, size_t command_len);
 pthread_cond_t sys_stop_condition = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t sys_stop_mutex = PTHREAD_MUTEX_INITIALIZER;
 bool need_shutdown_wait = false;
@@ -59,17 +59,17 @@ static bool sync_worker_thread_initialized = false;
 pthread_mutex_t sys_reconnect_mutex = PTHREAD_MUTEX_INITIALIZER;
 bool shutdown_process_started = false;
 
-static size_t wm_sys_query_handler(void* data, char* query, char** output); // Query handler
+static size_t gm_sys_query_handler(void* data, char* query, char** output); // Query handler
 
-const wm_context WM_SYS_CONTEXT =
+const gm_context GM_SYS_CONTEXT =
 {
     .name = SYSCOLLECTOR_WM_NAME,
-    .start = (wm_routine)wm_sys_main,
-    .destroy = (void(*)(void*))wm_sys_destroy,
-    .dump = (cJSON * (*)(const void*))wm_sys_dump,
-    .sync = (int(*)(const char*, size_t))wm_sync_message,
-    .stop = (void(*)(void*))wm_sys_stop,
-    .query = wm_sys_query_handler,
+    .start = (gm_routine)gm_sys_main,
+    .destroy = (void(*)(void*))gm_sys_destroy,
+    .dump = (cJSON * (*)(const void*))gm_sys_dump,
+    .sync = (int(*)(const char*, size_t))gm_sync_message,
+    .stop = (void(*)(void*))gm_sys_stop,
+    .query = gm_sys_query_handler,
 };
 
 void* syscollector_module = NULL;
@@ -97,7 +97,7 @@ typedef enum
     SYSCOLLECTOR_STARTUP_ACTION_WAIT = 0,
     SYSCOLLECTOR_STARTUP_ACTION_IMMEDIATE,
     SYSCOLLECTOR_STARTUP_ACTION_STOP
-} wm_syscollector_startup_action_t;
+} gm_syscollector_startup_action_t;
 
 // Mutex access function pointers
 typedef void (*syscollector_lock_scan_mutex_func)();
@@ -131,7 +131,7 @@ static bool is_shutdown_process_started()
     return ret_val;
 }
 
-bool wm_sys_query_agentd(const char* command, char* output_buffer, size_t buffer_size)
+bool gm_sys_query_agentd(const char* command, char* output_buffer, size_t buffer_size)
 {
     if (!command || !output_buffer || buffer_size == 0)
     {
@@ -152,14 +152,14 @@ bool wm_sys_query_agentd(const char* command, char* output_buffer, size_t buffer
 
     if (sock < 0)
     {
-        mtdebug1(WM_SYS_LOGTAG, "Could not connect to agent socket: %s", strerror(errno));
+        mtdebug1(GM_SYS_LOGTAG, "Could not connect to agent socket: %s", strerror(errno));
         return false;
     }
 
     // Send request
     if (OS_SendSecureTCP(sock, strlen(command), command) != 0)
     {
-        mterror(WM_SYS_LOGTAG, "Failed to send request to agent socket: %s", strerror(errno));
+        mterror(GM_SYS_LOGTAG, "Failed to send request to agent socket: %s", strerror(errno));
         close(sock);
         return false;
     }
@@ -173,15 +173,15 @@ bool wm_sys_query_agentd(const char* command, char* output_buffer, size_t buffer
     {
         if (response_length == 0)
         {
-            mtdebug1(WM_SYS_LOGTAG, "Empty response from agent socket");
+            mtdebug1(GM_SYS_LOGTAG, "Empty response from agent socket");
         }
         else if (response_length == -2)  // OS_SOCKTERR
         {
-            mterror(WM_SYS_LOGTAG, "Maximum buffer length reached reading from agent socket");
+            mterror(GM_SYS_LOGTAG, "Maximum buffer length reached reading from agent socket");
         }
         else
         {
-            mterror(WM_SYS_LOGTAG, "Failed to receive response from agent socket: %s", strerror(errno));
+            mterror(GM_SYS_LOGTAG, "Failed to receive response from agent socket: %s", strerror(errno));
         }
 
         return false;
@@ -204,7 +204,7 @@ bool wm_sys_query_agentd(const char* command, char* output_buffer, size_t buffer
     {
         // Free output if allocated (defensive, in case agcom_dispatch allocated but failed)
         os_free(output);
-        mtdebug1(WM_SYS_LOGTAG, "Failed to query agentd via agcom_dispatch");
+        mtdebug1(GM_SYS_LOGTAG, "Failed to query agentd via agcom_dispatch");
         return false;
     }
 
@@ -214,7 +214,7 @@ bool wm_sys_query_agentd(const char* command, char* output_buffer, size_t buffer
 
     if (output_len > max_copy)
     {
-        mtwarn(WM_SYS_LOGTAG, "Response too large (%zu bytes), truncating to %zu bytes",
+        mtwarn(GM_SYS_LOGTAG, "Response too large (%zu bytes), truncating to %zu bytes",
                output_len, max_copy);
         output_len = max_copy;
     }
@@ -226,7 +226,7 @@ bool wm_sys_query_agentd(const char* command, char* output_buffer, size_t buffer
 #endif
 
     // Common response parsing (works for both platforms)
-    mtdebug2(WM_SYS_LOGTAG, "Response from agentd: %s", response_buffer);
+    mtdebug2(GM_SYS_LOGTAG, "Response from agentd: %s", response_buffer);
 
     // Check if response starts with "ok "
     if (response_length >= 3 && strncmp(response_buffer, "ok ", 3) == 0)
@@ -237,7 +237,7 @@ bool wm_sys_query_agentd(const char* command, char* output_buffer, size_t buffer
 
         if (json_len >= buffer_size)
         {
-            mterror(WM_SYS_LOGTAG, "Output buffer too small (%zu bytes needed, %zu available)",
+            mterror(GM_SYS_LOGTAG, "Output buffer too small (%zu bytes needed, %zu available)",
                     json_len + 1, buffer_size);
             return false;
         }
@@ -249,39 +249,39 @@ bool wm_sys_query_agentd(const char* command, char* output_buffer, size_t buffer
     else if (response_length >= 4 && strncmp(response_buffer, "err ", 4) == 0)
     {
         // Error response from agentd
-        mtdebug1(WM_SYS_LOGTAG, "Agentd returned error: %s", response_buffer + 4);
+        mtdebug1(GM_SYS_LOGTAG, "Agentd returned error: %s", response_buffer + 4);
         return false;
     }
     else
     {
-        mterror(WM_SYS_LOGTAG, "Unexpected response format from agentd: %s", response_buffer);
+        mterror(GM_SYS_LOGTAG, "Unexpected response format from agentd: %s", response_buffer);
         return false;
     }
 }
 
-static void wm_sys_send_message(const void* data, const char queue_id)
+static void gm_sys_send_message(const void* data, const char queue_id)
 {
     if (!is_shutdown_process_started())
     {
         const int eps = 1000000 / syscollector_max_eps;
 
-        if (wm_sendmsg_ex(eps, queue_fd, data, WM_SYS_LOCATION, queue_id, &is_shutdown_process_started) < 0)
+        if (gm_sendmsg_ex(eps, queue_fd, data, GM_SYS_LOCATION, queue_id, &is_shutdown_process_started) < 0)
         {
-            mtdebug1(WM_SYS_LOGTAG, "Unable to send message to '%s'", DEFAULTQUEUE);
+            mtdebug1(GM_SYS_LOGTAG, "Unable to send message to '%s'", DEFAULTQUEUE);
 
             // Since this method is beign called by multiple threads it's necessary this particular portion of code
             // to be mutually exclusive. When one thread is successfully reconnected, the other ones will make use of it.
             w_mutex_lock(&sys_reconnect_mutex);
 
-            if (!is_shutdown_process_started() && wm_sendmsg_ex(eps, queue_fd, data, WM_SYS_LOCATION, queue_id, &is_shutdown_process_started) < 0)
+            if (!is_shutdown_process_started() && gm_sendmsg_ex(eps, queue_fd, data, GM_SYS_LOCATION, queue_id, &is_shutdown_process_started) < 0)
             {
                 if (queue_fd = MQReconnectPredicated(DEFAULTQUEUE, &is_shutdown_process_started), 0 <= queue_fd)
                 {
-                    mtinfo(WM_SYS_LOGTAG, "Successfully reconnected to '%s'", DEFAULTQUEUE);
+                    mtinfo(GM_SYS_LOGTAG, "Successfully reconnected to '%s'", DEFAULTQUEUE);
 
-                    if (wm_sendmsg_ex(eps, queue_fd, data, WM_SYS_LOCATION, queue_id, &is_shutdown_process_started) < 0)
+                    if (gm_sendmsg_ex(eps, queue_fd, data, GM_SYS_LOCATION, queue_id, &is_shutdown_process_started) < 0)
                     {
-                        mterror(WM_SYS_LOGTAG, "Unable to send message to '%s' after a successfull reconnection...", DEFAULTQUEUE);
+                        mterror(GM_SYS_LOGTAG, "Unable to send message to '%s' after a successfull reconnection...", DEFAULTQUEUE);
                     }
                 }
             }
@@ -291,12 +291,12 @@ static void wm_sys_send_message(const void* data, const char queue_id)
     }
 }
 
-static void wm_sys_send_diff_message(const void* data)
+static void gm_sys_send_diff_message(const void* data)
 {
-    wm_sys_send_message(data, SYSCOLLECTOR_MQ);
+    gm_sys_send_message(data, SYSCOLLECTOR_MQ);
 }
 
-static bool wm_sys_parse_query_int(const char* output, const char* field, int* value)
+static bool gm_sys_parse_query_int(const char* output, const char* field, int* value)
 {
     bool result = false;
     cJSON* root = NULL;
@@ -328,7 +328,7 @@ static bool wm_sys_parse_query_int(const char* output, const char* field, int* v
     return result;
 }
 
-static bool wm_sys_query_int(const char* query, const char* field, int* value)
+static bool gm_sys_query_int(const char* query, const char* field, int* value)
 {
     bool result = false;
     char* output = NULL;
@@ -342,7 +342,7 @@ static bool wm_sys_query_int(const char* query, const char* field, int* value)
 
     if (output)
     {
-        result = wm_sys_parse_query_int(output, field, value);
+        result = gm_sys_parse_query_int(output, field, value);
         free(output);
     }
 
@@ -353,11 +353,11 @@ static bool wm_sys_query_int(const char* query, const char* field, int* value)
 // before triggering synchronization anyway (guards against the marker never being
 // persisted, observed on the Windows agent where the scan writes inventory to the
 // local DB but does not reach the marker-write step).
-#ifndef WM_SYS_STARTUP_SYNC_MAX_WAIT
-#define WM_SYS_STARTUP_SYNC_MAX_WAIT 45
+#ifndef GM_SYS_STARTUP_SYNC_MAX_WAIT
+#define GM_SYS_STARTUP_SYNC_MAX_WAIT 45
 #endif
 
-static wm_syscollector_startup_action_t wm_sys_get_startup_action(bool* first_sync_completed)
+static gm_syscollector_startup_action_t gm_sys_get_startup_action(bool* first_sync_completed)
 {
     int marker = 0;
 
@@ -368,13 +368,13 @@ static wm_syscollector_startup_action_t wm_sys_get_startup_action(bool* first_sy
 
     if (!syscollector_query_ptr)
     {
-        mtdebug1(WM_SYS_LOGTAG, "Syscollector query function not available. Keeping startup synchronization delay.");
+        mtdebug1(GM_SYS_LOGTAG, "Syscollector query function not available. Keeping startup synchronization delay.");
         return SYSCOLLECTOR_STARTUP_ACTION_WAIT;
     }
 
-    if (!wm_sys_query_int("{\"command\":\"get_first_sync_completed\"}", "first_sync_completed", &marker))
+    if (!gm_sys_query_int("{\"command\":\"get_first_sync_completed\"}", "first_sync_completed", &marker))
     {
-        mtdebug1(WM_SYS_LOGTAG, "Failed to detect whether the first inventory synchronization already completed. Keeping startup synchronization delay.");
+        mtdebug1(GM_SYS_LOGTAG, "Failed to detect whether the first inventory synchronization already completed. Keeping startup synchronization delay.");
         return SYSCOLLECTOR_STARTUP_ACTION_WAIT;
     }
 
@@ -385,11 +385,11 @@ static wm_syscollector_startup_action_t wm_sys_get_startup_action(bool* first_sy
             *first_sync_completed = true;
         }
 
-        mtdebug1(WM_SYS_LOGTAG, "Inventory first synchronization already completed in a previous run. Keeping startup synchronization delay.");
+        mtdebug1(GM_SYS_LOGTAG, "Inventory first synchronization already completed in a previous run. Keeping startup synchronization delay.");
         return SYSCOLLECTOR_STARTUP_ACTION_WAIT;
     }
 
-    mtdebug1(WM_SYS_LOGTAG, "Inventory initial scan data is not ready yet. First synchronization will wait for scan data.");
+    mtdebug1(GM_SYS_LOGTAG, "Inventory initial scan data is not ready yet. First synchronization will wait for scan data.");
 
     int log_throttle = 0;
     int startup_wait_seconds = 0;
@@ -398,30 +398,30 @@ static wm_syscollector_startup_action_t wm_sys_get_startup_action(bool* first_sy
     {
         int scan_marker = 0;
 
-        if (!wm_sys_query_int("{\"command\":\"get_first_scan_completed\"}", "first_scan_completed", &scan_marker))
+        if (!gm_sys_query_int("{\"command\":\"get_first_scan_completed\"}", "first_scan_completed", &scan_marker))
         {
-            mtdebug1(WM_SYS_LOGTAG, "Failed to detect initial Syscollector scan completion. Keeping startup synchronization delay.");
+            mtdebug1(GM_SYS_LOGTAG, "Failed to detect initial Syscollector scan completion. Keeping startup synchronization delay.");
             return SYSCOLLECTOR_STARTUP_ACTION_WAIT;
         }
 
         if (scan_marker > 0)
         {
-            mtdebug1(WM_SYS_LOGTAG, "First inventory scan completed. Triggering first synchronization without startup delay.");
+            mtdebug1(GM_SYS_LOGTAG, "First inventory scan completed. Triggering first synchronization without startup delay.");
             return SYSCOLLECTOR_STARTUP_ACTION_IMMEDIATE;
         }
 
         // Do not block the synchronization worker indefinitely if the first-scan
         // completion marker is never observed. After a bounded wait, trigger
         // synchronization anyway so the already-scanned inventory reaches the manager.
-        if (++startup_wait_seconds >= WM_SYS_STARTUP_SYNC_MAX_WAIT)
+        if (++startup_wait_seconds >= GM_SYS_STARTUP_SYNC_MAX_WAIT)
         {
-            mtinfo(WM_SYS_LOGTAG, "First inventory scan marker not observed after %d s; triggering synchronization from persisted inventory.", startup_wait_seconds);
+            mtinfo(GM_SYS_LOGTAG, "First inventory scan marker not observed after %d s; triggering synchronization from persisted inventory.", startup_wait_seconds);
             return SYSCOLLECTOR_STARTUP_ACTION_IMMEDIATE;
         }
 
         if (log_throttle == 0)
         {
-            mtdebug1(WM_SYS_LOGTAG, "Synchronization deferred: waiting for first inventory scan to complete.");
+            mtdebug1(GM_SYS_LOGTAG, "Synchronization deferred: waiting for first inventory scan to complete.");
         }
 
         log_throttle = (log_throttle + 1) % 30;
@@ -431,23 +431,23 @@ static wm_syscollector_startup_action_t wm_sys_get_startup_action(bool* first_sy
     return SYSCOLLECTOR_STARTUP_ACTION_STOP;
 }
 
-static void wm_sys_persist_diff_message(const char* id, Operation_t operation, const char* index, const void* data, uint64_t version)
+static void gm_sys_persist_diff_message(const char* id, Operation_t operation, const char* index, const void* data, uint64_t version)
 {
     if (enable_synchronization && syscollector_persist_diff_ptr)
     {
         const char* msg = (const char*)data;
-        mtdebug2(WM_SYS_LOGTAG, "Persisting Inventory event: %s", msg);
+        mtdebug2(GM_SYS_LOGTAG, "Persisting Inventory event: %s", msg);
         syscollector_persist_diff_ptr(id, operation, index, msg, version);
     }
     else
     {
-        mtdebug2(WM_SYS_LOGTAG, "Inventory synchronization is disabled or function not available");
+        mtdebug2(GM_SYS_LOGTAG, "Inventory synchronization is disabled or function not available");
     }
 }
 
-static void wm_sys_log_config(wm_sys_t* sys)
+static void gm_sys_log_config(gm_sys_t* sys)
 {
-    cJSON* config_json = wm_sys_dump(sys);
+    cJSON* config_json = gm_sys_dump(sys);
 
     if (config_json)
     {
@@ -455,7 +455,7 @@ static void wm_sys_log_config(wm_sys_t* sys)
 
         if (config_str)
         {
-            mtdebug1(WM_SYS_LOGTAG, "%s", config_str);
+            mtdebug1(GM_SYS_LOGTAG, "%s", config_str);
             cJSON_free(config_str);
         }
 
@@ -463,26 +463,26 @@ static void wm_sys_log_config(wm_sys_t* sys)
     }
 }
 
-static int wm_sys_startmq(const char* key, short type, short attempts)
+static int gm_sys_startmq(const char* key, short type, short attempts)
 {
     return StartMQPredicated(key, type, attempts, &is_shutdown_process_started);
 }
 
-static int wm_sys_send_binary_msg(int queue, const void* message, size_t message_len, const char* locmsg, char loc)
+static int gm_sys_send_binary_msg(int queue, const void* message, size_t message_len, const char* locmsg, char loc)
 {
     return SendBinaryMSG(queue, message, message_len, locmsg, loc);
 }
 
-static void wm_handle_sys_disabled_and_notify_data_clean(wm_sys_t* sys)
+static void gm_handle_sys_disabled_and_notify_data_clean(gm_sys_t* sys)
 {
 
     if (w_is_file(SYSCOLLECTOR_DB_DISK_PATH))
     {
-        mtinfo(WM_SYS_LOGTAG, "Syscollector is disabled, Syscollector database file exists. Proceeding with data clean notification.");
+        mtinfo(GM_SYS_LOGTAG, "Syscollector is disabled, Syscollector database file exists. Proceeding with data clean notification.");
     }
     else
     {
-        mtinfo(WM_SYS_LOGTAG, "Syscollector is disabled, Syscollector database file does not exist. Skipping data clean notification.");
+        mtinfo(GM_SYS_LOGTAG, "Syscollector is disabled, Syscollector database file does not exist. Skipping data clean notification.");
         return;
     }
 
@@ -499,8 +499,8 @@ static void wm_handle_sys_disabled_and_notify_data_clean(wm_sys_t* sys)
         syscollector_delete_database_ptr = so_get_function_sym(syscollector_module, "syscollector_delete_database");
 
         syscollector_init_ptr(sys->interval,
-                              wm_sys_send_diff_message,
-                              wm_sys_persist_diff_message,
+                              gm_sys_send_diff_message,
+                              gm_sys_persist_diff_message,
                               taggedLogFunction,
                               SYSCOLLECTOR_DB_DISK_PATH,
                               SYSCOLLECTOR_NORM_CONFIG_DISK_PATH,
@@ -522,10 +522,10 @@ static void wm_handle_sys_disabled_and_notify_data_clean(wm_sys_t* sys)
 
         MQ_Functions mq_funcs =
         {
-            .start = wm_sys_startmq,
-            .send_binary = wm_sys_send_binary_msg
+            .start = gm_sys_startmq,
+            .send_binary = gm_sys_send_binary_msg
         };
-        syscollector_init_sync_ptr(WM_SYS_LOCATION, SYS_SYNC_PROTOCOL_DB_PATH, SYS_SYNC_PROTOCOL_VD_DB_PATH, &mq_funcs, sync_end_delay, sync_response_timeout, SYS_SYNC_RETRIES, sync_max_eps,
+        syscollector_init_sync_ptr(GM_SYS_LOCATION, SYS_SYNC_PROTOCOL_DB_PATH, SYS_SYNC_PROTOCOL_VD_DB_PATH, &mq_funcs, sync_end_delay, sync_response_timeout, SYS_SYNC_RETRIES, sync_max_eps,
                                    integrity_interval);
 
         if (syscollector_notify_data_clean_ptr && syscollector_delete_database_ptr)
@@ -563,30 +563,30 @@ static void wm_handle_sys_disabled_and_notify_data_clean(wm_sys_t* sys)
                 }
                 else
                 {
-                    mtdebug1(WM_SYS_LOGTAG, "Syscollector data clean notification sent successfully.");
+                    mtdebug1(GM_SYS_LOGTAG, "Syscollector data clean notification sent successfully.");
                     syscollector_delete_database_ptr();
                 }
             }
         }
         else
         {
-            mtwarn(WM_SYS_LOGTAG, "Syscollector notify data clean functions not available.");
+            mtwarn(GM_SYS_LOGTAG, "Syscollector notify data clean functions not available.");
         }
 
     }
     else
     {
-        mtwarn(WM_SYS_LOGTAG, "Failed to load Syscollector module for data clean notification.");
+        mtwarn(GM_SYS_LOGTAG, "Failed to load Syscollector module for data clean notification.");
         return;
     }
 }
 
 #ifdef WIN32
-DWORD WINAPI wm_sys_main(void* arg)
+DWORD WINAPI gm_sys_main(void* arg)
 {
-    wm_sys_t* sys = (wm_sys_t*)arg;
+    gm_sys_t* sys = (gm_sys_t*)arg;
 #else
-void* wm_sys_main(wm_sys_t* sys)
+void* gm_sys_main(gm_sys_t* sys)
 {
 #endif
 
@@ -605,12 +605,12 @@ void* wm_sys_main(wm_sys_t* sys)
 
     if (!sys->flags.enabled)
     {
-        wm_handle_sys_disabled_and_notify_data_clean(sys);
-        mtinfo(WM_SYS_LOGTAG, "Module disabled. Exiting.");
+        gm_handle_sys_disabled_and_notify_data_clean(sys);
+        mtinfo(GM_SYS_LOGTAG, "Module disabled. Exiting.");
         pthread_exit(NULL);
     }
 
-    mtdebug1(WM_SYS_LOGTAG, "Module enabled.");
+    mtdebug1(GM_SYS_LOGTAG, "Module enabled.");
 
 #ifndef WIN32
     // Connect to socket
@@ -618,7 +618,7 @@ void* wm_sys_main(wm_sys_t* sys)
 
     if (queue_fd < 0)
     {
-        mterror(WM_SYS_LOGTAG, "Can't connect to queue.");
+        mterror(GM_SYS_LOGTAG, "Can't connect to queue.");
         pthread_exit(NULL);
     }
 
@@ -653,13 +653,13 @@ void* wm_sys_main(wm_sys_t* sys)
     }
     else
     {
-        mterror(WM_SYS_LOGTAG, "Can't load syscollector.");
+        mterror(GM_SYS_LOGTAG, "Can't load syscollector.");
         pthread_exit(NULL);
     }
 
     if (syscollector_init_ptr && syscollector_start_ptr)
     {
-        mtdebug1(WM_SYS_LOGTAG, "Starting module.");
+        mtdebug1(GM_SYS_LOGTAG, "Starting module.");
         w_mutex_lock(&sys_stop_mutex);
         need_shutdown_wait = true;
         w_mutex_unlock(&sys_stop_mutex);
@@ -680,12 +680,12 @@ void* wm_sys_main(wm_sys_t* sys)
             syscollector_max_eps = sys->max_eps;
         }
 
-        wm_sys_log_config(sys);
+        gm_sys_log_config(sys);
 
         // Initialize syscollector FIRST to set up the logger callback
         syscollector_init_ptr(sys->interval,
-                              wm_sys_send_diff_message,
-                              wm_sys_persist_diff_message,
+                              gm_sys_send_diff_message,
+                              gm_sys_persist_diff_message,
                               taggedLogFunction,
                               SYSCOLLECTOR_DB_DISK_PATH,
                               SYSCOLLECTOR_NORM_CONFIG_DISK_PATH,
@@ -709,12 +709,12 @@ void* wm_sys_main(wm_sys_t* sys)
         // Syscollector will fetch document limits from agentd
         if (syscollector_set_agentd_query_func_setter)
         {
-            syscollector_set_agentd_query_func_setter(wm_sys_query_agentd);
-            mtdebug1(WM_SYS_LOGTAG, "Agentd query function configured for document limits.");
+            syscollector_set_agentd_query_func_setter(gm_sys_query_agentd);
+            mtdebug1(GM_SYS_LOGTAG, "Agentd query function configured for document limits.");
         }
         else
         {
-            mtdebug1(WM_SYS_LOGTAG, "Agentd query function setter not available.");
+            mtdebug1(GM_SYS_LOGTAG, "Agentd query function setter not available.");
         }
 
         // Initialize sync protocol AFTER init (so logger is available)
@@ -722,27 +722,27 @@ void* wm_sys_main(wm_sys_t* sys)
         {
             MQ_Functions mq_funcs =
             {
-                .start = wm_sys_startmq,
-                .send_binary = wm_sys_send_binary_msg
+                .start = gm_sys_startmq,
+                .send_binary = gm_sys_send_binary_msg
             };
-            syscollector_init_sync_ptr(WM_SYS_LOCATION, SYS_SYNC_PROTOCOL_DB_PATH, SYS_SYNC_PROTOCOL_VD_DB_PATH, &mq_funcs, sync_end_delay, sync_response_timeout, SYS_SYNC_RETRIES, sync_max_eps,
+            syscollector_init_sync_ptr(GM_SYS_LOCATION, SYS_SYNC_PROTOCOL_DB_PATH, SYS_SYNC_PROTOCOL_VD_DB_PATH, &mq_funcs, sync_end_delay, sync_response_timeout, SYS_SYNC_RETRIES, sync_max_eps,
                                        integrity_interval);
 #ifndef WIN32
             // Launch inventory synchronization thread as joinable so we can wait for it
             // before releasing resources on shutdown
             sync_module_running = 1;
-            sync_worker_thread_initialized = (CreateThreadJoinable(&sync_worker_thread, wm_sync_module, NULL) == 0);
+            sync_worker_thread_initialized = (CreateThreadJoinable(&sync_worker_thread, gm_sync_module, NULL) == 0);
             if (!sync_worker_thread_initialized)
             {
-                mterror(WM_SYS_LOGTAG, THREAD_ERROR);
+                mterror(GM_SYS_LOGTAG, THREAD_ERROR);
                 sync_module_running = 0;
             }
 #else
             sync_module_running = 1;
-            sync_worker_thread = CreateThread(NULL, 0, wm_sync_module, NULL, 0, NULL);
+            sync_worker_thread = CreateThread(NULL, 0, gm_sync_module, NULL, 0, NULL);
             if (sync_worker_thread == NULL)
             {
-                mterror(WM_SYS_LOGTAG, THREAD_ERROR);
+                mterror(GM_SYS_LOGTAG, THREAD_ERROR);
                 sync_module_running = 0;
             }
             else
@@ -754,15 +754,15 @@ void* wm_sys_main(wm_sys_t* sys)
         }
         else
         {
-            mtdebug1(WM_SYS_LOGTAG, "Inventory synchronization is disabled or function not available");
+            mtdebug1(GM_SYS_LOGTAG, "Inventory synchronization is disabled or function not available");
         }
 
-        mtinfo(WM_SYS_LOGTAG, STARTUP_MSG, (int)getpid());
+        mtinfo(GM_SYS_LOGTAG, STARTUP_MSG, (int)getpid());
         syscollector_start_ptr();
     }
     else
     {
-        mterror(WM_SYS_LOGTAG, "Can't get syscollector_start_ptr.");
+        mterror(GM_SYS_LOGTAG, "Can't get syscollector_start_ptr.");
         pthread_exit(NULL);
     }
 
@@ -798,7 +798,7 @@ void* wm_sys_main(wm_sys_t* sys)
     }
 #endif
 
-    mtinfo(WM_SYS_LOGTAG, "Module finished.");
+    mtinfo(GM_SYS_LOGTAG, "Module finished.");
     w_mutex_lock(&sys_stop_mutex);
     need_shutdown_wait = false;
     sys_main_thread_initialized = false;
@@ -815,12 +815,12 @@ void* wm_sys_main(wm_sys_t* sys)
     return 0;
 }
 
-void wm_sys_destroy(wm_sys_t* data)
+void gm_sys_destroy(gm_sys_t* data)
 {
     free(data);
 }
 
-void wm_sys_stop(__attribute__((unused))wm_sys_t* data)
+void gm_sys_stop(__attribute__((unused))gm_sys_t* data)
 {
     if (!data->flags.running)
     {
@@ -833,7 +833,7 @@ void wm_sys_stop(__attribute__((unused))wm_sys_t* data)
     // Stop sync module
     sync_module_running = 0;
 
-    mtinfo(WM_SYS_LOGTAG, "Stop received for Syscollector.");
+    mtinfo(GM_SYS_LOGTAG, "Stop received for Syscollector.");
 
     if (syscollector_stop_ptr)
     {
@@ -846,7 +846,7 @@ void wm_sys_stop(__attribute__((unused))wm_sys_t* data)
 
     if (called_from_sys_main_thread)
     {
-        mtdebug1(WM_SYS_LOGTAG, "Stop called from syscollector worker thread. Skipping synchronous shutdown wait.");
+        mtdebug1(GM_SYS_LOGTAG, "Stop called from syscollector worker thread. Skipping synchronous shutdown wait.");
     }
 
     if (need_shutdown_wait && !called_from_sys_main_thread)
@@ -859,7 +859,7 @@ void wm_sys_stop(__attribute__((unused))wm_sys_t* data)
         {
             if (pthread_cond_timedwait(&sys_stop_condition, &sys_stop_mutex, &ts) == ETIMEDOUT)
             {
-                mtwarn(WM_SYS_LOGTAG, "Timeout waiting for Syscollector to complete shutdown.");
+                mtwarn(GM_SYS_LOGTAG, "Timeout waiting for Syscollector to complete shutdown.");
                 break;
             }
         }
@@ -868,61 +868,61 @@ void wm_sys_stop(__attribute__((unused))wm_sys_t* data)
     w_mutex_unlock(&sys_stop_mutex);
 }
 
-cJSON* wm_sys_dump(const wm_sys_t* sys)
+cJSON* gm_sys_dump(const gm_sys_t* sys)
 {
     cJSON* root = cJSON_CreateObject();
-    cJSON* wm_sys = cJSON_CreateObject();
+    cJSON* gm_sys = cJSON_CreateObject();
 
     // System provider values
-    if (sys->flags.enabled) cJSON_AddStringToObject(wm_sys, "disabled", "no");
-    else cJSON_AddStringToObject(wm_sys, "disabled", "yes");
+    if (sys->flags.enabled) cJSON_AddStringToObject(gm_sys, "disabled", "no");
+    else cJSON_AddStringToObject(gm_sys, "disabled", "yes");
 
-    if (sys->flags.scan_on_start) cJSON_AddStringToObject(wm_sys, "scan-on-start", "yes");
-    else cJSON_AddStringToObject(wm_sys, "scan-on-start", "no");
+    if (sys->flags.scan_on_start) cJSON_AddStringToObject(gm_sys, "scan-on-start", "yes");
+    else cJSON_AddStringToObject(gm_sys, "scan-on-start", "no");
 
-    cJSON_AddNumberToObject(wm_sys, "interval", sys->interval);
-    cJSON_AddNumberToObject(wm_sys, "max_eps", sys->max_eps);
+    cJSON_AddNumberToObject(gm_sys, "interval", sys->interval);
+    cJSON_AddNumberToObject(gm_sys, "max_eps", sys->max_eps);
 
-    if (sys->flags.notify_first_scan) cJSON_AddStringToObject(wm_sys, "notify_first_scan", "yes");
-    else cJSON_AddStringToObject(wm_sys, "notify_first_scan", "no");
+    if (sys->flags.notify_first_scan) cJSON_AddStringToObject(gm_sys, "notify_first_scan", "yes");
+    else cJSON_AddStringToObject(gm_sys, "notify_first_scan", "no");
 
-    if (sys->flags.netinfo) cJSON_AddStringToObject(wm_sys, "network", "yes");
-    else cJSON_AddStringToObject(wm_sys, "network", "no");
+    if (sys->flags.netinfo) cJSON_AddStringToObject(gm_sys, "network", "yes");
+    else cJSON_AddStringToObject(gm_sys, "network", "no");
 
-    if (sys->flags.osinfo) cJSON_AddStringToObject(wm_sys, "os", "yes");
-    else cJSON_AddStringToObject(wm_sys, "os", "no");
+    if (sys->flags.osinfo) cJSON_AddStringToObject(gm_sys, "os", "yes");
+    else cJSON_AddStringToObject(gm_sys, "os", "no");
 
-    if (sys->flags.hwinfo) cJSON_AddStringToObject(wm_sys, "hardware", "yes");
-    else cJSON_AddStringToObject(wm_sys, "hardware", "no");
+    if (sys->flags.hwinfo) cJSON_AddStringToObject(gm_sys, "hardware", "yes");
+    else cJSON_AddStringToObject(gm_sys, "hardware", "no");
 
-    if (sys->flags.programinfo) cJSON_AddStringToObject(wm_sys, "packages", "yes");
-    else cJSON_AddStringToObject(wm_sys, "packages", "no");
+    if (sys->flags.programinfo) cJSON_AddStringToObject(gm_sys, "packages", "yes");
+    else cJSON_AddStringToObject(gm_sys, "packages", "no");
 
-    if (sys->flags.portsinfo) cJSON_AddStringToObject(wm_sys, "ports", "yes");
-    else cJSON_AddStringToObject(wm_sys, "ports", "no");
+    if (sys->flags.portsinfo) cJSON_AddStringToObject(gm_sys, "ports", "yes");
+    else cJSON_AddStringToObject(gm_sys, "ports", "no");
 
-    if (sys->flags.allports) cJSON_AddStringToObject(wm_sys, "ports_all", "yes");
-    else cJSON_AddStringToObject(wm_sys, "ports_all", "no");
+    if (sys->flags.allports) cJSON_AddStringToObject(gm_sys, "ports_all", "yes");
+    else cJSON_AddStringToObject(gm_sys, "ports_all", "no");
 
-    if (sys->flags.procinfo) cJSON_AddStringToObject(wm_sys, "processes", "yes");
-    else cJSON_AddStringToObject(wm_sys, "processes", "no");
+    if (sys->flags.procinfo) cJSON_AddStringToObject(gm_sys, "processes", "yes");
+    else cJSON_AddStringToObject(gm_sys, "processes", "no");
 
-    if (sys->flags.groups) cJSON_AddStringToObject(wm_sys, "groups", "yes");
-    else cJSON_AddStringToObject(wm_sys, "groups", "no");
+    if (sys->flags.groups) cJSON_AddStringToObject(gm_sys, "groups", "yes");
+    else cJSON_AddStringToObject(gm_sys, "groups", "no");
 
-    if (sys->flags.users) cJSON_AddStringToObject(wm_sys, "users", "yes");
-    else cJSON_AddStringToObject(wm_sys, "users", "no");
+    if (sys->flags.users) cJSON_AddStringToObject(gm_sys, "users", "yes");
+    else cJSON_AddStringToObject(gm_sys, "users", "no");
 
-    if (sys->flags.services) cJSON_AddStringToObject(wm_sys, "services", "yes");
-    else cJSON_AddStringToObject(wm_sys, "services", "no");
+    if (sys->flags.services) cJSON_AddStringToObject(gm_sys, "services", "yes");
+    else cJSON_AddStringToObject(gm_sys, "services", "no");
 
-    if (sys->flags.browser_extensions) cJSON_AddStringToObject(wm_sys, "browser_extensions", "yes");
-    else cJSON_AddStringToObject(wm_sys, "browser_extensions", "no");
+    if (sys->flags.browser_extensions) cJSON_AddStringToObject(gm_sys, "browser_extensions", "yes");
+    else cJSON_AddStringToObject(gm_sys, "browser_extensions", "no");
 
 #ifdef WIN32
 
-    if (sys->flags.hotfixinfo) cJSON_AddStringToObject(wm_sys, "hotfixes", "yes");
-    else cJSON_AddStringToObject(wm_sys, "hotfixes", "no");
+    if (sys->flags.hotfixinfo) cJSON_AddStringToObject(gm_sys, "hotfixes", "yes");
+    else cJSON_AddStringToObject(gm_sys, "hotfixes", "no");
 
 #endif
 
@@ -935,18 +935,18 @@ cJSON* wm_sys_dump(const wm_sys_t* sys)
     cJSON_AddNumberToObject(synchronization, "sync_end_delay", sys->sync.sync_end_delay);
     cJSON_AddNumberToObject(synchronization, "integrity_interval", sys->sync.integrity_interval);
 
-    cJSON_AddItemToObject(wm_sys, "synchronization", synchronization);
+    cJSON_AddItemToObject(gm_sys, "synchronization", synchronization);
 
-    cJSON_AddItemToObject(root, "syscollector", wm_sys);
+    cJSON_AddItemToObject(root, "syscollector", gm_sys);
 
     return root;
 }
 
-int wm_sync_message(const char* command, size_t command_len)
+int gm_sync_message(const char* command, size_t command_len)
 {
     if (shutdown_process_started)
     {
-        mtdebug1(WM_SYS_LOGTAG, "Sync message received during shutdown, ignoring");
+        mtdebug1(GM_SYS_LOGTAG, "Sync message received during shutdown, ignoring");
         return 0;
     }
 
@@ -967,12 +967,12 @@ int wm_sync_message(const char* command, size_t command_len)
 
             if (syscollector_parse_response_vd_ptr)
             {
-                mtdebug2(WM_SYS_LOGTAG, "Routing message to VD parser");
+                mtdebug2(GM_SYS_LOGTAG, "Routing message to VD parser");
                 ret = syscollector_parse_response_vd_ptr(data, data_len);
             }
             else
             {
-                mtdebug1(WM_SYS_LOGTAG, "VD parser function not available");
+                mtdebug1(GM_SYS_LOGTAG, "VD parser function not available");
                 return -1;
             }
         }
@@ -985,19 +985,19 @@ int wm_sync_message(const char* command, size_t command_len)
 
             if (syscollector_parse_response_ptr)
             {
-                mtdebug2(WM_SYS_LOGTAG, "Routing message to regular parser");
+                mtdebug2(GM_SYS_LOGTAG, "Routing message to regular parser");
                 ret = syscollector_parse_response_ptr(data, data_len);
             }
             else
             {
-                mtdebug1(WM_SYS_LOGTAG, "Regular parser function not available");
+                mtdebug1(GM_SYS_LOGTAG, "Regular parser function not available");
                 return -1;
             }
         }
 
         if (!ret)
         {
-            mtdebug1(WM_SYS_LOGTAG, "Error syncing module");
+            mtdebug1(GM_SYS_LOGTAG, "Error syncing module");
             return -1;
         }
 
@@ -1005,23 +1005,23 @@ int wm_sync_message(const char* command, size_t command_len)
     }
     else
     {
-        mtdebug1(WM_SYS_LOGTAG, "Inventory synchronization is disabled or function not available");
+        mtdebug1(GM_SYS_LOGTAG, "Inventory synchronization is disabled or function not available");
         return -1;
     }
 }
 
 #ifdef WIN32
-DWORD WINAPI wm_sync_module(__attribute__((unused)) void* args)
+DWORD WINAPI gm_sync_module(__attribute__((unused)) void* args)
 {
 #else
-void* wm_sync_module(__attribute__((unused)) void* args)
+void* gm_sync_module(__attribute__((unused)) void* args)
 {
 #endif
     bool first_sync_completed = false;
     bool wait_before_sync = true;
     bool first_sync_blocked_on_scan = false;
 
-    switch (wm_sys_get_startup_action(&first_sync_completed))
+    switch (gm_sys_get_startup_action(&first_sync_completed))
     {
         case SYSCOLLECTOR_STARTUP_ACTION_IMMEDIATE:
             wait_before_sync = false;
@@ -1060,9 +1060,9 @@ void* wm_sync_module(__attribute__((unused)) void* args)
         if (first_sync_blocked_on_scan && syscollector_is_scanning_ptr)
         {
             int scan_wait = 0;
-            while (sync_module_running && syscollector_is_scanning_ptr() && scan_wait++ < WM_SYS_STARTUP_SYNC_MAX_WAIT)
+            while (sync_module_running && syscollector_is_scanning_ptr() && scan_wait++ < GM_SYS_STARTUP_SYNC_MAX_WAIT)
             {
-                mtdebug1(WM_SYS_LOGTAG, "Waiting for scan to finish before forced post-first-scan synchronization.");
+                mtdebug1(GM_SYS_LOGTAG, "Waiting for scan to finish before forced post-first-scan synchronization.");
                 sleep(1);
             }
 
@@ -1077,7 +1077,7 @@ void* wm_sync_module(__attribute__((unused)) void* args)
         // Skip synchronization if scan is in progress to avoid syncing incomplete data.
         if (syscollector_is_scanning_ptr && syscollector_is_scanning_ptr())
         {
-            mtdebug1(WM_SYS_LOGTAG, "Scan in progress, skipping sync cycle");
+            mtdebug1(GM_SYS_LOGTAG, "Scan in progress, skipping sync cycle");
             continue;
         }
 
@@ -1108,7 +1108,7 @@ void* wm_sync_module(__attribute__((unused)) void* args)
         }
         else
         {
-            mtdebug1(WM_SYS_LOGTAG, "Sync function not available");
+            mtdebug1(GM_SYS_LOGTAG, "Sync function not available");
         }
     }
 
@@ -1119,7 +1119,7 @@ void* wm_sync_module(__attribute__((unused)) void* args)
 #endif
 }
 
-static size_t wm_sys_query_handler(void* data, char* query, char** output)
+static size_t gm_sys_query_handler(void* data, char* query, char** output)
 {
     (void)data;  // Unused parameter
 

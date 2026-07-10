@@ -24,22 +24,22 @@
 #include "wm_task_manager_tasks.h"
 #include "shared.h"
 
-int wm_task_manager_init(wm_task_manager *task_config);
-void* wm_task_manager_main(wm_task_manager* task_config);
-void wm_task_manager_destroy(wm_task_manager* task_config);
-cJSON* wm_task_manager_dump(const wm_task_manager* task_config);
+int gm_task_manager_init(gm_task_manager *task_config);
+void* gm_task_manager_main(gm_task_manager* task_config);
+void gm_task_manager_destroy(gm_task_manager* task_config);
+cJSON* gm_task_manager_dump(const gm_task_manager* task_config);
 
 // Setup / teardown
 
 static int setup_group(void **state) {
-    wm_task_manager *config = NULL;
-    os_calloc(1, sizeof(wm_task_manager), config);
+    gm_task_manager *config = NULL;
+    os_calloc(1, sizeof(gm_task_manager), config);
     *state = config;
     return 0;
 }
 
 static int teardown_group(void **state) {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
     os_free(config);
     return 0;
 }
@@ -70,11 +70,11 @@ int __wrap_accept() {
 
 void test_wm_task_manager_dump_enabled(void **state)
 {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
 
     config->enabled = 1;
 
-    cJSON *ret = wm_task_manager_dump(config);
+    cJSON *ret = gm_task_manager_dump(config);
 
     state[1] = ret;
 
@@ -87,11 +87,11 @@ void test_wm_task_manager_dump_enabled(void **state)
 
 void test_wm_task_manager_dump_disabled(void **state)
 {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
 
     config->enabled = 0;
 
-    cJSON *ret = wm_task_manager_dump(config);
+    cJSON *ret = gm_task_manager_dump(config);
 
     state[1] = ret;
 
@@ -104,18 +104,18 @@ void test_wm_task_manager_dump_disabled(void **state)
 
 void test_wm_task_manager_destroy(void **state)
 {
-    wm_task_manager *config = NULL;
-    os_calloc(1, sizeof(wm_task_manager), config);
+    gm_task_manager *config = NULL;
+    os_calloc(1, sizeof(gm_task_manager), config);
 
     expect_string(__wrap__mtinfo, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mtinfo, formatted_msg, "(8201): Module Task Manager finished.");
 
-    wm_task_manager_destroy(config);
+    gm_task_manager_destroy(config);
 }
 
 void test_wm_task_manager_init_ok(void **state)
 {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
     int sock = 555;
 
     config->enabled = 1;
@@ -129,14 +129,14 @@ void test_wm_task_manager_init_ok(void **state)
 
     will_return(__wrap_OS_BindUnixDomainWithPerms, sock);
 
-    int ret = wm_task_manager_init(config);
+    int ret = gm_task_manager_init(config);
 
     assert_int_equal(ret, sock);
 }
 
 void test_wm_task_manager_init_bind_err(void **state)
 {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
 
     config->enabled = 1;
 
@@ -152,12 +152,12 @@ void test_wm_task_manager_init_bind_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8251): Queue 'queue/tasks/task' not accessible: 'Success'. Exiting...");
 
-    expect_assert_failure(wm_task_manager_init(config));
+    expect_assert_failure(gm_task_manager_init(config));
 }
 
 void test_wm_task_manager_init_disabled(void **state)
 {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
     int sock = 555;
 
     config->enabled = 0;
@@ -165,7 +165,7 @@ void test_wm_task_manager_init_disabled(void **state)
     expect_string(__wrap__mtinfo, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mtinfo, formatted_msg, "(8202): Module disabled. Exiting...");
 
-    expect_assert_failure(wm_task_manager_init(config));
+    expect_assert_failure(gm_task_manager_init(config));
 }
 
 void test_wm_task_manager_dispatch_ok(void **state)
@@ -182,8 +182,8 @@ void test_wm_task_manager_dispatch_ok(void **state)
                     "   }"
                     "}";
 
-    wm_task_manager_task *task = wm_task_manager_init_task();
-    wm_task_manager_upgrade *task_parameters = wm_task_manager_init_upgrade_parameters();
+    gm_task_manager_task *task = gm_task_manager_init_task();
+    gm_task_manager_upgrade *task_parameters = gm_task_manager_init_upgrade_parameters();
     int *agents = NULL;
 
     os_calloc(3, sizeof(int), agents);
@@ -195,18 +195,18 @@ void test_wm_task_manager_dispatch_ok(void **state)
     os_strdup("node05", task_parameters->node);
     task_parameters->agent_ids = agents;
 
-    task->command = WM_TASK_UPGRADE;
+    task->command = GM_TASK_UPGRADE;
     task->parameters = task_parameters;
 
     cJSON *data_array = cJSON_CreateArray();
 
     cJSON *response1 = cJSON_CreateObject();
-    cJSON_AddNumberToObject(response1, "error", WM_TASK_SUCCESS);
+    cJSON_AddNumberToObject(response1, "error", GM_TASK_SUCCESS);
     cJSON_AddStringToObject(response1, "message", "Success");
     cJSON_AddNumberToObject(response1, "agent", 1);
 
     cJSON *response2 = cJSON_CreateObject();
-    cJSON_AddNumberToObject(response2, "error", WM_TASK_SUCCESS);
+    cJSON_AddNumberToObject(response2, "error", GM_TASK_SUCCESS);
     cJSON_AddStringToObject(response2, "message", "Success");
     cJSON_AddNumberToObject(response2, "agent", 2);
 
@@ -231,13 +231,13 @@ void test_wm_task_manager_dispatch_ok(void **state)
     will_return(__wrap_wm_task_manager_parse_message, task);
 
     expect_memory(__wrap_wm_task_manager_process_task, task, task, sizeof(task));
-    will_return(__wrap_wm_task_manager_process_task, WM_TASK_SUCCESS);
+    will_return(__wrap_wm_task_manager_process_task, GM_TASK_SUCCESS);
     will_return(__wrap_wm_task_manager_process_task, data_array);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8205): Response to message: '{\"error\":0,\"data\":[{\"error\":0,\"message\":\"Success\",\"agent\":1},{\"error\":0,\"message\":\"Success\",\"agent\":2}],\"message\":\"Success\"}'");
 
-    int ret = wm_task_manager_dispatch(message, &response);
+    int ret = gm_task_manager_dispatch(message, &response);
 
     state[1] = response;
 
@@ -259,12 +259,12 @@ void test_wm_task_manager_dispatch_command_err(void **state)
                     "   }"
                     "}";
 
-    wm_task_manager_task *task = wm_task_manager_init_task();
+    gm_task_manager_task *task = gm_task_manager_init_task();
 
-    task->command = WM_TASK_UNKNOWN;
+    task->command = GM_TASK_UNKNOWN;
 
     cJSON *response_error = cJSON_CreateObject();
-    cJSON_AddNumberToObject(response_error, "error", WM_TASK_INVALID_COMMAND);
+    cJSON_AddNumberToObject(response_error, "error", GM_TASK_INVALID_COMMAND);
     cJSON_AddStringToObject(response_error, "message", "Invalid command");
 
     char *result = "{\"error\":2,\"data\":[{\"error\":2,\"message\":\"Invalid command\"}],\"message\":\"Invalid command\"}";
@@ -285,13 +285,13 @@ void test_wm_task_manager_dispatch_command_err(void **state)
     will_return(__wrap_wm_task_manager_parse_message, task);
 
     expect_memory(__wrap_wm_task_manager_process_task, task, task, sizeof(task));
-    will_return(__wrap_wm_task_manager_process_task, WM_TASK_INVALID_COMMAND);
+    will_return(__wrap_wm_task_manager_process_task, GM_TASK_INVALID_COMMAND);
     will_return(__wrap_wm_task_manager_process_task, NULL);
 
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8258): No action defined for command provided.");
 
-    expect_value(__wrap_wm_task_manager_parse_data_response, error_code, WM_TASK_INVALID_COMMAND);
+    expect_value(__wrap_wm_task_manager_parse_data_response, error_code, GM_TASK_INVALID_COMMAND);
     expect_value(__wrap_wm_task_manager_parse_data_response, agent_id, OS_INVALID);
     expect_value(__wrap_wm_task_manager_parse_data_response, task_id, OS_INVALID);
     will_return(__wrap_wm_task_manager_parse_data_response, response_error);
@@ -299,7 +299,7 @@ void test_wm_task_manager_dispatch_command_err(void **state)
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8205): Response to message: '{\"error\":2,\"data\":[{\"error\":2,\"message\":\"Invalid command\"}],\"message\":\"Invalid command\"}'");
 
-    int ret = wm_task_manager_dispatch(message, &response);
+    int ret = gm_task_manager_dispatch(message, &response);
 
     state[1] = response;
 
@@ -321,8 +321,8 @@ void test_wm_task_manager_dispatch_db_err(void **state)
                     "   }"
                     "}";
 
-    wm_task_manager_task *task = wm_task_manager_init_task();
-    wm_task_manager_upgrade *task_parameters = wm_task_manager_init_upgrade_parameters();
+    gm_task_manager_task *task = gm_task_manager_init_task();
+    gm_task_manager_upgrade *task_parameters = gm_task_manager_init_upgrade_parameters();
     int *agents = NULL;
 
     os_calloc(3, sizeof(int), agents);
@@ -334,11 +334,11 @@ void test_wm_task_manager_dispatch_db_err(void **state)
     os_strdup("node05", task_parameters->node);
     task_parameters->agent_ids = agents;
 
-    task->command = WM_TASK_UPGRADE;
+    task->command = GM_TASK_UPGRADE;
     task->parameters = task_parameters;
 
     cJSON *response_error = cJSON_CreateObject();
-    cJSON_AddNumberToObject(response_error, "error", WM_TASK_DATABASE_ERROR);
+    cJSON_AddNumberToObject(response_error, "error", GM_TASK_DATABASE_ERROR);
     cJSON_AddStringToObject(response_error, "message", "Database error");
 
     char *result = "{\"error\":4,\"data\":[{\"error\":4,\"message\":\"Database error\"}],\"message\":\"Database error\"}";
@@ -359,13 +359,13 @@ void test_wm_task_manager_dispatch_db_err(void **state)
     will_return(__wrap_wm_task_manager_parse_message, task);
 
     expect_memory(__wrap_wm_task_manager_process_task, task, task, sizeof(task));
-    will_return(__wrap_wm_task_manager_process_task, WM_TASK_DATABASE_ERROR);
+    will_return(__wrap_wm_task_manager_process_task, GM_TASK_DATABASE_ERROR);
     will_return(__wrap_wm_task_manager_process_task, NULL);
 
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8261): Database error.");
 
-    expect_value(__wrap_wm_task_manager_parse_data_response, error_code, WM_TASK_DATABASE_ERROR);
+    expect_value(__wrap_wm_task_manager_parse_data_response, error_code, GM_TASK_DATABASE_ERROR);
     expect_value(__wrap_wm_task_manager_parse_data_response, agent_id, OS_INVALID);
     expect_value(__wrap_wm_task_manager_parse_data_response, task_id, OS_INVALID);
     will_return(__wrap_wm_task_manager_parse_data_response, response_error);
@@ -373,7 +373,7 @@ void test_wm_task_manager_dispatch_db_err(void **state)
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8205): Response to message: '{\"error\":4,\"data\":[{\"error\":4,\"message\":\"Database error\"}],\"message\":\"Database error\"}'");
 
-    int ret = wm_task_manager_dispatch(message, &response);
+    int ret = gm_task_manager_dispatch(message, &response);
 
     state[1] = response;
 
@@ -395,8 +395,8 @@ void test_wm_task_manager_dispatch_db_parse_err(void **state)
                     "   }"
                     "}";
 
-    wm_task_manager_task *task = wm_task_manager_init_task();
-    wm_task_manager_upgrade *task_parameters = wm_task_manager_init_upgrade_parameters();
+    gm_task_manager_task *task = gm_task_manager_init_task();
+    gm_task_manager_upgrade *task_parameters = gm_task_manager_init_upgrade_parameters();
     int *agents = NULL;
 
     os_calloc(3, sizeof(int), agents);
@@ -408,11 +408,11 @@ void test_wm_task_manager_dispatch_db_parse_err(void **state)
     os_strdup("node05", task_parameters->node);
     task_parameters->agent_ids = agents;
 
-    task->command = WM_TASK_UPGRADE;
+    task->command = GM_TASK_UPGRADE;
     task->parameters = task_parameters;
 
     cJSON *response_error = cJSON_CreateObject();
-    cJSON_AddNumberToObject(response_error, "error", WM_TASK_DATABASE_PARSE_ERROR);
+    cJSON_AddNumberToObject(response_error, "error", GM_TASK_DATABASE_PARSE_ERROR);
     cJSON_AddStringToObject(response_error, "message", "Parse DB response error");
 
     char *result = "{\"error\":5,\"data\":[{\"error\":5,\"message\":\"Parse DB response error\"}],\"message\":\"Parse DB response error\"}";
@@ -433,13 +433,13 @@ void test_wm_task_manager_dispatch_db_parse_err(void **state)
     will_return(__wrap_wm_task_manager_parse_message, task);
 
     expect_memory(__wrap_wm_task_manager_process_task, task, task, sizeof(task));
-    will_return(__wrap_wm_task_manager_process_task, WM_TASK_DATABASE_PARSE_ERROR);
+    will_return(__wrap_wm_task_manager_process_task, GM_TASK_DATABASE_PARSE_ERROR);
     will_return(__wrap_wm_task_manager_process_task, NULL);
 
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8261): Database error.");
 
-    expect_value(__wrap_wm_task_manager_parse_data_response, error_code, WM_TASK_DATABASE_PARSE_ERROR);
+    expect_value(__wrap_wm_task_manager_parse_data_response, error_code, GM_TASK_DATABASE_PARSE_ERROR);
     expect_value(__wrap_wm_task_manager_parse_data_response, agent_id, OS_INVALID);
     expect_value(__wrap_wm_task_manager_parse_data_response, task_id, OS_INVALID);
     will_return(__wrap_wm_task_manager_parse_data_response, response_error);
@@ -447,7 +447,7 @@ void test_wm_task_manager_dispatch_db_parse_err(void **state)
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8205): Response to message: '{\"error\":5,\"data\":[{\"error\":5,\"message\":\"Parse DB response error\"}],\"message\":\"Parse DB response error\"}'");
 
-    int ret = wm_task_manager_dispatch(message, &response);
+    int ret = gm_task_manager_dispatch(message, &response);
 
     state[1] = response;
 
@@ -469,8 +469,8 @@ void test_wm_task_manager_dispatch_db_request_err(void **state)
                     "   }"
                     "}";
 
-    wm_task_manager_task *task = wm_task_manager_init_task();
-    wm_task_manager_upgrade *task_parameters = wm_task_manager_init_upgrade_parameters();
+    gm_task_manager_task *task = gm_task_manager_init_task();
+    gm_task_manager_upgrade *task_parameters = gm_task_manager_init_upgrade_parameters();
     int *agents = NULL;
 
     os_calloc(3, sizeof(int), agents);
@@ -482,11 +482,11 @@ void test_wm_task_manager_dispatch_db_request_err(void **state)
     os_strdup("node05", task_parameters->node);
     task_parameters->agent_ids = agents;
 
-    task->command = WM_TASK_UPGRADE;
+    task->command = GM_TASK_UPGRADE;
     task->parameters = task_parameters;
 
     cJSON *response_error = cJSON_CreateObject();
-    cJSON_AddNumberToObject(response_error, "error", WM_TASK_DATABASE_REQUEST_ERROR);
+    cJSON_AddNumberToObject(response_error, "error", GM_TASK_DATABASE_REQUEST_ERROR);
     cJSON_AddStringToObject(response_error, "message", "Error in DB request");
 
     char *result = "{\"error\":6,\"data\":[{\"error\":6,\"message\":\"Error in DB request\"}],\"message\":\"Error in DB request\"}";
@@ -507,13 +507,13 @@ void test_wm_task_manager_dispatch_db_request_err(void **state)
     will_return(__wrap_wm_task_manager_parse_message, task);
 
     expect_memory(__wrap_wm_task_manager_process_task, task, task, sizeof(task));
-    will_return(__wrap_wm_task_manager_process_task, WM_TASK_DATABASE_REQUEST_ERROR);
+    will_return(__wrap_wm_task_manager_process_task, GM_TASK_DATABASE_REQUEST_ERROR);
     will_return(__wrap_wm_task_manager_process_task, NULL);
 
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8261): Database error.");
 
-    expect_value(__wrap_wm_task_manager_parse_data_response, error_code, WM_TASK_DATABASE_REQUEST_ERROR);
+    expect_value(__wrap_wm_task_manager_parse_data_response, error_code, GM_TASK_DATABASE_REQUEST_ERROR);
     expect_value(__wrap_wm_task_manager_parse_data_response, agent_id, OS_INVALID);
     expect_value(__wrap_wm_task_manager_parse_data_response, task_id, OS_INVALID);
     will_return(__wrap_wm_task_manager_parse_data_response, response_error);
@@ -521,7 +521,7 @@ void test_wm_task_manager_dispatch_db_request_err(void **state)
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8205): Response to message: '{\"error\":6,\"data\":[{\"error\":6,\"message\":\"Error in DB request\"}],\"message\":\"Error in DB request\"}'");
 
-    int ret = wm_task_manager_dispatch(message, &response);
+    int ret = gm_task_manager_dispatch(message, &response);
 
     state[1] = response;
 
@@ -535,7 +535,7 @@ void test_wm_task_manager_dispatch_parse_err(void **state)
     char *message = "unknown json";
 
     cJSON *response_json = cJSON_CreateObject();
-    cJSON_AddNumberToObject(response_json, "error", WM_TASK_INVALID_MESSAGE);
+    cJSON_AddNumberToObject(response_json, "error", GM_TASK_INVALID_MESSAGE);
     cJSON_AddStringToObject(response_json, "message", "Invalid message");
 
     char *result = "{\"error\":1,\"data\":[{\"error\":1,\"message\":\"Invalid message\"}],\"message\":\"Invalid message\"}";
@@ -546,12 +546,12 @@ void test_wm_task_manager_dispatch_parse_err(void **state)
     expect_string(__wrap_wm_task_manager_parse_message, msg, message);
     will_return(__wrap_wm_task_manager_parse_message, NULL);
 
-    expect_value(__wrap_wm_task_manager_parse_data_response, error_code, WM_TASK_INVALID_MESSAGE);
+    expect_value(__wrap_wm_task_manager_parse_data_response, error_code, GM_TASK_INVALID_MESSAGE);
     expect_value(__wrap_wm_task_manager_parse_data_response, agent_id, OS_INVALID);
     expect_value(__wrap_wm_task_manager_parse_data_response, task_id, OS_INVALID);
     will_return(__wrap_wm_task_manager_parse_data_response, response_json);
 
-    int ret = wm_task_manager_dispatch(message, &response);
+    int ret = gm_task_manager_dispatch(message, &response);
 
     state[1] = response;
 
@@ -561,7 +561,7 @@ void test_wm_task_manager_dispatch_parse_err(void **state)
 
 void test_wm_task_manager_main_ok(void **state)
 {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
     int sock = 555;
     int peer = 1111;
 
@@ -578,8 +578,8 @@ void test_wm_task_manager_main_ok(void **state)
                     "   }"
                     "}";
 
-    wm_task_manager_task *task = wm_task_manager_init_task();
-    wm_task_manager_upgrade *task_parameters = wm_task_manager_init_upgrade_parameters();
+    gm_task_manager_task *task = gm_task_manager_init_task();
+    gm_task_manager_upgrade *task_parameters = gm_task_manager_init_upgrade_parameters();
     int *agents = NULL;
 
     os_calloc(3, sizeof(int), agents);
@@ -591,18 +591,18 @@ void test_wm_task_manager_main_ok(void **state)
     os_strdup("node05", task_parameters->node);
     task_parameters->agent_ids = agents;
 
-    task->command = WM_TASK_UPGRADE;
+    task->command = GM_TASK_UPGRADE;
     task->parameters = task_parameters;
 
     cJSON *data_array = cJSON_CreateArray();
 
     cJSON *response1 = cJSON_CreateObject();
-    cJSON_AddNumberToObject(response1, "error", WM_TASK_SUCCESS);
+    cJSON_AddNumberToObject(response1, "error", GM_TASK_SUCCESS);
     cJSON_AddStringToObject(response1, "message", "Success");
     cJSON_AddNumberToObject(response1, "agent", 1);
 
     cJSON *response2 = cJSON_CreateObject();
-    cJSON_AddNumberToObject(response2, "error", WM_TASK_SUCCESS);
+    cJSON_AddNumberToObject(response2, "error", GM_TASK_SUCCESS);
     cJSON_AddStringToObject(response2, "message", "Success");
     cJSON_AddNumberToObject(response2, "agent", 2);
 
@@ -654,7 +654,7 @@ void test_wm_task_manager_main_ok(void **state)
     will_return(__wrap_wm_task_manager_parse_message, task);
 
     expect_memory(__wrap_wm_task_manager_process_task, task, task, sizeof(task));
-    will_return(__wrap_wm_task_manager_process_task, WM_TASK_SUCCESS);
+    will_return(__wrap_wm_task_manager_process_task, GM_TASK_SUCCESS);
     will_return(__wrap_wm_task_manager_process_task, data_array);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:task-manager");
@@ -665,12 +665,12 @@ void test_wm_task_manager_main_ok(void **state)
     expect_string(__wrap_OS_SendSecureTCP, msg, response);
     will_return(__wrap_OS_SendSecureTCP, 0);
 
-    wm_task_manager_main(config);
+    gm_task_manager_main(config);
 }
 
 void test_wm_task_manager_main_recv_max_err(void **state)
 {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
     int sock = 555;
     int peer = 1111;
 
@@ -715,12 +715,12 @@ void test_wm_task_manager_main_recv_max_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8256): Received message > '4194304'");
 
-    wm_task_manager_main(config);
+    gm_task_manager_main(config);
 }
 
 void test_wm_task_manager_main_recv_empty_err(void **state)
 {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
     int sock = 555;
     int peer = 1111;
 
@@ -765,12 +765,12 @@ void test_wm_task_manager_main_recv_empty_err(void **state)
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8203): Empty message from local client.");
 
-    wm_task_manager_main(config);
+    gm_task_manager_main(config);
 }
 
 void test_wm_task_manager_main_recv_err(void **state)
 {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
     int sock = 555;
     int peer = 1111;
 
@@ -815,12 +815,12 @@ void test_wm_task_manager_main_recv_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8254): Error in recv(): 'Success'");
 
-    wm_task_manager_main(config);
+    gm_task_manager_main(config);
 }
 
 void test_wm_task_manager_main_sockterr_err(void **state)
 {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
     int sock = 555;
     int peer = 1111;
 
@@ -865,12 +865,12 @@ void test_wm_task_manager_main_sockterr_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8255): Response size is bigger than expected.");
 
-    wm_task_manager_main(config);
+    gm_task_manager_main(config);
 }
 
 void test_wm_task_manager_main_accept_err(void **state)
 {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
     int sock = 555;
     int peer = 1111;
 
@@ -922,12 +922,12 @@ void test_wm_task_manager_main_accept_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8255): Response size is bigger than expected.");
 
-    wm_task_manager_main(config);
+    gm_task_manager_main(config);
 }
 
 void test_wm_task_manager_main_select_empty_err(void **state)
 {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
     int sock = 555;
     int peer = 1111;
 
@@ -974,12 +974,12 @@ void test_wm_task_manager_main_select_empty_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8255): Response size is bigger than expected.");
 
-    wm_task_manager_main(config);
+    gm_task_manager_main(config);
 }
 
 void test_wm_task_manager_main_select_err(void **state)
 {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
     int sock = 555;
     int peer = 1111;
 
@@ -1017,12 +1017,12 @@ void test_wm_task_manager_main_select_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mterror, formatted_msg, "(8252): Error in select(): 'Success'. Exiting...");
 
-    expect_assert_failure(wm_task_manager_main(config));
+    expect_assert_failure(gm_task_manager_main(config));
 }
 
 void test_wm_task_manager_main_worker_err(void **state)
 {
-    wm_task_manager *config = *state;
+    gm_task_manager *config = *state;
 
     config->enabled = 1;
 
@@ -1042,7 +1042,7 @@ void test_wm_task_manager_main_worker_err(void **state)
     expect_string(__wrap__mtinfo, tag, "guardsarm-manager-modulesd:task-manager");
     expect_string(__wrap__mtinfo, formatted_msg, "(8207): Module Task Manager only runs on Master nodes in cluster configuration.");
 
-    wm_task_manager_main(config);
+    gm_task_manager_main(config);
 }
 
 int main(void) {

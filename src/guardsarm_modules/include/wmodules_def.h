@@ -22,31 +22,31 @@
 #endif // ARGV0
 
 #ifdef WIN32
-typedef DWORD WINAPI (*wm_routine)(void*);  // Standard routine pointer
+typedef DWORD WINAPI (*gm_routine)(void*);  // Standard routine pointer
 #else
-typedef void* (*wm_routine)(void*);         // Standard routine pointer
+typedef void* (*gm_routine)(void*);         // Standard routine pointer
 #endif
 
 // Module context: this should be defined for every module
 
-typedef struct wm_context {
+typedef struct gm_context {
     const char *name;                           // Name for module
-    wm_routine start;                           // Main function
+    gm_routine start;                           // Main function
     void (*destroy)(void *);                    // Configuration destructor
     cJSON *(* dump)(const void *);              // Dump current configuration
     int (* sync)(const char*, size_t);          // Sync
     void (*stop)(void *);                       // Module destructor
     size_t (*query)(void *, char *, char **);   // Run a query
-} wm_context;
+} gm_context;
 
 // Main module structure
 
-typedef struct wmodule {
+typedef struct gmodule {
     pthread_t thread;                   // Thread ID
-    const wm_context *context;          // Context (common structure)
+    const gm_context *context;          // Context (common structure)
     char *tag;                          // Module tag
     void *data;                         // Data (module-dependent structure)
-    struct wmodule *next;               // Pointer to next module
-} wmodule;
+    struct gmodule *next;               // Pointer to next module
+} gmodule;
 
 #endif //W_MODULES_DEFS

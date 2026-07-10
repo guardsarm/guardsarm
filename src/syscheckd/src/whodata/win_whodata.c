@@ -99,7 +99,7 @@ int set_privilege(HANDLE hdle, LPCTSTR privilege, int enable);
 unsigned long WINAPI whodata_callback(EVT_SUBSCRIBE_NOTIFY_ACTION action, __attribute__((unused)) void *_void, EVT_HANDLE event);
 int set_policies();
 void set_subscription_query(wchar_t *query);
-extern int wm_exec(char *command, char **output, int *exitcode, int secs, const char * add_path);
+extern int gm_exec(char *command, char **output, int *exitcode, int secs, const char * add_path);
 int restore_audit_policies();
 int whodata_hash_add(OSHash *table, char *id, void *data, char *tag);
 void notify_SACL_change(char *dir);
@@ -556,21 +556,21 @@ int restore_audit_policies() {
 
     // Get the current policies
     char *cmd_output = NULL;
-    int wm_exec_ret_code, i = 0;
+    int gm_exec_ret_code, i = 0;
     int retries = 5;
     int timeout = 5;
     BOOL cmd_failed;
     do {
         cmd_failed = 0;
-        wm_exec_ret_code = wm_exec(command, &cmd_output, &result_code, timeout+i, NULL);
-        if (wm_exec_ret_code < 0) {
+        gm_exec_ret_code = gm_exec(command, &cmd_output, &result_code, timeout+i, NULL);
+        if (gm_exec_ret_code < 0) {
             merror(FIM_ERROR_WHODATA_AUDITPOL, "failed to execute command");
             cmd_failed = 1;
-        } else if (wm_exec_ret_code == 1) {
+        } else if (gm_exec_ret_code == 1) {
             merror(FIM_ERROR_WHODATA_AUDITPOL, "time overtaken while running the command");
             os_free(cmd_output);
             cmd_failed = 1;
-        } else if (!wm_exec_ret_code && result_code) {
+        } else if (!gm_exec_ret_code && result_code) {
             char error_msg[OS_MAXSTR];
             snprintf(error_msg, OS_MAXSTR, FIM_ERROR_WHODATA_AUDITPOL, "command returned failure'. Output: '%s");
             merror(error_msg, cmd_output);
@@ -1271,19 +1271,19 @@ int set_policies() {
     snprintf(command, OS_SIZE_1024, WPOL_BACKUP_COMMAND, WPOL_BACKUP_FILE);
 
     // Get the current policies
-    int wm_exec_ret_code, i = 0;
+    int gm_exec_ret_code, i = 0;
     int retries = 5;
     int timeout = 5;
     do {
-        wm_exec_ret_code = wm_exec(command, NULL, &result_code, timeout+i, NULL);
-        if (wm_exec_ret_code || result_code) {
+        gm_exec_ret_code = gm_exec(command, NULL, &result_code, timeout+i, NULL);
+        if (gm_exec_ret_code || result_code) {
             retval = 2;
             merror(FIM_AUDITPOL_ATTEMPT_FAIL, i+1);
         } else {
             retval = 1;
         }
         i++;
-    } while (i <= retries && (wm_exec_ret_code || result_code));
+    } while (i <= retries && (gm_exec_ret_code || result_code));
 
     if (retval == 2) {
         merror(FIM_WARN_WHODATA_AUTOCONF);
@@ -1315,15 +1315,15 @@ int set_policies() {
     // Set the new policies
     i = 0;
     do {
-        wm_exec_ret_code = wm_exec(command, NULL, &result_code, timeout+i, NULL);
-        if (wm_exec_ret_code || result_code) {
+        gm_exec_ret_code = gm_exec(command, NULL, &result_code, timeout+i, NULL);
+        if (gm_exec_ret_code || result_code) {
             retval = 2;
             merror(FIM_AUDITPOL_ATTEMPT_FAIL, i+1);
         } else {
             retval = 1;
         }
         i++;
-    } while (i <= retries && (wm_exec_ret_code || result_code));
+    } while (i <= retries && (gm_exec_ret_code || result_code));
 
     if (retval == 2) {
         merror(FIM_WARN_WHODATA_AUTOCONF);

@@ -189,7 +189,7 @@ size_t wcom_getconfig(const char * section, char ** output) {
         if (cfg = getARConfig(), cfg) {
             os_strdup("ok ", *output);
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
@@ -200,7 +200,7 @@ size_t wcom_getconfig(const char * section, char ** output) {
         if (cfg = getLoggingConfig(), cfg) {
             os_strdup("ok ", *output);
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
@@ -211,7 +211,7 @@ size_t wcom_getconfig(const char * section, char ** output) {
         if (cfg = getExecdInternalOptions(), cfg) {
             os_strdup("ok ", *output);
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
@@ -236,7 +236,7 @@ size_t wcom_getconfig(const char * section, char ** output) {
             if (cfg = getClusterConfig(), cfg) {
                 os_strdup("ok ", *output);
                 json_str = cJSON_PrintUnformatted(cfg);
-                wm_strcat(output, json_str, ' ');
+                gm_strcat(output, json_str, ' ');
                 free(json_str);
                 cJSON_Delete(cfg);
                 return strlen(*output);
@@ -281,7 +281,7 @@ size_t wcom_check_manager_config(char **output) {
             response_retval = 0;
             snprintf(command_in, PATH_MAX, "%s -t", daemons[i]);
             // Exec a command with a timeout of 2000 seconds.
-            if (wm_exec(command_in, &command_out, &response_retval, 2000, NULL) < 0) {
+            if (gm_exec(command_in, &command_out, &response_retval, 2000, NULL) < 0) {
                 if (response_retval == EXECVE_ERROR) {
                     mwarn("Path is invalid or file has insufficient permissions. %s", command_in);
                 } else {
@@ -300,7 +300,7 @@ size_t wcom_check_manager_config(char **output) {
                 size_t lastchar = strlen(command_out) - 1;
                 command_out[lastchar] = command_out[lastchar] == '\n' ? '\0' : command_out[lastchar];
 
-                wm_strcat(&response_string, command_out, ' ');
+                gm_strcat(&response_string, command_out, ' ');
             }
 
             os_free(command_out);

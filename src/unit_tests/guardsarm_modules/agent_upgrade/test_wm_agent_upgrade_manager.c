@@ -24,23 +24,23 @@
 #include "wm_agent_upgrade_manager.h"
 #include "shared.h"
 
-void wm_agent_upgrade_listen_messages(const wm_manager_configs* manager_configs);
-void* wm_agent_upgrade_router_subscriber_thread(void);
-void wm_agent_upgrade_router_callback(const char* message);
+void gm_agent_upgrade_listen_messages(const gm_manager_configs* manager_configs);
+void* gm_agent_upgrade_router_subscriber_thread(void);
+void gm_agent_upgrade_router_callback(const char* message);
 bool initialize_router_functions(void);
 
 // Setup / teardown
 
 static int setup_group(void **state) {
-    wm_manager_configs *config = NULL;
-    os_calloc(1, sizeof(wm_manager_configs), config);
+    gm_manager_configs *config = NULL;
+    os_calloc(1, sizeof(gm_manager_configs), config);
     *state = config;
     test_mode = 1;
     return 0;
 }
 
 static int teardown_group(void **state) {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     os_free(config);
     test_mode = 0;
     return 0;
@@ -56,7 +56,7 @@ int __wrap_accept() {
 
 void test_wm_agent_upgrade_listen_messages_upgrade_command(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     int socket = 0;
     int peer = 1111;
 
@@ -69,11 +69,11 @@ void test_wm_agent_upgrade_listen_messages_upgrade_command(void **state)
                   "}";
 
     size_t input_size = strlen(input) + 1;
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_upgrade_task *upgrade_task = NULL;
     int *agents = NULL;
     char *response = NULL;
 
-    os_calloc(1, sizeof(wm_upgrade_task), upgrade_task);
+    os_calloc(1, sizeof(gm_upgrade_task), upgrade_task);
     os_calloc(2, sizeof(int), agents);
     os_calloc(OS_SIZE_256, sizeof(char), response);
 
@@ -93,7 +93,7 @@ void test_wm_agent_upgrade_listen_messages_upgrade_command(void **state)
                       "    \"message\":\"Success\""
                       "}");
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -101,7 +101,7 @@ void test_wm_agent_upgrade_listen_messages_upgrade_command(void **state)
     expect_value(__wrap_OS_BindUnixDomainWithPerms, perm, 0660);
     will_return(__wrap_OS_BindUnixDomainWithPerms, socket);
 
-    expect_value_count(__wrap_sleep, seconds, 1, WM_AGENT_UPGRADE_START_WAIT_TIME);
+    expect_value_count(__wrap_sleep, seconds, 1, GM_AGENT_UPGRADE_START_WAIT_TIME);
 
     will_return(__wrap_wm_agent_upgrade_cancel_pending_upgrades, 1);
 
@@ -127,7 +127,7 @@ void test_wm_agent_upgrade_listen_messages_upgrade_command(void **state)
     will_return(__wrap_wm_agent_upgrade_parse_message, (void*)upgrade_task);
     will_return(__wrap_wm_agent_upgrade_parse_message, agents);
     will_return(__wrap_wm_agent_upgrade_parse_message, NULL);
-    will_return(__wrap_wm_agent_upgrade_parse_message, WM_UPGRADE_UPGRADE);
+    will_return(__wrap_wm_agent_upgrade_parse_message, GM_UPGRADE_UPGRADE);
 
     expect_value(__wrap_wm_agent_upgrade_process_upgrade_command, agent_ids, agents);
     expect_value(__wrap_wm_agent_upgrade_process_upgrade_command, task, upgrade_task);
@@ -152,12 +152,12 @@ void test_wm_agent_upgrade_listen_messages_upgrade_command(void **state)
     expect_string(__wrap_OS_SendSecureTCP, msg, response);
     will_return(__wrap_OS_SendSecureTCP, 0);
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_listen_messages_upgrade_custom_command(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     int socket = 0;
     int peer = 1111;
 
@@ -170,11 +170,11 @@ void test_wm_agent_upgrade_listen_messages_upgrade_custom_command(void **state)
                   "}";
 
     size_t input_size = strlen(input) + 1;
-    wm_upgrade_custom_task *upgrade_custom_task = NULL;
+    gm_upgrade_custom_task *upgrade_custom_task = NULL;
     int *agents = NULL;
     char *response = NULL;
 
-    os_calloc(1, sizeof(wm_upgrade_custom_task), upgrade_custom_task);
+    os_calloc(1, sizeof(gm_upgrade_custom_task), upgrade_custom_task);
     os_calloc(2, sizeof(int), agents);
     os_calloc(OS_SIZE_256, sizeof(char), response);
 
@@ -194,7 +194,7 @@ void test_wm_agent_upgrade_listen_messages_upgrade_custom_command(void **state)
                       "    \"message\":\"Success\""
                       "}");
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -202,7 +202,7 @@ void test_wm_agent_upgrade_listen_messages_upgrade_custom_command(void **state)
     expect_value(__wrap_OS_BindUnixDomainWithPerms, perm, 0660);
     will_return(__wrap_OS_BindUnixDomainWithPerms, socket);
 
-    expect_value_count(__wrap_sleep, seconds, 1, WM_AGENT_UPGRADE_START_WAIT_TIME);
+    expect_value_count(__wrap_sleep, seconds, 1, GM_AGENT_UPGRADE_START_WAIT_TIME);
 
     will_return(__wrap_wm_agent_upgrade_cancel_pending_upgrades, 1);
 
@@ -228,7 +228,7 @@ void test_wm_agent_upgrade_listen_messages_upgrade_custom_command(void **state)
     will_return(__wrap_wm_agent_upgrade_parse_message, (void*)upgrade_custom_task);
     will_return(__wrap_wm_agent_upgrade_parse_message, agents);
     will_return(__wrap_wm_agent_upgrade_parse_message, NULL);
-    will_return(__wrap_wm_agent_upgrade_parse_message, WM_UPGRADE_UPGRADE_CUSTOM);
+    will_return(__wrap_wm_agent_upgrade_parse_message, GM_UPGRADE_UPGRADE_CUSTOM);
 
     expect_value(__wrap_wm_agent_upgrade_process_upgrade_custom_command, agent_ids, agents);
     expect_value(__wrap_wm_agent_upgrade_process_upgrade_custom_command, task, upgrade_custom_task);
@@ -253,12 +253,12 @@ void test_wm_agent_upgrade_listen_messages_upgrade_custom_command(void **state)
     expect_string(__wrap_OS_SendSecureTCP, msg, response);
     will_return(__wrap_OS_SendSecureTCP, 0);
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_listen_messages_agent_update_status_command(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     int socket = 0;
     int peer = 1111;
 
@@ -273,11 +273,11 @@ void test_wm_agent_upgrade_listen_messages_agent_update_status_command(void **st
                   "}";
 
     size_t input_size = strlen(input) + 1;
-    wm_upgrade_agent_status_task *upgrade_agent_status_task = NULL;
+    gm_upgrade_agent_status_task *upgrade_agent_status_task = NULL;
     int *agents = NULL;
     char *response = NULL;
 
-    os_calloc(1, sizeof(wm_upgrade_agent_status_task), upgrade_agent_status_task);
+    os_calloc(1, sizeof(gm_upgrade_agent_status_task), upgrade_agent_status_task);
     os_calloc(2, sizeof(int), agents);
     os_calloc(OS_SIZE_256, sizeof(char), response);
 
@@ -296,7 +296,7 @@ void test_wm_agent_upgrade_listen_messages_agent_update_status_command(void **st
                       "    \"message\":\"Success\""
                       "}");
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -304,7 +304,7 @@ void test_wm_agent_upgrade_listen_messages_agent_update_status_command(void **st
     expect_value(__wrap_OS_BindUnixDomainWithPerms, perm, 0660);
     will_return(__wrap_OS_BindUnixDomainWithPerms, socket);
 
-    expect_value_count(__wrap_sleep, seconds, 1, WM_AGENT_UPGRADE_START_WAIT_TIME);
+    expect_value_count(__wrap_sleep, seconds, 1, GM_AGENT_UPGRADE_START_WAIT_TIME);
 
     will_return(__wrap_wm_agent_upgrade_cancel_pending_upgrades, 1);
 
@@ -332,7 +332,7 @@ void test_wm_agent_upgrade_listen_messages_agent_update_status_command(void **st
     will_return(__wrap_wm_agent_upgrade_parse_message, (void*)upgrade_agent_status_task);
     will_return(__wrap_wm_agent_upgrade_parse_message, agents);
     will_return(__wrap_wm_agent_upgrade_parse_message, NULL);
-    will_return(__wrap_wm_agent_upgrade_parse_message, WM_UPGRADE_AGENT_UPDATE_STATUS);
+    will_return(__wrap_wm_agent_upgrade_parse_message, GM_UPGRADE_AGENT_UPDATE_STATUS);
 
     expect_value(__wrap_wm_agent_upgrade_process_agent_result_command, agent_ids, agents);
     expect_value(__wrap_wm_agent_upgrade_process_agent_result_command, task, upgrade_agent_status_task);
@@ -356,12 +356,12 @@ void test_wm_agent_upgrade_listen_messages_agent_update_status_command(void **st
     expect_string(__wrap_OS_SendSecureTCP, msg, response);
     will_return(__wrap_OS_SendSecureTCP, 0);
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_listen_messages_upgrade_result_command(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     int socket = 0;
     int peer = 1111;
 
@@ -400,7 +400,7 @@ void test_wm_agent_upgrade_listen_messages_upgrade_result_command(void **state)
                       "    \"message\":\"Success\""
                       "}");
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -408,7 +408,7 @@ void test_wm_agent_upgrade_listen_messages_upgrade_result_command(void **state)
     expect_value(__wrap_OS_BindUnixDomainWithPerms, perm, 0660);
     will_return(__wrap_OS_BindUnixDomainWithPerms, socket);
 
-    expect_value_count(__wrap_sleep, seconds, 1, WM_AGENT_UPGRADE_START_WAIT_TIME);
+    expect_value_count(__wrap_sleep, seconds, 1, GM_AGENT_UPGRADE_START_WAIT_TIME);
 
     will_return(__wrap_wm_agent_upgrade_cancel_pending_upgrades, 1);
 
@@ -433,7 +433,7 @@ void test_wm_agent_upgrade_listen_messages_upgrade_result_command(void **state)
     will_return(__wrap_wm_agent_upgrade_parse_message, task);
     will_return(__wrap_wm_agent_upgrade_parse_message, agents);
     will_return(__wrap_wm_agent_upgrade_parse_message, NULL);
-    will_return(__wrap_wm_agent_upgrade_parse_message, WM_UPGRADE_RESULT);
+    will_return(__wrap_wm_agent_upgrade_parse_message, GM_UPGRADE_RESULT);
 
     expect_value(__wrap_wm_agent_upgrade_process_upgrade_result_command, agent_ids, agents);
     will_return(__wrap_wm_agent_upgrade_process_upgrade_result_command, response);
@@ -461,12 +461,12 @@ void test_wm_agent_upgrade_listen_messages_upgrade_result_command(void **state)
     expect_string(__wrap_OS_SendSecureTCP, msg, response);
     will_return(__wrap_OS_SendSecureTCP, 0);
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_listen_messages_parse_error(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     int socket = 0;
     int peer = 1111;
     char *input = "Bad JSON";
@@ -474,12 +474,12 @@ void test_wm_agent_upgrade_listen_messages_parse_error(void **state)
 
     cJSON *response_json = cJSON_CreateObject();
 
-    cJSON_AddNumberToObject(response_json, "error", WM_UPGRADE_UNKNOWN_ERROR);
-    cJSON_AddStringToObject(response_json, "message", upgrade_error_codes[WM_UPGRADE_UNKNOWN_ERROR]);
+    cJSON_AddNumberToObject(response_json, "error", GM_UPGRADE_UNKNOWN_ERROR);
+    cJSON_AddStringToObject(response_json, "message", upgrade_error_codes[GM_UPGRADE_UNKNOWN_ERROR]);
 
     char *response = "{\"error\":27,\"message\":\"Upgrade procedure could not start\",\"data\":[{\"error\":27,\"message\":\"Upgrade procedure could not start\"}]}";
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -487,7 +487,7 @@ void test_wm_agent_upgrade_listen_messages_parse_error(void **state)
     expect_value(__wrap_OS_BindUnixDomainWithPerms, perm, 0660);
     will_return(__wrap_OS_BindUnixDomainWithPerms, socket);
 
-    expect_value_count(__wrap_sleep, seconds, 1, WM_AGENT_UPGRADE_START_WAIT_TIME);
+    expect_value_count(__wrap_sleep, seconds, 1, GM_AGENT_UPGRADE_START_WAIT_TIME);
 
     will_return(__wrap_wm_agent_upgrade_cancel_pending_upgrades, 1);
 
@@ -509,7 +509,7 @@ void test_wm_agent_upgrade_listen_messages_parse_error(void **state)
     will_return(__wrap_wm_agent_upgrade_parse_message, NULL);
     will_return(__wrap_wm_agent_upgrade_parse_message, OS_INVALID);
 
-    expect_value(__wrap_wm_agent_upgrade_parse_response, error_id, WM_UPGRADE_UNKNOWN_ERROR);
+    expect_value(__wrap_wm_agent_upgrade_parse_response, error_id, GM_UPGRADE_UNKNOWN_ERROR);
     will_return(__wrap_wm_agent_upgrade_parse_response, response_json);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
@@ -520,12 +520,12 @@ void test_wm_agent_upgrade_listen_messages_parse_error(void **state)
     expect_string(__wrap_OS_SendSecureTCP, msg, response);
     will_return(__wrap_OS_SendSecureTCP, 0);
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_listen_messages_parse_error_with_message(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     int socket = 0;
     int peer = 1111;
     char *input = "Bad JSON";
@@ -536,7 +536,7 @@ void test_wm_agent_upgrade_listen_messages_parse_error_with_message(void **state
 
     sprintf(response, "{\"error\":1,\"data\":[{\"error\":1,\"message\":\"Could not parse message JSON\"}],\"message\":\"Could not parse message JSON\"}");
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -544,7 +544,7 @@ void test_wm_agent_upgrade_listen_messages_parse_error_with_message(void **state
     expect_value(__wrap_OS_BindUnixDomainWithPerms, perm, 0660);
     will_return(__wrap_OS_BindUnixDomainWithPerms, socket);
 
-    expect_value_count(__wrap_sleep, seconds, 1, WM_AGENT_UPGRADE_START_WAIT_TIME);
+    expect_value_count(__wrap_sleep, seconds, 1, GM_AGENT_UPGRADE_START_WAIT_TIME);
 
     will_return(__wrap_wm_agent_upgrade_cancel_pending_upgrades, 1);
 
@@ -574,17 +574,17 @@ void test_wm_agent_upgrade_listen_messages_parse_error_with_message(void **state
     expect_string(__wrap_OS_SendSecureTCP, msg, response);
     will_return(__wrap_OS_SendSecureTCP, 0);
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_listen_messages_receive_empty(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     int socket = 0;
     int peer = 1111;
     char *input = "Bad JSON";
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -592,7 +592,7 @@ void test_wm_agent_upgrade_listen_messages_receive_empty(void **state)
     expect_value(__wrap_OS_BindUnixDomainWithPerms, perm, 0660);
     will_return(__wrap_OS_BindUnixDomainWithPerms, socket);
 
-    expect_value_count(__wrap_sleep, seconds, 1, WM_AGENT_UPGRADE_START_WAIT_TIME);
+    expect_value_count(__wrap_sleep, seconds, 1, GM_AGENT_UPGRADE_START_WAIT_TIME);
 
     will_return(__wrap_wm_agent_upgrade_cancel_pending_upgrades, 1);
 
@@ -608,17 +608,17 @@ void test_wm_agent_upgrade_listen_messages_receive_empty(void **state)
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8159): Empty message from local client.");
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_listen_messages_receive_error(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     int socket = 0;
     int peer = 1111;
     char *input = "Bad JSON";
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -626,7 +626,7 @@ void test_wm_agent_upgrade_listen_messages_receive_error(void **state)
     expect_value(__wrap_OS_BindUnixDomainWithPerms, perm, 0660);
     will_return(__wrap_OS_BindUnixDomainWithPerms, socket);
 
-    expect_value_count(__wrap_sleep, seconds, 1, WM_AGENT_UPGRADE_START_WAIT_TIME);
+    expect_value_count(__wrap_sleep, seconds, 1, GM_AGENT_UPGRADE_START_WAIT_TIME);
 
     will_return(__wrap_wm_agent_upgrade_cancel_pending_upgrades, 1);
 
@@ -642,17 +642,17 @@ void test_wm_agent_upgrade_listen_messages_receive_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8111): Error in recv(): 'Success'");
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_listen_messages_receive_sock_error(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     int socket = 0;
     int peer = 1111;
     char *input = "Bad JSON";
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -660,7 +660,7 @@ void test_wm_agent_upgrade_listen_messages_receive_sock_error(void **state)
     expect_value(__wrap_OS_BindUnixDomainWithPerms, perm, 0660);
     will_return(__wrap_OS_BindUnixDomainWithPerms, socket);
 
-    expect_value_count(__wrap_sleep, seconds, 1, WM_AGENT_UPGRADE_START_WAIT_TIME);
+    expect_value_count(__wrap_sleep, seconds, 1, GM_AGENT_UPGRADE_START_WAIT_TIME);
 
     will_return(__wrap_wm_agent_upgrade_cancel_pending_upgrades, 1);
 
@@ -676,18 +676,18 @@ void test_wm_agent_upgrade_listen_messages_receive_sock_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8112): Response size is bigger than expected.");
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_listen_messages_accept_error_eintr(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     int socket = 0;
     int peer = 1111;
     char *input = "Bad JSON";
     errno = EINTR;
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -695,7 +695,7 @@ void test_wm_agent_upgrade_listen_messages_accept_error_eintr(void **state)
     expect_value(__wrap_OS_BindUnixDomainWithPerms, perm, 0660);
     will_return(__wrap_OS_BindUnixDomainWithPerms, socket);
 
-    expect_value_count(__wrap_sleep, seconds, 1, WM_AGENT_UPGRADE_START_WAIT_TIME);
+    expect_value_count(__wrap_sleep, seconds, 1, GM_AGENT_UPGRADE_START_WAIT_TIME);
 
     will_return(__wrap_wm_agent_upgrade_cancel_pending_upgrades, 1);
 
@@ -715,18 +715,18 @@ void test_wm_agent_upgrade_listen_messages_accept_error_eintr(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8112): Response size is bigger than expected.");
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_listen_messages_accept_error(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     int socket = 0;
     int peer = 1111;
     char *input = "Bad JSON";
     errno = 1;
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -734,7 +734,7 @@ void test_wm_agent_upgrade_listen_messages_accept_error(void **state)
     expect_value(__wrap_OS_BindUnixDomainWithPerms, perm, 0660);
     will_return(__wrap_OS_BindUnixDomainWithPerms, socket);
 
-    expect_value_count(__wrap_sleep, seconds, 1, WM_AGENT_UPGRADE_START_WAIT_TIME);
+    expect_value_count(__wrap_sleep, seconds, 1, GM_AGENT_UPGRADE_START_WAIT_TIME);
 
     will_return(__wrap_wm_agent_upgrade_cancel_pending_upgrades, 1);
 
@@ -757,17 +757,17 @@ void test_wm_agent_upgrade_listen_messages_accept_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8112): Response size is bigger than expected.");
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_listen_messages_select_zero(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     int socket = 0;
     int peer = 1111;
     char *input = "Bad JSON";
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -775,7 +775,7 @@ void test_wm_agent_upgrade_listen_messages_select_zero(void **state)
     expect_value(__wrap_OS_BindUnixDomainWithPerms, perm, 0660);
     will_return(__wrap_OS_BindUnixDomainWithPerms, socket);
 
-    expect_value_count(__wrap_sleep, seconds, 1, WM_AGENT_UPGRADE_START_WAIT_TIME);
+    expect_value_count(__wrap_sleep, seconds, 1, GM_AGENT_UPGRADE_START_WAIT_TIME);
 
     will_return(__wrap_wm_agent_upgrade_cancel_pending_upgrades, 1);
 
@@ -793,18 +793,18 @@ void test_wm_agent_upgrade_listen_messages_select_zero(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8112): Response size is bigger than expected.");
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_listen_messages_select_error_eintr(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     int socket = 0;
     int peer = 1111;
     char *input = "Bad JSON";
     errno = EINTR;
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -812,7 +812,7 @@ void test_wm_agent_upgrade_listen_messages_select_error_eintr(void **state)
     expect_value(__wrap_OS_BindUnixDomainWithPerms, perm, 0660);
     will_return(__wrap_OS_BindUnixDomainWithPerms, socket);
 
-    expect_value_count(__wrap_sleep, seconds, 1, WM_AGENT_UPGRADE_START_WAIT_TIME);
+    expect_value_count(__wrap_sleep, seconds, 1, GM_AGENT_UPGRADE_START_WAIT_TIME);
 
     will_return(__wrap_wm_agent_upgrade_cancel_pending_upgrades, 1);
 
@@ -830,16 +830,16 @@ void test_wm_agent_upgrade_listen_messages_select_error_eintr(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8112): Response size is bigger than expected.");
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_listen_messages_select_error(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     int socket = 0;
     errno = 1;
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -847,7 +847,7 @@ void test_wm_agent_upgrade_listen_messages_select_error(void **state)
     expect_value(__wrap_OS_BindUnixDomainWithPerms, perm, 0660);
     will_return(__wrap_OS_BindUnixDomainWithPerms, socket);
 
-    expect_value_count(__wrap_sleep, seconds, 1, WM_AGENT_UPGRADE_START_WAIT_TIME);
+    expect_value_count(__wrap_sleep, seconds, 1, GM_AGENT_UPGRADE_START_WAIT_TIME);
 
     will_return(__wrap_wm_agent_upgrade_cancel_pending_upgrades, 1);
 
@@ -856,14 +856,14 @@ void test_wm_agent_upgrade_listen_messages_select_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8109): Error in select(): 'Operation not permitted'. Exiting...");
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_listen_messages_bind_error(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -874,17 +874,17 @@ void test_wm_agent_upgrade_listen_messages_bind_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8108): Unable to bind to socket 'queue/tasks/upgrade': 'Operation not permitted'");
 
-    wm_agent_upgrade_listen_messages(config);
+    gm_agent_upgrade_listen_messages(config);
 }
 
 void test_wm_agent_upgrade_start_manager_module_enabled(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
 
     expect_string(__wrap__mtinfo, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_any(__wrap__mtinfo, formatted_msg);
 
-    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_BindUnixDomainWithPerms, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, type, SOCK_STREAM);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, max_msg_size, OS_MAXSTR);
     expect_value(__wrap_OS_BindUnixDomainWithPerms, uid, getuid());
@@ -895,17 +895,17 @@ void test_wm_agent_upgrade_start_manager_module_enabled(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8108): Unable to bind to socket 'queue/tasks/upgrade': 'Operation not permitted'");
 
-    wm_agent_upgrade_start_manager_module(config, 1);
+    gm_agent_upgrade_start_manager_module(config, 1);
 }
 
 void test_wm_agent_upgrade_start_manager_module_disabled(void **state)
 {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
 
     expect_string(__wrap__mtinfo, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtinfo, formatted_msg, "(8152): Module Agent Upgrade disabled. Exiting...");
 
-    expect_assert_failure(wm_agent_upgrade_start_manager_module(config, 0));
+    expect_assert_failure(gm_agent_upgrade_start_manager_module(config, 0));
 }
 void test_wm_agent_upgrade_router_callback_failed_connection(void **state)
 {
@@ -913,7 +913,7 @@ void test_wm_agent_upgrade_router_callback_failed_connection(void **state)
     short int type = WRITE;
     char * path = "/queue";
 
-    expect_string(__wrap_OS_ConnectUnixDomain, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_ConnectUnixDomain, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_ConnectUnixDomain, type, SOCK_STREAM);
     expect_value(__wrap_OS_ConnectUnixDomain, max_msg_size, OS_MAXSTR);
     will_return(__wrap_OS_ConnectUnixDomain, -6);
@@ -921,7 +921,7 @@ void test_wm_agent_upgrade_router_callback_failed_connection(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "Could not connect to upgrade module socket at 'queue/tasks/upgrade'. Error: Operation not permitted");
 
-    wm_agent_upgrade_router_callback(input_message);
+    gm_agent_upgrade_router_callback(input_message);
 }
 
 void test_wm_agent_upgrade_router_callback_success(void **state)
@@ -930,7 +930,7 @@ void test_wm_agent_upgrade_router_callback_success(void **state)
     short int type = WRITE;
     char * path = "/queue";
 
-    expect_string(__wrap_OS_ConnectUnixDomain, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_ConnectUnixDomain, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_ConnectUnixDomain, type, SOCK_STREAM);
     expect_value(__wrap_OS_ConnectUnixDomain, max_msg_size, OS_MAXSTR);
     will_return(__wrap_OS_ConnectUnixDomain, 5);
@@ -943,7 +943,7 @@ void test_wm_agent_upgrade_router_callback_success(void **state)
     expect_string(__wrap_OS_SendSecureTCP, msg, input_message);
     will_return(__wrap_OS_SendSecureTCP, 0);
 
-    wm_agent_upgrade_router_callback(input_message);
+    gm_agent_upgrade_router_callback(input_message);
 
     os_free(input_message);
 }
@@ -953,14 +953,14 @@ void test_wm_agent_upgrade_router_callback_null_message(void **state)
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "Empty router message received");
 
-    wm_agent_upgrade_router_callback(NULL);
+    gm_agent_upgrade_router_callback(NULL);
 }
 
 void test_wm_agent_upgrade_router_callback_socket_error(void **state)
 {
     char *input_message = strdup("{\"command\":\"upgrade_update_status\",\"parameters\":{\"agents\":[1],\"error\":0,\"message\":\"Success\",\"status\":\"Done\"}}");
 
-    expect_string(__wrap_OS_ConnectUnixDomain, path, WM_UPGRADE_SOCK);
+    expect_string(__wrap_OS_ConnectUnixDomain, path, GM_UPGRADE_SOCK);
     expect_value(__wrap_OS_ConnectUnixDomain, type, SOCK_STREAM);
     expect_value(__wrap_OS_ConnectUnixDomain, max_msg_size, OS_MAXSTR);
     will_return(__wrap_OS_ConnectUnixDomain, OS_SOCKTERR);
@@ -968,7 +968,7 @@ void test_wm_agent_upgrade_router_callback_socket_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "Could not connect to upgrade module socket at 'queue/tasks/upgrade'. Error: Operation not permitted");
 
-    wm_agent_upgrade_router_callback(input_message);
+    gm_agent_upgrade_router_callback(input_message);
 
     os_free(input_message);
 }
@@ -1066,7 +1066,7 @@ void test_wm_agent_upgrade_router_subscriber_thread_success(void **state)
     expect_string(__wrap__mtinfo, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtinfo, formatted_msg, "Router subscriber thread stopped");
 
-    void* result = wm_agent_upgrade_router_subscriber_thread();
+    void* result = gm_agent_upgrade_router_subscriber_thread();
     assert_null(result);
 }
 
@@ -1085,7 +1085,7 @@ void test_wm_agent_upgrade_router_subscriber_thread_init_failure(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "Failed to initialize router functions");
 
-    void* result = wm_agent_upgrade_router_subscriber_thread();
+    void* result = gm_agent_upgrade_router_subscriber_thread();
     assert_null(result);
 }
 
@@ -1125,7 +1125,7 @@ void test_wm_agent_upgrade_router_subscriber_thread_create_failure(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "Failed to create router subscriber for topic 'upgrade_notifications'");
 
-    void* result = wm_agent_upgrade_router_subscriber_thread();
+    void* result = gm_agent_upgrade_router_subscriber_thread();
     assert_null(result);
 }
 
@@ -1174,7 +1174,7 @@ void test_wm_agent_upgrade_router_subscriber_thread_subscribe_failure(void **sta
     expect_value(__wrap_router_subscriber_destroy, handle, mock_subscriber);
     will_return(__wrap_router_subscriber_destroy, 0);
 
-    void* result = wm_agent_upgrade_router_subscriber_thread();
+    void* result = gm_agent_upgrade_router_subscriber_thread();
     assert_null(result);
 }
 

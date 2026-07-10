@@ -21,34 +21,34 @@ static const char *XML_SKIP_VERIFICATION = "skip_verification";
 
 // Parse XML
 
-int wm_command_read(xml_node **nodes, wmodule *module, int agent_cfg)
+int gm_command_read(xml_node **nodes, gmodule *module, int agent_cfg)
 {
 
     int i;
     int empty = 0;
-    wm_command_t * command;
+    gm_command_t * command;
     size_t command_tag_length;
     char * command_tag = NULL;
 
     if (!nodes) {
-        merror("Tag <%s> not found at module '%s'.", XML_COMMAND, WM_COMMAND_CONTEXT.name);
+        merror("Tag <%s> not found at module '%s'.", XML_COMMAND, GM_COMMAND_CONTEXT.name);
         return OS_INVALID;
     }
 
     // Create module
 
-    os_calloc(1, sizeof(wm_command_t), command);
+    os_calloc(1, sizeof(gm_command_t), command);
     command->enabled = 1;
     command->run_on_start = 1;
     command->skip_verification = 0;
     sched_scan_init(&(command->scan_config));
-    command->scan_config.interval = WM_COMMAND_DEFAULT_INTERVAL;
+    command->scan_config.interval = GM_COMMAND_DEFAULT_INTERVAL;
     command->agent_cfg = agent_cfg;
     command->md5_hash = NULL;
     command->sha1_hash = NULL;
     command->sha256_hash = NULL;
     command->full_command = NULL;
-    module->context = &WM_COMMAND_CONTEXT;
+    module->context = &GM_COMMAND_CONTEXT;
     module->data = command;
 
     // Iterate over module subelements
@@ -63,15 +63,15 @@ int wm_command_read(xml_node **nodes, wmodule *module, int agent_cfg)
             else if (!strcmp(nodes[i]->content, "no"))
                 command->enabled = 1;
             else {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_DISABLED, WM_COMMAND_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_DISABLED, GM_COMMAND_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_TAG)) {
             if (strlen(nodes[i]->content) == 0) {
-                mwarn("Empty content for tag '%s' at module '%s'.", XML_TAG, WM_COMMAND_CONTEXT.name);
-                command_tag_length = strlen(WM_COMMAND_CONTEXT.name) + 2;
+                mwarn("Empty content for tag '%s' at module '%s'.", XML_TAG, GM_COMMAND_CONTEXT.name);
+                command_tag_length = strlen(GM_COMMAND_CONTEXT.name) + 2;
                 os_malloc(sizeof(char) * command_tag_length, command_tag);
-                snprintf(command_tag, command_tag_length, "%s", WM_COMMAND_CONTEXT.name);
+                snprintf(command_tag, command_tag_length, "%s", GM_COMMAND_CONTEXT.name);
                 empty = 1;
             }
 
@@ -79,9 +79,9 @@ int wm_command_read(xml_node **nodes, wmodule *module, int agent_cfg)
             os_strdup(nodes[i]->content, command->tag);
 
             if (!empty) {
-                command_tag_length = strlen(WM_COMMAND_CONTEXT.name) + strlen(command->tag) + 2;
+                command_tag_length = strlen(GM_COMMAND_CONTEXT.name) + strlen(command->tag) + 2;
                 os_malloc(sizeof(char) * command_tag_length, command_tag);
-                snprintf(command_tag, command_tag_length, "%s:%s", WM_COMMAND_CONTEXT.name, command->tag);
+                snprintf(command_tag, command_tag_length, "%s:%s", GM_COMMAND_CONTEXT.name, command->tag);
             }
 
             free(module->tag);
@@ -90,7 +90,7 @@ int wm_command_read(xml_node **nodes, wmodule *module, int agent_cfg)
             empty = 0;
         } else if (!strcmp(nodes[i]->element, XML_COMMAND)) {
             if (strlen(nodes[i]->content) == 0) {
-                merror("Empty content for tag '%s' at module '%s'.", XML_COMMAND, WM_COMMAND_CONTEXT.name);
+                merror("Empty content for tag '%s' at module '%s'.", XML_COMMAND, GM_COMMAND_CONTEXT.name);
                 return OS_INVALID;
             }
 #ifdef WIN32
@@ -108,7 +108,7 @@ int wm_command_read(xml_node **nodes, wmodule *module, int agent_cfg)
             else if (!strcmp(nodes[i]->content, "no"))
                 command->run_on_start = 0;
             else {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_RUN_ON_START, WM_COMMAND_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_RUN_ON_START, GM_COMMAND_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_IGNORE_OUTPUT)) {
@@ -117,7 +117,7 @@ int wm_command_read(xml_node **nodes, wmodule *module, int agent_cfg)
             else if (!strcmp(nodes[i]->content, "no"))
                 command->ignore_output = 0;
             else {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_IGNORE_OUTPUT, WM_COMMAND_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_IGNORE_OUTPUT, GM_COMMAND_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_TIMEOUT)) {
@@ -125,12 +125,12 @@ int wm_command_read(xml_node **nodes, wmodule *module, int agent_cfg)
             command->timeout = strtol(nodes[i]->content, &endptr, 0);
 
             if (*endptr || command->timeout < 0) {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_TIMEOUT, WM_COMMAND_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_TIMEOUT, GM_COMMAND_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_VERIFY_MD5)) {
             if (strlen(nodes[i]->content) != 32) {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_VERIFY_MD5, WM_COMMAND_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_VERIFY_MD5, GM_COMMAND_CONTEXT.name);
                 return OS_INVALID;
             }
 
@@ -138,7 +138,7 @@ int wm_command_read(xml_node **nodes, wmodule *module, int agent_cfg)
             os_strdup(nodes[i]->content, command->md5_hash);
         } else if (!strcmp(nodes[i]->element, XML_VERIFY_SHA1)) {
             if (strlen(nodes[i]->content) != 40) {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_VERIFY_SHA1, WM_COMMAND_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_VERIFY_SHA1, GM_COMMAND_CONTEXT.name);
                 return OS_INVALID;
             }
 
@@ -146,7 +146,7 @@ int wm_command_read(xml_node **nodes, wmodule *module, int agent_cfg)
             os_strdup(nodes[i]->content, command->sha1_hash);
         } else if (!strcmp(nodes[i]->element, XML_VERIFY_SHA256)) {
             if (strlen(nodes[i]->content) != 64) {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_VERIFY_SHA256, WM_COMMAND_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_VERIFY_SHA256, GM_COMMAND_CONTEXT.name);
                 return OS_INVALID;
             }
 
@@ -158,13 +158,13 @@ int wm_command_read(xml_node **nodes, wmodule *module, int agent_cfg)
             else if (!strcmp(nodes[i]->content, "no"))
                 command->skip_verification = 0;
             else {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_SKIP_VERIFICATION, WM_COMMAND_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_SKIP_VERIFICATION, GM_COMMAND_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (is_sched_tag(nodes[i]->element)) {
             // Do nothing
         } else {
-            merror("No such tag '%s' at module '%s'.", nodes[i]->element, WM_COMMAND_CONTEXT.name);
+            merror("No such tag '%s' at module '%s'.", nodes[i]->element, GM_COMMAND_CONTEXT.name);
             return OS_INVALID;
         }
     }
@@ -175,12 +175,12 @@ int wm_command_read(xml_node **nodes, wmodule *module, int agent_cfg)
     }
 
     if (!command->tag) {
-        mwarn("Option <%s> not found at module '%s'.", XML_TAG, WM_COMMAND_CONTEXT.name);
+        mwarn("Option <%s> not found at module '%s'.", XML_TAG, GM_COMMAND_CONTEXT.name);
         os_strdup("", command->tag);
     }
 
     if (!command->command) {
-        merror("Tag <%s> not found at module '%s'.", XML_COMMAND, WM_COMMAND_CONTEXT.name);
+        merror("Tag <%s> not found at module '%s'.", XML_COMMAND, GM_COMMAND_CONTEXT.name);
         return OS_INVALID;
     }
 

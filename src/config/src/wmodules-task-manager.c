@@ -9,17 +9,17 @@
 static const char *XML_CLEANUP_TIME = "cleanup_time";
 static const char *XML_TASK_TIMEOUT = "task_timeout";
 
-int wm_task_manager_read(__attribute__((unused)) const OS_XML *xml, xml_node **nodes, wmodule *module) {
+int gm_task_manager_read(__attribute__((unused)) const OS_XML *xml, xml_node **nodes, gmodule *module) {
 
     unsigned int i;
-    wm_task_manager* data;
+    gm_task_manager* data;
 
     if (!module->data) {
-        os_calloc(1, sizeof(wm_task_manager), data);
+        os_calloc(1, sizeof(gm_task_manager), data);
         data->enabled = 1;
-        data->cleanup_time = WM_TASK_DEFAULT_CLEANUP_TIME;
-        data->task_timeout = WM_TASK_MAX_IN_PROGRESS_TIME;
-        module->context = &WM_TASK_MANAGER_CONTEXT;
+        data->cleanup_time = GM_TASK_DEFAULT_CLEANUP_TIME;
+        data->task_timeout = GM_TASK_MAX_IN_PROGRESS_TIME;
+        module->context = &GM_TASK_MANAGER_CONTEXT;
         module->tag = strdup(module->context->name);
         module->data = data;
     }
@@ -40,7 +40,7 @@ int wm_task_manager_read(__attribute__((unused)) const OS_XML *xml, xml_node **n
             data->cleanup_time = strtol(nodes[i]->content, &endptr, 0);
 
             if (data->cleanup_time == 0 || data->cleanup_time == INT_MAX) {
-                merror("Invalid cleanup_time at module '%s'", WM_TASK_MANAGER_CONTEXT.name);
+                merror("Invalid cleanup_time at module '%s'", GM_TASK_MANAGER_CONTEXT.name);
                 return OS_INVALID;
             }
 
@@ -58,7 +58,7 @@ int wm_task_manager_read(__attribute__((unused)) const OS_XML *xml, xml_node **n
             case '\0':
                 break;
             default:
-                merror("Invalid cleanup_time at module '%s'", WM_TASK_MANAGER_CONTEXT.name);
+                merror("Invalid cleanup_time at module '%s'", GM_TASK_MANAGER_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_TASK_TIMEOUT)) {
@@ -66,7 +66,7 @@ int wm_task_manager_read(__attribute__((unused)) const OS_XML *xml, xml_node **n
             data->task_timeout = strtol(nodes[i]->content, &endptr, 0);
 
             if (data->task_timeout == 0 || data->task_timeout == INT_MAX) {
-                merror("Invalid task_timeout at module '%s'", WM_TASK_MANAGER_CONTEXT.name);
+                merror("Invalid task_timeout at module '%s'", GM_TASK_MANAGER_CONTEXT.name);
                 return OS_INVALID;
             }
 
@@ -84,16 +84,16 @@ int wm_task_manager_read(__attribute__((unused)) const OS_XML *xml, xml_node **n
             case '\0':
                 break;
             default:
-                merror("Invalid task_timeout at module '%s'", WM_TASK_MANAGER_CONTEXT.name);
+                merror("Invalid task_timeout at module '%s'", GM_TASK_MANAGER_CONTEXT.name);
                 return OS_INVALID;
             }
         } else {
-            mwarn("No such tag <%s> at module '%s'.", nodes[i]->element, WM_TASK_MANAGER_CONTEXT.name);
+            mwarn("No such tag <%s> at module '%s'.", nodes[i]->element, GM_TASK_MANAGER_CONTEXT.name);
         }
     }
 
     if (data->cleanup_time < data->task_timeout) {
-        merror("Too short cleanup_time at module '%s'", WM_TASK_MANAGER_CONTEXT.name);
+        merror("Too short cleanup_time at module '%s'", GM_TASK_MANAGER_CONTEXT.name);
         return OS_INVALID;
     }
 

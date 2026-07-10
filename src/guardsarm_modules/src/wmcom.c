@@ -32,7 +32,7 @@ size_t wmcom_dispatch(char * command, size_t length, char ** output){
         }
         return wmcom_getconfig(rcv_args, output);
     } else if (strncmp(command, "query ", 6) == 0) {
-        return wm_module_query(command + 6, output);
+        return gm_module_query(command + 6, output);
     } else if (wmcom_sync(command, length) == 0) {
         /*
          * syscollector_sync { ... }
@@ -55,7 +55,7 @@ size_t wmcom_getconfig(const char * section, char ** output) {
         if (cfg = getModulesConfig(), cfg) {
             os_strdup("ok", *output);
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
@@ -66,7 +66,7 @@ size_t wmcom_getconfig(const char * section, char ** output) {
         if (cfg = getModulesInternalOptions(), cfg) {
             os_strdup("ok", *output);
             json_str = cJSON_PrintUnformatted(cfg);
-            wm_strcat(output, json_str, ' ');
+            gm_strcat(output, json_str, ' ');
             free(json_str);
             cJSON_Delete(cfg);
             return strlen(*output);
@@ -102,7 +102,7 @@ void wmcom_send(char * message, size_t length)
 void wmcom_send(char * message, size_t length)
 {
     int sock;
-    if (sock = OS_ConnectUnixDomain(WM_LOCAL_SOCK, SOCK_STREAM, OS_MAXSTR), sock < 0) {
+    if (sock = OS_ConnectUnixDomain(GM_LOCAL_SOCK, SOCK_STREAM, OS_MAXSTR), sock < 0) {
         switch (errno) {
             case ECONNREFUSED:
                 mdebug1("Target wmodules refused connection. The component might be disabled");
@@ -129,15 +129,15 @@ void * wmcom_main(__attribute__((unused)) void * arg) {
 
     mdebug1("Local requests thread ready");
 
-    if (sock = OS_BindUnixDomainWithPerms(WM_LOCAL_SOCK, SOCK_STREAM, OS_MAXSTR, getuid(), wm_getGroupID(), 0660), sock < 0) {
-        merror("Unable to bind to socket '%s': (%d) %s.", WM_LOCAL_SOCK, errno, strerror(errno));
+    if (sock = OS_BindUnixDomainWithPerms(GM_LOCAL_SOCK, SOCK_STREAM, OS_MAXSTR, getuid(), gm_getGroupID(), 0660), sock < 0) {
+        merror("Unable to bind to socket '%s': (%d) %s.", GM_LOCAL_SOCK, errno, strerror(errno));
         return NULL;
     }
 
-    while (!wm_shutdown_requested) {
+    while (!gm_shutdown_requested) {
 
 
-        switch (wm_select_interruptible(sock, &fdset)) {
+        switch (gm_select_interruptible(sock, &fdset)) {
         case -1:
             merror_exit("At wmcom_main(): select(): %s", strerror(errno));
             break;

@@ -80,14 +80,14 @@ public:
             m_spBaseContext->configData = parameters.at("configData");
 
             logDebug1(
-                WM_CONTENTUPDATER, "Creating '%s' Content Updater orchestration", m_spBaseContext->topicName.c_str());
+                GM_CONTENTUPDATER, "Creating '%s' Content Updater orchestration", m_spBaseContext->topicName.c_str());
 
             auto executionContext {std::make_shared<ExecutionContext>()};
             executionContext->handleRequest(m_spBaseContext);
 
             m_spUpdaterOrchestration = FactoryContentUpdater::create(m_spBaseContext->configData);
 
-            logDebug1(WM_CONTENTUPDATER, "Content updater orchestration created");
+            logDebug1(GM_CONTENTUPDATER, "Content updater orchestration created");
         }
         catch (const std::exception& e)
         {
@@ -145,7 +145,7 @@ private:
      */
     void runContentUpdate(std::shared_ptr<UpdaterContext> spUpdaterContext, const bool forceFullReload) const
     {
-        logDebug2(WM_CONTENTUPDATER,
+        logDebug2(GM_CONTENTUPDATER,
                   "Running '%s' content update (forceFullReload=%s)",
                   spUpdaterContext->spUpdaterBaseContext->topicName.c_str(),
                   forceFullReload ? "true" : "false");
@@ -153,7 +153,7 @@ private:
         if (forceFullReload && spUpdaterContext->spUpdaterBaseContext->spRocksDB)
         {
             // Clear the stored cursor so IndexerDownloader performs a full PIT load.
-            logDebug2(WM_CONTENTUPDATER,
+            logDebug2(GM_CONTENTUPDATER,
                       "Clearing stored cursor for '%s' to force full reload",
                       spUpdaterContext->spUpdaterBaseContext->topicName.c_str());
             spUpdaterContext->spUpdaterBaseContext->spRocksDB->put(

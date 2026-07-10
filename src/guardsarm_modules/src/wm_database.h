@@ -6,22 +6,22 @@
  * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
-#ifndef WM_DATABASE
-#define WM_DATABASE
+#ifndef GM_DATABASE
+#define GM_DATABASE
 
-#define WM_DATABASE_LOGTAG ARGV0 ":database"
+#define GM_DATABASE_LOGTAG ARGV0 ":database"
 
-typedef struct wm_database {
+typedef struct gm_database {
     int sync_agents;
     int real_time;
     int interval;
     int max_queued_events;
-} wm_database;
+} gm_database;
 
 extern int wdb_wmdb_sock;
 
 // Read configuration and return a module (if enabled) or NULL (if disabled)
-wmodule* wm_database_read();
+gmodule* gm_database_read();
 
 /**
  * @brief Synchronizes a keystore with the agent table of global.db. It will insert

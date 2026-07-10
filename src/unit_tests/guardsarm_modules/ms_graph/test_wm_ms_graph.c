@@ -34,7 +34,7 @@
 #define TEST_MAX_DATES 5
 #define TEST_MAX_TENANT 3
 
-static wmodule *ms_graph_module;
+static gmodule *ms_graph_module;
 static OS_XML *lxml;
 
 unsigned int __wrap_gmtime_r(__attribute__ ((__unused__)) const time_t *t, __attribute__ ((__unused__)) struct tm *tm) {
@@ -45,8 +45,8 @@ int __wrap_isDebug() {
     return mock();
 }
 
-static void wmodule_cleanup(wmodule *module){
-    wm_ms_graph* module_data = (wm_ms_graph*)module->data;
+static void gmodule_cleanup(gmodule *module){
+    gm_ms_graph* module_data = (gm_ms_graph*)module->data;
     if(module_data){
         os_free(module_data->version);
         for(unsigned int resource = 0; resource < module_data->num_resources; resource++){
@@ -77,7 +77,7 @@ static void wmodule_cleanup(wmodule *module){
 
 static int setup_test_read(void **state) {
     test_structure *test = calloc(1, sizeof(test_structure));
-    test->module =  calloc(1, sizeof(wmodule));
+    test->module =  calloc(1, sizeof(gmodule));
     *state = test;
     return 0;
 }
@@ -86,27 +86,27 @@ static int teardown_test_read(void **state) {
     test_structure *test = *state;
     OS_ClearNode(test->nodes);
     OS_ClearXML(&(test->xml));
-    wm_ms_graph* module_data = (wm_ms_graph*)test->module->data;
+    gm_ms_graph* module_data = (gm_ms_graph*)test->module->data;
     if(module_data && &(module_data->scan_config)){
         sched_scan_free(&(module_data->scan_config));
     }
-    wmodule_cleanup(test->module);
+    gmodule_cleanup(test->module);
     os_free(test);
     return 0;
 }
 
 static int setup_conf(void **state) {
-    wm_ms_graph* init_data = NULL;
-    os_calloc(1,sizeof(wm_ms_graph), init_data);
+    gm_ms_graph* init_data = NULL;
+    os_calloc(1,sizeof(gm_ms_graph), init_data);
     test_mode = true;
     *state = init_data;
     return 0;
 }
 
 static int teardown_conf(void **state) {
-    wm_ms_graph *data  = (wm_ms_graph *)*state;
+    gm_ms_graph *data  = (gm_ms_graph *)*state;
     test_mode = false;
-    wm_ms_graph_destroy(data);
+    gm_ms_graph_destroy(data);
     return 0;
 }
 
@@ -138,7 +138,7 @@ void test_bad_tag(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "(1233): Invalid attribute 'invalid' in the configuration: 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_empty_module(void **state) {
@@ -146,7 +146,7 @@ void test_empty_module(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Empty configuration found in module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_invalid_enabled(void **state) {
@@ -176,7 +176,7 @@ void test_invalid_enabled(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Invalid content for tag 'enabled' at module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_enabled_no(void **state) {
@@ -205,8 +205,8 @@ void test_enabled_no(void **state) {
     ;
     test_structure *test = *state;
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_SUCCESS);
-    wm_ms_graph *module_data = (wm_ms_graph*)test->module->data;
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_SUCCESS);
+    gm_ms_graph *module_data = (gm_ms_graph*)test->module->data;
     assert_int_equal(module_data->enabled, 0);
     assert_int_equal(module_data->only_future_events, 1);
     assert_int_equal(module_data->curl_max_size, OS_SIZE_1048576);
@@ -253,7 +253,7 @@ void test_invalid_only_future_events(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Invalid content for tag 'only_future_events' at module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_disabled_only_future_events(void **state) {
@@ -282,8 +282,8 @@ void test_disabled_only_future_events(void **state) {
     ;
     test_structure *test = *state;
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_SUCCESS);
-    wm_ms_graph *module_data = (wm_ms_graph*)test->module->data;
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_SUCCESS);
+    gm_ms_graph *module_data = (gm_ms_graph*)test->module->data;
     assert_int_equal(module_data->enabled, 1);
     assert_int_equal(module_data->only_future_events, 0);
     assert_int_equal(module_data->curl_max_size, OS_SIZE_1048576);
@@ -329,7 +329,7 @@ void test_invalid_curl_max_size(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Invalid content for tag 'curl_max_size' at module 'ms-graph'. The minimum value allowed is 1KB.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_invalid_negative_curl_max_size(void **state) {
@@ -359,7 +359,7 @@ void test_invalid_negative_curl_max_size(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Invalid content for tag 'curl_max_size' at module 'ms-graph'. The minimum value allowed is 1KB.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_value_curl_max_size(void **state) {
@@ -388,8 +388,8 @@ void test_value_curl_max_size(void **state) {
     ;
     test_structure *test = *state;
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_SUCCESS);
-    wm_ms_graph *module_data = (wm_ms_graph*)test->module->data;
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_SUCCESS);
+    gm_ms_graph *module_data = (gm_ms_graph*)test->module->data;
     assert_int_equal(module_data->curl_max_size, 4096);
 }
 
@@ -420,7 +420,7 @@ void test_invalid_run_on_start(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Invalid content for tag 'run_on_start' at module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_disabled_run_on_start(void **state) {
@@ -449,8 +449,8 @@ void test_disabled_run_on_start(void **state) {
     ;
     test_structure *test = *state;
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_SUCCESS);
-    wm_ms_graph *module_data = (wm_ms_graph*)test->module->data;
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_SUCCESS);
+    gm_ms_graph *module_data = (gm_ms_graph*)test->module->data;
     assert_int_equal(module_data->enabled, 1);
     assert_int_equal(module_data->only_future_events, 1);
     assert_int_equal(module_data->curl_max_size, OS_SIZE_1048576);
@@ -496,7 +496,7 @@ void test_invalid_interval(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Invalid content for tag 'interval' at module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_INVALID);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_INVALID);
 }
 
 void test_invalid_version(void **state) {
@@ -526,7 +526,7 @@ void test_invalid_version(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Invalid content for tag 'version' at module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_missing_api_auth(void **state) {
@@ -550,7 +550,7 @@ void test_missing_api_auth(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "(1228): Element 'api_auth' without any option.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
 }
 
 void test_empty_api_auth(void **state) {
@@ -575,7 +575,7 @@ void test_empty_api_auth(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'api_auth' at module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_invalid_client_id(void **state) {
@@ -605,7 +605,7 @@ void test_invalid_client_id(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'client_id' at module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_missing_client_id(void **state) {
@@ -634,7 +634,7 @@ void test_missing_client_id(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "(1228): Element 'client_id' without any option.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
 }
 
 void test_invalid_tenant_id(void **state) {
@@ -664,7 +664,7 @@ void test_invalid_tenant_id(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'tenant_id' at module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_missing_tenant_id(void **state) {
@@ -693,7 +693,7 @@ void test_missing_tenant_id(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "(1228): Element 'tenant_id' without any option.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
 }
 
 void test_invalid_secret_value(void **state) {
@@ -723,7 +723,7 @@ void test_invalid_secret_value(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'secret_value' at module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_missing_secret_value(void **state) {
@@ -752,7 +752,7 @@ void test_missing_secret_value(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "(1228): Element 'secret_value' without any option.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
 }
 
 void test_invalid_api_type(void **state){
@@ -782,7 +782,7 @@ void test_invalid_api_type(void **state){
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Invalid content for tag 'api_type' at module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_missing_api_type(void **state){
@@ -811,7 +811,7 @@ void test_missing_api_type(void **state){
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "(1228): Element 'api_type' without any option.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
 }
 
 void test_empty_api_type(void **state){
@@ -841,7 +841,7 @@ void test_empty_api_type(void **state){
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'api_type' at module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_invalid_attribute_api_type(void **state) {
@@ -867,7 +867,7 @@ void test_invalid_attribute_api_type(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "(1233): Invalid attribute 'invalid' in the configuration: 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_missing_resource(void **state) {
@@ -888,7 +888,7 @@ void test_missing_resource(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "(1228): Element 'resource' without any option.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
 }
 
 void test_empty_resource(void **state) {
@@ -910,7 +910,7 @@ void test_empty_resource(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'resource' at module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_missing_name(void **state) {
@@ -939,7 +939,7 @@ void test_missing_name(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "(1228): Element 'name' without any option.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
 }
 
 void test_empty_name(void **state) {
@@ -969,7 +969,7 @@ void test_empty_name(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'name' at module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_missing_relationship(void **state) {
@@ -997,7 +997,7 @@ void test_missing_relationship(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "(1228): Element 'relationship' without any option.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_NOTFOUND);
 }
 
 void test_empty_relationship(void **state) {
@@ -1026,7 +1026,7 @@ void test_empty_relationship(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "Empty content for tag 'relationship' at module 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 void test_invalid_attribute_resource(void **state) {
@@ -1055,7 +1055,7 @@ void test_invalid_attribute_resource(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "(1233): Invalid attribute 'invalid' in the configuration: 'ms-graph'.");
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_CFGERR);
 }
 
 // Main program tests
@@ -1085,8 +1085,8 @@ void test_normal_config(void **state) {
     ;
     test_structure *test = *state;
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_SUCCESS);
-    wm_ms_graph *module_data = (wm_ms_graph*)test->module->data;
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_SUCCESS);
+    gm_ms_graph *module_data = (gm_ms_graph*)test->module->data;
     assert_int_equal(module_data->enabled, 1);
     assert_int_equal(module_data->only_future_events, 1);
     assert_int_equal(module_data->curl_max_size, OS_SIZE_1048576);
@@ -1131,8 +1131,8 @@ void test_normal_config_api_type_gcc(void **state) {
     ;
     test_structure *test = *state;
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_SUCCESS);
-    wm_ms_graph *module_data = (wm_ms_graph*)test->module->data;
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_SUCCESS);
+    gm_ms_graph *module_data = (gm_ms_graph*)test->module->data;
     assert_int_equal(module_data->enabled, 1);
     assert_int_equal(module_data->only_future_events, 1);
     assert_int_equal(module_data->curl_max_size, OS_SIZE_1048576);
@@ -1179,8 +1179,8 @@ void test_normal_config_api_type_dod(void **state) {
     ;
     test_structure *test = *state;
     test->nodes = string_to_xml_node(config, &(test->xml));
-    assert_int_equal(wm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_SUCCESS);
-    wm_ms_graph *module_data = (wm_ms_graph*)test->module->data;
+    assert_int_equal(gm_ms_graph_read(&(test->xml), test->nodes, test->module), OS_SUCCESS);
+    gm_ms_graph *module_data = (gm_ms_graph*)test->module->data;
     assert_int_equal(module_data->enabled, 1);
     assert_int_equal(module_data->only_future_events, 1);
     assert_int_equal(module_data->curl_max_size, OS_SIZE_1048576);
@@ -1202,16 +1202,16 @@ void test_normal_config_api_type_dod(void **state) {
 }
 
 void test_cleanup() {
-    expect_string(__wrap__mtinfo, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Module shutdown.");
-    wm_ms_graph_cleanup();
+    gm_ms_graph_cleanup();
 }
 
 void test_setup_complete(void **state) {
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
 
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
 
     module_data->enabled = true;
     module_data->only_future_events = false;
@@ -1223,9 +1223,9 @@ void test_setup_complete(void **state) {
     os_strdup("example_string", module_data->auth_config[0]->client_id);
     os_strdup("example_string", module_data->auth_config[0]->tenant_id);
     os_strdup("example_string", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource) * 2, module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource) * 2, module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     os_strdup("identityProtection", module_data->resources[1].name);
     module_data->num_resources = 2;
@@ -1239,7 +1239,7 @@ void test_setup_complete(void **state) {
     module_data->resources[1].num_relationships = 2;
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_value(__wrap_wm_state_io, state, &module_data->state);
     expect_value(__wrap_wm_state_io, size, sizeof(module_data->state));
     will_return(__wrap_wm_state_io, -1);
@@ -1248,18 +1248,18 @@ void test_setup_complete(void **state) {
     expect_value(__wrap_StartMQ, type, WRITE);
     will_return(__wrap_StartMQ, -1);
 
-    expect_string(__wrap__mterror, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "Unable to connect to Message Queue. Exiting...");
 
-    wm_ms_graph_setup(module_data);
+    gm_ms_graph_setup(module_data);
 }
 
 void test_main_token(void **state) {
     current_time = 1;
     unsigned int run_on_start = 1;
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -1270,9 +1270,9 @@ void test_main_token(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -1290,7 +1290,7 @@ void test_main_token(void **state) {
     will_return(__wrap_FOREVER, 1);
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_value(__wrap_wm_state_io, state, &module_data->state);
     expect_value(__wrap_wm_state_io, size, sizeof(module_data->state));
     will_return(__wrap_wm_state_io, -1);
@@ -1299,11 +1299,11 @@ void test_main_token(void **state) {
     expect_value(__wrap_StartMQ, type, WRITE);
     will_return(__wrap_StartMQ, 1);
 
-    expect_string(__wrap__mtinfo, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Started module.");
 
     expect_value(__wrap_sched_scan_get_time_until_next_scan, config, &module_data->scan_config);
-    expect_string(__wrap_sched_scan_get_time_until_next_scan, MODULE_TAG, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap_sched_scan_get_time_until_next_scan, MODULE_TAG, GM_MS_GRAPH_LOGTAG);
     expect_value(__wrap_sched_scan_get_time_until_next_scan, run_on_start, 1);
     will_return(__wrap_sched_scan_get_time_until_next_scan, 1);
 
@@ -1311,10 +1311,10 @@ void test_main_token(void **state) {
     expect_value(__wrap_w_get_timestamp, time, 0);
     will_return(__wrap_w_get_timestamp, test_date);
 
-    expect_string(__wrap__mtdebug1, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Waiting until: 2023/08/07 12:00:00");
 
-    expect_string(__wrap__mtinfo, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Obtaining access token.");
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-modulesd:ms-graph");
@@ -1325,20 +1325,20 @@ void test_main_token(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
     will_return(__wrap_FOREVER, 0);
 
-    wm_ms_graph_main(module_data);
+    gm_ms_graph_main(module_data);
 }
 
 void test_main_relationships(void **state) {
     current_time = 1;
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -1350,9 +1350,9 @@ void test_main_relationships(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -1373,7 +1373,7 @@ void test_main_relationships(void **state) {
 #endif
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_value(__wrap_wm_state_io, state, &module_data->state);
     expect_value(__wrap_wm_state_io, size, sizeof(module_data->state));
     will_return(__wrap_wm_state_io, -1);
@@ -1383,18 +1383,18 @@ void test_main_relationships(void **state) {
     will_return(__wrap_StartMQ, 1);
 
     expect_value(__wrap_sched_scan_get_time_until_next_scan, config, &module_data->scan_config);
-    expect_string(__wrap_sched_scan_get_time_until_next_scan, MODULE_TAG, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap_sched_scan_get_time_until_next_scan, MODULE_TAG, GM_MS_GRAPH_LOGTAG);
     expect_value(__wrap_sched_scan_get_time_until_next_scan, run_on_start, 1);
     will_return(__wrap_sched_scan_get_time_until_next_scan, 0);
 
-    expect_string(__wrap__mtinfo, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Started module.");
 
-    expect_string(__wrap__mtinfo, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Scanning tenant 'example_tenant'");
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, -1);
@@ -1408,7 +1408,7 @@ void test_main_relationships(void **state) {
     will_return(__wrap_strftime, 20);
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_WRITE);
+    expect_value(__wrap_wm_state_io, op, GM_IO_WRITE);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 1);
@@ -1418,41 +1418,41 @@ void test_main_relationships(void **state) {
 
     will_return(__wrap_FOREVER, 0);
 
-    wm_ms_graph_main(module_data);
+    gm_ms_graph_main(module_data);
 }
 
 void test_disabled(void **state) {
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
     module_data->enabled = false;
 
-    expect_string(__wrap__mtinfo, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Module disabled. Exiting...");
 
-    wm_ms_graph_main(module_data);
+    gm_ms_graph_main(module_data);
 }
 
 void test_no_resources(void **state) {
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
     module_data->enabled = true;
     module_data->num_resources = 0;
 
-    expect_string(__wrap__mterror, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "Invalid module configuration (Missing API info, resources, relationships). Exiting...");
 
-    wm_ms_graph_main(module_data);
+    gm_ms_graph_main(module_data);
 }
 
 void test_no_relationships(void **state) {
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
     module_data->enabled = true;
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     module_data->resources[0].num_relationships = 0;
     module_data->num_resources = 1;
 
-    expect_string(__wrap__mterror, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "Invalid module configuration (Missing API info, resources, relationships). Exiting...");
 
-    wm_ms_graph_main(module_data);
+    gm_ms_graph_main(module_data);
 
     os_free(module_data->resources);
     module_data->num_resources = 0;
@@ -1478,9 +1478,9 @@ void test_dump(void **state) {
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -1491,16 +1491,16 @@ void test_dump(void **state) {
     os_strdup("example_string", module_data->auth_config[0]->client_id);
     os_strdup("example_string", module_data->auth_config[0]->tenant_id);
     os_strdup("example_string", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
     os_strdup("alerts_v2", module_data->resources[0].relationships[0]);
     module_data->resources[0].num_relationships = 1;
 
-    cJSON* dump = wm_ms_graph_dump(module_data);
+    cJSON* dump = gm_ms_graph_dump(module_data);
     char* dump_text = cJSON_PrintUnformatted(dump);
 
     assert_string_equal(dump_text, "{\"ms_graph\":{\"enabled\":\"yes\",\"only_future_events\":\"no\",\"curl_max_size\":1024,\"page_size\":100,\"time_delay\":10,\"run_on_start\":\"yes\",\"version\":\"v1.0\",\"wday\":\"sunday\",\"api_auth\":{\"client_id\":\"example_string\",\"tenant_id\":\"example_string\",\"secret_value\":\"example_string\",\"api_type\":\"global\",\"name\":\"security\"},\"resources\":[{\"relationship\":\"alerts_v2\"}]}}");
@@ -1527,9 +1527,9 @@ void test_dump_gcc_configuration(void **state) {
     <resource>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = false;
     module_data->only_future_events = true;
     module_data->curl_max_size = 1024L;
@@ -1540,13 +1540,13 @@ void test_dump_gcc_configuration(void **state) {
     os_strdup("example_string", module_data->auth_config[0]->client_id);
     os_strdup("example_string", module_data->auth_config[0]->tenant_id);
     os_strdup("example_string", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GCC_HIGH_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GCC_HIGH_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GCC_HIGH_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GCC_HIGH_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     module_data->resources[0].name = NULL;
     module_data->num_resources = 1;
 
-    cJSON* dump = wm_ms_graph_dump(module_data);
+    cJSON* dump = gm_ms_graph_dump(module_data);
     char* dump_text = cJSON_PrintUnformatted(dump);
 
     assert_string_equal(dump_text, "{\"ms_graph\":{\"enabled\":\"no\",\"only_future_events\":\"yes\",\"curl_max_size\":1024,\"page_size\":100,\"time_delay\":10,\"run_on_start\":\"no\",\"version\":\"v1.0\",\"wday\":\"sunday\",\"api_auth\":{\"client_id\":\"example_string\",\"tenant_id\":\"example_string\",\"secret_value\":\"example_string\",\"api_type\":\"gcc-high\"}}}");
@@ -1576,9 +1576,9 @@ void test_dump_dod_configuration(void **state) {
     <resource>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = false;
     module_data->only_future_events = true;
     module_data->curl_max_size = 1024L;
@@ -1589,10 +1589,10 @@ void test_dump_dod_configuration(void **state) {
     os_strdup("example_string", module_data->auth_config[0]->client_id);
     os_strdup("example_string", module_data->auth_config[0]->tenant_id);
     os_strdup("example_string", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_DOD_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_DOD_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_DOD_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_DOD_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
 
-    cJSON* dump = wm_ms_graph_dump(module_data);
+    cJSON* dump = gm_ms_graph_dump(module_data);
     char* dump_text = cJSON_PrintUnformatted(dump);
 
     assert_string_equal(dump_text, "{\"ms_graph\":{\"enabled\":\"no\",\"only_future_events\":\"yes\",\"curl_max_size\":1024,\"page_size\":100,\"time_delay\":10,\"run_on_start\":\"no\",\"version\":\"v1.0\",\"wday\":\"sunday\",\"api_auth\":{\"client_id\":\"example_string\",\"tenant_id\":\"example_string\",\"secret_value\":\"example_string\",\"api_type\":\"dod\"}}}");
@@ -1621,9 +1621,9 @@ void test_wm_ms_graph_get_access_token_no_response(void **state) {
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -1634,9 +1634,9 @@ void test_wm_ms_graph_get_access_token_no_response(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -1652,14 +1652,14 @@ void test_wm_ms_graph_get_access_token_no_response(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, NULL);
 
     expect_string(__wrap__mtwarn, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtwarn, formatted_msg, "No response received when attempting to obtain access token.");
 
-    wm_ms_graph_get_access_token(module_data->auth_config[0], max_size);
+    gm_ms_graph_get_access_token(module_data->auth_config[0], max_size);
 
     assert_null(module_data->auth_config[0]->access_token);
 }
@@ -1684,9 +1684,9 @@ void test_wm_ms_graph_get_access_token_unsuccessful_status_code(void **state) {
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -1697,9 +1697,9 @@ void test_wm_ms_graph_get_access_token_unsuccessful_status_code(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -1721,14 +1721,14 @@ void test_wm_ms_graph_get_access_token_unsuccessful_status_code(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
     expect_string(__wrap__mtwarn, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtwarn, formatted_msg, "Received unsuccessful status code when attempting to obtain access token: Status code was '400' & response was '{\"error\":\"bad_request\"}'");
 
-    wm_ms_graph_get_access_token(module_data->auth_config[0], max_size);
+    gm_ms_graph_get_access_token(module_data->auth_config[0], max_size);
 
     assert_null(module_data->auth_config[0]->access_token);
 }
@@ -1753,9 +1753,9 @@ void test_wm_ms_graph_get_access_token_curl_max_size(void **state) {
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -1766,9 +1766,9 @@ void test_wm_ms_graph_get_access_token_curl_max_size(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -1791,13 +1791,13 @@ void test_wm_ms_graph_get_access_token_curl_max_size(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
     expect_string(__wrap__mtwarn, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtwarn, formatted_msg, "Reached maximum CURL size when attempting to obtain access token. Consider increasing the value of 'curl_max_size'.");
 
-    wm_ms_graph_get_access_token(module_data->auth_config[0], max_size);
+    gm_ms_graph_get_access_token(module_data->auth_config[0], max_size);
 
     assert_null(module_data->auth_config[0]->access_token);
 }
@@ -1822,9 +1822,9 @@ void test_wm_ms_graph_get_access_token_parse_json_fail(void **state) {
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -1835,9 +1835,9 @@ void test_wm_ms_graph_get_access_token_parse_json_fail(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -1860,13 +1860,13 @@ void test_wm_ms_graph_get_access_token_parse_json_fail(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
     expect_string(__wrap__mtwarn, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtwarn, formatted_msg, "Failed to parse access token JSON body.");
 
-    wm_ms_graph_get_access_token(module_data->auth_config[0], max_size);
+    gm_ms_graph_get_access_token(module_data->auth_config[0], max_size);
 
     assert_null(module_data->auth_config[0]->access_token);
 }
@@ -1891,9 +1891,9 @@ void test_wm_ms_graph_get_access_token_success(void **state) {
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -1904,9 +1904,9 @@ void test_wm_ms_graph_get_access_token_success(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -1930,11 +1930,11 @@ void test_wm_ms_graph_get_access_token_success(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
-    wm_ms_graph_get_access_token(module_data->auth_config[0], max_size);
+    gm_ms_graph_get_access_token(module_data->auth_config[0], max_size);
 
     assert_string_equal(module_data->auth_config[0]->access_token, "token_value");
 #ifdef WIN32
@@ -1964,9 +1964,9 @@ void test_wm_ms_graph_get_access_token_no_access_token(void **state) {
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -1977,9 +1977,9 @@ void test_wm_ms_graph_get_access_token_no_access_token(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -2002,14 +2002,14 @@ void test_wm_ms_graph_get_access_token_no_access_token(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
     expect_string(__wrap__mtwarn, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtwarn, formatted_msg, "Incomplete access token response, value or expiration time not present.");
 
-    wm_ms_graph_get_access_token(module_data->auth_config[0], max_size);
+    gm_ms_graph_get_access_token(module_data->auth_config[0], max_size);
 }
 
 void test_wm_ms_graph_get_access_token_no_expire_time(void **state) {
@@ -2032,9 +2032,9 @@ void test_wm_ms_graph_get_access_token_no_expire_time(void **state) {
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -2045,9 +2045,9 @@ void test_wm_ms_graph_get_access_token_no_expire_time(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -2070,14 +2070,14 @@ void test_wm_ms_graph_get_access_token_no_expire_time(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
     expect_string(__wrap__mtwarn, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtwarn, formatted_msg, "Incomplete access token response, value or expiration time not present.");
 
-    wm_ms_graph_get_access_token(module_data->auth_config[0], max_size);
+    gm_ms_graph_get_access_token(module_data->auth_config[0], max_size);
 }
 
 void test_wm_ms_graph_scan_relationships_single_initial_only_no(void **state) {
@@ -2100,9 +2100,9 @@ void test_wm_ms_graph_scan_relationships_single_initial_only_no(void **state) {
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -2114,9 +2114,9 @@ void test_wm_ms_graph_scan_relationships_single_initial_only_no(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -2132,7 +2132,7 @@ void test_wm_ms_graph_scan_relationships_single_initial_only_no(void **state) {
 #endif
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, -1);
@@ -2146,7 +2146,7 @@ void test_wm_ms_graph_scan_relationships_single_initial_only_no(void **state) {
     will_return(__wrap_strftime, 20);
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_WRITE);
+    expect_value(__wrap_wm_state_io, op, GM_IO_WRITE);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 1);
@@ -2154,7 +2154,7 @@ void test_wm_ms_graph_scan_relationships_single_initial_only_no(void **state) {
     expect_string(__wrap__mtdebug1, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtdebug1, formatted_msg, "Bookmark updated to '2023-02-08T12:24:56Z' for tenant 'example_tenant' resource 'security' and relationship 'alerts_v2', waiting '60' seconds to run first scan.");
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 void test_wm_ms_graph_scan_relationships_single_initial_only_yes_fail_write(void **state) {
@@ -2177,9 +2177,9 @@ void test_wm_ms_graph_scan_relationships_single_initial_only_yes_fail_write(void
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = true;
     module_data->curl_max_size = 1024L;
@@ -2191,9 +2191,9 @@ void test_wm_ms_graph_scan_relationships_single_initial_only_yes_fail_write(void
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -2209,21 +2209,21 @@ void test_wm_ms_graph_scan_relationships_single_initial_only_yes_fail_write(void
 #endif
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, -1);
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_WRITE);
+    expect_value(__wrap_wm_state_io, op, GM_IO_WRITE);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, -1);
 
-    expect_string(__wrap__mterror, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "Couldn't save running state for resource 'security' and relationship 'alerts_v2'. State file: 'var/wodles/ms-graph-example_tenant-security-alerts_v2'.");
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 void test_wm_ms_graph_scan_relationships_slash_in_relationship_name(void **state) {
@@ -2237,9 +2237,9 @@ void test_wm_ms_graph_scan_relationships_slash_in_relationship_name(void **state
       <relationship>cases/eDiscoveryCases</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = true;
     module_data->curl_max_size = 1024L;
@@ -2251,9 +2251,9 @@ void test_wm_ms_graph_scan_relationships_slash_in_relationship_name(void **state
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -2270,7 +2270,7 @@ void test_wm_ms_graph_scan_relationships_slash_in_relationship_name(void **state
     // The '/' in "cases/eDiscoveryCases" must be replaced with '-' in the state file name,
     // while the original relationship name is preserved in the bookmark log message.
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-cases-eDiscoveryCases");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, -1);
@@ -2284,15 +2284,15 @@ void test_wm_ms_graph_scan_relationships_slash_in_relationship_name(void **state
     will_return(__wrap_strftime, 20);
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-cases-eDiscoveryCases");
-    expect_value(__wrap_wm_state_io, op, WM_IO_WRITE);
+    expect_value(__wrap_wm_state_io, op, GM_IO_WRITE);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 1);
 
-    expect_string(__wrap__mtdebug1, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Bookmark updated to '2023-02-08T12:24:56Z' for tenant 'example_tenant' resource 'security' and relationship 'cases/eDiscoveryCases', waiting '60' seconds to run first scan.");
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 void test_wm_ms_graph_scan_relationships_single_initial_only_no_next_time_no_response(void **state) {
@@ -2315,10 +2315,10 @@ void test_wm_ms_graph_scan_relationships_single_initial_only_no_next_time_no_res
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    wm_ms_graph_state_t relationship_state_struc;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    gm_ms_graph_state_t relationship_state_struc;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     relationship_state_struc.next_time = 10;
     module_data->enabled = true;
     module_data->only_future_events = false;
@@ -2331,11 +2331,11 @@ void test_wm_ms_graph_scan_relationships_single_initial_only_no_next_time_no_res
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     os_strdup("token", module_data->auth_config[0]->access_token);
     module_data->auth_config[0]->token_expiration_time = time(NULL) + 100;
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -2351,7 +2351,7 @@ void test_wm_ms_graph_scan_relationships_single_initial_only_no_next_time_no_res
 #endif
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 0);
@@ -2377,14 +2377,14 @@ void test_wm_ms_graph_scan_relationships_single_initial_only_no_next_time_no_res
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, NULL);
 
     expect_string(__wrap__mtwarn, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtwarn, formatted_msg, "No response received when attempting to get relationship 'alerts_v2' from resource 'security' on API version 'v1.0'.");
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 void test_wm_ms_graph_scan_relationships_single_no_initial_no_timestamp(void **state) {
@@ -2407,10 +2407,10 @@ void test_wm_ms_graph_scan_relationships_single_no_initial_no_timestamp(void **s
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    wm_ms_graph_state_t relationship_state_struc;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    gm_ms_graph_state_t relationship_state_struc;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     relationship_state_struc.next_time = 10;
     module_data->enabled = true;
     module_data->only_future_events = false;
@@ -2423,9 +2423,9 @@ void test_wm_ms_graph_scan_relationships_single_no_initial_no_timestamp(void **s
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -2441,7 +2441,7 @@ void test_wm_ms_graph_scan_relationships_single_no_initial_no_timestamp(void **s
 #endif
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, -1);
@@ -2455,7 +2455,7 @@ void test_wm_ms_graph_scan_relationships_single_no_initial_no_timestamp(void **s
     will_return(__wrap_strftime, 20);
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_WRITE);
+    expect_value(__wrap_wm_state_io, op, GM_IO_WRITE);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 1);
@@ -2463,7 +2463,7 @@ void test_wm_ms_graph_scan_relationships_single_no_initial_no_timestamp(void **s
     expect_string(__wrap__mtdebug1, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtdebug1, formatted_msg, "Bookmark updated to '2023-02-08T12:24:56Z' for tenant 'example_tenant' resource 'security' and relationship 'alerts_v2', waiting '60' seconds to run first scan.");
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 void test_wm_ms_graph_scan_relationships_single_unsuccessful_status_code(void **state) {
@@ -2486,10 +2486,10 @@ void test_wm_ms_graph_scan_relationships_single_unsuccessful_status_code(void **
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    wm_ms_graph_state_t relationship_state_struc;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    gm_ms_graph_state_t relationship_state_struc;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     relationship_state_struc.next_time = 10;
     module_data->enabled = true;
     module_data->only_future_events = false;
@@ -2502,11 +2502,11 @@ void test_wm_ms_graph_scan_relationships_single_unsuccessful_status_code(void **
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     os_strdup("token", module_data->auth_config[0]->access_token);
     module_data->auth_config[0]->token_expiration_time = time(NULL) + 100;
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -2528,7 +2528,7 @@ void test_wm_ms_graph_scan_relationships_single_unsuccessful_status_code(void **
 #endif
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 0);
@@ -2554,14 +2554,14 @@ void test_wm_ms_graph_scan_relationships_single_unsuccessful_status_code(void **
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
     expect_string(__wrap__mtwarn, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtwarn, formatted_msg, "Received unsuccessful status code when attempting to get relationship 'alerts_v2' logs: Status code was '400' & response was '{\"error\":\"bad_request\"}'");
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 void test_wm_ms_graph_scan_relationships_single_reached_curl_size(void **state) {
@@ -2584,10 +2584,10 @@ void test_wm_ms_graph_scan_relationships_single_reached_curl_size(void **state) 
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    wm_ms_graph_state_t relationship_state_struc;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    gm_ms_graph_state_t relationship_state_struc;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     relationship_state_struc.next_time = 10;
     module_data->enabled = true;
     module_data->only_future_events = false;
@@ -2600,11 +2600,11 @@ void test_wm_ms_graph_scan_relationships_single_reached_curl_size(void **state) 
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     os_strdup("token", module_data->auth_config[0]->access_token);
     module_data->auth_config[0]->token_expiration_time = time(NULL) + 100;
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -2627,7 +2627,7 @@ void test_wm_ms_graph_scan_relationships_single_reached_curl_size(void **state) 
 #endif
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 0);
@@ -2653,14 +2653,14 @@ void test_wm_ms_graph_scan_relationships_single_reached_curl_size(void **state) 
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
     expect_string(__wrap__mtwarn, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtwarn, formatted_msg, "Reached maximum CURL size when attempting to get relationship 'alerts_v2' logs. Consider increasing the value of 'curl_max_size'.");
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 void test_wm_ms_graph_scan_relationships_single_failed_parse(void **state) {
@@ -2683,10 +2683,10 @@ void test_wm_ms_graph_scan_relationships_single_failed_parse(void **state) {
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    wm_ms_graph_state_t relationship_state_struc;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    gm_ms_graph_state_t relationship_state_struc;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     relationship_state_struc.next_time = 10;
     module_data->enabled = true;
     module_data->only_future_events = false;
@@ -2699,11 +2699,11 @@ void test_wm_ms_graph_scan_relationships_single_failed_parse(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     os_strdup("token", module_data->auth_config[0]->access_token);
     module_data->auth_config[0]->token_expiration_time = time(NULL) + 100;
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -2726,7 +2726,7 @@ void test_wm_ms_graph_scan_relationships_single_failed_parse(void **state) {
 #endif
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 0);
@@ -2752,14 +2752,14 @@ void test_wm_ms_graph_scan_relationships_single_failed_parse(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
     expect_string(__wrap__mtwarn, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtwarn, formatted_msg, "Failed to parse relationship 'alerts_v2' JSON body.");
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 void test_wm_ms_graph_scan_relationships_single_no_logs(void **state) {
@@ -2782,10 +2782,10 @@ void test_wm_ms_graph_scan_relationships_single_no_logs(void **state) {
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    wm_ms_graph_state_t relationship_state_struc;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    gm_ms_graph_state_t relationship_state_struc;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     relationship_state_struc.next_time = 10;
     module_data->enabled = true;
     module_data->only_future_events = false;
@@ -2798,11 +2798,11 @@ void test_wm_ms_graph_scan_relationships_single_no_logs(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     os_strdup("token", module_data->auth_config[0]->access_token);
     module_data->auth_config[0]->token_expiration_time = time(NULL) + 100;
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -2825,7 +2825,7 @@ void test_wm_ms_graph_scan_relationships_single_no_logs(void **state) {
 #endif
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 0);
@@ -2851,7 +2851,7 @@ void test_wm_ms_graph_scan_relationships_single_no_logs(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
@@ -2859,7 +2859,7 @@ void test_wm_ms_graph_scan_relationships_single_no_logs(void **state) {
     expect_string(__wrap__mtdebug2, formatted_msg, "No new logs received.");
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_WRITE);
+    expect_value(__wrap_wm_state_io, op, GM_IO_WRITE);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 1);
@@ -2867,7 +2867,7 @@ void test_wm_ms_graph_scan_relationships_single_no_logs(void **state) {
     expect_string(__wrap__mtdebug1, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtdebug1, formatted_msg, "Bookmark updated to '2023-02-08T12:25:56Z' for tenant 'example_tenant' resource 'security' and relationship 'alerts_v2', waiting '60' seconds to run next scan.");
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 void test_wm_ms_graph_scan_relationships_single_success_one_log(void **state) {
@@ -2890,10 +2890,10 @@ void test_wm_ms_graph_scan_relationships_single_success_one_log(void **state) {
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    wm_ms_graph_state_t relationship_state_struc;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    gm_ms_graph_state_t relationship_state_struc;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     relationship_state_struc.next_time = 10;
     module_data->enabled = true;
     module_data->only_future_events = false;
@@ -2906,11 +2906,11 @@ void test_wm_ms_graph_scan_relationships_single_success_one_log(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     os_strdup("token", module_data->auth_config[0]->access_token);
     module_data->auth_config[0]->token_expiration_time = time(NULL) + 100;
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -2919,7 +2919,7 @@ void test_wm_ms_graph_scan_relationships_single_success_one_log(void **state) {
     size_t max_size = OS_SIZE_8192;
     bool initial = false;
     curl_response* response;
-    wm_max_eps = 1;
+    gm_max_eps = 1;
 
     os_calloc(1, sizeof(curl_response), response);
     response->status_code = 200;
@@ -2934,7 +2934,7 @@ void test_wm_ms_graph_scan_relationships_single_success_one_log(void **state) {
 #endif
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 0);
@@ -2960,7 +2960,7 @@ void test_wm_ms_graph_scan_relationships_single_success_one_log(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
@@ -2977,7 +2977,7 @@ void test_wm_ms_graph_scan_relationships_single_success_one_log(void **state) {
     will_return(__wrap_wm_sendmsg, result);
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_WRITE);
+    expect_value(__wrap_wm_state_io, op, GM_IO_WRITE);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 1);
@@ -2985,7 +2985,7 @@ void test_wm_ms_graph_scan_relationships_single_success_one_log(void **state) {
     expect_string(__wrap__mtdebug1, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtdebug1, formatted_msg, "Bookmark updated to '2023-02-08T12:25:56Z' for tenant 'example_tenant' resource 'security' and relationship 'alerts_v2', waiting '60' seconds to run next scan.");
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 void test_wm_ms_graph_scan_relationships_single_success_two_logs(void **state) {
@@ -3008,9 +3008,9 @@ void test_wm_ms_graph_scan_relationships_single_success_two_logs(void **state) {
       <relationship>detectedApps</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -3022,11 +3022,11 @@ void test_wm_ms_graph_scan_relationships_single_success_two_logs(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     os_strdup("token", module_data->auth_config[0]->access_token);
     module_data->auth_config[0]->token_expiration_time = time(NULL) + 100;
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("deviceManagement", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -3037,7 +3037,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_logs(void **state) {
     curl_response* response;
     curl_response* response2;
     curl_response* response3;
-    wm_max_eps = 1;
+    gm_max_eps = 1;
 
     os_calloc(1, sizeof(curl_response), response);
     response->status_code = 200;
@@ -3071,7 +3071,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_logs(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
@@ -3096,7 +3096,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_logs(void **state) {
 
     will_return(__wrap_strerror, "Error");
 
-    expect_string(__wrap__mterror, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "(1210): Queue 'queue/sockets/queue' not accessible: 'Error'");
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-modulesd:ms-graph");
@@ -3107,7 +3107,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_logs(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response2);
 
@@ -3119,7 +3119,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_logs(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response3);
 
@@ -3141,7 +3141,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_logs(void **state) {
     expect_value(__wrap_wm_sendmsg, loc, LOCALFILE_MQ);
     will_return(__wrap_wm_sendmsg, 1);
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 void test_wm_ms_graph_scan_relationships_single_success_two_pages(void **state) {
@@ -3164,9 +3164,9 @@ void test_wm_ms_graph_scan_relationships_single_success_two_pages(void **state) 
       <relationship>managedDevices</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -3178,11 +3178,11 @@ void test_wm_ms_graph_scan_relationships_single_success_two_pages(void **state) 
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     os_strdup("token", module_data->auth_config[0]->access_token);
     module_data->auth_config[0]->token_expiration_time = time(NULL) + 100;
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("deviceManagement", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -3192,7 +3192,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_pages(void **state) 
     bool initial = false;
     curl_response* response;
     curl_response* response2;
-    wm_max_eps = 1;
+    gm_max_eps = 1;
 
     os_calloc(1, sizeof(curl_response), response);
     response->status_code = 200;
@@ -3220,7 +3220,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_pages(void **state) 
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
@@ -3245,7 +3245,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_pages(void **state) 
 
     will_return(__wrap_strerror, "Error");
 
-    expect_string(__wrap__mterror, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "(1210): Queue 'queue/sockets/queue' not accessible: 'Error'");
 
     expect_string(__wrap__mtdebug2, tag, "guardsarm-modulesd:ms-graph");
@@ -3274,7 +3274,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_pages(void **state) 
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response2);
 
@@ -3297,7 +3297,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_pages(void **state) 
     expect_value(__wrap_wm_sendmsg, loc, LOCALFILE_MQ);
     will_return(__wrap_wm_sendmsg, 1);
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 void test_wm_ms_graph_scan_relationships_single_success_two_resources(void **state) {
@@ -3324,11 +3324,11 @@ void test_wm_ms_graph_scan_relationships_single_success_two_resources(void **sta
       <relationship>auditEvents</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    wm_ms_graph_state_t relationship_state_struc;
-    wm_ms_graph_state_t relationship_state_struc_2;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    gm_ms_graph_state_t relationship_state_struc;
+    gm_ms_graph_state_t relationship_state_struc_2;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     relationship_state_struc.next_time = 10;
     relationship_state_struc_2.next_time = 10;
     module_data->enabled = true;
@@ -3342,11 +3342,11 @@ void test_wm_ms_graph_scan_relationships_single_success_two_resources(void **sta
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     os_strdup("token", module_data->auth_config[0]->access_token);
     module_data->auth_config[0]->token_expiration_time = time(NULL) + 100;
-    os_malloc(sizeof(wm_ms_graph_resource) * 2, module_data->resources);
+    os_malloc(sizeof(gm_ms_graph_resource) * 2, module_data->resources);
     os_strdup("identityProtection", module_data->resources[0].name);
     os_strdup("deviceManagement", module_data->resources[1].name);
     module_data->num_resources = 2;
@@ -3359,7 +3359,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_resources(void **sta
     size_t max_size = OS_SIZE_8192;
     bool initial = false;
     curl_response* response;
-    wm_max_eps = 1;
+    gm_max_eps = 1;
 
     os_calloc(1, sizeof(curl_response), response);
     response->status_code = 200;
@@ -3374,7 +3374,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_resources(void **sta
 #endif
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-identityProtection-riskDetections");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 0);
@@ -3400,7 +3400,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_resources(void **sta
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
@@ -3416,7 +3416,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_resources(void **sta
     will_return(__wrap_wm_sendmsg, 1);
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-identityProtection-riskDetections");
-    expect_value(__wrap_wm_state_io, op, WM_IO_WRITE);
+    expect_value(__wrap_wm_state_io, op, GM_IO_WRITE);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 1);
@@ -3432,7 +3432,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_resources(void **sta
     os_strdup("test", response->header);
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-deviceManagement-auditEvents");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 0);
@@ -3458,7 +3458,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_resources(void **sta
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
@@ -3474,7 +3474,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_resources(void **sta
     will_return(__wrap_wm_sendmsg, 1);
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-deviceManagement-auditEvents");
-    expect_value(__wrap_wm_state_io, op, WM_IO_WRITE);
+    expect_value(__wrap_wm_state_io, op, GM_IO_WRITE);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, -1);
@@ -3482,7 +3482,7 @@ void test_wm_ms_graph_scan_relationships_single_success_two_resources(void **sta
     expect_string(__wrap__mterror, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mterror, formatted_msg, "Couldn't save running state for resource 'deviceManagement' and relationship 'auditEvents'. State file: 'var/wodles/ms-graph-example_tenant-deviceManagement-auditEvents'.");
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 void test_wm_ms_graph_scan_relationships_renew_token(void **state) {
@@ -3505,10 +3505,10 @@ void test_wm_ms_graph_scan_relationships_renew_token(void **state) {
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    wm_ms_graph_state_t relationship_state_struc;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    gm_ms_graph_state_t relationship_state_struc;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     relationship_state_struc.next_time = 10;
     module_data->enabled = true;
     module_data->only_future_events = false;
@@ -3521,11 +3521,11 @@ void test_wm_ms_graph_scan_relationships_renew_token(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     os_strdup("token", module_data->auth_config[0]->access_token);
-    module_data->auth_config[0]->token_expiration_time = time(NULL) + (WM_MS_GRAPH_DEFAULT_TIMEOUT - 30);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    module_data->auth_config[0]->token_expiration_time = time(NULL) + (GM_MS_GRAPH_DEFAULT_TIMEOUT - 30);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -3534,7 +3534,7 @@ void test_wm_ms_graph_scan_relationships_renew_token(void **state) {
     size_t max_size = OS_SIZE_8192;
     bool initial = false;
     curl_response* response;
-    wm_max_eps = 1;
+    gm_max_eps = 1;
 
     os_calloc(1, sizeof(curl_response), response);
     response->status_code = 200;
@@ -3549,7 +3549,7 @@ void test_wm_ms_graph_scan_relationships_renew_token(void **state) {
 #endif
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 0);
@@ -3571,10 +3571,10 @@ void test_wm_ms_graph_scan_relationships_renew_token(void **state) {
     expect_string(__wrap__mtdebug1, formatted_msg, "Microsoft Graph API Log URL: 'https://graph.microsoft.com/v1.0/security/alerts_v2?$top=10&$filter=createdDateTime+ge+2023-02-08T12:24:56Z+and+createdDateTime+lt+2023-02-08T12:25:56Z'");
 
     // -----------wm_ms_graph_ensure_valid_token-----------------------
-    expect_string(__wrap__mtinfo, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Access token expired or missing. Requesting new token.");
 
-    expect_string(__wrap__mtdebug1, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Microsoft Graph API Access Token URL: 'https://login.microsoftonline.com/example_tenant/oauth2/v2.0/token'");
 
     time_t new_token_expiration_time = time(NULL) + 3600;
@@ -3592,7 +3592,7 @@ void test_wm_ms_graph_scan_relationships_renew_token(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response_new_token);
     // -----------END wm_ms_graph_ensure_valid_token-----------------------
@@ -3603,7 +3603,7 @@ void test_wm_ms_graph_scan_relationships_renew_token(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
@@ -3620,7 +3620,7 @@ void test_wm_ms_graph_scan_relationships_renew_token(void **state) {
     will_return(__wrap_wm_sendmsg, result);
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_WRITE);
+    expect_value(__wrap_wm_state_io, op, GM_IO_WRITE);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 1);
@@ -3628,7 +3628,7 @@ void test_wm_ms_graph_scan_relationships_renew_token(void **state) {
     expect_string(__wrap__mtdebug1, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtdebug1, formatted_msg, "Bookmark updated to '2023-02-08T12:25:56Z' for tenant 'example_tenant' resource 'security' and relationship 'alerts_v2', waiting '60' seconds to run next scan.");
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 void test_wm_ms_graph_scan_relationships_renew_token_failed(void **state) {
@@ -3651,10 +3651,10 @@ void test_wm_ms_graph_scan_relationships_renew_token_failed(void **state) {
       <relationship>alerts_v2</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    wm_ms_graph_state_t relationship_state_struc;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    gm_ms_graph_state_t relationship_state_struc;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     relationship_state_struc.next_time = 10;
     module_data->enabled = true;
     module_data->only_future_events = false;
@@ -3667,11 +3667,11 @@ void test_wm_ms_graph_scan_relationships_renew_token_failed(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     os_strdup("token", module_data->auth_config[0]->access_token);
     module_data->auth_config[0]->token_expiration_time = time(NULL);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("security", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -3687,7 +3687,7 @@ void test_wm_ms_graph_scan_relationships_renew_token_failed(void **state) {
 #endif
 
     expect_string(__wrap_wm_state_io, tag, "ms-graph-example_tenant-security-alerts_v2");
-    expect_value(__wrap_wm_state_io, op, WM_IO_READ);
+    expect_value(__wrap_wm_state_io, op, GM_IO_READ);
     expect_any(__wrap_wm_state_io, state);
     expect_any(__wrap_wm_state_io, size);
     will_return(__wrap_wm_state_io, 0);
@@ -3709,7 +3709,7 @@ void test_wm_ms_graph_scan_relationships_renew_token_failed(void **state) {
     expect_string(__wrap__mtdebug1, formatted_msg, "Microsoft Graph API Log URL: 'https://graph.microsoft.com/v1.0/security/alerts_v2?$top=50&$filter=createdDateTime+ge+2023-02-08T12:24:56Z+and+createdDateTime+lt+2023-02-08T12:25:56Z'");
 
     // -----------wm_ms_graph_ensure_valid_token-----------------------
-    expect_string(__wrap__mtinfo, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Access token expired or missing. Requesting new token.");
 
     curl_response* response;
@@ -3720,7 +3720,7 @@ void test_wm_ms_graph_scan_relationships_renew_token_failed(void **state) {
     os_strdup("no json", response->body);
     os_strdup("test", response->header);
 
-    expect_string(__wrap__mtdebug1, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Microsoft Graph API Access Token URL: 'https://login.microsoftonline.com/example_tenant/oauth2/v2.0/token'");
 
     expect_any(__wrap_wurl_http_request, method);
@@ -3728,20 +3728,20 @@ void test_wm_ms_graph_scan_relationships_renew_token_failed(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
-    expect_string(__wrap__mtwarn, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Failed to parse access token JSON body.");
 
-    expect_string(__wrap__mtwarn, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Failed to renew access token.");
     // -----------END wm_ms_graph_ensure_valid_token-----------------------
 
-    expect_string(__wrap__mtwarn, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Aborting scan of 'alerts_v2' for tenant 'example_tenant' due to access token error.");
 
-    wm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
+    gm_ms_graph_scan_relationships(module_data, module_data->auth_config[0], initial);
 }
 
 static void test_wm_ms_graph_scan_apps_devices_renew_token(void **state) {
@@ -3764,9 +3764,9 @@ static void test_wm_ms_graph_scan_apps_devices_renew_token(void **state) {
       <relationship>detectedApps</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -3778,11 +3778,11 @@ static void test_wm_ms_graph_scan_apps_devices_renew_token(void **state) {
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     os_strdup("token", module_data->auth_config[0]->access_token);
     module_data->auth_config[0]->token_expiration_time = time(NULL);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("deviceManagement", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -3791,7 +3791,7 @@ static void test_wm_ms_graph_scan_apps_devices_renew_token(void **state) {
     size_t max_size = OS_SIZE_8192;
     bool initial = false;
     curl_response* response;
-    wm_max_eps = 1;
+    gm_max_eps = 1;
 
     os_calloc(1, sizeof(curl_response), response);
     response->status_code = 200;
@@ -3803,10 +3803,10 @@ static void test_wm_ms_graph_scan_apps_devices_renew_token(void **state) {
     expect_string(__wrap__mtdebug1, formatted_msg, "Microsoft Graph API Log URL: 'https://graph.microsoft.com/v1.0/deviceManagement/detectedApps/12345/managedDevices?$top=10&$select=id,deviceName'");
 
     // -----------wm_ms_graph_ensure_valid_token-----------------------
-    expect_string(__wrap__mtinfo, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Access token expired or missing. Requesting new token.");
 
-    expect_string(__wrap__mtdebug1, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Microsoft Graph API Access Token URL: 'https://login.microsoftonline.com/example_tenant/oauth2/v2.0/token'");
 
     time_t new_token_expiration_time = time(NULL) + 3600;
@@ -3824,7 +3824,7 @@ static void test_wm_ms_graph_scan_apps_devices_renew_token(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response_new_token);
     // -----------END wm_ms_graph_ensure_valid_token-----------------------
@@ -3834,7 +3834,7 @@ static void test_wm_ms_graph_scan_apps_devices_renew_token(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
@@ -3845,7 +3845,7 @@ static void test_wm_ms_graph_scan_apps_devices_renew_token(void **state) {
     os_strdup(auth_header, headers[0]);
     cJSON *app_id = cJSON_CreateString("12345");
 
-    cJSON *result = wm_ms_graph_scan_apps_devices(module_data, app_id, module_data->auth_config[0]->query_fqdn, headers, module_data->auth_config[0]);
+    cJSON *result = gm_ms_graph_scan_apps_devices(module_data, app_id, module_data->auth_config[0]->query_fqdn, headers, module_data->auth_config[0]);
 
     assert_non_null(result);
     assert_string_equal(headers[0], "Authorization: Bearer new_token");
@@ -3874,9 +3874,9 @@ static void test_wm_ms_graph_scan_apps_devices_renew_token_failed(void **state) 
       <relationship>detectedApps</relationship>
     </resource>
     */
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->enabled = true;
     module_data->only_future_events = false;
     module_data->curl_max_size = 1024L;
@@ -3888,11 +3888,11 @@ static void test_wm_ms_graph_scan_apps_devices_renew_token_failed(void **state) 
     os_strdup("example_client", module_data->auth_config[0]->client_id);
     os_strdup("example_tenant", module_data->auth_config[0]->tenant_id);
     os_strdup("example_secret", module_data->auth_config[0]->secret_value);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN, module_data->auth_config[0]->login_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     os_strdup("token", module_data->auth_config[0]->access_token);
     module_data->auth_config[0]->token_expiration_time = time(NULL);
-    os_malloc(sizeof(wm_ms_graph_resource), module_data->resources);
+    os_malloc(sizeof(gm_ms_graph_resource), module_data->resources);
     os_strdup("deviceManagement", module_data->resources[0].name);
     module_data->num_resources = 1;
     os_malloc(sizeof(char*), module_data->resources[0].relationships);
@@ -3900,13 +3900,13 @@ static void test_wm_ms_graph_scan_apps_devices_renew_token_failed(void **state) 
     module_data->resources[0].num_relationships = 1;
     size_t max_size = OS_SIZE_8192;
     bool initial = false;
-    wm_max_eps = 1;
+    gm_max_eps = 1;
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-modulesd:ms-graph");
     expect_string(__wrap__mtdebug1, formatted_msg, "Microsoft Graph API Log URL: 'https://graph.microsoft.com/v1.0/deviceManagement/detectedApps/12345/managedDevices?$top=10&$select=id,deviceName'");
 
     // -----------wm_ms_graph_ensure_valid_token-----------------------
-    expect_string(__wrap__mtinfo, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Access token expired or missing. Requesting new token.");
 
     curl_response* response;
@@ -3917,7 +3917,7 @@ static void test_wm_ms_graph_scan_apps_devices_renew_token_failed(void **state) 
     os_strdup("no json", response->body);
     os_strdup("test", response->header);
 
-    expect_string(__wrap__mtdebug1, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Microsoft Graph API Access Token URL: 'https://login.microsoftonline.com/example_tenant/oauth2/v2.0/token'");
 
     expect_any(__wrap_wurl_http_request, method);
@@ -3925,17 +3925,17 @@ static void test_wm_ms_graph_scan_apps_devices_renew_token_failed(void **state) 
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
-    expect_string(__wrap__mtwarn, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Failed to parse access token JSON body.");
 
-    expect_string(__wrap__mtwarn, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Failed to renew access token.");
     // -----------END wm_ms_graph_ensure_valid_token-----------------------
 
-    expect_string(__wrap__mtwarn, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Aborting app-device scan due to access token error.");
 
     // Prepare headers
@@ -3945,7 +3945,7 @@ static void test_wm_ms_graph_scan_apps_devices_renew_token_failed(void **state) 
     os_strdup(auth_header, headers[0]);
     cJSON *app_id = cJSON_CreateString("12345");
 
-    cJSON *result = wm_ms_graph_scan_apps_devices(module_data, app_id, module_data->auth_config[0]->query_fqdn, headers, module_data->auth_config[0]);
+    cJSON *result = gm_ms_graph_scan_apps_devices(module_data, app_id, module_data->auth_config[0]->query_fqdn, headers, module_data->auth_config[0]);
 
     assert_non_null(result);
     assert_int_equal(cJSON_GetArraySize(result), 0);
@@ -3955,14 +3955,14 @@ static void test_wm_ms_graph_scan_apps_devices_renew_token_failed(void **state) 
 }
 
 static void test_wm_ms_graph_scan_apps_devices_unsuccessful_status_code(void **state) {
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->curl_max_size = 1024L;
     module_data->page_size = 10;
     os_strdup("v1.0", module_data->version);
     os_strdup("token", module_data->auth_config[0]->access_token);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     module_data->auth_config[0]->token_expiration_time = time(NULL) + 100;
 
     curl_response* response;
@@ -3980,7 +3980,7 @@ static void test_wm_ms_graph_scan_apps_devices_unsuccessful_status_code(void **s
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
@@ -3991,7 +3991,7 @@ static void test_wm_ms_graph_scan_apps_devices_unsuccessful_status_code(void **s
     os_strdup("Authorization: Bearer token", headers[0]);
     cJSON *app_id = cJSON_CreateString("12345");
 
-    cJSON *result = wm_ms_graph_scan_apps_devices(module_data, app_id, module_data->auth_config[0]->query_fqdn, headers, module_data->auth_config[0]);
+    cJSON *result = gm_ms_graph_scan_apps_devices(module_data, app_id, module_data->auth_config[0]->query_fqdn, headers, module_data->auth_config[0]);
 
     assert_non_null(result);
     assert_int_equal(cJSON_GetArraySize(result), 0);
@@ -4001,14 +4001,14 @@ static void test_wm_ms_graph_scan_apps_devices_unsuccessful_status_code(void **s
 }
 
 static void test_wm_ms_graph_scan_apps_devices_401_invalidates_token(void **state) {
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->curl_max_size = 1024L;
     module_data->page_size = 10;
     os_strdup("v1.0", module_data->version);
     os_strdup("token", module_data->auth_config[0]->access_token);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     module_data->auth_config[0]->token_expiration_time = time(NULL) + 100;
 
     curl_response* response;
@@ -4026,7 +4026,7 @@ static void test_wm_ms_graph_scan_apps_devices_401_invalidates_token(void **stat
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
@@ -4037,7 +4037,7 @@ static void test_wm_ms_graph_scan_apps_devices_401_invalidates_token(void **stat
     os_strdup("Authorization: Bearer token", headers[0]);
     cJSON *app_id = cJSON_CreateString("12345");
 
-    cJSON *result = wm_ms_graph_scan_apps_devices(module_data, app_id, module_data->auth_config[0]->query_fqdn, headers, module_data->auth_config[0]);
+    cJSON *result = gm_ms_graph_scan_apps_devices(module_data, app_id, module_data->auth_config[0]->query_fqdn, headers, module_data->auth_config[0]);
 
     assert_non_null(result);
     assert_int_equal(cJSON_GetArraySize(result), 0);
@@ -4048,14 +4048,14 @@ static void test_wm_ms_graph_scan_apps_devices_401_invalidates_token(void **stat
 }
 
 static void test_wm_ms_graph_scan_apps_devices_reached_curl_size(void **state) {
-    wm_ms_graph* module_data = (wm_ms_graph *)*state;
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config);
-    os_calloc(1, sizeof(wm_ms_graph_auth), module_data->auth_config[0]);
+    gm_ms_graph* module_data = (gm_ms_graph *)*state;
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config);
+    os_calloc(1, sizeof(gm_ms_graph_auth), module_data->auth_config[0]);
     module_data->curl_max_size = 1024L;
     module_data->page_size = 10;
     os_strdup("v1.0", module_data->version);
     os_strdup("token", module_data->auth_config[0]->access_token);
-    os_strdup(WM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
+    os_strdup(GM_MS_GRAPH_GLOBAL_API_QUERY_FQDN, module_data->auth_config[0]->query_fqdn);
     module_data->auth_config[0]->token_expiration_time = time(NULL) + 100;
 
     curl_response* response;
@@ -4073,7 +4073,7 @@ static void test_wm_ms_graph_scan_apps_devices_reached_curl_size(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
@@ -4084,7 +4084,7 @@ static void test_wm_ms_graph_scan_apps_devices_reached_curl_size(void **state) {
     os_strdup("Authorization: Bearer token", headers[0]);
     cJSON *app_id = cJSON_CreateString("12345");
 
-    cJSON *result = wm_ms_graph_scan_apps_devices(module_data, app_id, module_data->auth_config[0]->query_fqdn, headers, module_data->auth_config[0]);
+    cJSON *result = gm_ms_graph_scan_apps_devices(module_data, app_id, module_data->auth_config[0]->query_fqdn, headers, module_data->auth_config[0]);
 
     assert_non_null(result);
     assert_int_equal(cJSON_GetArraySize(result), 0);
@@ -4109,11 +4109,11 @@ static void test_wm_ms_graph_http_get_with_retry_success_first_attempt(void **st
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
-    curl_response* result = wm_ms_graph_http_get_with_retry(headers, "https://example.com", 1024, "alerts_v2");
+    curl_response* result = gm_ms_graph_http_get_with_retry(headers, "https://example.com", 1024, "alerts_v2");
 
     assert_non_null(result);
     assert_int_equal(result->status_code, 200);
@@ -4144,7 +4144,7 @@ static void test_wm_ms_graph_http_get_with_retry_429_then_success(void **state) 
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response_429);
 
@@ -4156,11 +4156,11 @@ static void test_wm_ms_graph_http_get_with_retry_429_then_success(void **state) 
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response_200);
 
-    curl_response* result = wm_ms_graph_http_get_with_retry(headers, "https://example.com", 1024, "alerts_v2");
+    curl_response* result = gm_ms_graph_http_get_with_retry(headers, "https://example.com", 1024, "alerts_v2");
 
     assert_non_null(result);
     assert_int_equal(result->status_code, 200);
@@ -4185,7 +4185,7 @@ static void test_wm_ms_graph_http_get_with_retry_429_exhausted(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response_429_1);
 
@@ -4205,7 +4205,7 @@ static void test_wm_ms_graph_http_get_with_retry_429_exhausted(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response_429_2);
 
@@ -4225,7 +4225,7 @@ static void test_wm_ms_graph_http_get_with_retry_429_exhausted(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response_429_3);
 
@@ -4245,11 +4245,11 @@ static void test_wm_ms_graph_http_get_with_retry_429_exhausted(void **state) {
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response_final);
 
-    curl_response* result = wm_ms_graph_http_get_with_retry(headers, "https://example.com", 1024, "alerts_v2");
+    curl_response* result = gm_ms_graph_http_get_with_retry(headers, "https://example.com", 1024, "alerts_v2");
 
     assert_non_null(result);
     assert_int_equal(result->status_code, 429);
@@ -4280,7 +4280,7 @@ static void test_wm_ms_graph_http_get_with_retry_429_retry_after_exceeds_warn(vo
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response_429);
 
@@ -4295,11 +4295,11 @@ static void test_wm_ms_graph_http_get_with_retry_429_retry_after_exceeds_warn(vo
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response_200);
 
-    curl_response* result = wm_ms_graph_http_get_with_retry(headers, "https://example.com", 1024, "alerts_v2");
+    curl_response* result = gm_ms_graph_http_get_with_retry(headers, "https://example.com", 1024, "alerts_v2");
 
     assert_non_null(result);
     assert_int_equal(result->status_code, 200);
@@ -4308,21 +4308,21 @@ static void test_wm_ms_graph_http_get_with_retry_429_retry_after_exceeds_warn(vo
 }
 
 static void test_wm_ms_graph_ensure_valid_token_token_valid(void **state) {
-    wm_ms_graph_auth auth = {0};
+    gm_ms_graph_auth auth = {0};
     auth.access_token = strdup("valid_token");
     auth.token_expiration_time = time(NULL) + 3600;
 
     bool token_changed = false;
-    assert_true(wm_ms_graph_ensure_valid_token(&auth, 1024, &token_changed));
+    assert_true(gm_ms_graph_ensure_valid_token(&auth, 1024, &token_changed));
     assert_false(token_changed);
     os_free(auth.access_token);
 }
 
 static void test_wm_ms_graph_ensure_valid_token_token_expired_and_renewed(void **state) {
-    wm_ms_graph_auth auth = {0};
+    gm_ms_graph_auth auth = {0};
     auth.access_token = strdup("expired_token");
     auth.token_expiration_time = time(NULL) - 10;
-    auth.login_fqdn = strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN);
+    auth.login_fqdn = strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN);
     auth.tenant_id = strdup("example_tenant");
 
     time_t new_token_expiration_time = time(NULL) + 3600;
@@ -4337,10 +4337,10 @@ static void test_wm_ms_graph_ensure_valid_token_token_expired_and_renewed(void *
 
     os_strdup(response_body, response->body);
 
-    expect_string(__wrap__mtinfo, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Access token expired or missing. Requesting new token.");
 
-    expect_string(__wrap__mtdebug1, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Microsoft Graph API Access Token URL: 'https://login.microsoftonline.com/example_tenant/oauth2/v2.0/token'");
 
     expect_any(__wrap_wurl_http_request, method);
@@ -4348,12 +4348,12 @@ static void test_wm_ms_graph_ensure_valid_token_token_expired_and_renewed(void *
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
     bool token_changed = false;
-    assert_true(wm_ms_graph_ensure_valid_token(&auth, 1024, &token_changed));
+    assert_true(gm_ms_graph_ensure_valid_token(&auth, 1024, &token_changed));
     assert_string_equal(auth.access_token, "new_token");
     assert_true(token_changed);
     os_free(auth.client_id);
@@ -4365,9 +4365,9 @@ static void test_wm_ms_graph_ensure_valid_token_token_expired_and_renewed(void *
 }
 
 static void test_wm_ms_graph_ensure_valid_token_token_missing_and_renewed(void **state) {
-    wm_ms_graph_auth auth = {0};
+    gm_ms_graph_auth auth = {0};
     auth.token_expiration_time = time(NULL) - 10;
-    auth.login_fqdn = strdup(WM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN);
+    auth.login_fqdn = strdup(GM_MS_GRAPH_GLOBAL_API_LOGIN_FQDN);
     auth.tenant_id = strdup("example_tenant");
 
     time_t new_token_expiration_time = time(NULL) + 3600;
@@ -4382,10 +4382,10 @@ static void test_wm_ms_graph_ensure_valid_token_token_missing_and_renewed(void *
 
     os_strdup(response_body, response->body);
 
-    expect_string(__wrap__mtinfo, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Access token expired or missing. Requesting new token.");
 
-    expect_string(__wrap__mtdebug1, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtdebug1, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtdebug1, formatted_msg, "Microsoft Graph API Access Token URL: 'https://login.microsoftonline.com/example_tenant/oauth2/v2.0/token'");
 
     expect_any(__wrap_wurl_http_request, method);
@@ -4393,12 +4393,12 @@ static void test_wm_ms_graph_ensure_valid_token_token_missing_and_renewed(void *
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
     bool token_changed = false;
-    assert_true(wm_ms_graph_ensure_valid_token(&auth, 1024, &token_changed));
+    assert_true(gm_ms_graph_ensure_valid_token(&auth, 1024, &token_changed));
     assert_string_equal(auth.access_token, "new_token");
     assert_true(token_changed);
     os_free(auth.client_id);
@@ -4410,11 +4410,11 @@ static void test_wm_ms_graph_ensure_valid_token_token_missing_and_renewed(void *
 }
 
 static void test_wm_ms_graph_ensure_valid_token_token_renewal_failed(void **state) {
-    wm_ms_graph_auth auth = {0};
+    gm_ms_graph_auth auth = {0};
     auth.access_token = strdup("expired_token");
     auth.token_expiration_time = 0;
 
-    expect_string(__wrap__mtinfo, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Access token expired or missing. Requesting new token.");
 
     curl_response* response;
@@ -4426,15 +4426,15 @@ static void test_wm_ms_graph_ensure_valid_token_token_renewal_failed(void **stat
     expect_any(__wrap_wurl_http_request, url);
     expect_any(__wrap_wurl_http_request, payload);
     expect_any(__wrap_wurl_http_request, max_size);
-    expect_value(__wrap_wurl_http_request, timeout, WM_MS_GRAPH_DEFAULT_TIMEOUT);
+    expect_value(__wrap_wurl_http_request, timeout, GM_MS_GRAPH_DEFAULT_TIMEOUT);
     expect_any(__wrap_wurl_http_request, ssl_verify);
     will_return(__wrap_wurl_http_request, response);
 
-    expect_string(__wrap__mtwarn, tag, WM_MS_GRAPH_LOGTAG);
+    expect_string(__wrap__mtwarn, tag, GM_MS_GRAPH_LOGTAG);
     expect_string(__wrap__mtwarn, formatted_msg, "Failed to renew access token.");
 
     bool token_changed = false;
-    assert_false(wm_ms_graph_ensure_valid_token(&auth, 1024, &token_changed));
+    assert_false(gm_ms_graph_ensure_valid_token(&auth, 1024, &token_changed));
     assert_string_equal(auth.access_token, "expired_token");
     assert_false(token_changed);
     os_free(auth.access_token);

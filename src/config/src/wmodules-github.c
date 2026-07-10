@@ -21,24 +21,24 @@ static const char *XML_API_PARAMETERS = "api_parameters";
 static const char *XML_EVENT_TYPE = "event_type";
 
 // Parse XML
-int wm_github_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
+int gm_github_read(const OS_XML *xml, xml_node **nodes, gmodule *module) {
 
     int i = 0;
     int j = 0;
     xml_node **children = NULL;
-    wm_github* github_config = NULL;
-    wm_github_auth *github_auth = NULL;
+    gm_github* github_config = NULL;
+    gm_github_auth *github_auth = NULL;
 
     if (!module->data) {
         // Default initialization
-        module->context = &WM_GITHUB_CONTEXT;
+        module->context = &GM_GITHUB_CONTEXT;
         module->tag = strdup(module->context->name);
-        os_calloc(1, sizeof(wm_github), github_config);
-        github_config->enabled =            WM_GITHUB_DEFAULT_ENABLED;
-        github_config->only_future_events = WM_GITHUB_DEFAULT_ONLY_FUTURE_EVENTS;
-        github_config->interval =           WM_GITHUB_DEFAULT_INTERVAL;
-        github_config->time_delay =         WM_GITHUB_DEFAULT_DELAY;
-        github_config->curl_max_size =      WM_GITHUB_DEFAULT_CURL_MAX_SIZE;
+        os_calloc(1, sizeof(gm_github), github_config);
+        github_config->enabled =            GM_GITHUB_DEFAULT_ENABLED;
+        github_config->only_future_events = GM_GITHUB_DEFAULT_ONLY_FUTURE_EVENTS;
+        github_config->interval =           GM_GITHUB_DEFAULT_INTERVAL;
+        github_config->time_delay =         GM_GITHUB_DEFAULT_DELAY;
+        github_config->curl_max_size =      GM_GITHUB_DEFAULT_CURL_MAX_SIZE;
         os_strdup(EVENT_TYPE_ALL, github_config->event_type);
         module->data = github_config;
     } else {
@@ -59,25 +59,25 @@ int wm_github_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
             else if (!strcmp(nodes[i]->content, "no"))
                 github_config->enabled = 0;
             else {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_ENABLED, WM_GITHUB_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_ENABLED, GM_GITHUB_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_INTERVAL)) {
             github_config->interval = w_parse_time(nodes[i]->content);
             if (github_config->interval < 0) {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_INTERVAL, WM_GITHUB_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_INTERVAL, GM_GITHUB_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_CURL_MAX_SIZE)) {
             github_config->curl_max_size = w_parse_size(nodes[i]->content);
             if (github_config->curl_max_size < 1024) {
-                merror("Invalid content for tag '%s' at module '%s'. The minimum value allowed is 1KB.", XML_CURL_MAX_SIZE, WM_GITHUB_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'. The minimum value allowed is 1KB.", XML_CURL_MAX_SIZE, GM_GITHUB_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_TIME_DELAY)) {
             github_config->time_delay = w_parse_time(nodes[i]->content);
             if (github_config->time_delay < 0) {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_TIME_DELAY, WM_GITHUB_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_TIME_DELAY, GM_GITHUB_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_ONLY_FUTURE_EVENTS)) {
@@ -86,17 +86,17 @@ int wm_github_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
             else if (!strcmp(nodes[i]->content, "no"))
                 github_config->only_future_events = 0;
             else {
-                merror("Invalid content for tag '%s' at module '%s'.", XML_ONLY_FUTURE_EVENTS, WM_GITHUB_CONTEXT.name);
+                merror("Invalid content for tag '%s' at module '%s'.", XML_ONLY_FUTURE_EVENTS, GM_GITHUB_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_API_AUTH)) {
             // Create auth node
             if (github_auth) {
-                os_calloc(1, sizeof(wm_github_auth), github_auth->next);
+                os_calloc(1, sizeof(gm_github_auth), github_auth->next);
                 github_auth = github_auth->next;
             } else {
                 // First github_auth
-                os_calloc(1, sizeof(wm_github_auth), github_auth);
+                os_calloc(1, sizeof(gm_github_auth), github_auth);
                 github_config->auth = github_auth;
             }
 
@@ -106,7 +106,7 @@ int wm_github_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
             for (j = 0; children[j]; j++) {
                 if (!strcmp(children[j]->element, XML_ORG_NAME)) {
                     if (strlen(children[j]->content) == 0) {
-                        merror("Empty content for tag '%s' at module '%s'.", XML_ORG_NAME, WM_GITHUB_CONTEXT.name);
+                        merror("Empty content for tag '%s' at module '%s'.", XML_ORG_NAME, GM_GITHUB_CONTEXT.name);
                         OS_ClearNode(children);
                         return OS_INVALID;
                     }
@@ -114,14 +114,14 @@ int wm_github_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
                     os_strdup(children[j]->content, github_auth->org_name);
                 } else if (!strcmp(children[j]->element, XML_API_TOKEN)) {
                     if (strlen(children[j]->content) == 0) {
-                        merror("Empty content for tag '%s' at module '%s'.", XML_API_TOKEN, WM_GITHUB_CONTEXT.name);
+                        merror("Empty content for tag '%s' at module '%s'.", XML_API_TOKEN, GM_GITHUB_CONTEXT.name);
                         OS_ClearNode(children);
                         return OS_INVALID;
                     }
                     os_free(github_auth->api_token);
                     os_strdup(children[j]->content, github_auth->api_token);
                 } else {
-                    merror("No such tag '%s' at module '%s'.", children[j]->element, WM_GITHUB_CONTEXT.name);
+                    merror("No such tag '%s' at module '%s'.", children[j]->element, GM_GITHUB_CONTEXT.name);
                     OS_ClearNode(children);
                     return OS_INVALID;
                 }
@@ -129,10 +129,10 @@ int wm_github_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
             OS_ClearNode(children);
 
             if(github_auth->org_name == NULL) {
-                merror("'%s' is missing at module '%s'.", XML_ORG_NAME, WM_GITHUB_CONTEXT.name);
+                merror("'%s' is missing at module '%s'.", XML_ORG_NAME, GM_GITHUB_CONTEXT.name);
                 return OS_INVALID;
             } else if(github_auth->api_token == NULL) {
-                merror("'%s' is missing at module '%s'.", XML_API_TOKEN, WM_GITHUB_CONTEXT.name);
+                merror("'%s' is missing at module '%s'.", XML_API_TOKEN, GM_GITHUB_CONTEXT.name);
                 return OS_INVALID;
             }
         } else if (!strcmp(nodes[i]->element, XML_API_PARAMETERS)) {
@@ -142,27 +142,27 @@ int wm_github_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
             for (j = 0; children[j]; j++) {
                 if (!strcmp(children[j]->element, XML_EVENT_TYPE)) {
                     if (strcmp(children[j]->content, EVENT_TYPE_ALL) && strcmp(children[j]->content, EVENT_TYPE_GIT) && strcmp(children[j]->content, EVENT_TYPE_WEB)) {
-                        merror("Invalid content for tag '%s' at module '%s'.", XML_EVENT_TYPE, WM_GITHUB_CONTEXT.name);
+                        merror("Invalid content for tag '%s' at module '%s'.", XML_EVENT_TYPE, GM_GITHUB_CONTEXT.name);
                         OS_ClearNode(children);
                         return OS_INVALID;
                     }
                     os_free(github_config->event_type);
                     os_strdup(children[j]->content, github_config->event_type);
                 } else {
-                    merror("No such tag '%s' at module '%s'.", children[j]->element, WM_GITHUB_CONTEXT.name);
+                    merror("No such tag '%s' at module '%s'.", children[j]->element, GM_GITHUB_CONTEXT.name);
                     OS_ClearNode(children);
                     return OS_INVALID;
                 }
             }
             OS_ClearNode(children);
         } else {
-            merror("No such tag '%s' at module '%s'.", nodes[i]->element, WM_GITHUB_CONTEXT.name);
+            merror("No such tag '%s' at module '%s'.", nodes[i]->element, GM_GITHUB_CONTEXT.name);
             return OS_INVALID;
         }
     }
 
     if (!github_auth) {
-        merror("Empty content for tag '%s' at module '%s'.", XML_API_AUTH, WM_GITHUB_CONTEXT.name);
+        merror("Empty content for tag '%s' at module '%s'.", XML_API_AUTH, GM_GITHUB_CONTEXT.name);
         return OS_INVALID;
     }
     return OS_SUCCESS;

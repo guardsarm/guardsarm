@@ -261,7 +261,7 @@ void * req_receiver(__attribute__((unused)) void * arg) {
         } else if (strncmp(node->target, "wmodules", 8) == 0) {
             length = wmcom_dispatch(node->buffer, node->length, &buffer);
         } else if (strncmp(node->target, "upgrade", 7) == 0) {
-            length = wm_agent_upgrade_process_command(node->buffer, &buffer);
+            length = gm_agent_upgrade_process_command(node->buffer, &buffer);
         } else if (strncmp(node->target, "control", 7) == 0) {
             length = control_dispatch(node->buffer, &buffer);
         } else {

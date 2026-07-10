@@ -118,9 +118,9 @@ static nlohmann::json getProcessInfo(const proc_t* process)
 static std::string getSerialNumber()
 {
     std::string serial;
-    std::fstream file{WM_SYS_HW_DIR, std::ios_base::in};
+    std::fstream file{GM_SYS_HW_DIR, std::ios_base::in};
 
-    if (file.is_open() && std::filesystem::file_size(WM_SYS_HW_DIR) > 0)
+    if (file.is_open() && std::filesystem::file_size(GM_SYS_HW_DIR) > 0)
     {
         file >> serial;
     }
@@ -136,7 +136,7 @@ static std::string getCpuName()
 {
     std::string retVal { UNKNOWN_VALUE };
     std::map<std::string, std::string> systemInfo;
-    getSystemInfo(WM_SYS_CPU_DIR, ":", systemInfo);
+    getSystemInfo(GM_SYS_CPU_DIR, ":", systemInfo);
     const auto& it { systemInfo.find("model name") };
 
     if (it != systemInfo.end())
@@ -151,7 +151,7 @@ static int getCpuCores()
 {
     int retVal { 0 };
     std::map<std::string, std::string> systemInfo;
-    getSystemInfo(WM_SYS_CPU_DIR, ":", systemInfo);
+    getSystemInfo(GM_SYS_CPU_DIR, ":", systemInfo);
     const auto& it { systemInfo.find("processor") };
 
     if (it != systemInfo.end())
@@ -166,7 +166,7 @@ static int getCpuMHz()
 {
     int retVal { 0 };
     std::map<std::string, std::string> systemInfo;
-    getSystemInfo(WM_SYS_CPU_DIR, ":", systemInfo);
+    getSystemInfo(GM_SYS_CPU_DIR, ":", systemInfo);
 
     const auto& it { systemInfo.find("cpu MHz") };
 
@@ -179,7 +179,7 @@ static int getCpuMHz()
         int cpuFreq { 0 };
 
         const file_system::FileSystemWrapper fileSystemWrapper;
-        const auto cpusInfo {fileSystemWrapper.list_directory(WM_SYS_CPU_FREC_DIR)};
+        const auto cpusInfo {fileSystemWrapper.list_directory(GM_SYS_CPU_FREC_DIR)};
 
         constexpr auto CPU_FREQ_DIRNAME_PATTERN {"cpu[0-9]+"};
         const std::regex cpuDirectoryRegex {CPU_FREQ_DIRNAME_PATTERN};
@@ -188,7 +188,7 @@ static int getCpuMHz()
         {
             if (std::regex_match(cpu.string(), cpuDirectoryRegex))
             {
-                std::fstream file{WM_SYS_CPU_FREC_DIR + cpu.string() + "/cpufreq/cpuinfo_max_freq", std::ios_base::in};
+                std::fstream file{GM_SYS_CPU_FREC_DIR + cpu.string() + "/cpufreq/cpuinfo_max_freq", std::ios_base::in};
 
                 if (file.is_open())
                 {
@@ -220,7 +220,7 @@ static int getCpuMHz()
 static void getMemory(nlohmann::json& info)
 {
     std::map<std::string, std::string> systemInfo;
-    getSystemInfo(WM_SYS_MEM_DIR, ":", systemInfo);
+    getSystemInfo(GM_SYS_MEM_DIR, ":", systemInfo);
 
     auto memTotal{ 1ull };
     auto memFree{ 0ull };
@@ -549,7 +549,7 @@ nlohmann::json SysInfo::getPorts() const
     for (const auto& portType : PORTS_TYPE)
     {
         const file_io::FileIOUtils ioUtils;
-        const auto fileContent {ioUtils.getFileContent(WM_SYS_NET_DIR + portType.second)};
+        const auto fileContent {ioUtils.getFileContent(GM_SYS_NET_DIR + portType.second)};
         auto rows { Utils::split(fileContent, '\n') };
         auto fileBody { false };
 
@@ -581,7 +581,7 @@ nlohmann::json SysInfo::getPorts() const
 
     if (!inodes.empty())
     {
-        ProcessInfo ret = portProcessInfo(WM_SYS_PROC_DIR, inodes);
+        ProcessInfo ret = portProcessInfo(GM_SYS_PROC_DIR, inodes);
 
         for (auto& port : ports)
         {

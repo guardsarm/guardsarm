@@ -24,31 +24,31 @@ TEST_F(ParseRuleTypeTest, ValidTypes)
 {
     auto result = ParseRuleType("f:/path");
     ASSERT_TRUE(result);
-    EXPECT_EQ(result->first, WM_SCA_TYPE_FILE);
+    EXPECT_EQ(result->first, GM_SCA_TYPE_FILE);
     EXPECT_EQ(result->second, "/path");
 
     result = ParseRuleType("r:HKEY_LOCAL_MACHINE\\...");
     ASSERT_TRUE(result);
-    EXPECT_EQ(result->first, WM_SCA_TYPE_REGISTRY);
+    EXPECT_EQ(result->first, GM_SCA_TYPE_REGISTRY);
 
     result = ParseRuleType("p:proc");
     ASSERT_TRUE(result);
-    EXPECT_EQ(result->first, WM_SCA_TYPE_PROCESS);
+    EXPECT_EQ(result->first, GM_SCA_TYPE_PROCESS);
 
     result = ParseRuleType("d:/dir");
     ASSERT_TRUE(result);
-    EXPECT_EQ(result->first, WM_SCA_TYPE_DIR);
+    EXPECT_EQ(result->first, GM_SCA_TYPE_DIR);
 
     result = ParseRuleType("c:echo");
     ASSERT_TRUE(result);
-    EXPECT_EQ(result->first, WM_SCA_TYPE_COMMAND);
+    EXPECT_EQ(result->first, GM_SCA_TYPE_COMMAND);
 }
 
 TEST_F(ParseRuleTypeTest, NegatedKey)
 {
     const auto result = ParseRuleType("!f:/negated");
     ASSERT_TRUE(result);
-    EXPECT_EQ(result->first, WM_SCA_TYPE_FILE);
+    EXPECT_EQ(result->first, GM_SCA_TYPE_FILE);
     EXPECT_EQ(result->second, "/negated");
 }
 

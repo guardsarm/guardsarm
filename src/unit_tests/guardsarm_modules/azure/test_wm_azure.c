@@ -28,12 +28,12 @@
 #define TEST_MAX_DATES 5
 
 
-static wmodule *azure_module;
+static gmodule *azure_module;
 static OS_XML *lxml;
 extern int test_mode;
 
-static void wmodule_cleanup(wmodule *module){
-    wm_azure_t* module_data = (wm_azure_t *)module->data;
+static void gmodule_cleanup(gmodule *module){
+    gm_azure_t* module_data = (gm_azure_t *)module->data;
     if(module_data->api_config){
         free(module_data->api_config->auth_path);
         free(module_data->api_config->tenantdomain);
@@ -52,7 +52,7 @@ static void wmodule_cleanup(wmodule *module){
 
 /***  SETUPS/TEARDOWNS  ******/
 static int setup_module() {
-    azure_module = calloc(1, sizeof(wmodule));
+    azure_module = calloc(1, sizeof(gmodule));
     const char *string =
         "<disabled>no</disabled>\n"
         "<interval>5m</interval>\n"
@@ -70,7 +70,7 @@ static int setup_module() {
     ;
     lxml = malloc(sizeof(OS_XML));
     XML_NODE nodes = string_to_xml_node(string, lxml);
-    int ret = wm_azure_read(lxml, nodes, azure_module);
+    int ret = gm_azure_read(lxml, nodes, azure_module);
     OS_ClearNode(nodes);
     test_mode = 1;
     w_test_pcre2_wrappers(false);
@@ -80,7 +80,7 @@ static int setup_module() {
 static int teardown_module(){
     test_mode = 0;
     w_test_pcre2_wrappers(true);
-    wmodule_cleanup(azure_module);
+    gmodule_cleanup(azure_module);
     OS_ClearXML(lxml);
     return 0;
 }
@@ -90,14 +90,14 @@ static int setup_test_executions(void **state) {
 }
 
 static int teardown_test_executions(void **state){
-    wm_azure_t* module_data = (wm_azure_t *) *state;
+    gm_azure_t* module_data = (gm_azure_t *) *state;
     sched_scan_free(&(module_data->scan_config));
     return 0;
 }
 
 static int setup_test_read(void **state) {
     test_structure *test = calloc(1, sizeof(test_structure));
-    test->module =  calloc(1, sizeof(wmodule));
+    test->module =  calloc(1, sizeof(gmodule));
     *state = test;
     return 0;
 }
@@ -106,16 +106,16 @@ static int teardown_test_read(void **state) {
     test_structure *test = *state;
     OS_ClearNode(test->nodes);
     OS_ClearXML(&(test->xml));
-    wm_azure_t *module_data = (wm_azure_t*)test->module->data;
+    gm_azure_t *module_data = (gm_azure_t*)test->module->data;
     sched_scan_free(&(module_data->scan_config));
-    wmodule_cleanup(test->module);
+    gmodule_cleanup(test->module);
     os_free(test);
     return 0;
 }
 /************************************/
 
 void test_interval_execution(void **state) {
-    wm_azure_t* module_data = (wm_azure_t *)azure_module->data;
+    gm_azure_t* module_data = (gm_azure_t *)azure_module->data;
     *state = module_data;
     module_data->scan_config.next_scheduled_scan_time = 0;
     module_data->scan_config.scan_day = 0;
@@ -123,8 +123,8 @@ void test_interval_execution(void **state) {
     module_data->scan_config.interval = 1200; // 20min
     module_data->scan_config.month_interval = false;
 
-    expect_string_count(__wrap__mtinfo, tag, WM_AZURE_LOGTAG, -1);
-    expect_string_count(__wrap__mtwarn, tag, WM_AZURE_LOGTAG, -1);
+    expect_string_count(__wrap__mtinfo, tag, GM_AZURE_LOGTAG, -1);
+    expect_string_count(__wrap__mtwarn, tag, GM_AZURE_LOGTAG, -1);
 
     expect_any_count(__wrap_SendMSG, message, (TEST_MAX_DATES + 1) * 2);
     expect_string_count(__wrap_SendMSG, locmsg, xml_rootcheck, (TEST_MAX_DATES + 1) * 2);
@@ -178,7 +178,7 @@ void test_fake_tag(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__merror, formatted_msg, "No such tag 'fake_tag' at module 'azure-logs'.");
     test->nodes = string_to_xml_node(string, &(test->xml));
-    assert_int_equal(wm_azure_read(&(test->xml), test->nodes, test->module),-1);
+    assert_int_equal(gm_azure_read(&(test->xml), test->nodes, test->module),-1);
 }
 
 void test_read_scheduling_monthday_configuration(void **state) {
@@ -201,8 +201,8 @@ void test_read_scheduling_monthday_configuration(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__mwarn, formatted_msg, "Interval must be a multiple of one month. New interval value: 1M");
     test->nodes = string_to_xml_node(string, &(test->xml));
-    assert_int_equal(wm_azure_read(&(test->xml), test->nodes, test->module),0);
-    wm_azure_t *module_data = (wm_azure_t*)test->module->data;
+    assert_int_equal(gm_azure_read(&(test->xml), test->nodes, test->module),0);
+    gm_azure_t *module_data = (gm_azure_t*)test->module->data;
     assert_int_equal(module_data->scan_config.scan_day, 4);
     assert_int_equal(module_data->scan_config.interval, 1);
     assert_int_equal(module_data->scan_config.month_interval, true);
@@ -230,8 +230,8 @@ void test_read_scheduling_weekday_configuration(void **state) {
     test_structure *test = *state;
     expect_string(__wrap__mwarn, formatted_msg, "Interval must be a multiple of one week. New interval value: 1w");
     test->nodes = string_to_xml_node(string, &(test->xml));
-    assert_int_equal(wm_azure_read(&(test->xml), test->nodes, test->module),0);
-    wm_azure_t *module_data = (wm_azure_t*)test->module->data;
+    assert_int_equal(gm_azure_read(&(test->xml), test->nodes, test->module),0);
+    gm_azure_t *module_data = (gm_azure_t*)test->module->data;
     assert_int_equal(module_data->scan_config.scan_day, 0);
     assert_int_equal(module_data->scan_config.interval, 604800);
     assert_int_equal(module_data->scan_config.month_interval, false);
@@ -257,10 +257,10 @@ void test_read_scheduling_daytime_configuration(void **state) {
     ;
     test_structure *test = *state;
     test->nodes = string_to_xml_node(string, &(test->xml));
-    assert_int_equal(wm_azure_read(&(test->xml), test->nodes, test->module),0);
-    wm_azure_t *module_data = (wm_azure_t*)test->module->data;
+    assert_int_equal(gm_azure_read(&(test->xml), test->nodes, test->module),0);
+    gm_azure_t *module_data = (gm_azure_t*)test->module->data;
     assert_int_equal(module_data->scan_config.scan_day, 0);
-    assert_int_equal(module_data->scan_config.interval, WM_DEF_INTERVAL);
+    assert_int_equal(module_data->scan_config.interval, GM_DEF_INTERVAL);
     assert_int_equal(module_data->scan_config.month_interval, false);
     assert_int_equal(module_data->scan_config.scan_wday, -1);
     assert_string_equal(module_data->scan_config.scan_time, "00:10");
@@ -284,8 +284,8 @@ void test_read_scheduling_interval_configuration(void **state) {
     ;
     test_structure *test = *state;
     test->nodes = string_to_xml_node(string, &(test->xml));
-    assert_int_equal(wm_azure_read(&(test->xml), test->nodes, test->module),0);
-    wm_azure_t *module_data = (wm_azure_t*)test->module->data;
+    assert_int_equal(gm_azure_read(&(test->xml), test->nodes, test->module),0);
+    gm_azure_t *module_data = (gm_azure_t*)test->module->data;
     assert_int_equal(module_data->scan_config.scan_day, 0);
     assert_int_equal(module_data->scan_config.interval, 3600*3);
     assert_int_equal(module_data->scan_config.month_interval, false);

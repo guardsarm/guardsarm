@@ -11,34 +11,34 @@
  * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
-#ifndef WM_EDR_H
-#define WM_EDR_H
+#ifndef GM_EDR_H
+#define GM_EDR_H
 
 #include "wmodules_def.h"
 #include "os_xml.h"
 
-#define WM_EDR_CONTEXT_NAME  "edr"
-#define WM_EDR_LOGTAG        ARGV0 ":edr"
-#define WM_EDR_DEFAULT_INTERVAL 5          // seconds between /proc sweeps
-#define WM_EDR_LOG_PATH      "logs/edr-telemetry.log"
+#define GM_EDR_CONTEXT_NAME  "edr"
+#define GM_EDR_LOGTAG        ARGV0 ":edr"
+#define GM_EDR_DEFAULT_INTERVAL 5          // seconds between /proc sweeps
+#define GM_EDR_LOG_PATH      "logs/edr-telemetry.log"
 
-typedef struct wm_edr_flags_t {
+typedef struct gm_edr_flags_t {
     unsigned int enabled:1;                // main switch
     unsigned int processes:1;              // process-exec telemetry (+ hash/cwd/script)
     unsigned int network:1;                // network-connection telemetry
     unsigned int persistence:1;            // cron/systemd/startup persistence telemetry
     unsigned int running:1;                // module is running
-} wm_edr_flags_t;
+} gm_edr_flags_t;
 
-typedef struct wm_edr_t {
+typedef struct gm_edr_t {
     unsigned int interval;                 // sweep interval (seconds)
-    wm_edr_flags_t flags;                  // feature switches
+    gm_edr_flags_t flags;                  // feature switches
     long max_eps;                          // max events per second
-} wm_edr_t;
+} gm_edr_t;
 
-extern const wm_context WM_EDR_CONTEXT;    // module context
+extern const gm_context GM_EDR_CONTEXT;    // module context
 
 // Parse the <wodle name="edr"> configuration block.
-int wm_edr_read(const OS_XML *xml, XML_NODE nodes, wmodule *module);
+int gm_edr_read(const OS_XML *xml, XML_NODE nodes, gmodule *module);
 
 #endif // WM_EDR_H

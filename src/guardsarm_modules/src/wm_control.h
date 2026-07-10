@@ -6,21 +6,21 @@
  * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 #ifndef WIN32
-#ifndef WM_CONTROL
-#define WM_CONTROL
+#ifndef GM_CONTROL
+#define GM_CONTROL
 
-#define WM_CONTROL_LOGTAG ARGV0 ":control"
+#define GM_CONTROL_LOGTAG ARGV0 ":control"
 
 #include "wmodules.h"
 
-extern const wm_context WM_CONTROL_CONTEXT;
+extern const gm_context GM_CONTROL_CONTEXT;
 
-typedef struct wm_control_t {
+typedef struct gm_control_t {
     unsigned int enabled:1;
     unsigned int run_on_start:1;
-} wm_control_t;
+} gm_control_t;
 
-wmodule *wm_control_read();
+gmodule *gm_control_read();
 
 /**
  * @brief Dispatch control commands and execute corresponding actions
@@ -33,13 +33,13 @@ wmodule *wm_control_read();
  * @param output Pointer to string that will contain the response message
  * @return size_t Length of the output string
  */
-size_t wm_control_dispatch(char *command, char **output);
+size_t gm_control_dispatch(char *command, char **output);
 
 /**
  * @brief Check if systemd is available as the init system
  * @return true if systemd is available, false otherwise
  */
-bool wm_control_check_systemd();
+bool gm_control_check_systemd();
 
 /**
  * @brief Wait for a GuardSarm service to be in active state
@@ -49,7 +49,7 @@ bool wm_control_check_systemd();
  * @param service Service name to check (e.g. "guardsarm-manager", "guardsarm-agent")
  * @return true if service is active, false otherwise
  */
-bool wm_control_wait_for_service_active(const char *service);
+bool gm_control_wait_for_service_active(const char *service);
 
 /**
  * @brief Get the control binary path used by the direct-exec fallback
@@ -60,7 +60,7 @@ bool wm_control_wait_for_service_active(const char *service);
  *
  * @return const char* Relative path to the control binary
  */
-const char *wm_control_get_bin(void);
+const char *gm_control_get_bin(void);
 
 /**
  * @brief Execute restart or reload action on a GuardSarm service
@@ -74,7 +74,7 @@ const char *wm_control_get_bin(void);
  * @param output Pointer to string that will contain the response message
  * @return size_t Length of the output string
  */
-size_t wm_control_execute_action(const char *action, const char *service, char **output);
+size_t gm_control_execute_action(const char *action, const char *service, char **output);
 
 #endif
 #endif

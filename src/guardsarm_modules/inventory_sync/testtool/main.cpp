@@ -1021,7 +1021,7 @@ int main(int argc, char* argv[])
 
                 if (logFile.is_open())
                 {
-                    if (strcmp(tag, WM_VULNSCAN_LOGTAG) == 0)
+                    if (strcmp(tag, GM_VULNSCAN_LOGTAG) == 0)
                     {
                         logFile << func << "():" << buffer << std::endl;
                     }
@@ -1042,7 +1042,7 @@ int main(int argc, char* argv[])
 
                 if (logFile.is_open())
                 {
-                    if (strcmp(tag, WM_VULNSCAN_LOGTAG) == 0)
+                    if (strcmp(tag, GM_VULNSCAN_LOGTAG) == 0)
                     {
                         logFile << func << "():" << buffer << std::endl;
                     }

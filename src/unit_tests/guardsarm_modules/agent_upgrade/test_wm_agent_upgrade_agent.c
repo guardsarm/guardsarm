@@ -26,32 +26,32 @@
 #include "shared.h"
 
 #ifndef TEST_WINAGENT
-void* wm_agent_upgrade_listen_messages(void *arg);
+void* gm_agent_upgrade_listen_messages(void *arg);
 #endif
-void wm_agent_upgrade_check_status(const wm_agent_configs* agent_config);
-bool wm_upgrade_agent_search_upgrade_result(int *queue_fd);
-void wm_upgrade_agent_send_ack_message(int *queue_fd, wm_upgrade_agent_state state, unsigned int raw_code);
-bool wm_agent_upgrade_is_shutting_down(void);
+void gm_agent_upgrade_check_status(const gm_agent_configs* agent_config);
+bool gm_upgrade_agent_search_upgrade_result(int *queue_fd);
+void gm_upgrade_agent_send_ack_message(int *queue_fd, gm_upgrade_agent_state state, unsigned int raw_code);
+bool gm_agent_upgrade_is_shutting_down(void);
 
 // Setup / teardown
 
 static int setup_group(void **state) {
-    wm_agent_configs *config = NULL;
-    os_calloc(1, sizeof(wm_agent_configs), config);
+    gm_agent_configs *config = NULL;
+    os_calloc(1, sizeof(gm_agent_configs), config);
     *state = config;
     test_mode = 1;
     return 0;
 }
 
 static int teardown_group(void **state) {
-    wm_agent_configs *config = *state;
+    gm_agent_configs *config = *state;
     os_free(config);
     test_mode = 0;
     return 0;
 }
 
 static int setup_test_executions(void **state) {
-    wm_max_eps = 1;
+    gm_max_eps = 1;
     return 0;
 }
 
@@ -73,7 +73,7 @@ void test_wm_upgrade_agent_send_ack_message_successful(void **state)
     (void) state;
     int queue = 0;
     int result = 0;
-    wm_upgrade_agent_state upgrade_state = WM_UPGRADE_SUCCESSFUL;
+    gm_upgrade_agent_state upgrade_state = GM_UPGRADE_SUCCESSFUL;
 
     expect_value(__wrap_wm_sendmsg, usec, 1000000);
     expect_value(__wrap_wm_sendmsg, queue, queue);
@@ -81,7 +81,7 @@ void test_wm_upgrade_agent_send_ack_message_successful(void **state)
                                                "\"parameters\":{\"error\":0,"
                                                            "\"message\":\"Upgrade was successful\","
                                                            "\"status\":\"Done\"}}");
-    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[WM_TASK_UPGRADE_MODULE]);
+    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[GM_TASK_UPGRADE_MODULE]);
     expect_value(__wrap_wm_sendmsg, loc, UPGRADE_MQ);
 
     will_return(__wrap_wm_sendmsg, result);
@@ -93,7 +93,7 @@ void test_wm_upgrade_agent_send_ack_message_successful(void **state)
                                                                  "\"message\":\"Upgrade was successful\","
                                                                  "\"status\":\"Done\"}}'");
 
-    wm_upgrade_agent_send_ack_message(&queue, upgrade_state, (unsigned int)upgrade_state);
+    gm_upgrade_agent_send_ack_message(&queue, upgrade_state, (unsigned int)upgrade_state);
 
     assert_int_equal(queue, 0);
 }
@@ -103,7 +103,7 @@ void test_wm_upgrade_agent_send_ack_message_failed(void **state)
     (void) state;
     int queue = 0;
     int result = 0;
-    wm_upgrade_agent_state upgrade_state = WM_UPGRADE_FAILED;
+    gm_upgrade_agent_state upgrade_state = GM_UPGRADE_FAILED;
 
     expect_value(__wrap_wm_sendmsg, usec, 1000000);
     expect_value(__wrap_wm_sendmsg, queue, queue);
@@ -111,7 +111,7 @@ void test_wm_upgrade_agent_send_ack_message_failed(void **state)
                                                "\"parameters\":{\"error\":2,"
                                                            "\"message\":\"Upgrade failed\","
                                                            "\"status\":\"Failed\"}}");
-    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[WM_TASK_UPGRADE_MODULE]);
+    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[GM_TASK_UPGRADE_MODULE]);
     expect_value(__wrap_wm_sendmsg, loc, UPGRADE_MQ);
 
     will_return(__wrap_wm_sendmsg, result);
@@ -123,7 +123,7 @@ void test_wm_upgrade_agent_send_ack_message_failed(void **state)
                                                                  "\"message\":\"Upgrade failed\","
                                                                  "\"status\":\"Failed\"}}'");
 
-    wm_upgrade_agent_send_ack_message(&queue, upgrade_state, (unsigned int)upgrade_state);
+    gm_upgrade_agent_send_ack_message(&queue, upgrade_state, (unsigned int)upgrade_state);
 
     assert_int_equal(queue, 0);
 }
@@ -133,7 +133,7 @@ void test_wm_upgrade_agent_send_ack_message_error(void **state)
     (void) state;
     int queue = 0;
     int result = -1;
-    wm_upgrade_agent_state upgrade_state = WM_UPGRADE_FAILED;
+    gm_upgrade_agent_state upgrade_state = GM_UPGRADE_FAILED;
 
     expect_value(__wrap_wm_sendmsg, usec, 1000000);
     expect_value(__wrap_wm_sendmsg, queue, queue);
@@ -141,7 +141,7 @@ void test_wm_upgrade_agent_send_ack_message_error(void **state)
                                                "\"parameters\":{\"error\":2,"
                                                            "\"message\":\"Upgrade failed\","
                                                            "\"status\":\"Failed\"}}");
-    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[WM_TASK_UPGRADE_MODULE]);
+    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[GM_TASK_UPGRADE_MODULE]);
     expect_value(__wrap_wm_sendmsg, loc, UPGRADE_MQ);
 
     will_return(__wrap_wm_sendmsg, result);
@@ -151,7 +151,7 @@ void test_wm_upgrade_agent_send_ack_message_error(void **state)
 
     expect_string(__wrap_StartMQPredicated, path, DEFAULTQUEUE);
     expect_value(__wrap_StartMQPredicated, type, WRITE);
-    expect_value(__wrap_StartMQPredicated, fn_ptr, wm_agent_upgrade_is_shutting_down);
+    expect_value(__wrap_StartMQPredicated, fn_ptr, gm_agent_upgrade_is_shutting_down);
     will_return(__wrap_StartMQPredicated, 1);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-modulesd:agent-upgrade");
@@ -161,7 +161,7 @@ void test_wm_upgrade_agent_send_ack_message_error(void **state)
                                                                  "\"message\":\"Upgrade failed\","
                                                                  "\"status\":\"Failed\"}}'");
 
-    wm_upgrade_agent_send_ack_message(&queue, upgrade_state, (unsigned int)upgrade_state);
+    gm_upgrade_agent_send_ack_message(&queue, upgrade_state, (unsigned int)upgrade_state);
 
     assert_int_equal(queue, 1);
 }
@@ -171,7 +171,7 @@ void test_wm_upgrade_agent_send_ack_message_error_exit(void **state)
     (void) state;
     int queue = 0;
     int result = -1;
-    wm_upgrade_agent_state upgrade_state = WM_UPGRADE_FAILED;
+    gm_upgrade_agent_state upgrade_state = GM_UPGRADE_FAILED;
 
     expect_value(__wrap_wm_sendmsg, usec, 1000000);
     expect_value(__wrap_wm_sendmsg, queue, queue);
@@ -179,7 +179,7 @@ void test_wm_upgrade_agent_send_ack_message_error_exit(void **state)
                                                "\"parameters\":{\"error\":2,"
                                                            "\"message\":\"Upgrade failed\","
                                                            "\"status\":\"Failed\"}}");
-    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[WM_TASK_UPGRADE_MODULE]);
+    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[GM_TASK_UPGRADE_MODULE]);
     expect_value(__wrap_wm_sendmsg, loc, UPGRADE_MQ);
 
     will_return(__wrap_wm_sendmsg, result);
@@ -189,7 +189,7 @@ void test_wm_upgrade_agent_send_ack_message_error_exit(void **state)
 
     expect_string(__wrap_StartMQPredicated, path, DEFAULTQUEUE);
     expect_value(__wrap_StartMQPredicated, type, WRITE);
-    expect_value(__wrap_StartMQPredicated, fn_ptr, wm_agent_upgrade_is_shutting_down);
+    expect_value(__wrap_StartMQPredicated, fn_ptr, gm_agent_upgrade_is_shutting_down);
     will_return(__wrap_StartMQPredicated, -1);
 
     expect_string(__wrap__mterror_exit, tag, "guardsarm-modulesd:agent-upgrade");
@@ -202,7 +202,7 @@ void test_wm_upgrade_agent_send_ack_message_error_exit(void **state)
                                                                  "\"message\":\"Upgrade failed\","
                                                                  "\"status\":\"Failed\"}}'");
 
-    wm_upgrade_agent_send_ack_message(&queue, upgrade_state, (unsigned int)upgrade_state);
+    gm_upgrade_agent_send_ack_message(&queue, upgrade_state, (unsigned int)upgrade_state);
 
     assert_int_equal(queue, -1);
 }
@@ -212,7 +212,7 @@ void test_wm_upgrade_agent_send_ack_message_shutdown(void **state)
     (void) state;
     int queue = 0;
     int result = -1;
-    wm_upgrade_agent_state upgrade_state = WM_UPGRADE_FAILED;
+    gm_upgrade_agent_state upgrade_state = GM_UPGRADE_FAILED;
 
     expect_value(__wrap_wm_sendmsg, usec, 1000000);
     expect_value(__wrap_wm_sendmsg, queue, queue);
@@ -220,7 +220,7 @@ void test_wm_upgrade_agent_send_ack_message_shutdown(void **state)
                                                "\"parameters\":{\"error\":2,"
                                                            "\"message\":\"Upgrade failed\","
                                                            "\"status\":\"Failed\"}}");
-    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[WM_TASK_UPGRADE_MODULE]);
+    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[GM_TASK_UPGRADE_MODULE]);
     expect_value(__wrap_wm_sendmsg, loc, UPGRADE_MQ);
 
     will_return(__wrap_wm_sendmsg, result);
@@ -230,19 +230,19 @@ void test_wm_upgrade_agent_send_ack_message_shutdown(void **state)
 
     expect_string(__wrap_StartMQPredicated, path, DEFAULTQUEUE);
     expect_value(__wrap_StartMQPredicated, type, WRITE);
-    expect_value(__wrap_StartMQPredicated, fn_ptr, wm_agent_upgrade_is_shutting_down);
+    expect_value(__wrap_StartMQPredicated, fn_ptr, gm_agent_upgrade_is_shutting_down);
     will_return(__wrap_StartMQPredicated, OS_INVALID);
 
     // Simulates SIGTERM arriving during the StartMQPredicated retry loop: the
     // predicate fires, the wrapper returns OS_INVALID, and the function must
     // return without escalating to mterror_exit.
-    wm_shutdown_requested = 1;
+    gm_shutdown_requested = 1;
 
-    wm_upgrade_agent_send_ack_message(&queue, upgrade_state, (unsigned int)upgrade_state);
+    gm_upgrade_agent_send_ack_message(&queue, upgrade_state, (unsigned int)upgrade_state);
 
     assert_int_equal(queue, OS_INVALID);
 
-    wm_shutdown_requested = 0;
+    gm_shutdown_requested = 0;
 }
 
 void test_wm_upgrade_agent_search_upgrade_result_successful(void **state)
@@ -250,9 +250,9 @@ void test_wm_upgrade_agent_search_upgrade_result_successful(void **state)
     (void) state;
     int queue = 0;
     int result = 0;
-    wm_upgrade_agent_state upgrade_state = WM_UPGRADE_SUCCESSFUL;
+    gm_upgrade_agent_state upgrade_state = GM_UPGRADE_SUCCESSFUL;
 
-    expect_string(__wrap_wfopen, path, WM_AGENT_UPGRADE_RESULT_FILE);
+    expect_string(__wrap_wfopen, path, GM_AGENT_UPGRADE_RESULT_FILE);
     expect_string(__wrap_wfopen, mode, "r");
     will_return(__wrap_wfopen, (FILE*)1);
 
@@ -273,7 +273,7 @@ void test_wm_upgrade_agent_search_upgrade_result_successful(void **state)
                                                "\"parameters\":{\"error\":0,"
                                                            "\"message\":\"Upgrade was successful\","
                                                            "\"status\":\"Done\"}}");
-    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[WM_TASK_UPGRADE_MODULE]);
+    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[GM_TASK_UPGRADE_MODULE]);
     expect_value(__wrap_wm_sendmsg, loc, UPGRADE_MQ);
 
     will_return(__wrap_wm_sendmsg, result);
@@ -285,7 +285,7 @@ void test_wm_upgrade_agent_search_upgrade_result_successful(void **state)
                                                                  "\"message\":\"Upgrade was successful\","
                                                                  "\"status\":\"Done\"}}'");
 
-    int ret = wm_upgrade_agent_search_upgrade_result(&queue);
+    int ret = gm_upgrade_agent_search_upgrade_result(&queue);
 
     assert_int_equal(ret, 1);
     assert_int_equal(queue, 0);
@@ -297,7 +297,7 @@ void test_wm_upgrade_agent_search_upgrade_result_failed_missing_dependency(void 
     int queue = 0;
     int result = 0;
 
-    expect_string(__wrap_wfopen, path, WM_AGENT_UPGRADE_RESULT_FILE);
+    expect_string(__wrap_wfopen, path, GM_AGENT_UPGRADE_RESULT_FILE);
     expect_string(__wrap_wfopen, mode, "r");
     will_return(__wrap_wfopen, (FILE*)1);
 
@@ -318,7 +318,7 @@ void test_wm_upgrade_agent_search_upgrade_result_failed_missing_dependency(void 
                                                "\"parameters\":{\"error\":1,"
                                                            "\"message\":\"Upgrade failed: intermediate version required\","
                                                            "\"status\":\"Failed\"}}");
-    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[WM_TASK_UPGRADE_MODULE]);
+    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[GM_TASK_UPGRADE_MODULE]);
     expect_value(__wrap_wm_sendmsg, loc, UPGRADE_MQ);
 
     will_return(__wrap_wm_sendmsg, result);
@@ -330,7 +330,7 @@ void test_wm_upgrade_agent_search_upgrade_result_failed_missing_dependency(void 
                                                                  "\"message\":\"Upgrade failed: intermediate version required\","
                                                                  "\"status\":\"Failed\"}}'");
 
-    int ret = wm_upgrade_agent_search_upgrade_result(&queue);
+    int ret = gm_upgrade_agent_search_upgrade_result(&queue);
 
     assert_int_equal(ret, 1);
     assert_int_equal(queue, 0);
@@ -341,9 +341,9 @@ void test_wm_upgrade_agent_search_upgrade_result_failed(void **state)
     (void) state;
     int queue = 0;
     int result = 0;
-    wm_upgrade_agent_state upgrade_state = WM_UPGRADE_FAILED;
+    gm_upgrade_agent_state upgrade_state = GM_UPGRADE_FAILED;
 
-    expect_string(__wrap_wfopen, path, WM_AGENT_UPGRADE_RESULT_FILE);
+    expect_string(__wrap_wfopen, path, GM_AGENT_UPGRADE_RESULT_FILE);
     expect_string(__wrap_wfopen, mode, "r");
     will_return(__wrap_wfopen, (FILE*)1);
 
@@ -364,7 +364,7 @@ void test_wm_upgrade_agent_search_upgrade_result_failed(void **state)
                                                "\"parameters\":{\"error\":2,"
                                                            "\"message\":\"Upgrade failed\","
                                                            "\"status\":\"Failed\"}}");
-    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[WM_TASK_UPGRADE_MODULE]);
+    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[GM_TASK_UPGRADE_MODULE]);
     expect_value(__wrap_wm_sendmsg, loc, UPGRADE_MQ);
 
     will_return(__wrap_wm_sendmsg, result);
@@ -376,7 +376,7 @@ void test_wm_upgrade_agent_search_upgrade_result_failed(void **state)
                                                                  "\"message\":\"Upgrade failed\","
                                                                  "\"status\":\"Failed\"}}'");
 
-    int ret = wm_upgrade_agent_search_upgrade_result(&queue);
+    int ret = gm_upgrade_agent_search_upgrade_result(&queue);
 
     assert_int_equal(ret, 1);
     assert_int_equal(queue, 0);
@@ -387,13 +387,13 @@ void test_wm_upgrade_agent_search_upgrade_result_error_open(void **state)
     (void) state;
     int queue = 0;
     int result = 0;
-    wm_upgrade_agent_state upgrade_state = WM_UPGRADE_FAILED;
+    gm_upgrade_agent_state upgrade_state = GM_UPGRADE_FAILED;
 
-    expect_string(__wrap_wfopen, path, WM_AGENT_UPGRADE_RESULT_FILE);
+    expect_string(__wrap_wfopen, path, GM_AGENT_UPGRADE_RESULT_FILE);
     expect_string(__wrap_wfopen, mode, "r");
     will_return(__wrap_wfopen, NULL);
 
-    int ret = wm_upgrade_agent_search_upgrade_result(&queue);
+    int ret = gm_upgrade_agent_search_upgrade_result(&queue);
 
     assert_int_equal(ret, 0);
     assert_int_equal(queue, 0);
@@ -405,7 +405,7 @@ void test_wm_upgrade_agent_search_upgrade_result_error_code(void **state)
     int queue = 0;
     int result = 0;
 
-    expect_string(__wrap_wfopen, path, WM_AGENT_UPGRADE_RESULT_FILE);
+    expect_string(__wrap_wfopen, path, GM_AGENT_UPGRADE_RESULT_FILE);
     expect_string(__wrap_wfopen, mode, "r");
     will_return(__wrap_wfopen, (FILE*)1);
 
@@ -428,7 +428,7 @@ void test_wm_upgrade_agent_search_upgrade_result_error_code(void **state)
                                                "\"parameters\":{\"error\":5,"
                                                            "\"message\":\"Upgrade failed\","
                                                            "\"status\":\"Failed\"}}");
-    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[WM_TASK_UPGRADE_MODULE]);
+    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[GM_TASK_UPGRADE_MODULE]);
     expect_value(__wrap_wm_sendmsg, loc, UPGRADE_MQ);
 
     will_return(__wrap_wm_sendmsg, result);
@@ -440,7 +440,7 @@ void test_wm_upgrade_agent_search_upgrade_result_error_code(void **state)
                                                                  "\"message\":\"Upgrade failed\","
                                                                  "\"status\":\"Failed\"}}'");
 
-    int ret = wm_upgrade_agent_search_upgrade_result(&queue);
+    int ret = gm_upgrade_agent_search_upgrade_result(&queue);
 
     assert_int_equal(ret, 1);
     assert_int_equal(queue, 0);
@@ -450,8 +450,8 @@ void test_wm_agent_upgrade_check_status_successful(void **state)
 {
     int queue = 0;
     int result = 0;
-    wm_upgrade_agent_state upgrade_state = WM_UPGRADE_SUCCESSFUL;
-    wm_agent_configs *config = *state;
+    gm_upgrade_agent_state upgrade_state = GM_UPGRADE_SUCCESSFUL;
+    gm_agent_configs *config = *state;
 
     config->upgrade_wait_start = 1;
     config->upgrade_wait_max = 10;
@@ -461,14 +461,14 @@ void test_wm_agent_upgrade_check_status_successful(void **state)
 
     expect_string(__wrap_StartMQPredicated, path, DEFAULTQUEUE);
     expect_value(__wrap_StartMQPredicated, type, WRITE);
-    expect_value(__wrap_StartMQPredicated, fn_ptr, wm_agent_upgrade_is_shutting_down);
+    expect_value(__wrap_StartMQPredicated, fn_ptr, gm_agent_upgrade_is_shutting_down);
     will_return(__wrap_StartMQPredicated, queue);
 
 #ifndef TEST_WINAGENT
     expect_any_always(__wrap_sleep, seconds);
 #endif
 
-    expect_string(__wrap_wfopen, path, WM_AGENT_UPGRADE_RESULT_FILE);
+    expect_string(__wrap_wfopen, path, GM_AGENT_UPGRADE_RESULT_FILE);
     expect_string(__wrap_wfopen, mode, "r");
     will_return(__wrap_wfopen, (FILE*)1);
 
@@ -489,7 +489,7 @@ void test_wm_agent_upgrade_check_status_successful(void **state)
                                                "\"parameters\":{\"error\":0,"
                                                            "\"message\":\"Upgrade was successful\","
                                                            "\"status\":\"Done\"}}");
-    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[WM_TASK_UPGRADE_MODULE]);
+    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[GM_TASK_UPGRADE_MODULE]);
     expect_value(__wrap_wm_sendmsg, loc, UPGRADE_MQ);
 
     will_return(__wrap_wm_sendmsg, result);
@@ -501,11 +501,11 @@ void test_wm_agent_upgrade_check_status_successful(void **state)
                                                                  "\"message\":\"Upgrade was successful\","
                                                                  "\"status\":\"Done\"}}'");
 
-    expect_string(__wrap_wfopen, path, WM_AGENT_UPGRADE_RESULT_FILE);
+    expect_string(__wrap_wfopen, path, GM_AGENT_UPGRADE_RESULT_FILE);
     expect_string(__wrap_wfopen, mode, "r");
     will_return(__wrap_wfopen, NULL);
 
-    wm_agent_upgrade_check_status(config);
+    gm_agent_upgrade_check_status(config);
 
     assert_int_equal(allow_upgrades, true);
 }
@@ -514,8 +514,8 @@ void test_wm_agent_upgrade_check_status_time_limit(void **state)
 {
     int queue = 0;
     int result = 0;
-    wm_upgrade_agent_state upgrade_state = WM_UPGRADE_SUCCESSFUL;
-    wm_agent_configs *config = *state;
+    gm_upgrade_agent_state upgrade_state = GM_UPGRADE_SUCCESSFUL;
+    gm_agent_configs *config = *state;
 
     config->upgrade_wait_start = 1;
     config->upgrade_wait_max = 10;
@@ -525,14 +525,14 @@ void test_wm_agent_upgrade_check_status_time_limit(void **state)
 
     expect_string(__wrap_StartMQPredicated, path, DEFAULTQUEUE);
     expect_value(__wrap_StartMQPredicated, type, WRITE);
-    expect_value(__wrap_StartMQPredicated, fn_ptr, wm_agent_upgrade_is_shutting_down);
+    expect_value(__wrap_StartMQPredicated, fn_ptr, gm_agent_upgrade_is_shutting_down);
     will_return(__wrap_StartMQPredicated, queue);
 
 #ifndef TEST_WINAGENT
     expect_any_always(__wrap_sleep, seconds);
 #endif
 
-    expect_string(__wrap_wfopen, path, WM_AGENT_UPGRADE_RESULT_FILE);
+    expect_string(__wrap_wfopen, path, GM_AGENT_UPGRADE_RESULT_FILE);
     expect_string(__wrap_wfopen, mode, "r");
     will_return(__wrap_wfopen, (FILE*)1);
 
@@ -553,7 +553,7 @@ void test_wm_agent_upgrade_check_status_time_limit(void **state)
                                                "\"parameters\":{\"error\":0,"
                                                            "\"message\":\"Upgrade was successful\","
                                                            "\"status\":\"Done\"}}");
-    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[WM_TASK_UPGRADE_MODULE]);
+    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[GM_TASK_UPGRADE_MODULE]);
     expect_value(__wrap_wm_sendmsg, loc, UPGRADE_MQ);
 
     will_return(__wrap_wm_sendmsg, result);
@@ -565,7 +565,7 @@ void test_wm_agent_upgrade_check_status_time_limit(void **state)
                                                                  "\"message\":\"Upgrade was successful\","
                                                                  "\"status\":\"Done\"}}'");
 
-    expect_string(__wrap_wfopen, path, WM_AGENT_UPGRADE_RESULT_FILE);
+    expect_string(__wrap_wfopen, path, GM_AGENT_UPGRADE_RESULT_FILE);
     expect_string(__wrap_wfopen, mode, "r");
     will_return(__wrap_wfopen, (FILE*)1);
 
@@ -586,7 +586,7 @@ void test_wm_agent_upgrade_check_status_time_limit(void **state)
                                                "\"parameters\":{\"error\":0,"
                                                            "\"message\":\"Upgrade was successful\","
                                                            "\"status\":\"Done\"}}");
-    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[WM_TASK_UPGRADE_MODULE]);
+    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[GM_TASK_UPGRADE_MODULE]);
     expect_value(__wrap_wm_sendmsg, loc, UPGRADE_MQ);
 
     will_return(__wrap_wm_sendmsg, result);
@@ -598,7 +598,7 @@ void test_wm_agent_upgrade_check_status_time_limit(void **state)
                                                                  "\"message\":\"Upgrade was successful\","
                                                                  "\"status\":\"Done\"}}'");
 
-    expect_string(__wrap_wfopen, path, WM_AGENT_UPGRADE_RESULT_FILE);
+    expect_string(__wrap_wfopen, path, GM_AGENT_UPGRADE_RESULT_FILE);
     expect_string(__wrap_wfopen, mode, "r");
     will_return(__wrap_wfopen, (FILE*)1);
 
@@ -619,7 +619,7 @@ void test_wm_agent_upgrade_check_status_time_limit(void **state)
                                                "\"parameters\":{\"error\":0,"
                                                            "\"message\":\"Upgrade was successful\","
                                                            "\"status\":\"Done\"}}");
-    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[WM_TASK_UPGRADE_MODULE]);
+    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[GM_TASK_UPGRADE_MODULE]);
     expect_value(__wrap_wm_sendmsg, loc, UPGRADE_MQ);
 
     will_return(__wrap_wm_sendmsg, result);
@@ -631,7 +631,7 @@ void test_wm_agent_upgrade_check_status_time_limit(void **state)
                                                                  "\"message\":\"Upgrade was successful\","
                                                                  "\"status\":\"Done\"}}'");
 
-    expect_string(__wrap_wfopen, path, WM_AGENT_UPGRADE_RESULT_FILE);
+    expect_string(__wrap_wfopen, path, GM_AGENT_UPGRADE_RESULT_FILE);
     expect_string(__wrap_wfopen, mode, "r");
     will_return(__wrap_wfopen, (FILE*)1);
 
@@ -652,7 +652,7 @@ void test_wm_agent_upgrade_check_status_time_limit(void **state)
                                                "\"parameters\":{\"error\":0,"
                                                            "\"message\":\"Upgrade was successful\","
                                                            "\"status\":\"Done\"}}");
-    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[WM_TASK_UPGRADE_MODULE]);
+    expect_string(__wrap_wm_sendmsg, locmsg, task_manager_modules_list[GM_TASK_UPGRADE_MODULE]);
     expect_value(__wrap_wm_sendmsg, loc, UPGRADE_MQ);
 
     will_return(__wrap_wm_sendmsg, result);
@@ -664,11 +664,11 @@ void test_wm_agent_upgrade_check_status_time_limit(void **state)
                                                                  "\"message\":\"Upgrade was successful\","
                                                                  "\"status\":\"Done\"}}'");
 
-    expect_string(__wrap_wfopen, path, WM_AGENT_UPGRADE_RESULT_FILE);
+    expect_string(__wrap_wfopen, path, GM_AGENT_UPGRADE_RESULT_FILE);
     expect_string(__wrap_wfopen, mode, "r");
     will_return(__wrap_wfopen, NULL);
 
-    wm_agent_upgrade_check_status(config);
+    gm_agent_upgrade_check_status(config);
 
     assert_int_equal(allow_upgrades, true);
 }
@@ -677,8 +677,8 @@ void test_wm_agent_upgrade_check_status_queue_error(void **state)
 {
     int queue = -1;
     int result = 0;
-    wm_upgrade_agent_state upgrade_state = WM_UPGRADE_SUCCESSFUL;
-    wm_agent_configs *config = *state;
+    gm_upgrade_agent_state upgrade_state = GM_UPGRADE_SUCCESSFUL;
+    gm_agent_configs *config = *state;
 
     config->upgrade_wait_start = 1;
     config->upgrade_wait_max = 10;
@@ -688,7 +688,7 @@ void test_wm_agent_upgrade_check_status_queue_error(void **state)
 
     expect_string(__wrap_StartMQPredicated, path, DEFAULTQUEUE);
     expect_value(__wrap_StartMQPredicated, type, WRITE);
-    expect_value(__wrap_StartMQPredicated, fn_ptr, wm_agent_upgrade_is_shutting_down);
+    expect_value(__wrap_StartMQPredicated, fn_ptr, gm_agent_upgrade_is_shutting_down);
     will_return(__wrap_StartMQPredicated, queue);
 
 #ifndef TEST_WINAGENT
@@ -698,7 +698,7 @@ void test_wm_agent_upgrade_check_status_queue_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8113): Could not open default queue to send upgrade notification.");
 
-    wm_agent_upgrade_check_status(config);
+    gm_agent_upgrade_check_status(config);
 
     assert_int_equal(allow_upgrades, true);
 }
@@ -770,7 +770,7 @@ void test_wm_agent_upgrade_listen_messages_ok(void **state)
     expect_string(__wrap_OS_SendSecureTCP, msg, response);
     will_return(__wrap_OS_SendSecureTCP, 0);
 
-    wm_agent_upgrade_listen_messages(NULL);
+    gm_agent_upgrade_listen_messages(NULL);
 }
 
 void test_wm_agent_upgrade_listen_messages_receive_empty(void **state)
@@ -799,7 +799,7 @@ void test_wm_agent_upgrade_listen_messages_receive_empty(void **state)
     expect_string(__wrap__mtdebug1, tag, "guardsarm-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8159): Empty message from local client.");
 
-    wm_agent_upgrade_listen_messages(NULL);
+    gm_agent_upgrade_listen_messages(NULL);
 }
 
 void test_wm_agent_upgrade_listen_messages_receive_error(void **state)
@@ -828,7 +828,7 @@ void test_wm_agent_upgrade_listen_messages_receive_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8111): Error in recv(): 'Success'");
 
-    wm_agent_upgrade_listen_messages(NULL);
+    gm_agent_upgrade_listen_messages(NULL);
 }
 
 void test_wm_agent_upgrade_listen_messages_receive_sock_error(void **state)
@@ -857,7 +857,7 @@ void test_wm_agent_upgrade_listen_messages_receive_sock_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8112): Response size is bigger than expected.");
 
-    wm_agent_upgrade_listen_messages(NULL);
+    gm_agent_upgrade_listen_messages(NULL);
 }
 
 void test_wm_agent_upgrade_listen_messages_accept_error_eintr(void **state)
@@ -891,7 +891,7 @@ void test_wm_agent_upgrade_listen_messages_accept_error_eintr(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8112): Response size is bigger than expected.");
 
-    wm_agent_upgrade_listen_messages(NULL);
+    gm_agent_upgrade_listen_messages(NULL);
 }
 
 void test_wm_agent_upgrade_listen_messages_accept_error(void **state)
@@ -928,7 +928,7 @@ void test_wm_agent_upgrade_listen_messages_accept_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8112): Response size is bigger than expected.");
 
-    wm_agent_upgrade_listen_messages(NULL);
+    gm_agent_upgrade_listen_messages(NULL);
 }
 
 void test_wm_agent_upgrade_listen_messages_select_zero(void **state)
@@ -959,7 +959,7 @@ void test_wm_agent_upgrade_listen_messages_select_zero(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8112): Response size is bigger than expected.");
 
-    wm_agent_upgrade_listen_messages(NULL);
+    gm_agent_upgrade_listen_messages(NULL);
 }
 
 void test_wm_agent_upgrade_listen_messages_select_error_eintr(void **state)
@@ -991,7 +991,7 @@ void test_wm_agent_upgrade_listen_messages_select_error_eintr(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8112): Response size is bigger than expected.");
 
-    wm_agent_upgrade_listen_messages(NULL);
+    gm_agent_upgrade_listen_messages(NULL);
 }
 
 void test_wm_agent_upgrade_listen_messages_select_error(void **state)
@@ -1012,7 +1012,7 @@ void test_wm_agent_upgrade_listen_messages_select_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8109): Error in select(): 'Operation not permitted'. Exiting...");
 
-    wm_agent_upgrade_listen_messages(NULL);
+    gm_agent_upgrade_listen_messages(NULL);
 }
 
 void test_wm_agent_upgrade_listen_messages_bind_error(void **state)
@@ -1028,7 +1028,7 @@ void test_wm_agent_upgrade_listen_messages_bind_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8108): Unable to bind to socket 'queue/sockets/upgrade': 'Operation not permitted'");
 
-    wm_agent_upgrade_listen_messages(NULL);
+    gm_agent_upgrade_listen_messages(NULL);
 }
 
 #endif
@@ -1037,8 +1037,8 @@ void test_wm_agent_upgrade_start_agent_module_enabled(void **state)
 {
     int queue = -1;
     int result = 0;
-    wm_upgrade_agent_state upgrade_state = WM_UPGRADE_SUCCESSFUL;
-    wm_agent_configs *config = *state;
+    gm_upgrade_agent_state upgrade_state = GM_UPGRADE_SUCCESSFUL;
+    gm_agent_configs *config = *state;
 
     config->upgrade_wait_start = 1;
     config->upgrade_wait_max = 10;
@@ -1050,12 +1050,12 @@ void test_wm_agent_upgrade_start_agent_module_enabled(void **state)
     expect_any(__wrap__mtinfo, formatted_msg);
 
 #ifndef TEST_WINAGENT
-    expect_memory(__wrap_CreateThread, function_pointer, wm_agent_upgrade_listen_messages, sizeof(wm_agent_upgrade_listen_messages));
+    expect_memory(__wrap_CreateThread, function_pointer, gm_agent_upgrade_listen_messages, sizeof(gm_agent_upgrade_listen_messages));
 #endif
 
     expect_string(__wrap_StartMQPredicated, path, DEFAULTQUEUE);
     expect_value(__wrap_StartMQPredicated, type, WRITE);
-    expect_value(__wrap_StartMQPredicated, fn_ptr, wm_agent_upgrade_is_shutting_down);
+    expect_value(__wrap_StartMQPredicated, fn_ptr, gm_agent_upgrade_is_shutting_down);
     will_return(__wrap_StartMQPredicated, queue);
 
 #ifndef TEST_WINAGENT
@@ -1065,22 +1065,22 @@ void test_wm_agent_upgrade_start_agent_module_enabled(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8113): Could not open default queue to send upgrade notification.");
 
-    wm_agent_upgrade_start_agent_module(config, 1);
+    gm_agent_upgrade_start_agent_module(config, 1);
 
     assert_int_equal(allow_upgrades, true);
 }
 
 void test_wm_agent_upgrade_start_agent_module_disabled(void **state)
 {
-    wm_agent_configs *config = *state;
+    gm_agent_configs *config = *state;
 
     allow_upgrades = false;
 
 #ifndef TEST_WINAGENT
-    expect_memory(__wrap_CreateThread, function_pointer, wm_agent_upgrade_listen_messages, sizeof(wm_agent_upgrade_listen_messages));
+    expect_memory(__wrap_CreateThread, function_pointer, gm_agent_upgrade_listen_messages, sizeof(gm_agent_upgrade_listen_messages));
 #endif
 
-    wm_agent_upgrade_start_agent_module(config, 0);
+    gm_agent_upgrade_start_agent_module(config, 0);
 
     assert_int_equal(allow_upgrades, false);
 }

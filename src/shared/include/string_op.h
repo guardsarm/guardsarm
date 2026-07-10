@@ -146,7 +146,7 @@ char * wstr_delete_repeated_groups(const char * string);
  * str1 must be a valid pointer to NULL or a string at heap
  * Returns 0 if success, or -1 if fail.
  */
-int wm_strcat(char **str1, const char *str2, char sep);
+int gm_strcat(char **str1, const char *str2, char sep);
 
 // Check if str ends in str_end
 int wstr_end(char *str, const char *str_end);

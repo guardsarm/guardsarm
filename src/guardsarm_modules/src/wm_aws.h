@@ -8,18 +8,18 @@
  * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
-#ifndef WM_AWS_H
-#define WM_AWS_H
+#ifndef GM_AWS_H
+#define GM_AWS_H
 
-#define WM_AWS_LOGTAG ARGV0 ":aws-s3"
-#define WM_AWS_DEFAULT_INTERVAL 5
-#define WM_AWS_SCRIPT_PATH "wodles/aws/aws-s3"
+#define GM_AWS_LOGTAG ARGV0 ":aws-s3"
+#define GM_AWS_DEFAULT_INTERVAL 5
+#define GM_AWS_SCRIPT_PATH "wodles/aws/aws-s3"
 
-typedef struct wm_aws_state_t {
+typedef struct gm_aws_state_t {
     time_t next_time;               // Absolute time for next scan
-} wm_aws_state_t;
+} gm_aws_state_t;
 
-typedef struct wm_aws_bucket {
+typedef struct gm_aws_bucket {
     char *bucket;                       // S3 bucket
     char *access_key;                   // IAM access key
     char *secret_key;                   // IAM secret key
@@ -39,11 +39,11 @@ typedef struct wm_aws_bucket {
     char *sts_endpoint;                 // URL for the VPC endpoint to use to obtain the STS token
     char *service_endpoint;             // URL for the endpoint to use to obtain the logs
     unsigned int remove_from_bucket:1;  // Remove the logs from the bucket
-    struct wm_aws_bucket *next;     // Pointer to next
-} wm_aws_bucket;
+    struct gm_aws_bucket *next;     // Pointer to next
+} gm_aws_bucket;
 
 
-typedef struct wm_aws_service {
+typedef struct gm_aws_service {
     char *type;                         // String defining service type.
     char *access_key;                   // IAM access key
     char *secret_key;                   // IAM secret key
@@ -60,10 +60,10 @@ typedef struct wm_aws_service {
     unsigned int remove_log_streams:1;  // Remove the log stream from the log group
     char *sts_endpoint;                 // URL for the VPC endpoint to use to obtain the STS token
     char *service_endpoint;             // URL for the endpoint to use to obtain the logs
-    struct wm_aws_service *next;        // Pointer to next
-} wm_aws_service;
+    struct gm_aws_service *next;        // Pointer to next
+} gm_aws_service;
 
-typedef struct wm_aws_subscriber {
+typedef struct gm_aws_subscriber {
     char *type;                            // String defining subscriber type.
     char *aws_profile;                     // AWS credentials profile
     char *sqs_name;                        // String defining SQS name
@@ -74,10 +74,10 @@ typedef struct wm_aws_subscriber {
     char *discard_regex;                   // REGEX to determine if an event should be skipped
     char *sts_endpoint;                    // URL for the VPC endpoint to use to obtain the STS token
     char *service_endpoint;                // URL for the endpoint to use to obtain the logs
-    struct wm_aws_subscriber *next;        // Pointer to next
-} wm_aws_subscriber;
+    struct gm_aws_subscriber *next;        // Pointer to next
+} gm_aws_subscriber;
 
-typedef struct wm_aws {
+typedef struct gm_aws {
     sched_scan_config scan_config;
     char *bucket;                       // DEPRECATE
     char *access_key;                   // DEPRECATE
@@ -87,15 +87,15 @@ typedef struct wm_aws {
     unsigned int run_on_start:1;
     unsigned int remove_from_bucket:1;  // DEPRECATE
     unsigned int skip_on_error:1;
-    wm_aws_state_t state;
-    wm_aws_bucket *buckets;      // buckets (linked list)
-    wm_aws_service *services;      // services (linked list)
-    wm_aws_subscriber *subscribers;
-} wm_aws;
+    gm_aws_state_t state;
+    gm_aws_bucket *buckets;      // buckets (linked list)
+    gm_aws_service *services;      // services (linked list)
+    gm_aws_subscriber *subscribers;
+} gm_aws;
 
-extern const wm_context WM_AWS_CONTEXT;   // Context
+extern const gm_context GM_AWS_CONTEXT;   // Context
 
 // Parse XML
-int wm_aws_read(const OS_XML *xml, xml_node **nodes, wmodule *module);
+int gm_aws_read(const OS_XML *xml, xml_node **nodes, gmodule *module);
 
 #endif // WM_AWS_H

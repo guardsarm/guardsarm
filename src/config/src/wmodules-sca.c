@@ -32,11 +32,11 @@ static unsigned int policies_count = 0;
 #undef mdebug1
 #undef mdebug2
 
-#define minfo(msg, ...) _mtinfo(WM_SCA_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
-#define mwarn(msg, ...) _mtwarn(WM_SCA_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
-#define merror(msg, ...) _mterror(WM_SCA_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
-#define mdebug1(msg, ...) _mtdebug1(WM_SCA_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
-#define mdebug2(msg, ...) _mtdebug2(WM_SCA_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
+#define minfo(msg, ...) _mtinfo(GM_SCA_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
+#define mwarn(msg, ...) _mtwarn(GM_SCA_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
+#define merror(msg, ...) _mterror(GM_SCA_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
+#define mdebug1(msg, ...) _mtdebug1(GM_SCA_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
+#define mdebug2(msg, ...) _mtdebug2(GM_SCA_LOGTAG, __FILE__, __LINE__, __func__, msg, ##__VA_ARGS__)
 
 static char * const old_policies_filenames[] = {
     "acsc_office2016_rcl.yml",
@@ -74,7 +74,7 @@ static short eval_bool(const char *str)
     return !str ? OS_INVALID : !strcmp(str, "yes") ? 1 : !strcmp(str, "no") ? 0 : OS_INVALID;
 }
 
-static void parse_synchronization_section(wm_sca_t * sca, XML_NODE node)
+static void parse_synchronization_section(gm_sca_t * sca, XML_NODE node)
 {
     const char *XML_DB_SYNC_ENABLED = "enabled";
     const char *XML_DB_SYNC_INTERVAL = "interval";
@@ -140,19 +140,19 @@ static void parse_synchronization_section(wm_sca_t * sca, XML_NODE node)
 }
 
 // Reading function
-int wm_sca_read(const OS_XML *xml,xml_node **nodes, wmodule *module)
+int gm_sca_read(const OS_XML *xml,xml_node **nodes, gmodule *module)
 {
     unsigned int i;
-    wm_sca_t *sca;
+    gm_sca_t *sca;
 
     if(!module->data) {
-        os_calloc(1, sizeof(wm_sca_t), sca);
+        os_calloc(1, sizeof(gm_sca_t), sca);
         sca->enabled = 1;
         sca->scan_on_start = 1;
         sca->max_eps = 50;
         sched_scan_init(&(sca->scan_config));
         sca->policies = NULL;
-        module->context = &WM_SCA_CONTEXT;
+        module->context = &GM_SCA_CONTEXT;
         module->tag = strdup(module->context->name);
         module->data = sca;
         policies_count = 0;
@@ -230,9 +230,9 @@ int wm_sca_read(const OS_XML *xml,xml_node **nodes, wmodule *module)
                 continue;
             }
 
-            os_realloc(sca->policies, (policies_count + 2) * sizeof(wm_sca_policy_t *), sca->policies);
-            wm_sca_policy_t *policy;
-            os_calloc(1,sizeof(wm_sca_policy_t),policy);
+            os_realloc(sca->policies, (policies_count + 2) * sizeof(gm_sca_policy_t *), sca->policies);
+            gm_sca_policy_t *policy;
+            os_calloc(1,sizeof(gm_sca_policy_t),policy);
 
             policy->enabled = 1;
             policy->policy_id = NULL;
@@ -297,7 +297,7 @@ int wm_sca_read(const OS_XML *xml,xml_node **nodes, wmodule *module)
         {
             if (!nodes[i]->content || !strlen(nodes[i]->content))
             {
-                merror("Invalid interval at module '%s'", WM_SCA_CONTEXT.name);
+                merror("Invalid interval at module '%s'", GM_SCA_CONTEXT.name);
                 return OS_INVALID;
             }
             char* endptr;
@@ -305,7 +305,7 @@ int wm_sca_read(const OS_XML *xml,xml_node **nodes, wmodule *module)
 
             if (interval == 0 || interval == UINT_MAX)
             {
-                merror("Invalid interval at module '%s'", WM_SCA_CONTEXT.name);
+                merror("Invalid interval at module '%s'", GM_SCA_CONTEXT.name);
                 return OS_INVALID;
             }
 
@@ -316,7 +316,7 @@ int wm_sca_read(const OS_XML *xml,xml_node **nodes, wmodule *module)
                 case 'm': interval *= W_MINUTE_SECONDS; break;
                 case 's':
                 case '\0': break;
-                default: merror("Invalid interval at module '%s'", WM_SCA_CONTEXT.name); return OS_INVALID;
+                default: merror("Invalid interval at module '%s'", GM_SCA_CONTEXT.name); return OS_INVALID;
             }
             sca->scan_config.interval = interval;
         }
@@ -400,9 +400,9 @@ int wm_sca_read(const OS_XML *xml,xml_node **nodes, wmodule *module)
                     }
 
                     if(!policy_found) {
-                        os_realloc(sca->policies, (policies_count + 2) * sizeof(wm_sca_policy_t *), sca->policies);
-                        wm_sca_policy_t *policy;
-                        os_calloc(1,sizeof(wm_sca_policy_t), policy);
+                        os_realloc(sca->policies, (policies_count + 2) * sizeof(gm_sca_policy_t *), sca->policies);
+                        gm_sca_policy_t *policy;
+                        os_calloc(1,sizeof(gm_sca_policy_t), policy);
                         policy->enabled = enabled;
                         policy->policy_id = NULL;
                         #ifdef WIN32
@@ -438,7 +438,7 @@ int wm_sca_read(const OS_XML *xml,xml_node **nodes, wmodule *module)
         else if (is_sched_tag(nodes[i]->element)) {
             // Do nothing
         } else {
-            merror("No such tag '%s' at module '%s'.", nodes[i]->element, WM_SCA_CONTEXT.name);
+            merror("No such tag '%s' at module '%s'.", nodes[i]->element, GM_SCA_CONTEXT.name);
             return OS_INVALID;
         }
     }

@@ -28,22 +28,22 @@
 #endif
 
 #ifdef WIN32
-STATIC DWORD WINAPI wm_office365_main(void *arg);                   // Module main function. It won't return
+STATIC DWORD WINAPI gm_office365_main(void *arg);                   // Module main function. It won't return
 #else
-STATIC void* wm_office365_main(wm_office365* office365_config);    // Module main function. It won't return
+STATIC void* gm_office365_main(gm_office365* office365_config);    // Module main function. It won't return
 #endif
-STATIC void wm_office365_destroy(wm_office365* office365_config);
-STATIC void wm_office365_auth_destroy(wm_office365_auth* office365_auth);
-STATIC void wm_office365_subscription_destroy(wm_office365_subscription* office365_subscription);
-STATIC void wm_office365_fail_destroy(wm_office365_fail* office365_fails);
-cJSON *wm_office365_dump(const wm_office365* office365_config);
+STATIC void gm_office365_destroy(gm_office365* office365_config);
+STATIC void gm_office365_auth_destroy(gm_office365_auth* office365_auth);
+STATIC void gm_office365_subscription_destroy(gm_office365_subscription* office365_subscription);
+STATIC void gm_office365_fail_destroy(gm_office365_fail* office365_fails);
+cJSON *gm_office365_dump(const gm_office365* office365_config);
 
 /**
  * @brief Execute a scan
  * @param github_config Office365 configuration structure
  * @param initial_scan Whether it is the first scan or not
  */
-STATIC void wm_office365_execute_scan(wm_office365* office365_config, int initial_scan);
+STATIC void gm_office365_execute_scan(gm_office365* office365_config, int initial_scan);
 
 /**
  * @brief Get access token through Office365 API
@@ -52,7 +52,7 @@ STATIC void wm_office365_execute_scan(wm_office365* office365_config, int initia
  * @param error_msg Error message to complete in case of failure
  * @return access_token if no error, NULL otherwise
  */
-STATIC char* wm_office365_get_access_token(wm_office365_auth* auth, size_t max_size, char **error_msg);
+STATIC char* gm_office365_get_access_token(gm_office365_auth* auth, size_t max_size, char **error_msg);
 
 /**
  * @brief Start/stop a subscription through Office365 API
@@ -65,7 +65,7 @@ STATIC char* wm_office365_get_access_token(wm_office365_auth* auth, size_t max_s
  * @param error_msg Error message to complete in case of failure
  * @return 0 if no error, -1 otherwise
  */
-STATIC int wm_office365_manage_subscription(wm_office365_subscription* subscription, const char* management_fqdn, const char* client_id, const char* token, int start, size_t max_size, char **error_msg);
+STATIC int gm_office365_manage_subscription(gm_office365_subscription* subscription, const char* management_fqdn, const char* client_id, const char* token, int start, size_t max_size, char **error_msg);
 
 /**
  * @brief Get a content blob through Office365 API
@@ -77,7 +77,7 @@ STATIC int wm_office365_manage_subscription(wm_office365_subscription* subscript
  * @param error_msg Error message to complete in case of failure
  * @return JSON content blob if no error, NULL otherwise
  */
-STATIC cJSON* wm_office365_get_content_blobs(const char* url, const char* token, char** next_page, size_t max_size, bool* buffer_size_reached, char **error_msg);
+STATIC cJSON* gm_office365_get_content_blobs(const char* url, const char* token, char** next_page, size_t max_size, bool* buffer_size_reached, char **error_msg);
 
 /**
  * @brief Get logs from content blob through Office365 API
@@ -88,7 +88,7 @@ STATIC cJSON* wm_office365_get_content_blobs(const char* url, const char* token,
  * @param error_msg Error message to complete in case of failure
  * @return JSON logs if no error, NULL otherwise
  */
-STATIC cJSON* wm_office365_get_logs_from_blob(const char* url, const char* token, size_t max_size, bool* buffer_size_reached, char **error_msg);
+STATIC cJSON* gm_office365_get_logs_from_blob(const char* url, const char* token, size_t max_size, bool* buffer_size_reached, char **error_msg);
 
 /**
  * @brief Get tenant and subscription node from office365 failure list
@@ -97,7 +97,7 @@ STATIC cJSON* wm_office365_get_logs_from_blob(const char* url, const char* token
  * @param subscription_name Subscription name to search
  * @return Pointer to tenant and subscription node if exists, NULL otherwise
  */
-STATIC wm_office365_fail* wm_office365_get_fail_by_tenant_and_subscription(wm_office365_fail* fails, char* tenant_id, char* subscription_name);
+STATIC gm_office365_fail* gm_office365_get_fail_by_tenant_and_subscription(gm_office365_fail* fails, char* tenant_id, char* subscription_name);
 
 /**
  * @brief Increase failure counter for tenant and subscription node and send failure message to manager if necessary
@@ -107,50 +107,50 @@ STATIC wm_office365_fail* wm_office365_get_fail_by_tenant_and_subscription(wm_of
  * @param error_msg Error message to send
  * @param queue_fd Socket ID
  */
-STATIC void wm_office365_scan_failure_action(wm_office365_fail** current_fails, char* tenant_id, char* subscription_name, char *error_msg, int queue_fd);
+STATIC void gm_office365_scan_failure_action(gm_office365_fail** current_fails, char* tenant_id, char* subscription_name, char *error_msg, int queue_fd);
 
 /* Context definition */
-const wm_context WM_OFFICE365_CONTEXT = {
+const gm_context GM_OFFICE365_CONTEXT = {
     .name = OFFICE365_WM_NAME,
-    .start = (wm_routine)wm_office365_main,
-    .destroy = (void(*)(void *))wm_office365_destroy,
-    .dump = (cJSON * (*)(const void *))wm_office365_dump,
+    .start = (gm_routine)gm_office365_main,
+    .destroy = (void(*)(void *))gm_office365_destroy,
+    .dump = (cJSON * (*)(const void *))gm_office365_dump,
     .sync = NULL,
     .stop = NULL,
     .query = NULL,
 };
 
 #ifdef WIN32
-STATIC DWORD WINAPI wm_office365_main(void *arg) {
-    wm_office365* office365_config = (wm_office365 *)arg;
+STATIC DWORD WINAPI gm_office365_main(void *arg) {
+    gm_office365* office365_config = (gm_office365 *)arg;
 #else
-void * wm_office365_main(wm_office365* office365_config) {
+void * gm_office365_main(gm_office365* office365_config) {
 #endif
     if (office365_config->enabled) {
-        mtinfo(WM_OFFICE365_LOGTAG, "Module Office365 started.");
+        mtinfo(GM_OFFICE365_LOGTAG, "Module Office365 started.");
 
 #ifndef WIN32
         // Connect to queue
         office365_config->queue_fd = StartMQ(DEFAULTQUEUE, WRITE, INFINITE_OPENQ_ATTEMPTS);
         if (office365_config->queue_fd < 0) {
-            mterror(WM_OFFICE365_LOGTAG, "Can't connect to queue. Closing module.");
+            mterror(GM_OFFICE365_LOGTAG, "Can't connect to queue. Closing module.");
             return NULL;
         }
 #endif
 
         // Execute initial scan
-        wm_office365_execute_scan(office365_config, 1);
+        gm_office365_execute_scan(office365_config, 1);
 
-        while (!wm_shutdown_requested) {
-            wm_sleep_interruptible(office365_config->interval);
-            if (wm_shutdown_requested) break;
-            wm_office365_execute_scan(office365_config, 0);
+        while (!gm_shutdown_requested) {
+            gm_sleep_interruptible(office365_config->interval);
+            if (gm_shutdown_requested) break;
+            gm_office365_execute_scan(office365_config, 0);
             #ifdef GUARDSARM_UNIT_TESTING
                 break;
             #endif
         }
     } else {
-        mtinfo(WM_OFFICE365_LOGTAG, "Module Office365 disabled.");
+        mtinfo(GM_OFFICE365_LOGTAG, "Module Office365 disabled.");
     }
 
 #ifdef WIN32
@@ -160,17 +160,17 @@ void * wm_office365_main(wm_office365* office365_config) {
 #endif
 }
 
-void wm_office365_destroy(wm_office365* office365_config) {
-    mtinfo(WM_OFFICE365_LOGTAG, "Module Office365 finished.");
-    wm_office365_auth_destroy(office365_config->auth);
-    wm_office365_subscription_destroy(office365_config->subscription);
-    wm_office365_fail_destroy(office365_config->fails);
+void gm_office365_destroy(gm_office365* office365_config) {
+    mtinfo(GM_OFFICE365_LOGTAG, "Module Office365 finished.");
+    gm_office365_auth_destroy(office365_config->auth);
+    gm_office365_subscription_destroy(office365_config->subscription);
+    gm_office365_fail_destroy(office365_config->fails);
     os_free(office365_config);
 }
 
-void wm_office365_auth_destroy(wm_office365_auth* office365_auth) {
-    wm_office365_auth* current = office365_auth;
-    wm_office365_auth* next = NULL;
+void gm_office365_auth_destroy(gm_office365_auth* office365_auth) {
+    gm_office365_auth* current = office365_auth;
+    gm_office365_auth* next = NULL;
     while (current != NULL)
     {
         next = current->next;
@@ -186,9 +186,9 @@ void wm_office365_auth_destroy(wm_office365_auth* office365_auth) {
     office365_auth = NULL;
 }
 
-void wm_office365_subscription_destroy(wm_office365_subscription* office365_subscription) {
-    wm_office365_subscription* current = office365_subscription;
-    wm_office365_subscription* next = NULL;
+void gm_office365_subscription_destroy(gm_office365_subscription* office365_subscription) {
+    gm_office365_subscription* current = office365_subscription;
+    gm_office365_subscription* next = NULL;
     while (current != NULL)
     {
         next = current->next;
@@ -199,9 +199,9 @@ void wm_office365_subscription_destroy(wm_office365_subscription* office365_subs
     office365_subscription = NULL;
 }
 
-STATIC void wm_office365_fail_destroy(wm_office365_fail* office365_fails) {
-    wm_office365_fail* current = office365_fails;
-    wm_office365_fail* next = NULL;
+STATIC void gm_office365_fail_destroy(gm_office365_fail* office365_fails) {
+    gm_office365_fail* current = office365_fails;
+    gm_office365_fail* next = NULL;
     while (current != NULL)
     {
         next = current->next;
@@ -213,28 +213,28 @@ STATIC void wm_office365_fail_destroy(wm_office365_fail* office365_fails) {
     office365_fails = NULL;
 }
 
-cJSON *wm_office365_dump(const wm_office365* office365_config) {
+cJSON *gm_office365_dump(const gm_office365* office365_config) {
     cJSON *root = cJSON_CreateObject();
-    cJSON *wm_info = cJSON_CreateObject();
+    cJSON *gm_info = cJSON_CreateObject();
 
     if (office365_config->enabled) {
-        cJSON_AddStringToObject(wm_info, "enabled", "yes");
+        cJSON_AddStringToObject(gm_info, "enabled", "yes");
     } else {
-        cJSON_AddStringToObject(wm_info, "enabled", "no");
+        cJSON_AddStringToObject(gm_info, "enabled", "no");
     }
     if (office365_config->only_future_events) {
-        cJSON_AddStringToObject(wm_info, "only_future_events", "yes");
+        cJSON_AddStringToObject(gm_info, "only_future_events", "yes");
     } else {
-        cJSON_AddStringToObject(wm_info, "only_future_events", "no");
+        cJSON_AddStringToObject(gm_info, "only_future_events", "no");
     }
     if (office365_config->interval) {
-        cJSON_AddNumberToObject(wm_info, "interval", office365_config->interval);
+        cJSON_AddNumberToObject(gm_info, "interval", office365_config->interval);
     }
     if (office365_config->curl_max_size) {
-        cJSON_AddNumberToObject(wm_info, "curl_max_size", office365_config->curl_max_size);
+        cJSON_AddNumberToObject(gm_info, "curl_max_size", office365_config->curl_max_size);
     }
     if (office365_config->auth) {
-        wm_office365_auth *iter;
+        gm_office365_auth *iter;
         cJSON *arr_auth = cJSON_CreateArray();
         for (iter = office365_config->auth; iter; iter = iter->next) {
             cJSON *api_auth = cJSON_CreateObject();
@@ -252,43 +252,43 @@ cJSON *wm_office365_dump(const wm_office365* office365_config) {
             }
             // The management API FQDN is unique between API types, so the login FQDN can be safely ignored
             if (iter->management_fqdn) {
-                if (!strncmp(iter->management_fqdn, WM_OFFICE365_DEFAULT_API_MANAGEMENT_FQDN, 17)) {
+                if (!strncmp(iter->management_fqdn, GM_OFFICE365_DEFAULT_API_MANAGEMENT_FQDN, 17)) {
                     cJSON_AddStringToObject(api_auth, "api_type", "commercial");
                 }
-                if (!strncmp(iter->management_fqdn, WM_OFFICE365_GCC_API_MANAGEMENT_FQDN, 21)) {
+                if (!strncmp(iter->management_fqdn, GM_OFFICE365_GCC_API_MANAGEMENT_FQDN, 21)) {
                     cJSON_AddStringToObject(api_auth, "api_type", "gcc");
                 }
-                if (!strncmp(iter->management_fqdn, WM_OFFICE365_GCC_HIGH_API_MANAGEMENT_FQDN, 19)) {
+                if (!strncmp(iter->management_fqdn, GM_OFFICE365_GCC_HIGH_API_MANAGEMENT_FQDN, 19)) {
                     cJSON_AddStringToObject(api_auth, "api_type", "gcc-high");
                 }
             }
             cJSON_AddItemToArray(arr_auth, api_auth);
         }
         if (cJSON_GetArraySize(arr_auth) > 0) {
-            cJSON_AddItemToObject(wm_info, "api_auth", arr_auth);
+            cJSON_AddItemToObject(gm_info, "api_auth", arr_auth);
         } else {
             cJSON_free(arr_auth);
         }
     }
     if (office365_config->subscription) {
-        wm_office365_subscription *iter;
+        gm_office365_subscription *iter;
         cJSON *arr_subscription = cJSON_CreateArray();
         for (iter = office365_config->subscription; iter; iter = iter->next) {
             cJSON_AddItemToArray(arr_subscription, cJSON_CreateString(iter->subscription_name));
         }
         if (cJSON_GetArraySize(arr_subscription) > 0) {
-            cJSON_AddItemToObject(wm_info, "subscriptions", arr_subscription);
+            cJSON_AddItemToObject(gm_info, "subscriptions", arr_subscription);
         } else {
             cJSON_free(arr_subscription);
         }
     }
 
-    cJSON_AddItemToObject(root, "office365", wm_info);
+    cJSON_AddItemToObject(root, "office365", gm_info);
 
     return root;
 }
 
-STATIC void wm_office365_execute_scan(wm_office365* office365_config, int initial_scan) {
+STATIC void gm_office365_execute_scan(gm_office365* office365_config, int initial_scan) {
     int scan_finished = 0;
     int fail = 0;
     char url[OS_SIZE_8192];
@@ -301,12 +301,12 @@ STATIC void wm_office365_execute_scan(wm_office365* office365_config, int initia
     time_t now;
     time_t start_time;
     time_t end_time;
-    wm_office365_state tenant_state_struc;
-    wm_office365_auth* next_auth = NULL;
-    wm_office365_auth* current_auth = office365_config->auth;
-    wm_office365_subscription* next_subscription = NULL;
-    wm_office365_subscription* current_subscription = NULL;
-    wm_office365_fail *tenant_fail = NULL;
+    gm_office365_state tenant_state_struc;
+    gm_office365_auth* next_auth = NULL;
+    gm_office365_auth* current_auth = office365_config->auth;
+    gm_office365_subscription* next_subscription = NULL;
+    gm_office365_subscription* current_subscription = NULL;
+    gm_office365_fail *tenant_fail = NULL;
     char start_time_str[80];
     char end_time_str[80];
     struct tm tm_aux = { .tm_sec = 0 };
@@ -315,19 +315,19 @@ STATIC void wm_office365_execute_scan(wm_office365* office365_config, int initia
     {
         next_auth = current_auth->next;
 
-        mtdebug1(WM_OFFICE365_LOGTAG, "Scanning tenant: '%s'", current_auth->tenant_id);
+        mtdebug1(GM_OFFICE365_LOGTAG, "Scanning tenant: '%s'", current_auth->tenant_id);
 
         // Get access token
         if (!initial_scan || !office365_config->only_future_events) {
-            if (access_token = wm_office365_get_access_token(current_auth, office365_config->curl_max_size, &error_msg), !access_token) {
-                wm_office365_scan_failure_action(&office365_config->fails, current_auth->tenant_id, NULL, error_msg, office365_config->queue_fd);
+            if (access_token = gm_office365_get_access_token(current_auth, office365_config->curl_max_size, &error_msg), !access_token) {
+                gm_office365_scan_failure_action(&office365_config->fails, current_auth->tenant_id, NULL, error_msg, office365_config->queue_fd);
                 current_auth = next_auth;
                 os_free(error_msg);
                 continue;
             } else {
-                if (tenant_fail = wm_office365_get_fail_by_tenant_and_subscription(office365_config->fails,
+                if (tenant_fail = gm_office365_get_fail_by_tenant_and_subscription(office365_config->fails,
                     current_auth->tenant_id, NULL), tenant_fail && tenant_fail->fails) {
-                    mtinfo(WM_OFFICE365_LOGTAG, "Office365 tenant '%s', connected successfully.", current_auth->tenant_id);
+                    mtinfo(GM_OFFICE365_LOGTAG, "Office365 tenant '%s', connected successfully.", current_auth->tenant_id);
                     tenant_fail->fails = 0;
                 }
             }
@@ -341,13 +341,13 @@ STATIC void wm_office365_execute_scan(wm_office365* office365_config, int initia
             next_subscription = current_subscription->next;
 
             memset(tenant_state_name, '\0', OS_SIZE_1024);
-            snprintf(tenant_state_name, OS_SIZE_1024 -1, "%s-%s-%s", WM_OFFICE365_CONTEXT.name,
+            snprintf(tenant_state_name, OS_SIZE_1024 -1, "%s-%s-%s", GM_OFFICE365_CONTEXT.name,
                 current_auth->tenant_id, current_subscription->subscription_name);
 
             memset(&tenant_state_struc, 0, sizeof(tenant_state_struc));
 
             // Load state for tenant
-            if (wm_state_io(tenant_state_name, WM_IO_READ, &tenant_state_struc, sizeof(tenant_state_struc)) < 0) {
+            if (gm_state_io(tenant_state_name, GM_IO_READ, &tenant_state_struc, sizeof(tenant_state_struc)) < 0) {
                 memset(&tenant_state_struc, 0, sizeof(tenant_state_struc));
             }
 
@@ -356,14 +356,14 @@ STATIC void wm_office365_execute_scan(wm_office365* office365_config, int initia
             if ((initial_scan && (!tenant_state_struc.last_log_time || office365_config->only_future_events)) ||
                 (!initial_scan && !tenant_state_struc.last_log_time)) {
                 tenant_state_struc.last_log_time = now;
-                if (wm_state_io(tenant_state_name, WM_IO_WRITE, &tenant_state_struc, sizeof(tenant_state_struc)) < 0) {
-                    mterror(WM_OFFICE365_LOGTAG, "Couldn't save running state.");
+                if (gm_state_io(tenant_state_name, GM_IO_WRITE, &tenant_state_struc, sizeof(tenant_state_struc)) < 0) {
+                    mterror(GM_OFFICE365_LOGTAG, "Couldn't save running state.");
                 }
                 else if (isDebug()) {
                     memset(start_time_str, '\0', 80);
                     gmtime_r(&now, &tm_aux);
                     strftime(start_time_str, sizeof(start_time_str), "%Y-%m-%dT%H:%M:%SZ", &tm_aux);
-                    mtdebug1(WM_OFFICE365_LOGTAG, "Bookmark updated to '%s' for tenant '%s' and subscription '%s', waiting '%ld' seconds to run first scan.",
+                    mtdebug1(GM_OFFICE365_LOGTAG, "Bookmark updated to '%s' for tenant '%s' and subscription '%s', waiting '%ld' seconds to run first scan.",
                         start_time_str, current_auth->tenant_id, current_subscription->subscription_name, office365_config->interval);
                 }
                 current_subscription = next_subscription;
@@ -371,14 +371,14 @@ STATIC void wm_office365_execute_scan(wm_office365* office365_config, int initia
             }
 
             // Start subscription
-            if (wm_office365_manage_subscription(current_subscription, current_auth->management_fqdn, current_auth->client_id, access_token, 1, office365_config->curl_max_size, &error_msg)) {
-                wm_office365_scan_failure_action(&office365_config->fails, current_auth->tenant_id,
+            if (gm_office365_manage_subscription(current_subscription, current_auth->management_fqdn, current_auth->client_id, access_token, 1, office365_config->curl_max_size, &error_msg)) {
+                gm_office365_scan_failure_action(&office365_config->fails, current_auth->tenant_id,
                     current_subscription->subscription_name, error_msg, office365_config->queue_fd);
                 current_subscription = next_subscription;
                 os_free(error_msg);
                 continue;
             } else {
-                if (tenant_fail = wm_office365_get_fail_by_tenant_and_subscription(office365_config->fails,
+                if (tenant_fail = gm_office365_get_fail_by_tenant_and_subscription(office365_config->fails,
                     current_auth->tenant_id, current_subscription->subscription_name), tenant_fail) {
                     tenant_fail->fails = 0;
                 }
@@ -407,7 +407,7 @@ STATIC void wm_office365_execute_scan(wm_office365* office365_config, int initia
                 strftime(end_time_str, sizeof(end_time_str), "%Y-%m-%dT%H:%M:%SZ", &tm_aux);
 
                 memset(url, '\0', OS_SIZE_8192);
-                snprintf(url, OS_SIZE_8192 -1, WM_OFFICE365_API_CONTENT_BLOB_URL, current_auth->management_fqdn, current_auth->client_id, current_subscription->subscription_name,
+                snprintf(url, OS_SIZE_8192 -1, GM_OFFICE365_API_CONTENT_BLOB_URL, current_auth->management_fqdn, current_auth->client_id, current_subscription->subscription_name,
                     start_time_str, end_time_str);
 
                 scan_finished = 0;
@@ -417,7 +417,7 @@ STATIC void wm_office365_execute_scan(wm_office365* office365_config, int initia
                     cJSON *blobs_array = NULL;
                     bool buffer_size_reached = false;
 
-                    if (blobs_array = wm_office365_get_content_blobs(url, access_token, &next_page, office365_config->curl_max_size, &buffer_size_reached, &error_msg), blobs_array) {
+                    if (blobs_array = gm_office365_get_content_blobs(url, access_token, &next_page, office365_config->curl_max_size, &buffer_size_reached, &error_msg), blobs_array) {
                         int size_blobs = cJSON_GetArraySize(blobs_array);
 
                         for (int i = 0; !scan_finished && (i < size_blobs); i++) {
@@ -427,7 +427,7 @@ STATIC void wm_office365_execute_scan(wm_office365* office365_config, int initia
                             if (content && (content->type == cJSON_String)) {
                                 cJSON *logs_array = NULL;
 
-                                if (logs_array = wm_office365_get_logs_from_blob(content->valuestring, access_token, office365_config->curl_max_size, &buffer_size_reached, &error_msg), logs_array) {
+                                if (logs_array = gm_office365_get_logs_from_blob(content->valuestring, access_token, office365_config->curl_max_size, &buffer_size_reached, &error_msg), logs_array) {
                                     int size_logs = cJSON_GetArraySize(logs_array);
 
                                     for (int i = 0 ; i < size_logs ; i++) {
@@ -438,16 +438,16 @@ STATIC void wm_office365_execute_scan(wm_office365* office365_config, int initia
 
                                             cJSON_AddStringToObject(log, "Subscription", current_subscription->subscription_name);
 
-                                            cJSON_AddStringToObject(office365, "integration", WM_OFFICE365_CONTEXT.name);
+                                            cJSON_AddStringToObject(office365, "integration", GM_OFFICE365_CONTEXT.name);
                                             cJSON_AddItemToObject(office365, "office365", cJSON_Duplicate(log, true));
 
                                             payload = cJSON_PrintUnformatted(office365);
 
-                                            mtdebug2(WM_OFFICE365_LOGTAG, "Sending Office365 log: '%s'", payload);
+                                            mtdebug2(GM_OFFICE365_LOGTAG, "Sending Office365 log: '%s'", payload);
 
-                                            if (wm_sendmsg(WM_OFFICE365_MSG_DELAY, office365_config->queue_fd,
-                                                payload, WM_OFFICE365_CONTEXT.name, LOCALFILE_MQ) < 0) {
-                                                mterror(WM_OFFICE365_LOGTAG, QUEUE_ERROR, DEFAULTQUEUE, strerror(errno));
+                                            if (gm_sendmsg(GM_OFFICE365_MSG_DELAY, office365_config->queue_fd,
+                                                payload, GM_OFFICE365_CONTEXT.name, LOCALFILE_MQ) < 0) {
+                                                mterror(GM_OFFICE365_LOGTAG, QUEUE_ERROR, DEFAULTQUEUE, strerror(errno));
                                             }
 
                                             os_free(payload);
@@ -484,21 +484,21 @@ STATIC void wm_office365_execute_scan(wm_office365* office365_config, int initia
                 }
 
                 if (fail) {
-                    wm_office365_scan_failure_action(&office365_config->fails, current_auth->tenant_id,
+                    gm_office365_scan_failure_action(&office365_config->fails, current_auth->tenant_id,
                         current_subscription->subscription_name, error_msg, office365_config->queue_fd);
                     os_free(error_msg);
                     break;
                 } else {
                     tenant_state_struc.last_log_time = end_time;
-                    if (wm_state_io(tenant_state_name, WM_IO_WRITE, &tenant_state_struc, sizeof(tenant_state_struc)) < 0) {
-                        mterror(WM_OFFICE365_LOGTAG, "Couldn't save running state.");
+                    if (gm_state_io(tenant_state_name, GM_IO_WRITE, &tenant_state_struc, sizeof(tenant_state_struc)) < 0) {
+                        mterror(GM_OFFICE365_LOGTAG, "Couldn't save running state.");
                     }
                     else {
-                        mtdebug1(WM_OFFICE365_LOGTAG, "Bookmark updated to '%s' for tenant '%s' and subscription '%s', waiting '%ld' seconds to run next scan.",
+                        mtdebug1(GM_OFFICE365_LOGTAG, "Bookmark updated to '%s' for tenant '%s' and subscription '%s', waiting '%ld' seconds to run next scan.",
                             end_time_str, current_auth->tenant_id, current_subscription->subscription_name, office365_config->interval);
                     }
 
-                    if (tenant_fail = wm_office365_get_fail_by_tenant_and_subscription(office365_config->fails,
+                    if (tenant_fail = gm_office365_get_fail_by_tenant_and_subscription(office365_config->fails,
                         current_auth->tenant_id, current_subscription->subscription_name), tenant_fail) {
                         tenant_fail->fails = 0;
                     }
@@ -517,7 +517,7 @@ STATIC void wm_office365_execute_scan(wm_office365* office365_config, int initia
     }
 }
 
-STATIC char* wm_office365_get_access_token(wm_office365_auth* auth, size_t max_size, char **error_msg) {
+STATIC char* gm_office365_get_access_token(gm_office365_auth* auth, size_t max_size, char **error_msg) {
     char **headers = NULL;
     char url[OS_SIZE_8192];
     char auth_payload[OS_SIZE_8192];
@@ -544,12 +544,12 @@ STATIC char* wm_office365_get_access_token(wm_office365_auth* auth, size_t max_s
     }
 
     memset(auth_payload, '\0', OS_SIZE_8192);
-    snprintf(auth_payload, OS_SIZE_8192 -1, WM_OFFICE365_API_ACCESS_TOKEN_PAYLOAD, auth->client_id, auth->management_fqdn, auth_secret);
+    snprintf(auth_payload, OS_SIZE_8192 -1, GM_OFFICE365_API_ACCESS_TOKEN_PAYLOAD, auth->client_id, auth->management_fqdn, auth_secret);
 
     memset(url, '\0', OS_SIZE_8192);
-    snprintf(url, OS_SIZE_8192 -1, WM_OFFICE365_API_ACCESS_TOKEN_URL, auth->login_fqdn, auth->tenant_id);
+    snprintf(url, OS_SIZE_8192 -1, GM_OFFICE365_API_ACCESS_TOKEN_URL, auth->login_fqdn, auth->tenant_id);
 
-    mtdebug1(WM_OFFICE365_LOGTAG, "Office 365 API access token URL: '%s'", url);
+    mtdebug1(GM_OFFICE365_LOGTAG, "Office 365 API access token URL: '%s'", url);
 
     char auth_header[OS_SIZE_8192];
     snprintf(auth_header, OS_SIZE_8192 -1, "Content-Type: application/x-www-form-urlencoded");
@@ -558,13 +558,13 @@ STATIC char* wm_office365_get_access_token(wm_office365_auth* auth, size_t max_s
     headers[0] = auth_header;
     headers[1] = NULL;
 
-    response = wurl_http_request(WURL_POST_METHOD, headers, url, auth_payload, max_size, WM_OFFICE365_DEFAULT_CURL_REQUEST_TIMEOUT, NULL, true);
+    response = wurl_http_request(WURL_POST_METHOD, headers, url, auth_payload, max_size, GM_OFFICE365_DEFAULT_CURL_REQUEST_TIMEOUT, NULL, true);
 
     if (response) {
         cJSON *response_json = NULL;
 
         if (response->max_size_reached) {
-            mtdebug1(WM_OFFICE365_LOGTAG, "Libcurl error, reached maximum response size.");
+            mtdebug1(GM_OFFICE365_LOGTAG, "Libcurl error, reached maximum response size.");
         } else if (response_json = cJSON_Parse(response->body), response_json) {
             cJSON *access_token_json = cJSON_GetObjectItem(response_json, "access_token");
 
@@ -572,15 +572,15 @@ STATIC char* wm_office365_get_access_token(wm_office365_auth* auth, size_t max_s
                 os_strdup(access_token_json->valuestring, access_token);
             } else {
                 os_strdup(response->body, *error_msg);
-                mtdebug1(WM_OFFICE365_LOGTAG, "Error while getting access token: '%s'", response->body);
+                mtdebug1(GM_OFFICE365_LOGTAG, "Error while getting access token: '%s'", response->body);
             }
             cJSON_Delete(response_json);
         } else {
-            mtdebug1(WM_OFFICE365_LOGTAG, "Error while parsing access token JSON response.");
+            mtdebug1(GM_OFFICE365_LOGTAG, "Error while parsing access token JSON response.");
         }
         wurl_free_response(response);
     } else {
-        mtdebug1(WM_OFFICE365_LOGTAG, "Unknown error while getting access token.");
+        mtdebug1(GM_OFFICE365_LOGTAG, "Unknown error while getting access token.");
     }
 
     os_free(headers);
@@ -588,7 +588,7 @@ STATIC char* wm_office365_get_access_token(wm_office365_auth* auth, size_t max_s
     return access_token;
 }
 
-STATIC int wm_office365_manage_subscription(wm_office365_subscription* subscription, const char* management_fqdn, const char* client_id, const char* token, int start, size_t max_size, char **error_msg) {
+STATIC int gm_office365_manage_subscription(gm_office365_subscription* subscription, const char* management_fqdn, const char* client_id, const char* token, int start, size_t max_size, char **error_msg) {
     char **headers = NULL;
     char url[OS_SIZE_8192];
     curl_response *response;
@@ -596,12 +596,12 @@ STATIC int wm_office365_manage_subscription(wm_office365_subscription* subscript
 
     memset(url, '\0', OS_SIZE_8192);
     if (start) {
-        snprintf(url, OS_SIZE_8192 -1, WM_OFFICE365_API_SUBSCRIPTION_URL, management_fqdn, client_id, WM_OFFICE365_API_SUBSCRIPTION_START, subscription->subscription_name);
+        snprintf(url, OS_SIZE_8192 -1, GM_OFFICE365_API_SUBSCRIPTION_URL, management_fqdn, client_id, GM_OFFICE365_API_SUBSCRIPTION_START, subscription->subscription_name);
     } else {
-        snprintf(url, OS_SIZE_8192 -1, WM_OFFICE365_API_SUBSCRIPTION_URL, management_fqdn, client_id, WM_OFFICE365_API_SUBSCRIPTION_STOP, subscription->subscription_name);
+        snprintf(url, OS_SIZE_8192 -1, GM_OFFICE365_API_SUBSCRIPTION_URL, management_fqdn, client_id, GM_OFFICE365_API_SUBSCRIPTION_STOP, subscription->subscription_name);
     }
 
-    mtdebug1(WM_OFFICE365_LOGTAG, "Office 365 API subscription URL: '%s'", url);
+    mtdebug1(GM_OFFICE365_LOGTAG, "Office 365 API subscription URL: '%s'", url);
 
     char auth_header1[OS_SIZE_8192];
     snprintf(auth_header1, OS_SIZE_8192 -1, "Content-Type: application/json");
@@ -614,13 +614,13 @@ STATIC int wm_office365_manage_subscription(wm_office365_subscription* subscript
     headers[1] = auth_header2;
     headers[2] = NULL;
 
-    response = wurl_http_request(WURL_POST_METHOD, headers, url, "", max_size, WM_OFFICE365_DEFAULT_CURL_REQUEST_TIMEOUT, NULL, true);
+    response = wurl_http_request(WURL_POST_METHOD, headers, url, "", max_size, GM_OFFICE365_DEFAULT_CURL_REQUEST_TIMEOUT, NULL, true);
 
     if (response) {
         cJSON *response_json = NULL;
 
         if (response->max_size_reached) {
-            mtdebug1(WM_OFFICE365_LOGTAG, "Libcurl error, reached maximum response size.");
+            mtdebug1(GM_OFFICE365_LOGTAG, "Libcurl error, reached maximum response size.");
         } else if (response_json = cJSON_Parse(response->body), response_json) {
             cJSON *code_json = cJSON_GetObjectItem(cJSON_GetObjectItem(response_json, "error"), "code");
 
@@ -630,15 +630,15 @@ STATIC int wm_office365_manage_subscription(wm_office365_subscription* subscript
                 ret_value = OS_SUCCESS;
             } else {
                 os_strdup(response->body, *error_msg);
-                mtdebug1(WM_OFFICE365_LOGTAG, "Error while managing subscription: '%s'", response->body);
+                mtdebug1(GM_OFFICE365_LOGTAG, "Error while managing subscription: '%s'", response->body);
             }
             cJSON_Delete(response_json);
         } else {
-            mtdebug1(WM_OFFICE365_LOGTAG, "Error while parsing managing subscription JSON response.");
+            mtdebug1(GM_OFFICE365_LOGTAG, "Error while parsing managing subscription JSON response.");
         }
         wurl_free_response(response);
     } else {
-        mtdebug1(WM_OFFICE365_LOGTAG, "Unknown error while managing subscription.");
+        mtdebug1(GM_OFFICE365_LOGTAG, "Unknown error while managing subscription.");
     }
 
     os_free(headers);
@@ -646,12 +646,12 @@ STATIC int wm_office365_manage_subscription(wm_office365_subscription* subscript
     return ret_value;
 }
 
-STATIC cJSON* wm_office365_get_content_blobs(const char* url, const char* token, char** next_page, size_t max_size, bool* buffer_size_reached, char **error_msg) {
+STATIC cJSON* gm_office365_get_content_blobs(const char* url, const char* token, char** next_page, size_t max_size, bool* buffer_size_reached, char **error_msg) {
     char **headers = NULL;
     curl_response *response;
     cJSON *blobs_array = NULL;
 
-    mtdebug1(WM_OFFICE365_LOGTAG, "Office 365 API content blobs URL: '%s'", url);
+    mtdebug1(GM_OFFICE365_LOGTAG, "Office 365 API content blobs URL: '%s'", url);
 
     char auth_header1[OS_SIZE_8192];
     snprintf(auth_header1, OS_SIZE_8192 -1, "Content-Type: application/json");
@@ -664,14 +664,14 @@ STATIC cJSON* wm_office365_get_content_blobs(const char* url, const char* token,
     headers[1] = auth_header2;
     headers[2] = NULL;
 
-    response = wurl_http_request(WURL_GET_METHOD, headers, url, "", max_size, WM_OFFICE365_DEFAULT_CURL_REQUEST_TIMEOUT, NULL, true);
+    response = wurl_http_request(WURL_GET_METHOD, headers, url, "", max_size, GM_OFFICE365_DEFAULT_CURL_REQUEST_TIMEOUT, NULL, true);
 
     if (response) {
         cJSON *response_json = NULL;
 
         if (response->max_size_reached) {
             *buffer_size_reached = true;
-            mtdebug1(WM_OFFICE365_LOGTAG, "Libcurl error, reached maximum response size.");
+            mtdebug1(GM_OFFICE365_LOGTAG, "Libcurl error, reached maximum response size.");
         } else if (response_json = cJSON_Parse(response->body), response_json) {
             cJSON *code_json = cJSON_GetObjectItem(cJSON_GetObjectItem(response_json, "error"), "code");
 
@@ -679,7 +679,7 @@ STATIC cJSON* wm_office365_get_content_blobs(const char* url, const char* token,
                 blobs_array = cJSON_Duplicate(response_json, true);
 
                 if (cJSON_GetArraySize(blobs_array) > 0) {
-                    *next_page = wm_read_http_header_element(response->header, WM_OFFICE365_NEXT_PAGE_REGEX);
+                    *next_page = gm_read_http_header_element(response->header, GM_OFFICE365_NEXT_PAGE_REGEX);
                 }
             } else if ((response->status_code == 400) && code_json && (code_json->type == cJSON_String) && !strncmp(code_json->valuestring, "AF20055", 7)) {
                 // Error AF20055: Start time and end time must both be specified (or both omitted) and must be less than or equal to 24 hours apart,
@@ -687,15 +687,15 @@ STATIC cJSON* wm_office365_get_content_blobs(const char* url, const char* token,
                 blobs_array = cJSON_CreateArray();
             } else {
                 os_strdup(response->body, *error_msg);
-                mtdebug1(WM_OFFICE365_LOGTAG, "Error while getting content blobs: '%s'", response->body);
+                mtdebug1(GM_OFFICE365_LOGTAG, "Error while getting content blobs: '%s'", response->body);
             }
             cJSON_Delete(response_json);
         } else {
-            mtdebug1(WM_OFFICE365_LOGTAG, "Error while parsing content blobs JSON response.");
+            mtdebug1(GM_OFFICE365_LOGTAG, "Error while parsing content blobs JSON response.");
         }
         wurl_free_response(response);
     } else {
-        mtdebug1(WM_OFFICE365_LOGTAG, "Unknown error while getting content blobs.");
+        mtdebug1(GM_OFFICE365_LOGTAG, "Unknown error while getting content blobs.");
     }
 
     os_free(headers);
@@ -703,12 +703,12 @@ STATIC cJSON* wm_office365_get_content_blobs(const char* url, const char* token,
     return blobs_array;
 }
 
-STATIC cJSON* wm_office365_get_logs_from_blob(const char* url, const char* token, size_t max_size, bool* buffer_size_reached, char **error_msg) {
+STATIC cJSON* gm_office365_get_logs_from_blob(const char* url, const char* token, size_t max_size, bool* buffer_size_reached, char **error_msg) {
     char **headers = NULL;
     curl_response *response;
     cJSON *logs_array = NULL;
 
-    mtdebug1(WM_OFFICE365_LOGTAG, "Office 365 API content URI: '%s'", url);
+    mtdebug1(GM_OFFICE365_LOGTAG, "Office 365 API content URI: '%s'", url);
 
     char auth_header1[OS_SIZE_8192];
     snprintf(auth_header1, OS_SIZE_8192 -1, "Content-Type: application/json");
@@ -721,28 +721,28 @@ STATIC cJSON* wm_office365_get_logs_from_blob(const char* url, const char* token
     headers[1] = auth_header2;
     headers[2] = NULL;
 
-    response = wurl_http_request(WURL_GET_METHOD, headers, url, "", max_size, WM_OFFICE365_DEFAULT_CURL_REQUEST_TIMEOUT, NULL, true);
+    response = wurl_http_request(WURL_GET_METHOD, headers, url, "", max_size, GM_OFFICE365_DEFAULT_CURL_REQUEST_TIMEOUT, NULL, true);
 
     if (response) {
         cJSON *response_json = NULL;
 
         if (response->max_size_reached) {
             *buffer_size_reached = true;
-            mtdebug1(WM_OFFICE365_LOGTAG, "Libcurl error, reached maximum response size.");
+            mtdebug1(GM_OFFICE365_LOGTAG, "Libcurl error, reached maximum response size.");
         } else if (response_json = cJSON_Parse(response->body), response_json) {
             if ((response->status_code == 200) && (response_json->type == cJSON_Array)) {
                 logs_array = cJSON_Duplicate(response_json, true);
             } else {
                 os_strdup(response->body, *error_msg);
-                mtdebug1(WM_OFFICE365_LOGTAG, "Error while getting logs from blob: '%s'", response->body);
+                mtdebug1(GM_OFFICE365_LOGTAG, "Error while getting logs from blob: '%s'", response->body);
             }
             cJSON_Delete(response_json);
         } else {
-            mtdebug1(WM_OFFICE365_LOGTAG, "Error while parsing logs from blob JSON response.");
+            mtdebug1(GM_OFFICE365_LOGTAG, "Error while parsing logs from blob JSON response.");
         }
         wurl_free_response(response);
     } else {
-        mtdebug1(WM_OFFICE365_LOGTAG, "Unknown error while getting logs from blob.");
+        mtdebug1(GM_OFFICE365_LOGTAG, "Unknown error while getting logs from blob.");
     }
 
     os_free(headers);
@@ -750,8 +750,8 @@ STATIC cJSON* wm_office365_get_logs_from_blob(const char* url, const char* token
     return logs_array;
 }
 
-STATIC wm_office365_fail* wm_office365_get_fail_by_tenant_and_subscription(wm_office365_fail* fails, char* tenant_id, char* subscription_name) {
-    wm_office365_fail* current;
+STATIC gm_office365_fail* gm_office365_get_fail_by_tenant_and_subscription(gm_office365_fail* fails, char* tenant_id, char* subscription_name) {
+    gm_office365_fail* current;
     current = fails;
     int target_tenant = 0;
 
@@ -773,15 +773,15 @@ STATIC wm_office365_fail* wm_office365_get_fail_by_tenant_and_subscription(wm_of
     return current;
 }
 
-STATIC void wm_office365_scan_failure_action(wm_office365_fail** current_fails, char* tenant_id, char* subscription_name, char *error_msg, int queue_fd) {
+STATIC void gm_office365_scan_failure_action(gm_office365_fail** current_fails, char* tenant_id, char* subscription_name, char *error_msg, int queue_fd) {
     char *payload;
-    wm_office365_fail *tenant_fail = NULL;
+    gm_office365_fail *tenant_fail = NULL;
 
-    if (tenant_fail = wm_office365_get_fail_by_tenant_and_subscription(*current_fails, tenant_id, subscription_name), !tenant_fail) {
-        os_calloc(1, sizeof(wm_office365_fail), tenant_fail);
+    if (tenant_fail = gm_office365_get_fail_by_tenant_and_subscription(*current_fails, tenant_id, subscription_name), !tenant_fail) {
+        os_calloc(1, sizeof(gm_office365_fail), tenant_fail);
 
         if (*current_fails) {
-            wm_office365_fail *aux = *current_fails;
+            gm_office365_fail *aux = *current_fails;
 
             while (aux->next) {
                 aux = aux->next;
@@ -801,7 +801,7 @@ STATIC void wm_office365_scan_failure_action(wm_office365_fail** current_fails, 
     } else {
         tenant_fail->fails++;
 
-        if (tenant_fail->fails == WM_OFFICE365_RETRIES_TO_SEND_ERROR) {
+        if (tenant_fail->fails == GM_OFFICE365_RETRIES_TO_SEND_ERROR) {
             // Send fail message
             cJSON *msg_obj = cJSON_Parse(error_msg);
             cJSON *fail_object = cJSON_CreateObject();
@@ -821,15 +821,15 @@ STATIC void wm_office365_scan_failure_action(wm_office365_fail** current_fails, 
                 cJSON_AddStringToObject(fail_object, "response", "Unknown error");
             }
 
-            cJSON_AddStringToObject(fail_office365, "integration", WM_OFFICE365_CONTEXT.name);
+            cJSON_AddStringToObject(fail_office365, "integration", GM_OFFICE365_CONTEXT.name);
             cJSON_AddItemToObject(fail_office365, "office365", fail_object);
 
             payload = cJSON_PrintUnformatted(fail_office365);
 
-            mtwarn(WM_OFFICE365_LOGTAG, "Sending Office365 internal message: '%s'", payload);
+            mtwarn(GM_OFFICE365_LOGTAG, "Sending Office365 internal message: '%s'", payload);
 
-            if (wm_sendmsg(WM_OFFICE365_MSG_DELAY, queue_fd, payload, WM_OFFICE365_CONTEXT.name, LOCALFILE_MQ) < 0) {
-                mterror(WM_OFFICE365_LOGTAG, QUEUE_ERROR, DEFAULTQUEUE, strerror(errno));
+            if (gm_sendmsg(GM_OFFICE365_MSG_DELAY, queue_fd, payload, GM_OFFICE365_CONTEXT.name, LOCALFILE_MQ) < 0) {
+                mterror(GM_OFFICE365_LOGTAG, QUEUE_ERROR, DEFAULTQUEUE, strerror(errno));
             }
 
             os_free(payload);

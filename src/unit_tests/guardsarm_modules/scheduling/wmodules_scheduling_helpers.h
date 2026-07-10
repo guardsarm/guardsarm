@@ -16,7 +16,7 @@
 
 typedef struct test_structure
 {
-    wmodule* module;
+    gmodule* module;
     OS_XML xml;
     XML_NODE nodes;
 } test_structure;

@@ -141,7 +141,7 @@ Copyright (C) 2026 GuardSarm, Inc. All rights reserved.\n"
 #define AG_LOCAL_SOCK      "queue/sockets/agent"
 #define LC_LOCAL_SOCK      "queue/sockets/logcollector"
 #define SYS_LOCAL_SOCK     "queue/sockets/syscheck"
-#define WM_LOCAL_SOCK      "queue/sockets/wmodules"
+#define GM_LOCAL_SOCK      "queue/sockets/wmodules"
 #define REMOTE_LOCAL_SOCK  "queue/sockets/remote"
 #define ANLSYS_LOCAL_SOCK  "queue/sockets/analysis"
 #define ANLSYS_ENRICH_SOCK "queue/sockets/queue-http.sock"
@@ -160,9 +160,9 @@ Copyright (C) 2026 GuardSarm, Inc. All rights reserved.\n"
 #define WDB_LOCAL_SOCK "queue/db/wdb"
 
 // Tasks socket
-#define WM_UPGRADE_SOCK "queue/tasks/upgrade"
+#define GM_UPGRADE_SOCK "queue/tasks/upgrade"
 
-#define WM_TASK_MODULE_SOCK "queue/tasks/task"
+#define GM_TASK_MODULE_SOCK "queue/tasks/task"
 
 /* Active Response files */
 #define AR_BINDIR      "active-response/bin"

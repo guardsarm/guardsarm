@@ -31,7 +31,7 @@ static short eval_bool(const char *str) {
     return !str ? OS_INVALID : !strcmp(str, "yes") ? 1 : !strcmp(str, "no") ? 0 : OS_INVALID;
 }
 
-static void clean_bucket(wm_gcp_bucket *cur_bucket, wm_gcp_bucket_base *gcp) {
+static void clean_bucket(gm_gcp_bucket *cur_bucket, gm_gcp_bucket_base *gcp) {
     if (cur_bucket->bucket) os_free(cur_bucket->bucket);
     if (cur_bucket->type) os_free(cur_bucket->type);
     if (cur_bucket->credentials_file) os_free(cur_bucket->credentials_file);
@@ -39,7 +39,7 @@ static void clean_bucket(wm_gcp_bucket *cur_bucket, wm_gcp_bucket_base *gcp) {
     if (cur_bucket->only_logs_after) os_free(cur_bucket->only_logs_after);
     if (gcp->buckets) {
         if (gcp->buckets->next) {
-            wm_gcp_bucket *buck = gcp->buckets->next;
+            gm_gcp_bucket *buck = gcp->buckets->next;
             while(buck != NULL) {
                 buck = buck->next;
             }
@@ -51,22 +51,22 @@ static void clean_bucket(wm_gcp_bucket *cur_bucket, wm_gcp_bucket_base *gcp) {
 
 /* Read XML configuration */
 
-int wm_gcp_pubsub_read(xml_node **nodes, wmodule *module) {
+int gm_gcp_pubsub_read(xml_node **nodes, gmodule *module) {
     unsigned int i;
-    wm_gcp_pubsub *gcp;
+    gm_gcp_pubsub *gcp;
 
     if (!module->data) {
-        os_calloc(1, sizeof(wm_gcp_pubsub), gcp);
+        os_calloc(1, sizeof(gm_gcp_pubsub), gcp);
         gcp->enabled = 1;
         gcp->max_messages = 100;
         gcp->num_threads = 1;
         gcp->project_id = NULL;
         sched_scan_init(&(gcp->scan_config));
-        gcp->scan_config.interval = WM_GCP_DEF_INTERVAL;
+        gcp->scan_config.interval = GM_GCP_DEF_INTERVAL;
         gcp->subscription_name = NULL;
         gcp->credentials_file = NULL;
         gcp->pull_on_start = 1;
-        module->context = &WM_GCP_PUBSUB_CONTEXT;
+        module->context = &GM_GCP_PUBSUB_CONTEXT;
         module->tag = strdup(module->context->name);
         module->data = gcp;
     }
@@ -74,7 +74,7 @@ int wm_gcp_pubsub_read(xml_node **nodes, wmodule *module) {
     gcp = module->data;
 
     if (!nodes) {
-        merror("Empty configuration at module '%s'.", WM_GCP_PUBSUB_CONTEXT.name);
+        merror("Empty configuration at module '%s'.", GM_GCP_PUBSUB_CONTEXT.name);
         return OS_INVALID;
     }
 
@@ -95,14 +95,14 @@ int wm_gcp_pubsub_read(xml_node **nodes, wmodule *module) {
         }
         else if (!strcmp(nodes[i]->element, XML_PROJECT_ID)) {
             if (strlen(nodes[i]->content) == 0) {
-                merror("Empty content for tag '%s' at module '%s'", XML_PROJECT_ID, WM_GCP_PUBSUB_CONTEXT.name);
+                merror("Empty content for tag '%s' at module '%s'", XML_PROJECT_ID, GM_GCP_PUBSUB_CONTEXT.name);
                 return OS_INVALID;
             }
             os_strdup(nodes[i]->content, gcp->project_id);
         }
         else if (!strcmp(nodes[i]->element, XML_SUBSCRIPTION_NAME)) {
             if (strlen(nodes[i]->content) == 0) {
-                merror("Empty content for tag '%s' at module '%s'", XML_SUBSCRIPTION_NAME, WM_GCP_PUBSUB_CONTEXT.name);
+                merror("Empty content for tag '%s' at module '%s'", XML_SUBSCRIPTION_NAME, GM_GCP_PUBSUB_CONTEXT.name);
                 return OS_INVALID;
             }
             os_strdup(nodes[i]->content, gcp->subscription_name);
@@ -112,7 +112,7 @@ int wm_gcp_pubsub_read(xml_node **nodes, wmodule *module) {
                 merror("File path is too long. Max path length is %d.", PATH_MAX);
                 return OS_INVALID;
             } else if (strlen(nodes[i]->content) == 0) {
-                merror("Empty content for tag '%s' at module '%s'", XML_CREDENTIALS_FILE, WM_GCP_PUBSUB_CONTEXT.name);
+                merror("Empty content for tag '%s' at module '%s'", XML_CREDENTIALS_FILE, GM_GCP_PUBSUB_CONTEXT.name);
                 return OS_INVALID;
             }
 
@@ -145,7 +145,7 @@ int wm_gcp_pubsub_read(xml_node **nodes, wmodule *module) {
             unsigned int j;
             for(j=0; j < strlen(nodes[i]->content); j++) {
                 if (!isdigit(nodes[i]->content[j])) {
-                    merror("Tag '%s' from the '%s' module should not have an alphabetic character.", XML_MAX_MESSAGES, WM_GCP_PUBSUB_CONTEXT.name);
+                    merror("Tag '%s' from the '%s' module should not have an alphabetic character.", XML_MAX_MESSAGES, GM_GCP_PUBSUB_CONTEXT.name);
                     return OS_INVALID;
                 }
             }
@@ -162,7 +162,7 @@ int wm_gcp_pubsub_read(xml_node **nodes, wmodule *module) {
             unsigned int j;
             for(j=0; j < strlen(nodes[i]->content); j++) {
                 if (!isdigit(nodes[i]->content[j])) {
-                    merror("Tag '%s' from the '%s' module should not have an alphabetic character.", XML_NUM_THREADS, WM_GCP_PUBSUB_CONTEXT.name);
+                    merror("Tag '%s' from the '%s' module should not have an alphabetic character.", XML_NUM_THREADS, GM_GCP_PUBSUB_CONTEXT.name);
                     return OS_INVALID;
                 }
             }
@@ -181,12 +181,12 @@ int wm_gcp_pubsub_read(xml_node **nodes, wmodule *module) {
             gcp->pull_on_start = pull_on_start;
         }
         else if (!strcmp(nodes[i]->element, XML_LOGGING)) {
-            mtdebug1(WM_GCP_PUBSUB_LOGTAG, "Tag '%s' from the '%s' module is deprecated. This setting will be skipped.", XML_LOGGING, WM_GCP_PUBSUB_CONTEXT.name);
+            mtdebug1(GM_GCP_PUBSUB_LOGTAG, "Tag '%s' from the '%s' module is deprecated. This setting will be skipped.", XML_LOGGING, GM_GCP_PUBSUB_CONTEXT.name);
         }
         else if (is_sched_tag(nodes[i]->element)) {
             // Do nothing
         } else {
-            merror("No such tag '%s' at module '%s'.", nodes[i]->element, WM_GCP_PUBSUB_CONTEXT.name);
+            merror("No such tag '%s' at module '%s'.", nodes[i]->element, GM_GCP_PUBSUB_CONTEXT.name);
             return OS_INVALID;
         }
     }
@@ -197,36 +197,36 @@ int wm_gcp_pubsub_read(xml_node **nodes, wmodule *module) {
     }
 
     if (!gcp->project_id) {
-        merror("No value defined for tag '%s' in module '%s'", XML_PROJECT_ID, WM_GCP_PUBSUB_CONTEXT.name);
+        merror("No value defined for tag '%s' in module '%s'", XML_PROJECT_ID, GM_GCP_PUBSUB_CONTEXT.name);
         return OS_INVALID;
     }
 
     if (!gcp->subscription_name) {
-        merror("No value defined for tag '%s' in module '%s'", XML_SUBSCRIPTION_NAME, WM_GCP_PUBSUB_CONTEXT.name);
+        merror("No value defined for tag '%s' in module '%s'", XML_SUBSCRIPTION_NAME, GM_GCP_PUBSUB_CONTEXT.name);
         return OS_INVALID;
     }
 
     if (!gcp->credentials_file) {
-        merror("No value defined for tag '%s' in module '%s'", XML_CREDENTIALS_FILE, WM_GCP_PUBSUB_CONTEXT.name);
+        merror("No value defined for tag '%s' in module '%s'", XML_CREDENTIALS_FILE, GM_GCP_PUBSUB_CONTEXT.name);
         return OS_INVALID;
     }
 
     return 0;
 }
-int wm_gcp_bucket_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
+int gm_gcp_bucket_read(const OS_XML *xml, xml_node **nodes, gmodule *module) {
     unsigned int i;
     unsigned int j;
     xml_node **children = NULL;
-    wm_gcp_bucket_base *gcp;
-    wm_gcp_bucket *cur_bucket = NULL;
+    gm_gcp_bucket_base *gcp;
+    gm_gcp_bucket *cur_bucket = NULL;
 
     if (!module->data) {
-        os_calloc(1, sizeof(wm_gcp_bucket_base), gcp);
+        os_calloc(1, sizeof(gm_gcp_bucket_base), gcp);
         gcp->enabled = 1;
         sched_scan_init(&(gcp->scan_config));
-        gcp->scan_config.interval = WM_GCP_DEF_INTERVAL;
+        gcp->scan_config.interval = GM_GCP_DEF_INTERVAL;
         gcp->run_on_start = 1;
-        module->context = &WM_GCP_BUCKET_CONTEXT;
+        module->context = &GM_GCP_BUCKET_CONTEXT;
         module->tag = strdup(module->context->name);
         module->data = gcp;
     }
@@ -234,7 +234,7 @@ int wm_gcp_bucket_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
     gcp = module->data;
 
     if (!nodes) {
-        merror("Empty configuration at module '%s'.", WM_GCP_BUCKET_CONTEXT.name);
+        merror("Empty configuration at module '%s'.", GM_GCP_BUCKET_CONTEXT.name);
         return OS_INVALID;
     }
 
@@ -264,20 +264,20 @@ int wm_gcp_bucket_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
             gcp->run_on_start = run_on_start;
         }
         else if (!strcmp(nodes[i]->element, XML_LOGGING)) {
-	    mtdebug1(WM_GCP_BUCKET_LOGTAG, "Tag '%s' from the '%s' module is deprecated. This setting will be skipped.", XML_LOGGING, WM_GCP_BUCKET_CONTEXT.name);
+	    mtdebug1(GM_GCP_BUCKET_LOGTAG, "Tag '%s' from the '%s' module is deprecated. This setting will be skipped.", XML_LOGGING, GM_GCP_BUCKET_CONTEXT.name);
 	}
         else if (!strcmp(nodes[i]->element, XML_BUCKET)) {
-            mtdebug2(WM_GCP_BUCKET_LOGTAG, "Found a bucket tag");
+            mtdebug2(GM_GCP_BUCKET_LOGTAG, "Found a bucket tag");
             // Create bucket node
             if (cur_bucket) {
-                os_calloc(1, sizeof(wm_gcp_bucket), cur_bucket->next);
+                os_calloc(1, sizeof(gm_gcp_bucket), cur_bucket->next);
                 cur_bucket = cur_bucket->next;
-                mtdebug2(WM_GCP_BUCKET_LOGTAG, "Creating another bucket structure");
+                mtdebug2(GM_GCP_BUCKET_LOGTAG, "Creating another bucket structure");
             } else {
                 // First bucket
-                os_calloc(1, sizeof(wm_gcp_bucket), cur_bucket);
+                os_calloc(1, sizeof(gm_gcp_bucket), cur_bucket);
                 gcp->buckets = cur_bucket;
-                mtdebug2(WM_GCP_BUCKET_LOGTAG, "Creating first bucket structure");
+                mtdebug2(GM_GCP_BUCKET_LOGTAG, "Creating first bucket structure");
             }
 
             // Expand bucket Child Nodes
@@ -307,15 +307,15 @@ int wm_gcp_bucket_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
                 return OS_INVALID;
             }
 
-            mtdebug2(WM_GCP_BUCKET_LOGTAG, "Loop thru child nodes");
+            mtdebug2(GM_GCP_BUCKET_LOGTAG, "Loop thru child nodes");
             for (j = 0; children[j]; j++) {
 
-                mtdebug2(WM_GCP_BUCKET_LOGTAG, "Parse child node: %s", children[j]->element);
+                mtdebug2(GM_GCP_BUCKET_LOGTAG, "Parse child node: %s", children[j]->element);
 
                 // Start
                 if (!strcmp(children[j]->element, XML_BUCKET_NAME)) {
                     if (strlen(children[j]->content) == 0) {
-                        merror("Empty content for tag '%s' at module '%s'.", XML_BUCKET_NAME, WM_GCP_BUCKET_CONTEXT.name);
+                        merror("Empty content for tag '%s' at module '%s'.", XML_BUCKET_NAME, GM_GCP_BUCKET_CONTEXT.name);
                         OS_ClearNode(children);
                         return OS_INVALID;
                     }
@@ -327,7 +327,7 @@ int wm_gcp_bucket_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
                     } else if (!strcmp(children[j]->content, "no")) {
                         cur_bucket->remove_from_bucket = 0;
                     } else {
-                        merror("Invalid content for tag '%s' at module '%s'.", XML_REMOVE_FROM_BUCKET, WM_GCP_BUCKET_CONTEXT.name);
+                        merror("Invalid content for tag '%s' at module '%s'.", XML_REMOVE_FROM_BUCKET, GM_GCP_BUCKET_CONTEXT.name);
                         OS_ClearNode(children);
                         return OS_INVALID;
                     }
@@ -336,7 +336,7 @@ int wm_gcp_bucket_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
                         free(cur_bucket->prefix);
                         os_strdup(children[j]->content, cur_bucket->prefix);
                     } else if (strlen(children[j]->content) == 0) {
-                        merror("Empty content for tag '%s' at module '%s'", XML_PREFIX, WM_GCP_BUCKET_CONTEXT.name);
+                        merror("Empty content for tag '%s' at module '%s'", XML_PREFIX, GM_GCP_BUCKET_CONTEXT.name);
                         OS_ClearNode(children);
                         return OS_INVALID;
                     }
@@ -345,7 +345,7 @@ int wm_gcp_bucket_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
                         free(cur_bucket->only_logs_after);
                         os_strdup(children[j]->content, cur_bucket->only_logs_after);
                     } else if (strlen(children[j]->content) == 0) {
-                        merror("Empty content for tag '%s' at module '%s'", XML_ONLY_LOGS_AFTER, WM_GCP_BUCKET_CONTEXT.name);
+                        merror("Empty content for tag '%s' at module '%s'", XML_ONLY_LOGS_AFTER, GM_GCP_BUCKET_CONTEXT.name);
                         OS_ClearNode(children);
                         return OS_INVALID;
                     }
@@ -355,7 +355,7 @@ int wm_gcp_bucket_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
                         OS_ClearNode(children);
                         return OS_INVALID;
                     } else if (strlen(children[j]->content) == 0) {
-                        merror("Empty content for tag '%s' at module '%s'", XML_CREDENTIALS_FILE, WM_GCP_BUCKET_CONTEXT.name);
+                        merror("Empty content for tag '%s' at module '%s'", XML_CREDENTIALS_FILE, GM_GCP_BUCKET_CONTEXT.name);
                         OS_ClearNode(children);
                         return OS_INVALID;
                     }
@@ -382,7 +382,7 @@ int wm_gcp_bucket_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
 
                     os_strdup(realpath_buffer, cur_bucket->credentials_file);
                 } else {
-                    merror("No such child tag '%s' of bucket at module '%s'.", children[j]->element, WM_GCP_BUCKET_CONTEXT.name);
+                    merror("No such child tag '%s' of bucket at module '%s'.", children[j]->element, GM_GCP_BUCKET_CONTEXT.name);
                     OS_ClearNode(children);
                     return OS_INVALID;
                 }
@@ -390,19 +390,19 @@ int wm_gcp_bucket_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
             OS_ClearNode(children);
 
             if (!cur_bucket->bucket) {
-                merror("No value defined for tag '%s' in module '%s'.", XML_BUCKET_NAME, WM_GCP_BUCKET_CONTEXT.name);
+                merror("No value defined for tag '%s' in module '%s'.", XML_BUCKET_NAME, GM_GCP_BUCKET_CONTEXT.name);
                 clean_bucket(cur_bucket, gcp);
                 return OS_INVALID;
             }
             else if (!cur_bucket->credentials_file) {
-                merror("No value defined for tag '%s' in module '%s'.", XML_CREDENTIALS_FILE, WM_GCP_BUCKET_CONTEXT.name);
+                merror("No value defined for tag '%s' in module '%s'.", XML_CREDENTIALS_FILE, GM_GCP_BUCKET_CONTEXT.name);
                 clean_bucket(cur_bucket, gcp);
                 return OS_INVALID;
             }
         } else if (is_sched_tag(nodes[i]->element)) {
             // Do nothing
         } else {
-            merror("No such tag '%s' at module '%s'.", nodes[i]->element, WM_GCP_BUCKET_CONTEXT.name);
+            merror("No such tag '%s' at module '%s'.", nodes[i]->element, GM_GCP_BUCKET_CONTEXT.name);
             return OS_INVALID;
         }
 
@@ -413,7 +413,7 @@ int wm_gcp_bucket_read(const OS_XML *xml, xml_node **nodes, wmodule *module) {
         return OS_INVALID;
     }
     if (!gcp->buckets) {
-        merror("No buckets or services definitions found at module '%s'.", WM_GCP_BUCKET_CONTEXT.name);
+        merror("No buckets or services definitions found at module '%s'.", GM_GCP_BUCKET_CONTEXT.name);
         return OS_INVALID;
     }
 

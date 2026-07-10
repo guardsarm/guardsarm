@@ -13,24 +13,24 @@
 #include "file_op.h"
 #include "os_net.h"
 
-static void *wm_control_main();
-static void wm_control_destroy();
-static void wm_control_stop();
-cJSON *wm_control_dump();
+static void *gm_control_main();
+static void gm_control_destroy();
+static void gm_control_stop();
+cJSON *gm_control_dump();
 static void *process_control();
 
-const wm_context WM_CONTROL_CONTEXT = {
+const gm_context GM_CONTROL_CONTEXT = {
     .name = "control",
-    .start = (wm_routine)wm_control_main,
-    .destroy = (void(*)(void *))wm_control_destroy,
-    .dump = (cJSON * (*)(const void *))wm_control_dump,
+    .start = (gm_routine)gm_control_main,
+    .destroy = (void(*)(void *))gm_control_destroy,
+    .dump = (cJSON * (*)(const void *))gm_control_dump,
     .sync = NULL,
-    .stop = (void(*)(void *))wm_control_stop,
+    .stop = (void(*)(void *))gm_control_stop,
     .query = NULL,
 };
 
-static void *wm_control_main() {
-    mtinfo(WM_CONTROL_LOGTAG, "Starting control thread.");
+static void *gm_control_main() {
+    mtinfo(GM_CONTROL_LOGTAG, "Starting control thread.");
 #ifdef CLIENT
     w_create_thread(process_control, NULL);
 #else
@@ -39,32 +39,32 @@ static void *wm_control_main() {
     return NULL;
 }
 
-static void wm_control_destroy() {
+static void gm_control_destroy() {
 }
 
-static void wm_control_stop() {
-    wm_shutdown_requested = 1;
+static void gm_control_stop() {
+    gm_shutdown_requested = 1;
 }
 
-wmodule *wm_control_read() {
-    wmodule *module;
+gmodule *gm_control_read() {
+    gmodule *module;
 
-    os_calloc(1, sizeof(wmodule), module);
-    module->context = &WM_CONTROL_CONTEXT;
+    os_calloc(1, sizeof(gmodule), module);
+    module->context = &GM_CONTROL_CONTEXT;
     module->tag = strdup(module->context->name);
 
     return module;
 }
 
-cJSON *wm_control_dump() {
+cJSON *gm_control_dump() {
     cJSON *root = cJSON_CreateObject();
-    cJSON *wm_wd = cJSON_CreateObject();
-    cJSON_AddStringToObject(wm_wd, "enabled", "yes");
-    cJSON_AddItemToObject(root, "guardsarm_control", wm_wd);
+    cJSON *gm_wd = cJSON_CreateObject();
+    cJSON_AddStringToObject(gm_wd, "enabled", "yes");
+    cJSON_AddItemToObject(root, "guardsarm_control", gm_wd);
     return root;
 }
 
-bool wm_control_check_systemd() {
+bool gm_control_check_systemd() {
     if (access("/run/systemd/system", F_OK) != 0) {
         return false;
     }
@@ -85,7 +85,7 @@ bool wm_control_check_systemd() {
     return false;
 }
 
-bool wm_control_wait_for_service_active(const char *service) {
+bool gm_control_wait_for_service_active(const char *service) {
     const int timeout = 60;
     int elapsed = 0;
     char cmd[256];
@@ -101,7 +101,7 @@ bool wm_control_wait_for_service_active(const char *service) {
 
                 if (strcmp(state, "inactive") == 0 || strcmp(state, "failed") == 0) {
                     pclose(fp);
-                    mtwarn(WM_CONTROL_LOGTAG, "Service %s is in state '%s', systemctl cannot reload", service, state);
+                    mtwarn(GM_CONTROL_LOGTAG, "Service %s is in state '%s', systemctl cannot reload", service, state);
                     return false;
                 }
 
@@ -117,11 +117,11 @@ bool wm_control_wait_for_service_active(const char *service) {
         elapsed++;
     }
 
-    mterror(WM_CONTROL_LOGTAG, "Service %s is not active after waiting %d seconds", service, timeout);
+    mterror(GM_CONTROL_LOGTAG, "Service %s is not active after waiting %d seconds", service, timeout);
     return false;
 }
 
-const char *wm_control_get_bin(void) {
+const char *gm_control_get_bin(void) {
     /* 5.0 rename: manager ships guardsarm-manager-control, agent ships guardsarm-control. */
 #ifdef CLIENT
     return "bin/guardsarm-control";
@@ -130,7 +130,7 @@ const char *wm_control_get_bin(void) {
 #endif
 }
 
-size_t wm_control_execute_action(const char *action, const char *service, char **output) {
+size_t gm_control_execute_action(const char *action, const char *service, char **output) {
 #ifdef __APPLE__
     /* On macOS, do not run guardsarm-control directly from here. Forking it from
      * guardsarm-modulesd makes modulesd the TCC "responsible process" of the
@@ -152,12 +152,12 @@ size_t wm_control_execute_action(const char *action, const char *service, char *
 
         FILE *fp = fopen(flag_tmp, "w");
         if (fp == NULL) {
-            mterror(WM_CONTROL_LOGTAG, "Cannot create control request flag '%s': %s (%d)", flag_tmp, strerror(errno), errno);
+            mterror(GM_CONTROL_LOGTAG, "Cannot create control request flag '%s': %s (%d)", flag_tmp, strerror(errno), errno);
             os_strdup("err Cannot write control flag", *output);
             return strlen(*output);
         }
         if (fprintf(fp, "%s\n", action) < 0) {
-            mterror(WM_CONTROL_LOGTAG, "Cannot write control request flag '%s': %s (%d)", flag_tmp, strerror(errno), errno);
+            mterror(GM_CONTROL_LOGTAG, "Cannot write control request flag '%s': %s (%d)", flag_tmp, strerror(errno), errno);
             fclose(fp);
             unlink(flag_tmp);
             os_strdup("err Cannot write control flag", *output);
@@ -165,57 +165,57 @@ size_t wm_control_execute_action(const char *action, const char *service, char *
         }
 
         if (fclose(fp) != 0) {
-            mterror(WM_CONTROL_LOGTAG, "Cannot flush control request flag '%s': %s (%d)", flag_tmp, strerror(errno), errno);
+            mterror(GM_CONTROL_LOGTAG, "Cannot flush control request flag '%s': %s (%d)", flag_tmp, strerror(errno), errno);
             unlink(flag_tmp);
             os_strdup("err Cannot write control flag", *output);
             return strlen(*output);
         }
 
         if (rename(flag_tmp, flag) != 0) {
-            mterror(WM_CONTROL_LOGTAG, "Cannot commit control request flag '%s': %s (%d)", flag, strerror(errno), errno);
+            mterror(GM_CONTROL_LOGTAG, "Cannot commit control request flag '%s': %s (%d)", flag, strerror(errno), errno);
             unlink(flag_tmp);
             os_strdup("err Cannot write control flag", *output);
             return strlen(*output);
         }
 
-        mtinfo(WM_CONTROL_LOGTAG, "Requested '%s' via GuardSarm-launcher (flag '%s')", action, flag);
+        mtinfo(GM_CONTROL_LOGTAG, "Requested '%s' via GuardSarm-launcher (flag '%s')", action, flag);
         os_strdup("ok ", *output);
         return strlen(*output);
     }
 #else
-    bool use_systemd = wm_control_check_systemd();
-    const char *control_bin = wm_control_get_bin();
+    bool use_systemd = gm_control_check_systemd();
+    const char *control_bin = gm_control_get_bin();
     char *exec_cmd[4] = {NULL};
 
     if (use_systemd) {
         exec_cmd[0] = "systemctl";
         exec_cmd[1] = (char *)action;
         exec_cmd[2] = (char *)service;
-        mtinfo(WM_CONTROL_LOGTAG, "Executing '%s' on %s using systemctl", action, service);
+        mtinfo(GM_CONTROL_LOGTAG, "Executing '%s' on %s using systemctl", action, service);
     } else {
         exec_cmd[0] = (char *)control_bin;
         exec_cmd[1] = (char *)action;
-        mtinfo(WM_CONTROL_LOGTAG, "Executing '%s' on %s using %s", action, service, control_bin);
+        mtinfo(GM_CONTROL_LOGTAG, "Executing '%s' on %s using %s", action, service, control_bin);
     }
 
     switch (fork()) {
         case -1:
-            mterror(WM_CONTROL_LOGTAG, "Cannot fork for %s", action);
+            mterror(GM_CONTROL_LOGTAG, "Cannot fork for %s", action);
             os_strdup("err Cannot fork", *output);
             return strlen(*output);
         case 0:
             if (use_systemd && strcmp(action, "reload") == 0) {
-                if (!wm_control_wait_for_service_active(service)) {
-                    mtwarn(WM_CONTROL_LOGTAG, "Service %s not active for systemctl, falling back to %s", service, control_bin);
+                if (!gm_control_wait_for_service_active(service)) {
+                    mtwarn(GM_CONTROL_LOGTAG, "Service %s not active for systemctl, falling back to %s", service, control_bin);
                     char *fallback_cmd[] = {(char *)control_bin, (char *)action, NULL};
                     if (execvp(fallback_cmd[0], fallback_cmd) < 0) {
-                        mterror(WM_CONTROL_LOGTAG, "Error executing %s command via %s: %s (%d)", action, control_bin, strerror(errno), errno);
+                        mterror(GM_CONTROL_LOGTAG, "Error executing %s command via %s: %s (%d)", action, control_bin, strerror(errno), errno);
                     }
                     _exit(1);
                 }
             }
             if (execvp(exec_cmd[0], exec_cmd) < 0) {
-                mterror(WM_CONTROL_LOGTAG, "Error executing %s command (%s): %s (%d)", action, exec_cmd[0], strerror(errno), errno);
+                mterror(GM_CONTROL_LOGTAG, "Error executing %s command (%s): %s (%d)", action, exec_cmd[0], strerror(errno), errno);
             }
             _exit(1);
         default:
@@ -225,14 +225,14 @@ size_t wm_control_execute_action(const char *action, const char *service, char *
 #endif
 }
 
-size_t wm_control_dispatch(char *command, char **output) {
+size_t gm_control_dispatch(char *command, char **output) {
     char *args = strchr(command, ' ');
     if (args) {
         *args = '\0';
         args++;
     }
 
-    mtdebug2(WM_CONTROL_LOGTAG, "Dispatching command: '%s'", command);
+    mtdebug2(GM_CONTROL_LOGTAG, "Dispatching command: '%s'", command);
 
 #ifdef CLIENT
     const char *service = "guardsarm-agent";
@@ -241,13 +241,13 @@ size_t wm_control_dispatch(char *command, char **output) {
 #endif
 
     if (strcmp(command, "restart") == 0) {
-        return wm_control_execute_action("restart", service, output);
+        return gm_control_execute_action("restart", service, output);
 
     } else if (strcmp(command, "reload") == 0) {
-        return wm_control_execute_action("reload", service, output);
+        return gm_control_execute_action("reload", service, output);
 
     } else {
-        mterror(WM_CONTROL_LOGTAG, "Unknown command: '%s'", command);
+        mterror(GM_CONTROL_LOGTAG, "Unknown command: '%s'", command);
         os_strdup("Err", *output);
         return strlen(*output);
     }
@@ -261,16 +261,16 @@ static void *process_control() {
     ssize_t length;
     fd_set fdset;
 
-    if (sock = OS_BindUnixDomainWithPerms(CONTROL_SOCK, SOCK_STREAM, OS_MAXSTR, getuid(), wm_getGroupID(), 0660), sock < 0) {
-        mterror(WM_CONTROL_LOGTAG, "Unable to bind to socket '%s': (%d) %s.", CONTROL_SOCK, errno, strerror(errno));
+    if (sock = OS_BindUnixDomainWithPerms(CONTROL_SOCK, SOCK_STREAM, OS_MAXSTR, getuid(), gm_getGroupID(), 0660), sock < 0) {
+        mterror(GM_CONTROL_LOGTAG, "Unable to bind to socket '%s': (%d) %s.", CONTROL_SOCK, errno, strerror(errno));
         return NULL;
     }
 
-    while (!wm_shutdown_requested) {
+    while (!gm_shutdown_requested) {
 
-        switch (wm_select_interruptible(sock, &fdset)) {
+        switch (gm_select_interruptible(sock, &fdset)) {
         case -1:
-            mterror_exit(WM_CONTROL_LOGTAG, "At process_control(): select(): %s", strerror(errno));
+            mterror_exit(GM_CONTROL_LOGTAG, "At process_control(): select(): %s", strerror(errno));
             break;
         case 0:
             continue;
@@ -280,7 +280,7 @@ static void *process_control() {
 
         if (peer = accept(sock, NULL, NULL), peer < 0) {
             if (errno != EINTR) {
-                mterror(WM_CONTROL_LOGTAG, "At process_control(): accept(): %s", strerror(errno));
+                mterror(GM_CONTROL_LOGTAG, "At process_control(): accept(): %s", strerror(errno));
             }
             continue;
         }
@@ -290,19 +290,19 @@ static void *process_control() {
 #ifdef CLIENT
         switch (length = OS_RecvSecureTCP(peer, buffer, OS_MAXSTR), length) {
         case -1:
-            mterror(WM_CONTROL_LOGTAG, "At process_control(): OS_RecvSecureTCP(): %s", strerror(errno));
+            mterror(GM_CONTROL_LOGTAG, "At process_control(): OS_RecvSecureTCP(): %s", strerror(errno));
             break;
         case 0:
-            mtinfo(WM_CONTROL_LOGTAG, "Empty message from local client.");
+            mtinfo(GM_CONTROL_LOGTAG, "Empty message from local client.");
             close(peer);
             break;
         case OS_SOCKTERR:
-            mterror(WM_CONTROL_LOGTAG, "Received message > %i", MAX_DYN_STR);
+            mterror(GM_CONTROL_LOGTAG, "Received message > %i", MAX_DYN_STR);
             close(peer);
             break;
         default:
             buffer[length] = '\0';
-            wm_control_dispatch(buffer, &response);
+            gm_control_dispatch(buffer, &response);
             if (response) {
                 OS_SendSecureTCP(peer, strlen(response), response);
                 free(response);
@@ -314,18 +314,18 @@ static void *process_control() {
 #else
         switch (length = OS_RecvUnix(peer, OS_MAXSTR, buffer), length) {
         case -1:
-            mterror(WM_CONTROL_LOGTAG, "At process_control(): OS_RecvUnix(): %s", strerror(errno));
+            mterror(GM_CONTROL_LOGTAG, "At process_control(): OS_RecvUnix(): %s", strerror(errno));
             break;
         case 0:
-            mtinfo(WM_CONTROL_LOGTAG, "Empty message from local client.");
+            mtinfo(GM_CONTROL_LOGTAG, "Empty message from local client.");
             close(peer);
             break;
         case OS_MAXLEN:
-            mterror(WM_CONTROL_LOGTAG, "Received message > %i", MAX_DYN_STR);
+            mterror(GM_CONTROL_LOGTAG, "Received message > %i", MAX_DYN_STR);
             close(peer);
             break;
         default:
-            wm_control_dispatch(buffer, &response);
+            gm_control_dispatch(buffer, &response);
             if (response) {
                 OS_SendUnix(peer, response, 0);
                 free(response);

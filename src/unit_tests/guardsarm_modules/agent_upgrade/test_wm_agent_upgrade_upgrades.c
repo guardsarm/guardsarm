@@ -32,18 +32,18 @@ extern w_linked_queue_t *upgrade_queue;
 extern sem_t upgrade_semaphore;
 
 typedef struct _test_upgrade_args {
-    wm_manager_configs *config;
-    wm_agent_task *agent_task;
+    gm_manager_configs *config;
+    gm_agent_task *agent_task;
 } test_upgrade_args;
 
-void* wm_agent_upgrade_start_upgrade(void *arg);
-int wm_agent_upgrade_send_wpk_to_agent(const wm_agent_task *agent_task, const wm_manager_configs* manager_configs);
-int wm_agent_upgrade_send_lock_restart(int agent_id);
-int wm_agent_upgrade_send_open(int agent_id, int wpk_message_format, const char *wpk_file);
-int wm_agent_upgrade_send_write(int agent_id, int wpk_message_format, const char *wpk_file, const char *file_path, int chunk_size);
-int wm_agent_upgrade_send_close(int agent_id, int wpk_message_format, const char *wpk_file);
-int wm_agent_upgrade_send_sha1(int agent_id, int wpk_message_format, const char *wpk_file, const char *file_sha1);
-int wm_agent_upgrade_send_upgrade(int agent_id, int wpk_message_format, const char *wpk_file, const char *installer);
+void* gm_agent_upgrade_start_upgrade(void *arg);
+int gm_agent_upgrade_send_wpk_to_agent(const gm_agent_task *agent_task, const gm_manager_configs* manager_configs);
+int gm_agent_upgrade_send_lock_restart(int agent_id);
+int gm_agent_upgrade_send_open(int agent_id, int wpk_message_format, const char *wpk_file);
+int gm_agent_upgrade_send_write(int agent_id, int wpk_message_format, const char *wpk_file, const char *file_path, int chunk_size);
+int gm_agent_upgrade_send_close(int agent_id, int wpk_message_format, const char *wpk_file);
+int gm_agent_upgrade_send_sha1(int agent_id, int wpk_message_format, const char *wpk_file, const char *file_sha1);
+int gm_agent_upgrade_send_upgrade(int agent_id, int wpk_message_format, const char *wpk_file, const char *installer);
 
 // Setup / teardown
 
@@ -54,16 +54,16 @@ static int teardown_string(void **state) {
 }
 
 static int setup_config(void **state) {
-    wm_manager_configs *config = NULL;
-    os_calloc(1, sizeof(wm_manager_configs), config);
+    gm_manager_configs *config = NULL;
+    os_calloc(1, sizeof(gm_manager_configs), config);
     config->max_threads = 8;
     *state = config;
-    wm_agent_upgrade_init_upgrade_queue(config->max_threads);
+    gm_agent_upgrade_init_upgrade_queue(config->max_threads);
     return 0;
 }
 
 static int teardown_config(void **state) {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
     os_free(config);
     linked_queue_free(upgrade_queue);
     return 0;
@@ -71,13 +71,13 @@ static int teardown_config(void **state) {
 
 static int setup_upgrade_args(void **state) {
     test_upgrade_args *args = NULL;
-    wm_manager_configs *config = NULL;
-    wm_agent_task *agent_task = NULL;
+    gm_manager_configs *config = NULL;
+    gm_agent_task *agent_task = NULL;
     os_calloc(1, sizeof(test_upgrade_args), args);
-    os_calloc(1, sizeof(wm_manager_configs), config);
-    agent_task = wm_agent_upgrade_init_agent_task();
-    agent_task->agent_info = wm_agent_upgrade_init_agent_info();
-    agent_task->task_info = wm_agent_upgrade_init_task_info();
+    os_calloc(1, sizeof(gm_manager_configs), config);
+    agent_task = gm_agent_upgrade_init_agent_task();
+    agent_task->agent_info = gm_agent_upgrade_init_agent_info();
+    agent_task->task_info = gm_agent_upgrade_init_task_info();
     args->agent_task = agent_task;
     args->config = config;
     state[0] = (void *)args;
@@ -88,7 +88,7 @@ static int setup_upgrade_args(void **state) {
 }
 
 static int teardown_upgrade_args(void **state) {
-    wm_manager_configs *config = state[1];
+    gm_manager_configs *config = state[1];
     os_free(config);
     linked_queue_free(upgrade_queue);
     sem_destroy(&upgrade_semaphore);
@@ -99,12 +99,12 @@ static int setup_nodes(void **state) {
     setup_hash_table(NULL);
     OSHashNode *node = NULL;
     OSHashNode *node_next = NULL;
-    wm_agent_task *agent_task = NULL;
-    wm_agent_task *agent_task_next = NULL;
+    gm_agent_task *agent_task = NULL;
+    gm_agent_task *agent_task_next = NULL;
     os_calloc(1, sizeof(OSHashNode), node);
     os_calloc(1, sizeof(OSHashNode), node_next);
-    agent_task = wm_agent_upgrade_init_agent_task();
-    agent_task_next = wm_agent_upgrade_init_agent_task();
+    agent_task = gm_agent_upgrade_init_agent_task();
+    agent_task_next = gm_agent_upgrade_init_agent_task();
     node->data = agent_task;
     node_next->data = agent_task_next;
     node->next = node_next;
@@ -117,10 +117,10 @@ static int teardown_nodes(void **state) {
     teardown_hash_table();
     OSHashNode *node = (OSHashNode *)*state;
     OSHashNode *node_next = node->next;
-    wm_agent_task *agent_task = node->data;
-    wm_agent_task *agent_task_next = node_next->data;
-    wm_agent_upgrade_free_agent_task(agent_task_next);
-    wm_agent_upgrade_free_agent_task(agent_task);
+    gm_agent_task *agent_task = node->data;
+    gm_agent_task *agent_task_next = node_next->data;
+    gm_agent_upgrade_free_agent_task(agent_task_next);
+    gm_agent_upgrade_free_agent_task(agent_task);
     os_free(node_next->key);
     os_free(node_next);
     os_free(node->key);
@@ -135,22 +135,22 @@ static int teardown_nodes(void **state) {
 }
 
 static int setup_config_agent_task(void **state) {
-    wm_manager_configs *config = NULL;
-    wm_agent_task *agent_task = NULL;
-    os_calloc(1, sizeof(wm_manager_configs), config);
-    agent_task = wm_agent_upgrade_init_agent_task();
-    agent_task->agent_info = wm_agent_upgrade_init_agent_info();
-    agent_task->task_info = wm_agent_upgrade_init_task_info();
+    gm_manager_configs *config = NULL;
+    gm_agent_task *agent_task = NULL;
+    os_calloc(1, sizeof(gm_manager_configs), config);
+    agent_task = gm_agent_upgrade_init_agent_task();
+    agent_task->agent_info = gm_agent_upgrade_init_agent_info();
+    agent_task->task_info = gm_agent_upgrade_init_task_info();
     state[0] = (void *)config;
     state[1] = (void *)agent_task;
     return 0;
 }
 
 static int teardown_config_agent_task(void **state) {
-    wm_manager_configs *config = state[0];
-    wm_agent_task *agent_task = state[1];
+    gm_manager_configs *config = state[0];
+    gm_agent_task *agent_task = state[1];
     os_free(config);
-    wm_agent_upgrade_free_agent_task(agent_task);
+    gm_agent_upgrade_free_agent_task(agent_task);
     return 0;
 }
 
@@ -170,13 +170,13 @@ int __wrap_CreateThread(void * (*function_pointer)(void *), void *data) {
     check_expected_ptr(function_pointer);
 
     test_upgrade_args *args = (test_upgrade_args *)data;
-    wm_agent_task *agent_task = args->agent_task;
-    wm_manager_configs *config = args->config;
+    gm_agent_task *agent_task = args->agent_task;
+    gm_manager_configs *config = args->config;
 
     check_expected(agent_task);
     check_expected(config);
 
-    wm_agent_upgrade_free_agent_task(agent_task);
+    gm_agent_upgrade_free_agent_task(agent_task);
     os_free(args);
 
     return 1;
@@ -212,7 +212,7 @@ void test_wm_agent_upgrade_send_command_to_agent_ok(void **state)
     expect_string(__wrap__mtdebug2, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug2, formatted_msg, "(8166): Receiving message from agent: 'Command received OK.'");
 
-    char *res = wm_agent_upgrade_send_command_to_agent(command, strlen(command));
+    char *res = gm_agent_upgrade_send_command_to_agent(command, strlen(command));
 
     *state = res;
 
@@ -247,7 +247,7 @@ void test_wm_agent_upgrade_send_command_to_agent_recv_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8111): Error in recv(): 'Success'");
 
-    char *res = wm_agent_upgrade_send_command_to_agent(command, 0);
+    char *res = gm_agent_upgrade_send_command_to_agent(command, 0);
 
     *state = res;
 
@@ -281,7 +281,7 @@ void test_wm_agent_upgrade_send_command_to_agent_sockterr_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8112): Response size is bigger than expected.");
 
-    char *res = wm_agent_upgrade_send_command_to_agent(command, 0);
+    char *res = gm_agent_upgrade_send_command_to_agent(command, 0);
 
     *state = res;
 
@@ -301,7 +301,7 @@ void test_wm_agent_upgrade_send_command_to_agent_connect_error(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8114): Cannot connect to 'queue/sockets/remote'. Could not reach agent.");
 
-    char *res = wm_agent_upgrade_send_command_to_agent(command, strlen(command));
+    char *res = gm_agent_upgrade_send_command_to_agent(command, strlen(command));
 
     *state = res;
 
@@ -341,7 +341,7 @@ void test_wm_agent_upgrade_send_lock_restart_ok(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res);
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, 0);
 
-    int res = wm_agent_upgrade_send_lock_restart(agent);
+    int res = gm_agent_upgrade_send_lock_restart(agent);
 
     assert_int_equal(res, 0);
 }
@@ -379,7 +379,7 @@ void test_wm_agent_upgrade_send_lock_restart_err(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res);
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, OS_INVALID);
 
-    int res = wm_agent_upgrade_send_lock_restart(agent);
+    int res = gm_agent_upgrade_send_lock_restart(agent);
 
     assert_int_equal(res, OS_INVALID);
 }
@@ -419,7 +419,7 @@ void test_wm_agent_upgrade_send_open_ok(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res);
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, 0);
 
-    int res = wm_agent_upgrade_send_open(agent, format, wpk_file);
+    int res = gm_agent_upgrade_send_open(agent, format, wpk_file);
 
     assert_int_equal(res, 0);
 }
@@ -459,7 +459,7 @@ void test_wm_agent_upgrade_send_open_ok_new(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_upgrade_command_response, agent_response, agent_res);
     will_return(__wrap_wm_agent_upgrade_parse_agent_upgrade_command_response, 0);
 
-    int res = wm_agent_upgrade_send_open(agent, format, wpk_file);
+    int res = gm_agent_upgrade_send_open(agent, format, wpk_file);
 
     assert_int_equal(res, 0);
 }
@@ -524,7 +524,7 @@ void test_wm_agent_upgrade_send_open_retry_ok(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res2);
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, 0);
 
-    int res = wm_agent_upgrade_send_open(agent, format, wpk_file);
+    int res = gm_agent_upgrade_send_open(agent, format, wpk_file);
 
     assert_int_equal(res, 0);
 }
@@ -598,7 +598,7 @@ void test_wm_agent_upgrade_send_open_retry_err(void **state)
     expect_string_count(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res, 10);
     will_return_count(__wrap_wm_agent_upgrade_parse_agent_response, OS_INVALID, 10);
 
-    int res = wm_agent_upgrade_send_open(agent, format, wpk_file);
+    int res = gm_agent_upgrade_send_open(agent, format, wpk_file);
 
     assert_int_equal(res, OS_INVALID);
 }
@@ -681,7 +681,7 @@ void test_wm_agent_upgrade_send_write_ok(void **state)
     expect_value(__wrap_fclose, _File, 1);
     will_return(__wrap_fclose, 0);
 
-    int res = wm_agent_upgrade_send_write(agent, format, wpk_file, file_path, chunk_size);
+    int res = gm_agent_upgrade_send_write(agent, format, wpk_file, file_path, chunk_size);
 
     assert_int_equal(res, 0);
 }
@@ -764,7 +764,7 @@ void test_wm_agent_upgrade_send_write_ok_new(void **state)
     expect_value(__wrap_fclose, _File, 1);
     will_return(__wrap_fclose, 0);
 
-    int res = wm_agent_upgrade_send_write(agent, format, wpk_file, file_path, chunk_size);
+    int res = gm_agent_upgrade_send_write(agent, format, wpk_file, file_path, chunk_size);
 
     assert_int_equal(res, 0);
 }
@@ -845,7 +845,7 @@ void test_wm_agent_upgrade_send_write_err(void **state)
     expect_value(__wrap_fclose, _File, 1);
     will_return(__wrap_fclose, 0);
 
-    int res = wm_agent_upgrade_send_write(agent, format, wpk_file, file_path, chunk_size);
+    int res = gm_agent_upgrade_send_write(agent, format, wpk_file, file_path, chunk_size);
 
     assert_int_equal(res, OS_INVALID);
 }
@@ -864,7 +864,7 @@ void test_wm_agent_upgrade_send_write_open_err(void **state)
     expect_string(__wrap_wfopen, mode, "rb");
     will_return(__wrap_wfopen, 0);
 
-    int res = wm_agent_upgrade_send_write(agent, format, wpk_file, file_path, chunk_size);
+    int res = gm_agent_upgrade_send_write(agent, format, wpk_file, file_path, chunk_size);
 
     assert_int_equal(res, OS_INVALID);
 }
@@ -904,7 +904,7 @@ void test_wm_agent_upgrade_send_close_ok(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res);
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, 0);
 
-    int res = wm_agent_upgrade_send_close(agent, format, wpk_file);
+    int res = gm_agent_upgrade_send_close(agent, format, wpk_file);
 
     assert_int_equal(res, 0);
 }
@@ -944,7 +944,7 @@ void test_wm_agent_upgrade_send_close_ok_new(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_upgrade_command_response, agent_response, agent_res);
     will_return(__wrap_wm_agent_upgrade_parse_agent_upgrade_command_response, 0);
 
-    int res = wm_agent_upgrade_send_close(agent, format, wpk_file);
+    int res = gm_agent_upgrade_send_close(agent, format, wpk_file);
 
     assert_int_equal(res, 0);
 }
@@ -984,7 +984,7 @@ void test_wm_agent_upgrade_send_close_err(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res);
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, OS_INVALID);
 
-    int res = wm_agent_upgrade_send_close(agent, format, wpk_file);
+    int res = gm_agent_upgrade_send_close(agent, format, wpk_file);
 
     assert_int_equal(res, OS_INVALID);
 }
@@ -1025,7 +1025,7 @@ void test_wm_agent_upgrade_send_sha1_ok(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res);
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, 0);
 
-    int res = wm_agent_upgrade_send_sha1(agent, format, wpk_file, file_sha1);
+    int res = gm_agent_upgrade_send_sha1(agent, format, wpk_file, file_sha1);
 
     assert_int_equal(res, 0);
 }
@@ -1067,7 +1067,7 @@ void test_wm_agent_upgrade_send_sha1_ok_new(void **state)
     will_return(__wrap_wm_agent_upgrade_parse_agent_upgrade_command_response, file_sha1);
     will_return(__wrap_wm_agent_upgrade_parse_agent_upgrade_command_response, 0);
 
-    int res = wm_agent_upgrade_send_sha1(agent, format, wpk_file, file_sha1);
+    int res = gm_agent_upgrade_send_sha1(agent, format, wpk_file, file_sha1);
 
     assert_int_equal(res, 0);
 }
@@ -1108,7 +1108,7 @@ void test_wm_agent_upgrade_send_sha1_err(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res);
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, OS_INVALID);
 
-    int res = wm_agent_upgrade_send_sha1(agent, format, wpk_file, file_sha1);
+    int res = gm_agent_upgrade_send_sha1(agent, format, wpk_file, file_sha1);
 
     assert_int_equal(res, OS_INVALID);
 }
@@ -1152,7 +1152,7 @@ void test_wm_agent_upgrade_send_sha1_invalid_sha1(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8118): The SHA1 of the file doesn't match in the agent.");
 
-    int res = wm_agent_upgrade_send_sha1(agent, format, wpk_file, file_sha1);
+    int res = gm_agent_upgrade_send_sha1(agent, format, wpk_file, file_sha1);
 
     assert_int_equal(res, OS_INVALID);
 }
@@ -1193,7 +1193,7 @@ void test_wm_agent_upgrade_send_upgrade_ok(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res);
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, 0);
 
-    int res = wm_agent_upgrade_send_upgrade(agent, format, wpk_file, installer);
+    int res = gm_agent_upgrade_send_upgrade(agent, format, wpk_file, installer);
 
     assert_int_equal(res, 0);
 }
@@ -1235,7 +1235,7 @@ void test_wm_agent_upgrade_send_upgrade_ok_new(void **state)
     will_return(__wrap_wm_agent_upgrade_parse_agent_upgrade_command_response, "0");
     will_return(__wrap_wm_agent_upgrade_parse_agent_upgrade_command_response, 0);
 
-    int res = wm_agent_upgrade_send_upgrade(agent, format, wpk_file, installer);
+    int res = gm_agent_upgrade_send_upgrade(agent, format, wpk_file, installer);
 
     assert_int_equal(res, 0);
 }
@@ -1276,7 +1276,7 @@ void test_wm_agent_upgrade_send_upgrade_err(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res);
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, OS_INVALID);
 
-    int res = wm_agent_upgrade_send_upgrade(agent, format, wpk_file, installer);
+    int res = gm_agent_upgrade_send_upgrade(agent, format, wpk_file, installer);
 
     assert_int_equal(res, OS_INVALID);
 }
@@ -1320,7 +1320,7 @@ void test_wm_agent_upgrade_send_upgrade_script_err(void **state)
     expect_string(__wrap__mterror, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mterror, formatted_msg, "(8121): Script execution failed in the agent.");
 
-    int res = wm_agent_upgrade_send_upgrade(agent, format, wpk_file, installer);
+    int res = gm_agent_upgrade_send_upgrade(agent, format, wpk_file, installer);
 
     assert_int_equal(res, OS_INVALID);
 }
@@ -1341,29 +1341,29 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_linux_ok(void **state)
     char *agent_res_ok_0 = "ok 0";
     char *agent_res_ok_sha1 = "ok d321af65983fa412e3a12c312ada12ab321a253a";
 
-    wm_manager_configs *config = state[0];
-    wm_agent_task *agent_task = state[1];
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_manager_configs *config = state[0];
+    gm_agent_task *agent_task = state[1];
+    gm_upgrade_task *upgrade_task = NULL;
 
     config->chunk_size = 5;
-    snprintf(repository, OS_BUFFER_SIZE-1, WM_UPGRADE_WPK_REPO_URL, 4);
+    snprintf(repository, OS_BUFFER_SIZE-1, GM_UPGRADE_WPK_REPO_URL, 4);
     config->wpk_repository = repository;
 
     agent_task->agent_info->agent_id = 111;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE;
-    upgrade_task = wm_agent_upgrade_init_upgrade_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE;
+    upgrade_task = gm_agent_upgrade_init_upgrade_task();
     os_strdup("test.wpk", upgrade_task->wpk_file);
     os_strdup("d321af65983fa412e3a12c312ada12ab321a253a", upgrade_task->wpk_sha1);
     agent_task->task_info->task = upgrade_task;
 
     // wm_agent_upgrade_validate_wpk_version
     expect_string(__wrap_wm_agent_upgrade_validate_wpk_version, wpk_repository_config, repository);
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, GM_UPGRADE_SUCCESS);
 
     // wm_agent_upgrade_validate_wpk
-    will_return(__wrap_wm_agent_upgrade_validate_wpk, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk, GM_UPGRADE_SUCCESS);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8162): Sending WPK to agent: '111'");
@@ -1388,7 +1388,7 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_linux_ok(void **state)
     // Format
 
     expect_string(__wrap_compare_guardsarm_versions, version1, agent_task->agent_info->guardsarm_version);
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
@@ -1487,7 +1487,7 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_linux_ok(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res_ok_0);
     will_return_count(__wrap_wm_agent_upgrade_parse_agent_response, 0, 6);
 
-    int res = wm_agent_upgrade_send_wpk_to_agent(agent_task, config);
+    int res = gm_agent_upgrade_send_wpk_to_agent(agent_task, config);
 
     assert_int_equal(res, 0);
 }
@@ -1508,29 +1508,29 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_windows_ok(void **state)
     char *agent_res_ok_0 = "ok 0";
     char *agent_res_ok_sha1 = "ok d321af65983fa412e3a12c312ada12ab321a253a";
 
-    wm_manager_configs *config = state[0];
-    wm_agent_task *agent_task = state[1];
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_manager_configs *config = state[0];
+    gm_agent_task *agent_task = state[1];
+    gm_upgrade_task *upgrade_task = NULL;
 
     config->chunk_size = 5;
-    snprintf(repository, OS_BUFFER_SIZE-1, WM_UPGRADE_WPK_REPO_URL, 4);
+    snprintf(repository, OS_BUFFER_SIZE-1, GM_UPGRADE_WPK_REPO_URL, 4);
     config->wpk_repository = repository;
 
     agent_task->agent_info->agent_id = 111;
     os_strdup("windows", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE;
-    upgrade_task = wm_agent_upgrade_init_upgrade_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE;
+    upgrade_task = gm_agent_upgrade_init_upgrade_task();
     os_strdup("test.wpk", upgrade_task->wpk_file);
     os_strdup("d321af65983fa412e3a12c312ada12ab321a253a", upgrade_task->wpk_sha1);
     agent_task->task_info->task = upgrade_task;
 
     // wm_agent_upgrade_validate_wpk_version
     expect_string(__wrap_wm_agent_upgrade_validate_wpk_version, wpk_repository_config, repository);
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, GM_UPGRADE_SUCCESS);
 
     // wm_agent_upgrade_validate_wpk
-    will_return(__wrap_wm_agent_upgrade_validate_wpk, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk, GM_UPGRADE_SUCCESS);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8162): Sending WPK to agent: '111'");
@@ -1555,7 +1555,7 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_windows_ok(void **state)
     // Format
 
     expect_string(__wrap_compare_guardsarm_versions, version1, agent_task->agent_info->guardsarm_version);
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
@@ -1654,7 +1654,7 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_windows_ok(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res_ok_0);
     will_return_count(__wrap_wm_agent_upgrade_parse_agent_response, 0, 6);
 
-    int res = wm_agent_upgrade_send_wpk_to_agent(agent_task, config);
+    int res = gm_agent_upgrade_send_wpk_to_agent(agent_task, config);
 
     assert_int_equal(res, 0);
 }
@@ -1674,23 +1674,23 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_custom_custom_installer_ok(
     char *agent_res_ok_0 = "ok 0";
     char *agent_res_ok_sha1 = "ok 2c312ada12ab321a253ad321af65983fa412e3a1";
 
-    wm_manager_configs *config = state[0];
-    wm_agent_task *agent_task = state[1];
-    wm_upgrade_custom_task *upgrade_custom_task = NULL;
+    gm_manager_configs *config = state[0];
+    gm_agent_task *agent_task = state[1];
+    gm_upgrade_custom_task *upgrade_custom_task = NULL;
 
     config->chunk_size = 5;
 
     agent_task->agent_info->agent_id = 111;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE_CUSTOM;
-    upgrade_custom_task = wm_agent_upgrade_init_upgrade_custom_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE_CUSTOM;
+    upgrade_custom_task = gm_agent_upgrade_init_upgrade_custom_task();
     os_strdup("/tmp/test.wpk", upgrade_custom_task->custom_file_path);
     os_strdup("test.sh", upgrade_custom_task->custom_installer);
     agent_task->task_info->task = upgrade_custom_task;
 
     // wm_agent_upgrade_validate_wpk_custom
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_custom, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_custom, GM_UPGRADE_SUCCESS);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8162): Sending WPK to agent: '111'");
@@ -1720,7 +1720,7 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_custom_custom_installer_ok(
     // Format
 
     expect_string(__wrap_compare_guardsarm_versions, version1, agent_task->agent_info->guardsarm_version);
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
@@ -1819,7 +1819,7 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_custom_custom_installer_ok(
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res_ok_0);
     will_return_count(__wrap_wm_agent_upgrade_parse_agent_response, 0, 6);
 
-    int res = wm_agent_upgrade_send_wpk_to_agent(agent_task, config);
+    int res = gm_agent_upgrade_send_wpk_to_agent(agent_task, config);
 
     assert_int_equal(res, 0);
 }
@@ -1839,22 +1839,22 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_custom_default_installer_ok
     char *agent_res_ok_0 = "ok 0";
     char *agent_res_ok_sha1 = "ok 2c312ada12ab321a253ad321af65983fa412e3a1";
 
-    wm_manager_configs *config = state[0];
-    wm_agent_task *agent_task = state[1];
-    wm_upgrade_custom_task *upgrade_custom_task = NULL;
+    gm_manager_configs *config = state[0];
+    gm_agent_task *agent_task = state[1];
+    gm_upgrade_custom_task *upgrade_custom_task = NULL;
 
     config->chunk_size = 5;
 
     agent_task->agent_info->agent_id = 111;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE_CUSTOM;
-    upgrade_custom_task = wm_agent_upgrade_init_upgrade_custom_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE_CUSTOM;
+    upgrade_custom_task = gm_agent_upgrade_init_upgrade_custom_task();
     os_strdup("/tmp/test.wpk", upgrade_custom_task->custom_file_path);
     agent_task->task_info->task = upgrade_custom_task;
 
     // wm_agent_upgrade_validate_wpk_custom
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_custom, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_custom, GM_UPGRADE_SUCCESS);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8162): Sending WPK to agent: '111'");
@@ -1884,7 +1884,7 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_custom_default_installer_ok
     // Format
 
     expect_string(__wrap_compare_guardsarm_versions, version1, agent_task->agent_info->guardsarm_version);
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
@@ -1983,7 +1983,7 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_custom_default_installer_ok
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res_ok_0);
     will_return_count(__wrap_wm_agent_upgrade_parse_agent_response, 0, 6);
 
-    int res = wm_agent_upgrade_send_wpk_to_agent(agent_task, config);
+    int res = gm_agent_upgrade_send_wpk_to_agent(agent_task, config);
 
     assert_int_equal(res, 0);
 }
@@ -2004,29 +2004,29 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_run_upgrade_err(void **stat
     char *agent_res_ok_sha1 = "ok d321af65983fa412e3a12c312ada12ab321a253a";
     char *agent_res_err = "err ";
 
-    wm_manager_configs *config = state[0];
-    wm_agent_task *agent_task = state[1];
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_manager_configs *config = state[0];
+    gm_agent_task *agent_task = state[1];
+    gm_upgrade_task *upgrade_task = NULL;
 
     config->chunk_size = 5;
-    snprintf(repository, OS_BUFFER_SIZE-1, WM_UPGRADE_WPK_REPO_URL, 4);
+    snprintf(repository, OS_BUFFER_SIZE-1, GM_UPGRADE_WPK_REPO_URL, 4);
     config->wpk_repository = repository;
 
     agent_task->agent_info->agent_id = 111;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE;
-    upgrade_task = wm_agent_upgrade_init_upgrade_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE;
+    upgrade_task = gm_agent_upgrade_init_upgrade_task();
     os_strdup("test.wpk", upgrade_task->wpk_file);
     os_strdup("d321af65983fa412e3a12c312ada12ab321a253a", upgrade_task->wpk_sha1);
     agent_task->task_info->task = upgrade_task;
 
     // wm_agent_upgrade_validate_wpk_version
     expect_string(__wrap_wm_agent_upgrade_validate_wpk_version, wpk_repository_config, repository);
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, GM_UPGRADE_SUCCESS);
 
     // wm_agent_upgrade_validate_wpk
-    will_return(__wrap_wm_agent_upgrade_validate_wpk, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk, GM_UPGRADE_SUCCESS);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8162): Sending WPK to agent: '111'");
@@ -2051,7 +2051,7 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_run_upgrade_err(void **stat
     // Format
 
     expect_string(__wrap_compare_guardsarm_versions, version1, agent_task->agent_info->guardsarm_version);
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
@@ -2151,9 +2151,9 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_run_upgrade_err(void **stat
     will_return_count(__wrap_wm_agent_upgrade_parse_agent_response, 0, 5);
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, OS_INVALID);
 
-    int res = wm_agent_upgrade_send_wpk_to_agent(agent_task, config);
+    int res = gm_agent_upgrade_send_wpk_to_agent(agent_task, config);
 
-    assert_int_equal(res, WM_UPGRADE_SEND_UPGRADE_ERROR);
+    assert_int_equal(res, GM_UPGRADE_SEND_UPGRADE_ERROR);
 }
 
 void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_send_sha1_err(void **state)
@@ -2170,29 +2170,29 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_send_sha1_err(void **state)
     char *agent_res_ok = "ok ";
     char *agent_res_ok_sha1 = "ok d321af65983fa412e3a21c312ada12ab321a253a";
 
-    wm_manager_configs *config = state[0];
-    wm_agent_task *agent_task = state[1];
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_manager_configs *config = state[0];
+    gm_agent_task *agent_task = state[1];
+    gm_upgrade_task *upgrade_task = NULL;
 
     config->chunk_size = 5;
-    snprintf(repository, OS_BUFFER_SIZE-1, WM_UPGRADE_WPK_REPO_URL, 4);
+    snprintf(repository, OS_BUFFER_SIZE-1, GM_UPGRADE_WPK_REPO_URL, 4);
     config->wpk_repository = repository;
 
     agent_task->agent_info->agent_id = 111;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE;
-    upgrade_task = wm_agent_upgrade_init_upgrade_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE;
+    upgrade_task = gm_agent_upgrade_init_upgrade_task();
     os_strdup("test.wpk", upgrade_task->wpk_file);
     os_strdup("d321af65983fa412e3a12c312ada12ab321a253a", upgrade_task->wpk_sha1);
     agent_task->task_info->task = upgrade_task;
 
     // wm_agent_upgrade_validate_wpk_version
     expect_string(__wrap_wm_agent_upgrade_validate_wpk_version, wpk_repository_config, repository);
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, GM_UPGRADE_SUCCESS);
 
     // wm_agent_upgrade_validate_wpk
-    will_return(__wrap_wm_agent_upgrade_validate_wpk, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk, GM_UPGRADE_SUCCESS);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8162): Sending WPK to agent: '111'");
@@ -2217,7 +2217,7 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_send_sha1_err(void **state)
     // Format
 
     expect_string(__wrap_compare_guardsarm_versions, version1, agent_task->agent_info->guardsarm_version);
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
@@ -2304,9 +2304,9 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_send_sha1_err(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res_ok_sha1);
     will_return_count(__wrap_wm_agent_upgrade_parse_agent_response, 0, 5);
 
-    int res = wm_agent_upgrade_send_wpk_to_agent(agent_task, config);
+    int res = gm_agent_upgrade_send_wpk_to_agent(agent_task, config);
 
-    assert_int_equal(res, WM_UPGRADE_SEND_SHA1_ERROR);
+    assert_int_equal(res, GM_UPGRADE_SEND_SHA1_ERROR);
 }
 
 void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_close_file_err(void **state)
@@ -2322,29 +2322,29 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_close_file_err(void **state
     char *agent_res_ok = "ok ";
     char *agent_res_err = "err ";
 
-    wm_manager_configs *config = state[0];
-    wm_agent_task *agent_task = state[1];
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_manager_configs *config = state[0];
+    gm_agent_task *agent_task = state[1];
+    gm_upgrade_task *upgrade_task = NULL;
 
     config->chunk_size = 5;
-    snprintf(repository, OS_BUFFER_SIZE-1, WM_UPGRADE_WPK_REPO_URL, 4);
+    snprintf(repository, OS_BUFFER_SIZE-1, GM_UPGRADE_WPK_REPO_URL, 4);
     config->wpk_repository = repository;
 
     agent_task->agent_info->agent_id = 111;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE;
-    upgrade_task = wm_agent_upgrade_init_upgrade_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE;
+    upgrade_task = gm_agent_upgrade_init_upgrade_task();
     os_strdup("test.wpk", upgrade_task->wpk_file);
     os_strdup("d321af65983fa412e3a12c312ada12ab321a253a", upgrade_task->wpk_sha1);
     agent_task->task_info->task = upgrade_task;
 
     // wm_agent_upgrade_validate_wpk_version
     expect_string(__wrap_wm_agent_upgrade_validate_wpk_version, wpk_repository_config, repository);
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, GM_UPGRADE_SUCCESS);
 
     // wm_agent_upgrade_validate_wpk
-    will_return(__wrap_wm_agent_upgrade_validate_wpk, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk, GM_UPGRADE_SUCCESS);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8162): Sending WPK to agent: '111'");
@@ -2369,7 +2369,7 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_close_file_err(void **state
     // Format
 
     expect_string(__wrap_compare_guardsarm_versions, version1, agent_task->agent_info->guardsarm_version);
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
@@ -2439,9 +2439,9 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_close_file_err(void **state
     will_return_count(__wrap_wm_agent_upgrade_parse_agent_response, 0, 3);
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, OS_INVALID);
 
-    int res = wm_agent_upgrade_send_wpk_to_agent(agent_task, config);
+    int res = gm_agent_upgrade_send_wpk_to_agent(agent_task, config);
 
-    assert_int_equal(res, WM_UPGRADE_SEND_CLOSE_ERROR);
+    assert_int_equal(res, GM_UPGRADE_SEND_CLOSE_ERROR);
 }
 
 void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_write_file_err(void **state)
@@ -2456,29 +2456,29 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_write_file_err(void **state
     char *agent_res_ok = "ok ";
     char *agent_res_err = "err ";
 
-    wm_manager_configs *config = state[0];
-    wm_agent_task *agent_task = state[1];
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_manager_configs *config = state[0];
+    gm_agent_task *agent_task = state[1];
+    gm_upgrade_task *upgrade_task = NULL;
 
     config->chunk_size = 5;
-    snprintf(repository, OS_BUFFER_SIZE-1, WM_UPGRADE_WPK_REPO_URL, 4);
+    snprintf(repository, OS_BUFFER_SIZE-1, GM_UPGRADE_WPK_REPO_URL, 4);
     config->wpk_repository = repository;
 
     agent_task->agent_info->agent_id = 111;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE;
-    upgrade_task = wm_agent_upgrade_init_upgrade_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE;
+    upgrade_task = gm_agent_upgrade_init_upgrade_task();
     os_strdup("test.wpk", upgrade_task->wpk_file);
     os_strdup("d321af65983fa412e3a12c312ada12ab321a253a", upgrade_task->wpk_sha1);
     agent_task->task_info->task = upgrade_task;
 
     // wm_agent_upgrade_validate_wpk_version
     expect_string(__wrap_wm_agent_upgrade_validate_wpk_version, wpk_repository_config, repository);
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, GM_UPGRADE_SUCCESS);
 
     // wm_agent_upgrade_validate_wpk
-    will_return(__wrap_wm_agent_upgrade_validate_wpk, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk, GM_UPGRADE_SUCCESS);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8162): Sending WPK to agent: '111'");
@@ -2503,7 +2503,7 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_write_file_err(void **state
     // Format
 
     expect_string(__wrap_compare_guardsarm_versions, version1, agent_task->agent_info->guardsarm_version);
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
@@ -2555,9 +2555,9 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_write_file_err(void **state
     will_return_count(__wrap_wm_agent_upgrade_parse_agent_response, 0, 2);
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, OS_INVALID);
 
-    int res = wm_agent_upgrade_send_wpk_to_agent(agent_task, config);
+    int res = gm_agent_upgrade_send_wpk_to_agent(agent_task, config);
 
-    assert_int_equal(res, WM_UPGRADE_SEND_WRITE_ERROR);
+    assert_int_equal(res, GM_UPGRADE_SEND_WRITE_ERROR);
 }
 
 void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_open_file_err(void **state)
@@ -2571,29 +2571,29 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_open_file_err(void **state)
     char *agent_res_ok = "ok ";
     char *agent_res_err = "err ";
 
-    wm_manager_configs *config = state[0];
-    wm_agent_task *agent_task = state[1];
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_manager_configs *config = state[0];
+    gm_agent_task *agent_task = state[1];
+    gm_upgrade_task *upgrade_task = NULL;
 
     config->chunk_size = 5;
-    snprintf(repository, OS_BUFFER_SIZE-1, WM_UPGRADE_WPK_REPO_URL, 4);
+    snprintf(repository, OS_BUFFER_SIZE-1, GM_UPGRADE_WPK_REPO_URL, 4);
     config->wpk_repository = repository;
 
     agent_task->agent_info->agent_id = 111;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE;
-    upgrade_task = wm_agent_upgrade_init_upgrade_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE;
+    upgrade_task = gm_agent_upgrade_init_upgrade_task();
     os_strdup("test.wpk", upgrade_task->wpk_file);
     os_strdup("d321af65983fa412e3a12c312ada12ab321a253a", upgrade_task->wpk_sha1);
     agent_task->task_info->task = upgrade_task;
 
     // wm_agent_upgrade_validate_wpk_version
     expect_string(__wrap_wm_agent_upgrade_validate_wpk_version, wpk_repository_config, repository);
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, GM_UPGRADE_SUCCESS);
 
     // wm_agent_upgrade_validate_wpk
-    will_return(__wrap_wm_agent_upgrade_validate_wpk, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk, GM_UPGRADE_SUCCESS);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8162): Sending WPK to agent: '111'");
@@ -2618,7 +2618,7 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_open_file_err(void **state)
     // Format
 
     expect_string(__wrap_compare_guardsarm_versions, version1, agent_task->agent_info->guardsarm_version);
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
@@ -2708,9 +2708,9 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_open_file_err(void **state)
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, 0);
     will_return_count(__wrap_wm_agent_upgrade_parse_agent_response, OS_INVALID, 10);
 
-    int res = wm_agent_upgrade_send_wpk_to_agent(agent_task, config);
+    int res = gm_agent_upgrade_send_wpk_to_agent(agent_task, config);
 
-    assert_int_equal(res, WM_UPGRADE_SEND_OPEN_ERROR);
+    assert_int_equal(res, GM_UPGRADE_SEND_OPEN_ERROR);
 }
 
 void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_lock_restart_err(void **state)
@@ -2722,29 +2722,29 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_lock_restart_err(void **sta
     char *lock_restart = "111 com lock_restart -1";
     char *agent_res_err = "err ";
 
-    wm_manager_configs *config = state[0];
-    wm_agent_task *agent_task = state[1];
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_manager_configs *config = state[0];
+    gm_agent_task *agent_task = state[1];
+    gm_upgrade_task *upgrade_task = NULL;
 
     config->chunk_size = 5;
-    snprintf(repository, OS_BUFFER_SIZE-1, WM_UPGRADE_WPK_REPO_URL, 4);
+    snprintf(repository, OS_BUFFER_SIZE-1, GM_UPGRADE_WPK_REPO_URL, 4);
     config->wpk_repository = repository;
 
     agent_task->agent_info->agent_id = 111;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE;
-    upgrade_task = wm_agent_upgrade_init_upgrade_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE;
+    upgrade_task = gm_agent_upgrade_init_upgrade_task();
     os_strdup("test.wpk", upgrade_task->wpk_file);
     os_strdup("d321af65983fa412e3a12c312ada12ab321a253a", upgrade_task->wpk_sha1);
     agent_task->task_info->task = upgrade_task;
 
     // wm_agent_upgrade_validate_wpk_version
     expect_string(__wrap_wm_agent_upgrade_validate_wpk_version, wpk_repository_config, repository);
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, GM_UPGRADE_SUCCESS);
 
     // wm_agent_upgrade_validate_wpk
-    will_return(__wrap_wm_agent_upgrade_validate_wpk, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk, GM_UPGRADE_SUCCESS);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8162): Sending WPK to agent: '111'");
@@ -2769,7 +2769,7 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_lock_restart_err(void **sta
     // Format
 
     expect_string(__wrap_compare_guardsarm_versions, version1, agent_task->agent_info->guardsarm_version);
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
@@ -2780,9 +2780,9 @@ void test_wm_agent_upgrade_send_wpk_to_agent_upgrade_lock_restart_err(void **sta
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res_err);
     will_return(__wrap_wm_agent_upgrade_parse_agent_response, OS_INVALID);
 
-    int res = wm_agent_upgrade_send_wpk_to_agent(agent_task, config);
+    int res = gm_agent_upgrade_send_wpk_to_agent(agent_task, config);
 
-    assert_int_equal(res, WM_UPGRADE_SEND_LOCK_RESTART_ERROR);
+    assert_int_equal(res, GM_UPGRADE_SEND_LOCK_RESTART_ERROR);
 }
 
 void test_wm_agent_upgrade_send_wpk_to_agent_validate_wpk_err(void **state)
@@ -2790,33 +2790,33 @@ void test_wm_agent_upgrade_send_wpk_to_agent_validate_wpk_err(void **state)
     (void) state;
 
     char repository[OS_BUFFER_SIZE] = "";
-    wm_manager_configs *config = state[0];
-    wm_agent_task *agent_task = state[1];
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_manager_configs *config = state[0];
+    gm_agent_task *agent_task = state[1];
+    gm_upgrade_task *upgrade_task = NULL;
 
     config->chunk_size = 5;
-    snprintf(repository, OS_BUFFER_SIZE-1, WM_UPGRADE_WPK_REPO_URL, 4);
+    snprintf(repository, OS_BUFFER_SIZE-1, GM_UPGRADE_WPK_REPO_URL, 4);
     config->wpk_repository = repository;
 
     agent_task->agent_info->agent_id = 111;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE;
-    upgrade_task = wm_agent_upgrade_init_upgrade_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE;
+    upgrade_task = gm_agent_upgrade_init_upgrade_task();
     os_strdup("test.wpk", upgrade_task->wpk_file);
     os_strdup("d321af65983fa412e3a12c312ada12ab321a253a", upgrade_task->wpk_sha1);
     agent_task->task_info->task = upgrade_task;
 
     // wm_agent_upgrade_validate_wpk_version
     expect_string(__wrap_wm_agent_upgrade_validate_wpk_version, wpk_repository_config, repository);
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, GM_UPGRADE_SUCCESS);
 
     // wm_agent_upgrade_validate_wpk
-    will_return(__wrap_wm_agent_upgrade_validate_wpk, WM_UPGRADE_WPK_SHA1_DOES_NOT_MATCH);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk, GM_UPGRADE_WPK_SHA1_DOES_NOT_MATCH);
 
-    int res = wm_agent_upgrade_send_wpk_to_agent(agent_task, config);
+    int res = gm_agent_upgrade_send_wpk_to_agent(agent_task, config);
 
-    assert_int_equal(res, WM_UPGRADE_WPK_SHA1_DOES_NOT_MATCH);
+    assert_int_equal(res, GM_UPGRADE_WPK_SHA1_DOES_NOT_MATCH);
 }
 
 void test_wm_agent_upgrade_send_wpk_to_agent_validate_wpk_version_err(void **state)
@@ -2824,57 +2824,57 @@ void test_wm_agent_upgrade_send_wpk_to_agent_validate_wpk_version_err(void **sta
     (void) state;
 
     char repository[OS_BUFFER_SIZE] = "";
-    wm_manager_configs *config = state[0];
-    wm_agent_task *agent_task = state[1];
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_manager_configs *config = state[0];
+    gm_agent_task *agent_task = state[1];
+    gm_upgrade_task *upgrade_task = NULL;
 
     config->chunk_size = 5;
-    snprintf(repository, OS_BUFFER_SIZE-1, WM_UPGRADE_WPK_REPO_URL, 4);
+    snprintf(repository, OS_BUFFER_SIZE-1, GM_UPGRADE_WPK_REPO_URL, 4);
     config->wpk_repository = repository;
 
     agent_task->agent_info->agent_id = 111;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE;
-    upgrade_task = wm_agent_upgrade_init_upgrade_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE;
+    upgrade_task = gm_agent_upgrade_init_upgrade_task();
     os_strdup("test.wpk", upgrade_task->wpk_file);
     os_strdup("d321af65983fa412e3a12c312ada12ab321a253a", upgrade_task->wpk_sha1);
     agent_task->task_info->task = upgrade_task;
 
     // wm_agent_upgrade_validate_wpk_version
     expect_string(__wrap_wm_agent_upgrade_validate_wpk_version, wpk_repository_config, repository);
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, WM_UPGRADE_WPK_VERSION_DOES_NOT_EXIST);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, GM_UPGRADE_WPK_VERSION_DOES_NOT_EXIST);
 
-    int res = wm_agent_upgrade_send_wpk_to_agent(agent_task, config);
+    int res = gm_agent_upgrade_send_wpk_to_agent(agent_task, config);
 
-    assert_int_equal(res, WM_UPGRADE_WPK_VERSION_DOES_NOT_EXIST);
+    assert_int_equal(res, GM_UPGRADE_WPK_VERSION_DOES_NOT_EXIST);
 }
 
 void test_wm_agent_upgrade_send_wpk_to_agent_validate_wpk_custom_err(void **state)
 {
     (void) state;
 
-    wm_manager_configs *config = state[0];
-    wm_agent_task *agent_task = state[1];
-    wm_upgrade_custom_task *upgrade_custom_task = NULL;
+    gm_manager_configs *config = state[0];
+    gm_agent_task *agent_task = state[1];
+    gm_upgrade_custom_task *upgrade_custom_task = NULL;
 
     config->chunk_size = 5;
 
     agent_task->agent_info->agent_id = 111;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE_CUSTOM;
-    upgrade_custom_task = wm_agent_upgrade_init_upgrade_custom_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE_CUSTOM;
+    upgrade_custom_task = gm_agent_upgrade_init_upgrade_custom_task();
     os_strdup("/tmp/test.wpk", upgrade_custom_task->custom_file_path);
     os_strdup("test.sh", upgrade_custom_task->custom_installer);
     agent_task->task_info->task = upgrade_custom_task;
 
     // wm_agent_upgrade_validate_wpk_custom
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_custom, WM_UPGRADE_WPK_FILE_DOES_NOT_EXIST);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_custom, GM_UPGRADE_WPK_FILE_DOES_NOT_EXIST);
 
-    int res = wm_agent_upgrade_send_wpk_to_agent(agent_task, config);
+    int res = gm_agent_upgrade_send_wpk_to_agent(agent_task, config);
 
-    assert_int_equal(res, WM_UPGRADE_WPK_FILE_DOES_NOT_EXIST);
+    assert_int_equal(res, GM_UPGRADE_WPK_FILE_DOES_NOT_EXIST);
 }
 
 void test_wm_agent_upgrade_start_upgrade_upgrade_ok(void **state)
@@ -2896,19 +2896,19 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_ok(void **state)
     char *agent_res_ok_sha1 = "ok d321af65983fa412e3a12c312ada12ab321a253a";
 
     test_upgrade_args *args = state[0];
-    wm_manager_configs *config = args->config;
-    wm_agent_task *agent_task = args->agent_task;
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_manager_configs *config = args->config;
+    gm_agent_task *agent_task = args->agent_task;
+    gm_upgrade_task *upgrade_task = NULL;
 
     config->chunk_size = 5;
-    snprintf(repository, OS_BUFFER_SIZE-1, WM_UPGRADE_WPK_REPO_URL, 4);
+    snprintf(repository, OS_BUFFER_SIZE-1, GM_UPGRADE_WPK_REPO_URL, 4);
     config->wpk_repository = repository;
 
     agent_task->agent_info->agent_id = agent_id;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE;
-    upgrade_task = wm_agent_upgrade_init_upgrade_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE;
+    upgrade_task = gm_agent_upgrade_init_upgrade_task();
     os_strdup("test.wpk", upgrade_task->wpk_file);
     os_strdup("d321af65983fa412e3a12c312ada12ab321a253a", upgrade_task->wpk_sha1);
     agent_task->task_info->task = upgrade_task;
@@ -2928,14 +2928,14 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_ok(void **state)
 
     cJSON *task_response_status = cJSON_CreateObject();
 
-    cJSON_AddStringToObject(task_response_status, "error", WM_UPGRADE_SUCCESS);
-    cJSON_AddStringToObject(task_response_status, "message", upgrade_error_codes[WM_UPGRADE_SUCCESS]);
+    cJSON_AddStringToObject(task_response_status, "error", GM_UPGRADE_SUCCESS);
+    cJSON_AddStringToObject(task_response_status, "message", upgrade_error_codes[GM_UPGRADE_SUCCESS]);
     cJSON_AddNumberToObject(task_response_status, "agent", agent_id);
     cJSON_AddStringToObject(task_response_status, "status", status);
 
     // wm_agent_upgrade_parse_task_module_request
 
-    expect_value(__wrap_wm_agent_upgrade_parse_task_module_request, command, WM_UPGRADE_AGENT_UPDATE_STATUS);
+    expect_value(__wrap_wm_agent_upgrade_parse_task_module_request, command, GM_UPGRADE_AGENT_UPDATE_STATUS);
     will_return(__wrap_wm_agent_upgrade_parse_task_module_request, task_request_status);
     expect_string(__wrap_wm_agent_upgrade_parse_task_module_request, status, status);
 
@@ -2953,9 +2953,9 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_ok(void **state)
     // wm_agent_upgrade_send_wpk_to_agent
 
     expect_string(__wrap_wm_agent_upgrade_validate_wpk_version, wpk_repository_config, repository);
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, GM_UPGRADE_SUCCESS);
 
-    will_return(__wrap_wm_agent_upgrade_validate_wpk, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk, GM_UPGRADE_SUCCESS);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8162): Sending WPK to agent: '025'");
@@ -2980,7 +2980,7 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_ok(void **state)
     // Format
 
     expect_string(__wrap_compare_guardsarm_versions, version1, agent_task->agent_info->guardsarm_version);
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
@@ -3079,7 +3079,7 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_ok(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res_ok_0);
     will_return_count(__wrap_wm_agent_upgrade_parse_agent_response, 0, 6);
 
-    wm_agent_upgrade_start_upgrade(args);
+    gm_agent_upgrade_start_upgrade(args);
 
     int value = 0;
     sem_getvalue(&upgrade_semaphore, &value);
@@ -3107,19 +3107,19 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_legacy_ok(void **state)
     char *agent_res_ok_sha1 = "ok d321af65983fa412e3a12c312ada12ab321a253a";
 
     test_upgrade_args *args = state[0];
-    wm_manager_configs *config = args->config;
-    wm_agent_task *agent_task = args->agent_task;
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_manager_configs *config = args->config;
+    gm_agent_task *agent_task = args->agent_task;
+    gm_upgrade_task *upgrade_task = NULL;
 
     config->chunk_size = 5;
-    snprintf(repository, OS_BUFFER_SIZE-1, WM_UPGRADE_WPK_REPO_URL, 4);
+    snprintf(repository, OS_BUFFER_SIZE-1, GM_UPGRADE_WPK_REPO_URL, 4);
     config->wpk_repository = repository;
 
     agent_task->agent_info->agent_id = agent_id;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE;
-    upgrade_task = wm_agent_upgrade_init_upgrade_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE;
+    upgrade_task = gm_agent_upgrade_init_upgrade_task();
     os_strdup("test.wpk", upgrade_task->wpk_file);
     os_strdup("d321af65983fa412e3a12c312ada12ab321a253a", upgrade_task->wpk_sha1);
     os_strdup("v3.13.1", upgrade_task->custom_version);
@@ -3140,8 +3140,8 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_legacy_ok(void **state)
 
     cJSON *task_response_status1 = cJSON_CreateObject();
 
-    cJSON_AddStringToObject(task_response_status1, "error", WM_UPGRADE_SUCCESS);
-    cJSON_AddStringToObject(task_response_status1, "message", upgrade_error_codes[WM_UPGRADE_SUCCESS]);
+    cJSON_AddStringToObject(task_response_status1, "error", GM_UPGRADE_SUCCESS);
+    cJSON_AddStringToObject(task_response_status1, "message", upgrade_error_codes[GM_UPGRADE_SUCCESS]);
     cJSON_AddNumberToObject(task_response_status1, "agent", agent_id);
     cJSON_AddStringToObject(task_response_status1, "status", status1);
 
@@ -3160,14 +3160,14 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_legacy_ok(void **state)
 
     cJSON *task_response_status2 = cJSON_CreateObject();
 
-    cJSON_AddStringToObject(task_response_status2, "error", WM_UPGRADE_SUCCESS);
-    cJSON_AddStringToObject(task_response_status2, "message", upgrade_error_codes[WM_UPGRADE_SUCCESS]);
+    cJSON_AddStringToObject(task_response_status2, "error", GM_UPGRADE_SUCCESS);
+    cJSON_AddStringToObject(task_response_status2, "message", upgrade_error_codes[GM_UPGRADE_SUCCESS]);
     cJSON_AddNumberToObject(task_response_status2, "agent", agent_id);
     cJSON_AddStringToObject(task_response_status2, "status", status2);
 
     // wm_agent_upgrade_parse_task_module_request
 
-    expect_value(__wrap_wm_agent_upgrade_parse_task_module_request, command, WM_UPGRADE_AGENT_UPDATE_STATUS);
+    expect_value(__wrap_wm_agent_upgrade_parse_task_module_request, command, GM_UPGRADE_AGENT_UPDATE_STATUS);
     will_return(__wrap_wm_agent_upgrade_parse_task_module_request, task_request_status1);
     expect_string(__wrap_wm_agent_upgrade_parse_task_module_request, status, status1);
 
@@ -3185,9 +3185,9 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_legacy_ok(void **state)
     // wm_agent_upgrade_send_wpk_to_agent
 
     expect_string(__wrap_wm_agent_upgrade_validate_wpk_version, wpk_repository_config, repository);
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, GM_UPGRADE_SUCCESS);
 
-    will_return(__wrap_wm_agent_upgrade_validate_wpk, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk, GM_UPGRADE_SUCCESS);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8162): Sending WPK to agent: '025'");
@@ -3212,7 +3212,7 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_legacy_ok(void **state)
     // Format
 
     expect_string(__wrap_compare_guardsarm_versions, version1, agent_task->agent_info->guardsarm_version);
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
@@ -3314,13 +3314,13 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_legacy_ok(void **state)
     // compare_guardsarm_versions
 
     expect_string(__wrap_compare_guardsarm_versions, version1, "v3.13.1");
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
     // wm_agent_upgrade_parse_task_module_request
 
-    expect_value(__wrap_wm_agent_upgrade_parse_task_module_request, command, WM_UPGRADE_AGENT_UPDATE_STATUS);
+    expect_value(__wrap_wm_agent_upgrade_parse_task_module_request, command, GM_UPGRADE_AGENT_UPDATE_STATUS);
     will_return(__wrap_wm_agent_upgrade_parse_task_module_request, task_request_status2);
     expect_string(__wrap_wm_agent_upgrade_parse_task_module_request, status, status2);
 
@@ -3335,7 +3335,7 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_legacy_ok(void **state)
     expect_memory(__wrap_wm_agent_upgrade_validate_task_status_message, input_json, task_response_status2, sizeof(task_response_status2));
     will_return(__wrap_wm_agent_upgrade_validate_task_status_message, agent_id);
 
-    wm_agent_upgrade_start_upgrade(args);
+    gm_agent_upgrade_start_upgrade(args);
 
     int value = 0;
     sem_getvalue(&upgrade_semaphore, &value);
@@ -3362,17 +3362,17 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_custom_ok(void **state)
     char *agent_res_ok_sha1 = "ok d321af65983fa412e3a12c312ada12ab321a253a";
 
     test_upgrade_args *args = state[0];
-    wm_manager_configs *config = args->config;
-    wm_agent_task *agent_task = args->agent_task;
-    wm_upgrade_custom_task *upgrade_custom_task = NULL;
+    gm_manager_configs *config = args->config;
+    gm_agent_task *agent_task = args->agent_task;
+    gm_upgrade_custom_task *upgrade_custom_task = NULL;
 
     config->chunk_size = 5;
 
     agent_task->agent_info->agent_id = agent_id;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE_CUSTOM;
-    upgrade_custom_task = wm_agent_upgrade_init_upgrade_custom_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE_CUSTOM;
+    upgrade_custom_task = gm_agent_upgrade_init_upgrade_custom_task();
     os_strdup("/tmp/test.wpk", upgrade_custom_task->custom_file_path);
     agent_task->task_info->task = upgrade_custom_task;
 
@@ -3391,14 +3391,14 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_custom_ok(void **state)
 
     cJSON *task_response_status = cJSON_CreateObject();
 
-    cJSON_AddStringToObject(task_response_status, "error", WM_UPGRADE_SUCCESS);
-    cJSON_AddStringToObject(task_response_status, "message", upgrade_error_codes[WM_UPGRADE_SUCCESS]);
+    cJSON_AddStringToObject(task_response_status, "error", GM_UPGRADE_SUCCESS);
+    cJSON_AddStringToObject(task_response_status, "message", upgrade_error_codes[GM_UPGRADE_SUCCESS]);
     cJSON_AddNumberToObject(task_response_status, "agent", agent_id);
     cJSON_AddStringToObject(task_response_status, "status", status);
 
     // wm_agent_upgrade_parse_task_module_request
 
-    expect_value(__wrap_wm_agent_upgrade_parse_task_module_request, command, WM_UPGRADE_AGENT_UPDATE_STATUS);
+    expect_value(__wrap_wm_agent_upgrade_parse_task_module_request, command, GM_UPGRADE_AGENT_UPDATE_STATUS);
     will_return(__wrap_wm_agent_upgrade_parse_task_module_request, task_request_status);
     expect_string(__wrap_wm_agent_upgrade_parse_task_module_request, status, status);
 
@@ -3415,7 +3415,7 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_custom_ok(void **state)
 
     // wm_agent_upgrade_send_wpk_to_agent
 
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_custom, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_custom, GM_UPGRADE_SUCCESS);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8162): Sending WPK to agent: '025'");
@@ -3445,7 +3445,7 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_custom_ok(void **state)
     // Format
 
     expect_string(__wrap_compare_guardsarm_versions, version1, agent_task->agent_info->guardsarm_version);
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
@@ -3544,7 +3544,7 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_custom_ok(void **state)
     expect_string(__wrap_wm_agent_upgrade_parse_agent_response, agent_response, agent_res_ok_0);
     will_return_count(__wrap_wm_agent_upgrade_parse_agent_response, 0, 6);
 
-    wm_agent_upgrade_start_upgrade(args);
+    gm_agent_upgrade_start_upgrade(args);
 
     int value = 0;
     sem_getvalue(&upgrade_semaphore, &value);
@@ -3572,19 +3572,19 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_err(void **state)
     char *agent_res_ok_sha1 = "ok d321af65983fa412e3a12c312ada12ab321a253a";
 
     test_upgrade_args *args = state[0];
-    wm_manager_configs *config = args->config;
-    wm_agent_task *agent_task = args->agent_task;
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_manager_configs *config = args->config;
+    gm_agent_task *agent_task = args->agent_task;
+    gm_upgrade_task *upgrade_task = NULL;
 
     config->chunk_size = 5;
-    snprintf(repository, OS_BUFFER_SIZE-1, WM_UPGRADE_WPK_REPO_URL, 4);
+    snprintf(repository, OS_BUFFER_SIZE-1, GM_UPGRADE_WPK_REPO_URL, 4);
     config->wpk_repository = repository;
 
     agent_task->agent_info->agent_id = agent_id;
     os_strdup("ubuntu", agent_task->agent_info->platform);
     os_strdup("v3.13.0", agent_task->agent_info->guardsarm_version);
-    agent_task->task_info->command = WM_UPGRADE_UPGRADE;
-    upgrade_task = wm_agent_upgrade_init_upgrade_task();
+    agent_task->task_info->command = GM_UPGRADE_UPGRADE;
+    upgrade_task = gm_agent_upgrade_init_upgrade_task();
     os_strdup("test.wpk", upgrade_task->wpk_file);
     os_strdup("d321af65983fa412e3a12c312ada12ab321a253a", upgrade_task->wpk_sha1);
     agent_task->task_info->task = upgrade_task;
@@ -3604,8 +3604,8 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_err(void **state)
 
     cJSON *task_response_status1 = cJSON_CreateObject();
 
-    cJSON_AddStringToObject(task_response_status1, "error", WM_UPGRADE_SUCCESS);
-    cJSON_AddStringToObject(task_response_status1, "message", upgrade_error_codes[WM_UPGRADE_SUCCESS]);
+    cJSON_AddStringToObject(task_response_status1, "error", GM_UPGRADE_SUCCESS);
+    cJSON_AddStringToObject(task_response_status1, "message", upgrade_error_codes[GM_UPGRADE_SUCCESS]);
     cJSON_AddNumberToObject(task_response_status1, "agent", agent_id);
     cJSON_AddStringToObject(task_response_status1, "status", status1);
 
@@ -3624,14 +3624,14 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_err(void **state)
 
     cJSON *task_response_status2 = cJSON_CreateObject();
 
-    cJSON_AddStringToObject(task_response_status2, "error", WM_UPGRADE_SUCCESS);
-    cJSON_AddStringToObject(task_response_status2, "message", upgrade_error_codes[WM_UPGRADE_SUCCESS]);
+    cJSON_AddStringToObject(task_response_status2, "error", GM_UPGRADE_SUCCESS);
+    cJSON_AddStringToObject(task_response_status2, "message", upgrade_error_codes[GM_UPGRADE_SUCCESS]);
     cJSON_AddNumberToObject(task_response_status2, "agent", agent_id);
     cJSON_AddStringToObject(task_response_status2, "status", status2);
 
     // wm_agent_upgrade_parse_task_module_request
 
-    expect_value(__wrap_wm_agent_upgrade_parse_task_module_request, command, WM_UPGRADE_AGENT_UPDATE_STATUS);
+    expect_value(__wrap_wm_agent_upgrade_parse_task_module_request, command, GM_UPGRADE_AGENT_UPDATE_STATUS);
     will_return(__wrap_wm_agent_upgrade_parse_task_module_request, task_request_status1);
     expect_string(__wrap_wm_agent_upgrade_parse_task_module_request, status, status1);
 
@@ -3649,9 +3649,9 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_err(void **state)
     // wm_agent_upgrade_send_wpk_to_agent
 
     expect_string(__wrap_wm_agent_upgrade_validate_wpk_version, wpk_repository_config, repository);
-    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk_version, GM_UPGRADE_SUCCESS);
 
-    will_return(__wrap_wm_agent_upgrade_validate_wpk, WM_UPGRADE_SUCCESS);
+    will_return(__wrap_wm_agent_upgrade_validate_wpk, GM_UPGRADE_SUCCESS);
 
     expect_string(__wrap__mtdebug1, tag, "guardsarm-manager-modulesd:agent-upgrade");
     expect_string(__wrap__mtdebug1, formatted_msg, "(8162): Sending WPK to agent: '025'");
@@ -3676,7 +3676,7 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_err(void **state)
     // Format
 
     expect_string(__wrap_compare_guardsarm_versions, version1, agent_task->agent_info->guardsarm_version);
-    expect_string(__wrap_compare_guardsarm_versions, version2, WM_UPGRADE_NEW_UPGRADE_MECHANISM);
+    expect_string(__wrap_compare_guardsarm_versions, version2, GM_UPGRADE_NEW_UPGRADE_MECHANISM);
     expect_value(__wrap_compare_guardsarm_versions, compare_patch, 1);
     will_return(__wrap_compare_guardsarm_versions, -1);
 
@@ -3689,7 +3689,7 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_err(void **state)
 
     // wm_agent_upgrade_parse_task_module_request
 
-    expect_value(__wrap_wm_agent_upgrade_parse_task_module_request, command, WM_UPGRADE_AGENT_UPDATE_STATUS);
+    expect_value(__wrap_wm_agent_upgrade_parse_task_module_request, command, GM_UPGRADE_AGENT_UPDATE_STATUS);
     will_return(__wrap_wm_agent_upgrade_parse_task_module_request, task_request_status2);
     expect_string(__wrap_wm_agent_upgrade_parse_task_module_request, status, status2);
     expect_string(__wrap_wm_agent_upgrade_parse_task_module_request, error, error);
@@ -3705,7 +3705,7 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_err(void **state)
     expect_memory(__wrap_wm_agent_upgrade_validate_task_status_message, input_json, task_response_status2, sizeof(task_response_status2));
     will_return(__wrap_wm_agent_upgrade_validate_task_status_message, agent_id);
 
-    wm_agent_upgrade_start_upgrade(args);
+    gm_agent_upgrade_start_upgrade(args);
 
     int value = 0;
     sem_getvalue(&upgrade_semaphore, &value);
@@ -3714,14 +3714,14 @@ void test_wm_agent_upgrade_start_upgrade_upgrade_err(void **state)
 }
 
 void test_wm_agent_upgrade_dispatch_upgrades(void **state) {
-    wm_manager_configs *config = *state;
+    gm_manager_configs *config = *state;
 
     config->max_threads = 8;
 
-    wm_agent_task *agent_task_next = NULL;
-    wm_upgrade_task *upgrade_task_next = NULL;
+    gm_agent_task *agent_task_next = NULL;
+    gm_upgrade_task *upgrade_task_next = NULL;
 
-    wm_agent_task *agent_task = wm_agent_upgrade_init_agent_task();
+    gm_agent_task *agent_task = gm_agent_upgrade_init_agent_task();
 
     config->chunk_size = 5;
 
@@ -3730,11 +3730,11 @@ void test_wm_agent_upgrade_dispatch_upgrades(void **state) {
     will_return(__wrap_linked_queue_pop_ex, 1);
     expect_memory(__wrap_linked_queue_pop_ex, queue, upgrade_queue, sizeof(upgrade_queue));
 
-    expect_memory(__wrap_CreateThread, function_pointer, wm_agent_upgrade_start_upgrade, sizeof(wm_agent_upgrade_start_upgrade));
+    expect_memory(__wrap_CreateThread, function_pointer, gm_agent_upgrade_start_upgrade, sizeof(gm_agent_upgrade_start_upgrade));
     expect_memory(__wrap_CreateThread, agent_task, agent_task, sizeof(agent_task));
     expect_memory(__wrap_CreateThread, config, config, sizeof(config));
 
-    wm_agent_upgrade_dispatch_upgrades(config);
+    gm_agent_upgrade_dispatch_upgrades(config);
 
     int value = 0;
     sem_getvalue(&upgrade_semaphore, &value);
@@ -3744,8 +3744,8 @@ void test_wm_agent_upgrade_dispatch_upgrades(void **state) {
 
 void test_wm_agent_upgrade_prepare_upgrades_ok(void **state) {
     OSHashNode *node = *state;
-    wm_agent_task *agent_task = node->data;
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_agent_task *agent_task = node->data;
+    gm_upgrade_task *upgrade_task = NULL;
 
     os_strdup("025", node->key);
 
@@ -3762,17 +3762,17 @@ void test_wm_agent_upgrade_prepare_upgrades_ok(void **state) {
     expect_value(__wrap_wm_agent_upgrade_remove_entry, free, 0);
     will_return(__wrap_wm_agent_upgrade_remove_entry, 1);
 
-    wm_agent_upgrade_prepare_upgrades();
+    gm_agent_upgrade_prepare_upgrades();
 }
 
 void test_wm_agent_upgrade_prepare_upgrades_multiple(void **state) {
     OSHashNode *node = *state;
-    wm_agent_task *agent_task = node->data;
-    wm_upgrade_task *upgrade_task = NULL;
+    gm_agent_task *agent_task = node->data;
+    gm_upgrade_task *upgrade_task = NULL;
 
     OSHashNode *node_next = node->next;
-    wm_agent_task *agent_task_next = node_next->data;
-    wm_upgrade_task *upgrade_task_next = NULL;
+    gm_agent_task *agent_task_next = node_next->data;
+    gm_upgrade_task *upgrade_task_next = NULL;
 
     os_strdup("025", node->key);
 
@@ -3801,7 +3801,7 @@ void test_wm_agent_upgrade_prepare_upgrades_multiple(void **state) {
     expect_value(__wrap_wm_agent_upgrade_remove_entry, free, 0);
     will_return(__wrap_wm_agent_upgrade_remove_entry, 1);
 
-    wm_agent_upgrade_prepare_upgrades();
+    gm_agent_upgrade_prepare_upgrades();
 }
 
 int main(void) {

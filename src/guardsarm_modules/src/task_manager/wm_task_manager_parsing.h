@@ -5,19 +5,19 @@
  *
  * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
-#ifndef WM_TAS_MANAGER_PARSING_H
-#define WM_TAS_MANAGER_PARSING_H
+#ifndef GM_TAS_MANAGER_PARSING_H
+#define GM_TAS_MANAGER_PARSING_H
 
 #include "wm_task_manager.h"
 
 typedef enum _upgrade_status {
-    WM_TASK_UPGRADE_IN_QUEUE = 0,
-    WM_TASK_UPGRADE_UPDATING,
-    WM_TASK_UPGRADE_UPDATED,
-    WM_TASK_UPGRADE_ERROR,
-    WM_TASK_UPGRADE_CANCELLED,
-    WM_TASK_UPGRADE_TIMEOUT,
-    WM_TASK_UPGRADE_LEGACY
+    GM_TASK_UPGRADE_IN_QUEUE = 0,
+    GM_TASK_UPGRADE_UPDATING,
+    GM_TASK_UPGRADE_UPDATED,
+    GM_TASK_UPGRADE_ERROR,
+    GM_TASK_UPGRADE_CANCELLED,
+    GM_TASK_UPGRADE_TIMEOUT,
+    GM_TASK_UPGRADE_LEGACY
 } upgrade_status;
 
 extern const char* task_statuses[];
@@ -40,7 +40,7 @@ extern const char* task_statuses[];
  * @param msg Incomming message from a connection.
  * @return task structure if there is no error, NULL otherwise.
  * */
-wm_task_manager_task* wm_task_manager_parse_message(const char *msg) __attribute__((nonnull));
+gm_task_manager_task* gm_task_manager_parse_message(const char *msg) __attribute__((nonnull));
 
 /**
  * Build a JSON data object.
@@ -67,7 +67,7 @@ wm_task_manager_task* wm_task_manager_parse_message(const char *msg) __attribute
  * @param status Status of the task when receiving a request for a specific status.
  * @return JSON object.
  * */
-cJSON* wm_task_manager_parse_data_response(int error_code, int agent_id, int task_id, char *status);
+cJSON* gm_task_manager_parse_data_response(int error_code, int agent_id, int task_id, char *status);
 
 /**
  * Add data to a JSON data object.
@@ -110,7 +110,7 @@ cJSON* wm_task_manager_parse_data_response(int error_code, int agent_id, int tas
  * @param last_update_time Date of update task.
  * @param request_command Command that requested the query.
  * */
-void wm_task_manager_parse_data_result(cJSON *response, const char *node, const char *module, const char *command, char *status, char *error, int create_time, int last_update_time, const char *request_command) __attribute__((nonnull(1)));
+void gm_task_manager_parse_data_result(cJSON *response, const char *node, const char *module, const char *command, char *status, char *error, int create_time, int last_update_time, const char *request_command) __attribute__((nonnull(1)));
 
 /**
  * Build a JSON response object.
@@ -140,6 +140,6 @@ void wm_task_manager_parse_data_result(cJSON *response, const char *node, const 
  * @param data [OPTIONAL] array of responses.
  * @return JSON object.
  * */
-cJSON* wm_task_manager_parse_response(int error_code, cJSON *data);
+cJSON* gm_task_manager_parse_response(int error_code, cJSON *data);
 
 #endif

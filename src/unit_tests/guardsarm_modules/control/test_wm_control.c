@@ -23,7 +23,7 @@
 
 /* WM_CONTROL_LOGTAG expands to ARGV0 ":control".
  * For the manager build ARGV0 is "guardsarm-manager-modulesd". */
-#define WM_CONTROL_TEST_LOGTAG "guardsarm-manager-modulesd:control"
+#define GM_CONTROL_TEST_LOGTAG "guardsarm-manager-modulesd:control"
 
 /* ------------------------------------------------------------------ */
 /* Setup / teardown                                                     */
@@ -71,14 +71,14 @@ static void test_dispatch_restart(void **state) {
     char command[] = "restart";
     char *output = NULL;
 
-    expect_string(__wrap__mtdebug2, tag, WM_CONTROL_TEST_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_CONTROL_TEST_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Dispatching command: 'restart'");
     expect_check_systemd_not_available();
-    expect_string(__wrap__mtinfo, tag, WM_CONTROL_TEST_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_CONTROL_TEST_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Executing 'restart' on guardsarm-manager using bin/guardsarm-manager-control");
     will_return(__wrap_fork, 1234);
 
-    size_t ret = wm_control_dispatch(command, &output);
+    size_t ret = gm_control_dispatch(command, &output);
 
     assert_non_null(output);
     assert_string_equal(output, "ok ");
@@ -91,14 +91,14 @@ static void test_dispatch_reload(void **state) {
     char command[] = "reload";
     char *output = NULL;
 
-    expect_string(__wrap__mtdebug2, tag, WM_CONTROL_TEST_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_CONTROL_TEST_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Dispatching command: 'reload'");
     expect_check_systemd_not_available();
-    expect_string(__wrap__mtinfo, tag, WM_CONTROL_TEST_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_CONTROL_TEST_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Executing 'reload' on guardsarm-manager using bin/guardsarm-manager-control");
     will_return(__wrap_fork, 5678);
 
-    size_t ret = wm_control_dispatch(command, &output);
+    size_t ret = gm_control_dispatch(command, &output);
 
     assert_non_null(output);
     assert_string_equal(output, "ok ");
@@ -112,14 +112,14 @@ static void test_dispatch_restart_with_args(void **state) {
     char command[] = "restart somearg";
     char *output = NULL;
 
-    expect_string(__wrap__mtdebug2, tag, WM_CONTROL_TEST_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_CONTROL_TEST_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Dispatching command: 'restart'");
     expect_check_systemd_not_available();
-    expect_string(__wrap__mtinfo, tag, WM_CONTROL_TEST_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_CONTROL_TEST_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Executing 'restart' on guardsarm-manager using bin/guardsarm-manager-control");
     will_return(__wrap_fork, 1234);
 
-    size_t ret = wm_control_dispatch(command, &output);
+    size_t ret = gm_control_dispatch(command, &output);
 
     assert_non_null(output);
     assert_string_equal(output, "ok ");
@@ -132,13 +132,13 @@ static void test_dispatch_unknown_command(void **state) {
     char command[] = "unknowncmd";
     char *output = NULL;
 
-    expect_string(__wrap__mtdebug2, tag, WM_CONTROL_TEST_LOGTAG);
+    expect_string(__wrap__mtdebug2, tag, GM_CONTROL_TEST_LOGTAG);
     expect_string(__wrap__mtdebug2, formatted_msg, "Dispatching command: 'unknowncmd'");
 
-    expect_string(__wrap__mterror, tag, WM_CONTROL_TEST_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_CONTROL_TEST_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "Unknown command: 'unknowncmd'");
 
-    size_t ret = wm_control_dispatch(command, &output);
+    size_t ret = gm_control_dispatch(command, &output);
 
     assert_non_null(output);
     assert_string_equal(output, "Err");
@@ -155,14 +155,14 @@ static void test_execute_action_fork_fails(void **state) {
     char *output = NULL;
 
     expect_check_systemd_not_available();
-    expect_string(__wrap__mtinfo, tag, WM_CONTROL_TEST_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_CONTROL_TEST_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Executing 'restart' on guardsarm-manager using bin/guardsarm-manager-control");
 
     will_return(__wrap_fork, -1);
-    expect_string(__wrap__mterror, tag, WM_CONTROL_TEST_LOGTAG);
+    expect_string(__wrap__mterror, tag, GM_CONTROL_TEST_LOGTAG);
     expect_string(__wrap__mterror, formatted_msg, "Cannot fork for restart");
 
-    size_t ret = wm_control_execute_action("restart", "guardsarm-manager", &output);
+    size_t ret = gm_control_execute_action("restart", "guardsarm-manager", &output);
 
     assert_non_null(output);
     assert_string_equal(output, "err Cannot fork");
@@ -175,12 +175,12 @@ static void test_execute_action_restart_no_systemd(void **state) {
     char *output = NULL;
 
     expect_check_systemd_not_available();
-    expect_string(__wrap__mtinfo, tag, WM_CONTROL_TEST_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_CONTROL_TEST_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Executing 'restart' on guardsarm-manager using bin/guardsarm-manager-control");
 
     will_return(__wrap_fork, 1234); /* Simulate parent process */
 
-    size_t ret = wm_control_execute_action("restart", "guardsarm-manager", &output);
+    size_t ret = gm_control_execute_action("restart", "guardsarm-manager", &output);
 
     assert_non_null(output);
     assert_string_equal(output, "ok ");
@@ -193,12 +193,12 @@ static void test_execute_action_restart_systemd(void **state) {
     char *output = NULL;
 
     expect_check_systemd_available();
-    expect_string(__wrap__mtinfo, tag, WM_CONTROL_TEST_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_CONTROL_TEST_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Executing 'restart' on guardsarm-manager using systemctl");
 
     will_return(__wrap_fork, 1234); /* Simulate parent process */
 
-    size_t ret = wm_control_execute_action("restart", "guardsarm-manager", &output);
+    size_t ret = gm_control_execute_action("restart", "guardsarm-manager", &output);
 
     assert_non_null(output);
     assert_string_equal(output, "ok ");
@@ -211,12 +211,12 @@ static void test_execute_action_reload_no_systemd(void **state) {
     char *output = NULL;
 
     expect_check_systemd_not_available();
-    expect_string(__wrap__mtinfo, tag, WM_CONTROL_TEST_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_CONTROL_TEST_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Executing 'reload' on guardsarm-manager using bin/guardsarm-manager-control");
 
     will_return(__wrap_fork, 5678); /* Simulate parent process */
 
-    size_t ret = wm_control_execute_action("reload", "guardsarm-manager", &output);
+    size_t ret = gm_control_execute_action("reload", "guardsarm-manager", &output);
 
     assert_non_null(output);
     assert_string_equal(output, "ok ");
@@ -229,12 +229,12 @@ static void test_execute_action_reload_systemd(void **state) {
     char *output = NULL;
 
     expect_check_systemd_available();
-    expect_string(__wrap__mtinfo, tag, WM_CONTROL_TEST_LOGTAG);
+    expect_string(__wrap__mtinfo, tag, GM_CONTROL_TEST_LOGTAG);
     expect_string(__wrap__mtinfo, formatted_msg, "Executing 'reload' on guardsarm-manager using systemctl");
 
     will_return(__wrap_fork, 5678); /* Simulate parent process */
 
-    size_t ret = wm_control_execute_action("reload", "guardsarm-manager", &output);
+    size_t ret = gm_control_execute_action("reload", "guardsarm-manager", &output);
 
     assert_non_null(output);
     assert_string_equal(output, "ok ");
