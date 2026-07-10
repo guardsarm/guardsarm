@@ -94,6 +94,7 @@ fi
 
 # base index names of every guardsarm-states-* template, collected for step 2.
 STATE_INDICES=""
+TPL_OK=0; TPL_FAIL=0        # aggregate template-install result (gap M8)
 
 while IFS= read -r jf; do
   [ -z "$jf" ] && continue
@@ -115,9 +116,9 @@ while IFS= read -r jf; do
             -X PUT "$OS_URL/_index_template/$name" \
             -H 'Content-Type: application/json' --data-binary @-)"
   if [ "$code" = "200" ]; then
-    ok "template $name"
+    ok "template $name"; TPL_OK=$((TPL_OK+1))
   else
-    err "template $name -> HTTP $code"
+    err "template $name -> HTTP $code"; TPL_FAIL=$((TPL_FAIL+1))
   fi
 
   case "$name" in
@@ -126,6 +127,15 @@ while IFS= read -r jf; do
 done <<EOF
 $JSON_LIST
 EOF
+
+# Aggregate result (gap M8): a partial install must not look like success.
+printf '  [INFO] templates: %d installed, %d failed
+' "$TPL_OK" "$TPL_FAIL" >&2
+BOOTSTRAP_FAILED=0
+if [ "$TPL_FAIL" -gt 0 ]; then
+  err "$TPL_FAIL template(s) failed to install -- bootstrap INCOMPLETE"
+  BOOTSTRAP_FAILED=1
+fi
 
 # -----------------------------------------------------------------------------
 info "2/4  Pre-creating guardsarm-states-* indices (exact base names, no docs)"
@@ -210,3 +220,6 @@ fi
 
 info "Bootstrap complete."
 echo "Verify state data with:  curl -s '$OS_URL/_cat/indices/guardsarm-states-*?v&h=index,docs.count'"
+
+# Exit non-zero if any template failed, so callers/CI can detect a partial bootstrap (gap M8).
+exit "${BOOTSTRAP_FAILED:-0}"
