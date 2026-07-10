@@ -560,11 +560,35 @@ void * gm_sca_main(gm_sca_t * data) {
         // Set synchronization parameters from config BEFORE setting sync protocol parameters
         sca_enable_synchronization = data->sync.enable_synchronization;
         if (sca_enable_synchronization) {
+            // Validate/clamp sync params from config before use (gap L4). Unbounded values
+            // are dangerous: sync_interval == 0 turns the `for (i < sca_sync_interval)` wait
+            // loops into a busy spin, and out-of-range timeouts/eps break the sync protocol.
             sca_sync_interval = data->sync.sync_interval;
+            if (sca_sync_interval < 5 || sca_sync_interval > 604800) {   // [5s .. 7d]
+                mwarn("sca sync_interval %u out of range [5,604800]; using 300", sca_sync_interval);
+                sca_sync_interval = 300;
+            }
             sca_sync_end_delay = data->sync.sync_end_delay;
+            if (sca_sync_end_delay > 300) {                             // [0 .. 300]
+                mwarn("sca sync_end_delay %u out of range [0,300]; using 1", sca_sync_end_delay);
+                sca_sync_end_delay = 1;
+            }
             sca_sync_response_timeout = data->sync.sync_response_timeout;
+            if (sca_sync_response_timeout < 1 || sca_sync_response_timeout > 3600) {  // [1s .. 1h]
+                mwarn("sca sync_response_timeout %u out of range [1,3600]; using 60", sca_sync_response_timeout);
+                sca_sync_response_timeout = 60;
+            }
             sca_sync_max_eps = data->sync.sync_max_eps;
-            sca_integrity_interval = data->sync.integrity_interval;
+            if (sca_sync_max_eps < 1 || sca_sync_max_eps > 100000) {     // [1 .. 100000]
+                mwarn("sca sync_max_eps %ld out of range [1,100000]; using 50", sca_sync_max_eps);
+                sca_sync_max_eps = 50;
+            }
+            sca_integrity_interval = data->sync.integrity_interval;     // 0 = disabled (allowed)
+            if (sca_integrity_interval != 0 &&
+                (sca_integrity_interval < 60 || sca_integrity_interval > 2592000)) {  // [60s .. 30d]
+                mwarn("sca integrity_interval %u out of range [60,2592000]; using 86400", sca_integrity_interval);
+                sca_integrity_interval = 86400;
+            }
         }
 
         // Set the sync protocol parameters

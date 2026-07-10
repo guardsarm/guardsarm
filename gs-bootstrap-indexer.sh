@@ -53,6 +53,7 @@ WITH_PATTERNS=0
 ok()   { printf '  [ ok ] %s\n' "$*"; }
 skip() { printf '  [skip] %s\n' "$*"; }
 info() { printf '\n== %s\n' "$*"; }
+warn() { printf '  [warn] %s\n' "$*" >&2; }
 err()  { printf '  [ERR] %s\n' "$*" >&2; }
 
 # curl wrapper that prints the HTTP status; treats "already exists" as success.
@@ -196,7 +197,11 @@ guardsarm-states-vulnerabilities*|
 guardsarm-findings-v5*|@timestamp
 guardsarm-findings-v5-security*|@timestamp
 '
-    printf '%s\n' "$PATTERNS" | while IFS='|' read -r title tf; do
+    # NB: feed the loop via a here-doc (NOT `printf ... | while`) so the pass/fail counters
+    # persist — a piped while runs in a subshell and its counter updates are discarded, so
+    # the previous version could silently swallow every failed pattern (gap L12).
+    p_ok=0; p_exist=0; p_fail=0
+    while IFS='|' read -r title tf; do
       [ -z "$title" ] && continue
       # saved-object id = URL-encoded title (only '*' needs encoding -> %2A).
       id="$(printf '%s' "$title" | sed 's/\*/%2A/g')"
@@ -210,11 +215,18 @@ guardsarm-findings-v5-security*|@timestamp
                 -H 'osd-xsrf: true' -H 'Content-Type: application/json' \
                 -d "$payload")"
       case "$code" in
-        200) ok "index-pattern $title" ;;
-        409) skip "index-pattern $title already exists" ;;
-        *)   err "index-pattern $title -> HTTP $code" ;;
+        200) ok "index-pattern $title"; p_ok=$((p_ok+1)) ;;
+        409) skip "index-pattern $title already exists"; p_exist=$((p_exist+1)) ;;
+        *)   err "index-pattern $title -> HTTP $code"; p_fail=$((p_fail+1)) ;;
       esac
-    done
+    done <<PATTERNS_EOF
+$PATTERNS
+PATTERNS_EOF
+    info "index-patterns: $p_ok created, $p_exist existed, $p_fail failed"
+    if [ "$p_fail" -ne 0 ]; then
+      warn "$p_fail index-pattern(s) failed — dashboard views may be incomplete"
+      BOOTSTRAP_FAILED=1
+    fi
   fi
 fi
 
