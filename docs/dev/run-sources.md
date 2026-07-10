@@ -65,7 +65,7 @@ Alternatively, use environment variables for unattended installation:
 ```bash
 USER_LANGUAGE="en" \
 USER_INSTALL_TYPE="agent" \
-USER_DIR="/var/ossec" \
+USER_DIR="/var/gsmsec" \
 USER_AGENT_MANAGER_IP="10.0.0.2" \
 USER_ENABLE_ACTIVE_RESPONSE="y" \
 USER_CA_STORE="n" \
@@ -80,13 +80,13 @@ USER_UPDATE="y" \
 After installation, start the agent:
 
 ```bash
-/var/ossec/bin/guardsarm-control start
+/var/gsmsec/bin/guardsarm-control start
 ```
 
 To verify the agent is running:
 
 ```bash
-/var/ossec/bin/guardsarm-control status
+/var/gsmsec/bin/guardsarm-control status
 ```
 
 ## Agent for Windows
@@ -164,14 +164,14 @@ After modifying the configuration, restart the server:
 
 The agent configuration file is located at:
 
-- **UNIX**: `/var/ossec/etc/ossec.conf`
-- **Windows**: `C:\Program Files (x86)\ossec-agent\ossec.conf`
+- **UNIX**: `/var/gsmsec/etc/gsmsec.conf`
+- **Windows**: `C:\Program Files (x86)\ossec-agent\gsmsec.conf`
 
 After modifying the configuration, restart the agent:
 
 **UNIX**:
 ```bash
-/var/ossec/bin/guardsarm-control restart
+/var/gsmsec/bin/guardsarm-control restart
 ```
 
 **Windows**:
@@ -190,7 +190,7 @@ Restart-Service -Name guardsarm
 ### Agent on UNIX
 
 ```bash
-/var/ossec/bin/guardsarm-control stop
+/var/gsmsec/bin/guardsarm-control stop
 ```
 
 ### Agent on Windows
@@ -217,23 +217,23 @@ tail -f /var/guardsarm-manager/logs/guardsarm-manager.log
 
 ### Agent Logs on UNIX
 
-Logs are located in `/var/ossec/logs/`:
+Logs are located in `/var/gsmsec/logs/`:
 
-- `ossec.log` - Main GuardSarm log
-- `ossec.json` - Structured GuardSarm log
-- Individual component logs in `/var/ossec/logs/`
+- `gsmsec.log` - Main GuardSarm log
+- `gsmsec.json` - Structured GuardSarm log
+- Individual component logs in `/var/gsmsec/logs/`
 
 To monitor logs in real-time:
 
 ```bash
-tail -f /var/ossec/logs/ossec.log
+tail -f /var/gsmsec/logs/gsmsec.log
 ```
 
 ### Agent Logs on Windows
 
 Logs are located in `C:\Program Files (x86)\ossec-agent\`:
 
-- `ossec.log` - Main agent log
+- `gsmsec.log` - Main agent log
 
 ## Troubleshooting
 
@@ -242,13 +242,13 @@ Logs are located in `C:\Program Files (x86)\ossec-agent\`:
 Check the logs for error messages:
 
 ```bash
-cat /var/ossec/logs/ossec.log
+cat /var/gsmsec/logs/gsmsec.log
 ```
 
 Verify the configuration file syntax:
 
 ```bash
-/var/ossec/bin/guardsarm-control configtest
+/var/gsmsec/bin/guardsarm-control configtest
 ```
 
 ### Agent Not Connecting to Server
@@ -265,7 +265,7 @@ Verify the configuration file syntax:
 
 4. Check authentication:
    ```bash
-   /var/ossec/bin/manage_agents -l
+   /var/gsmsec/bin/manage_agents -l
    ```
 
 ### Permission Errors
@@ -273,7 +273,7 @@ Verify the configuration file syntax:
 Ensure GuardSarm is running with appropriate permissions:
 
 ```bash
-ls -l /var/ossec/
+ls -l /var/gsmsec/
 ```
 
 GuardSarm typically runs as the `ossec` user.

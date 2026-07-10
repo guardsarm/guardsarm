@@ -96,7 +96,7 @@ All notable changes to this project will be documented in this file.
 
 #### Changed
 
-- Changed the GuardSarm Manager installation path to `/var/guardsarm-manager` (replacing `/var/ossec`) and removed agent ID `000`, fully decoupling agent and manager processes on shared hosts. ([#33378](https://github.com/guardsarm/guardsarm/issues/33378))
+- Changed the GuardSarm Manager installation path to `/var/guardsarm-manager` (replacing `/var/gsmsec`) and removed agent ID `000`, fully decoupling agent and manager processes on shared hosts. ([#33378](https://github.com/guardsarm/guardsarm/issues/33378))
 - Changed Vulnerability Detection to use the GuardSarm Indexer as the sole authoritative CVE data source, removing direct CTI network access from the agent-side Vulnerability Detector. ([#34849](https://github.com/guardsarm/guardsarm/issues/34849))
 - Adjusted agent-side Vulnerability Detector inventory emission and synchronization (OS, packages, hotfixes) to align with the updated VD behavior in GuardSarm 5.0. ([#33199](https://github.com/guardsarm/guardsarm/issues/33199))
 - Simplified rootcheck: removed the server-side database, sync path, and API surface; findings are now indexed through the standard alert pipeline. ([#31478](https://github.com/guardsarm/guardsarm/issues/31478))

@@ -21,7 +21,7 @@ On **Windows agents**, the equivalent logic is implemented in `control_dispatch(
 The control module serves as the control plane for operational commands. It:
 
 1. **Manager**: Listens on `$GUARDSARM_HOME/queue/sockets/control` (default: `/var/guardsarm-manager/queue/sockets/control`)
-2. **Agent (Unix)**: Listens on `$GUARDSARM_HOME/queue/sockets/control` (default: `/var/ossec/queue/sockets/control`)
+2. **Agent (Unix)**: Listens on `$GUARDSARM_HOME/queue/sockets/control` (default: `/var/gsmsec/queue/sockets/control`)
 3. **Receives control commands** from the API, framework, or remoted
 4. **Executes system operations** (restart/reload) via systemctl or guardsarm-control
 5. **Returns operation status** to the caller
@@ -37,7 +37,7 @@ Agent-side (Unix) is the same `wm_control.c` compiled with `CLIENT` defined; Win
 | Component | Socket Path |
 |-----------|-------------|
 | Manager | `$GUARDSARM_HOME/queue/sockets/control` (default: `/var/guardsarm-manager/queue/sockets/control`) |
-| Agent (Unix) | `$GUARDSARM_HOME/queue/sockets/control` (default: `/var/ossec/queue/sockets/control`) |
+| Agent (Unix) | `$GUARDSARM_HOME/queue/sockets/control` (default: `/var/gsmsec/queue/sockets/control`) |
 
 ### Manager-Side Commands
 
@@ -150,7 +150,7 @@ result = send_control_command('restart')  # Returns: "ok "
 
 **Previous Architecture (v4.x)**:
 - Control functionality in `guardsarm-execd` daemon
-- Socket: `/var/ossec/queue/sockets/com`
+- Socket: `/var/gsmsec/queue/sockets/com`
 - Agent restart/reload triggered via Active Response scripts (`restart.sh`, `restart-guardsarm.exe`)
 
 **Current Architecture (v5.0)**:

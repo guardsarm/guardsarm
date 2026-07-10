@@ -1,6 +1,6 @@
 # Log collectors
 
-Logcollector reads events from different log sources on the monitored endpoint. Each source is configured with a `<localfile>` block in `ossec.conf`, where `<log_format>` selects the collector.
+Logcollector reads events from different log sources on the monitored endpoint. Each source is configured with a `<localfile>` block in `gsmsec.conf`, where `<log_format>` selects the collector.
 
 | Format | Operating system | Description |
 |--------|-----------------|-------------|

@@ -58,13 +58,13 @@ configure_component() {
             )
             ;;
         agent)
-            INSTALL_DIR="/var/ossec"
+            INSTALL_DIR="/var/gsmsec"
             MARKER="GUARDSARM_AGENT_UPGRADE_RULES_MARKER"
             DELETED_ETC_REL="etc/internal_options.conf"
             DELETED_DATA_REL=""
             BINARY_REL="bin/guardsarm-agentd"
             COMMENT_MARKERS=(
-                "etc/ossec.conf|ossec-conf|<!-- | -->"
+                "etc/gsmsec.conf|ossec-conf|<!-- | -->"
                 "etc/local_internal_options.conf|local-internal-options|# |"
                 "etc/client.keys|client-keys|# |"
             )
@@ -413,8 +413,8 @@ run_full_upgrade() {
     old_package_path="/old_package/$(basename "$OLD_PACKAGE_URL")"
     package_operation "$old_package_path" "install"
 
-    if [ "$COMPONENT" = "agent" ] && [ -f "${INSTALL_DIR}/etc/ossec.conf" ]; then
-        sed -i 's/MANAGER_IP/1.1.1.1/g' "${INSTALL_DIR}/etc/ossec.conf"
+    if [ "$COMPONENT" = "agent" ] && [ -f "${INSTALL_DIR}/etc/gsmsec.conf" ]; then
+        sed -i 's/MANAGER_IP/1.1.1.1/g' "${INSTALL_DIR}/etc/gsmsec.conf"
     fi
 
     prepare

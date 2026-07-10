@@ -14,7 +14,7 @@ GuardSarm connects to the CloudWatch Logs API to pull log events from specified 
 
 ## Configuration
 
-Configure the AWS module in the GuardSarm agent `ossec.conf` file using the `service` element with `type="cloudwatchlogs"`:
+Configure the AWS module in the GuardSarm agent `gsmsec.conf` file using the `service` element with `type="cloudwatchlogs"`:
 
 ```xml
   <wodle name="aws-s3">
@@ -104,7 +104,7 @@ systemctl restart guardsarm-agent
 Check the module logs:
 
 ```bash
-grep "aws-s3" /var/ossec/logs/ossec.log
+grep "aws-s3" /var/gsmsec/logs/gsmsec.log
 ```
 
 CloudWatch log events generate alerts with the `aws` data field.

@@ -208,12 +208,12 @@ The agent's `guardsarm-execd` daemon:
 - **Input Validation**: All scripts validate JSON input structure before execution
 - **Command Whitelisting**: Only `enable` and `disable` commands are accepted
 - **Firewall Safety**: IP blocking scripts use safe methods and validate IP addresses
-- **Logging**: All operations logged to `/var/ossec/logs/active-responses.log`
+- **Logging**: All operations logged to `/var/gsmsec/logs/active-responses.log`
 
 ## Logging
 
 Active Response operations are logged to:
-- **Linux/macOS**: `/var/ossec/logs/active-responses.log`
+- **Linux/macOS**: `/var/gsmsec/logs/active-responses.log`
 - **Windows**: `C:\Program Files (x86)\ossec-agent\active-response\active-responses.log`
 
 Log format:

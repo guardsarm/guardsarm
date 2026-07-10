@@ -25,7 +25,7 @@ The module runs on the GuardSarm agent and periodically queries the Microsoft Gr
 
 ## Configuration
 
-Configure the Microsoft Graph module in the GuardSarm agent `ossec.conf` file:
+Configure the Microsoft Graph module in the GuardSarm agent `gsmsec.conf` file:
 
 ```xml
   <ms-graph>
@@ -114,7 +114,7 @@ systemctl restart guardsarm-agent
 Check the module logs:
 
 ```bash
-grep "ms-graph" /var/ossec/logs/ossec.log
+grep "ms-graph" /var/gsmsec/logs/gsmsec.log
 ```
 
 Microsoft Graph security events generate alerts with the `ms-graph` data field populated.

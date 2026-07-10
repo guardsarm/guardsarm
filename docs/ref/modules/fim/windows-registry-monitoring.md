@@ -17,7 +17,7 @@ The GuardSarm FIM module uses two databases to collect FIM event data, such as r
 - Local SQLite database on the endpoint:  
   `C:\Program Files (x86)\ossec-agent\queue\fim\db`
 - Agent database on the GuardSarm server:  
-  `/var/ossec/queue/db`
+  `/var/gsmsec/queue/db`
 
 
 The FIM module synchronization mechanism ensures synchronization between the GuardSarm agent and the GuardSarm server databases. It always updates the file inventory in the GuardSarm server with the data available to the GuardSarm agent. This allows servicing FIM-related API queries regarding the GuardSarm agents.
@@ -27,7 +27,7 @@ The FIM module synchronization mechanism ensures synchronization between the Gua
 To configure the FIM module, specify the registry keys that FIM must monitor for creation, modification, and deletion using the `<windows_registry>` label.
 
 You can modify the default FIM configuration in  
-`C:\Program Files (x86)\ossec-agent\ossec.conf`.
+`C:\Program Files (x86)\ossec-agent\gsmsec.conf`.
 
 You can also configure this capability remotely using centralized configuration.
 

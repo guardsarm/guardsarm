@@ -16,7 +16,7 @@
 #include <windows.h>
 #include "os_regex.h"
 
-#define GUARDSARMCONF   "ossec.conf"
+#define GUARDSARMCONF   "gsmsec.conf"
 #define OS_MAXSTR   1024
 
 

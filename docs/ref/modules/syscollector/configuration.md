@@ -1,6 +1,6 @@
 # Configuration
 
-Syscollector is configured in the agent's `ossec.conf` file using the `<wodle name="syscollector">` section. The module supports both basic inventory collection and advanced synchronization features for persistent inventory state management.
+Syscollector is configured in the agent's `gsmsec.conf` file using the `<wodle name="syscollector">` section. The module supports both basic inventory collection and advanced synchronization features for persistent inventory state management.
 
 > **Important:** Starting in version 5.0, vulnerability detection is handled by a separate Vulnerability Detector module. Syscollector focuses exclusively on inventory collection (packages, OS, hotfixes, etc.), while vulnerability detection and CVE correlation are performed independently.
 
@@ -348,10 +348,10 @@ For environments with frequent inventory changes:
 
 Validate configuration syntax:
 ```bash
-/var/ossec/bin/guardsarm-agentd -t
+/var/gsmsec/bin/guardsarm-agentd -t
 ```
 
 Monitor for errors:
 ```bash
-tail -f /var/ossec/logs/ossec.log | grep syscollector
+tail -f /var/gsmsec/logs/gsmsec.log | grep syscollector
 ```

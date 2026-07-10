@@ -1,6 +1,6 @@
 # Migrating Syslog Input to Logcollector with rsyslog
 
-In previous GuardSarm versions (4.x), the manager's `remoted` module accepted raw syslog messages from network devices (firewalls, routers, switches) on port 514, configured via `<connection>syslog</connection>` in the manager's `ossec.conf`.
+In previous GuardSarm versions (4.x), the manager's `remoted` module accepted raw syslog messages from network devices (firewalls, routers, switches) on port 514, configured via `<connection>syslog</connection>` in the manager's `gsmsec.conf`.
 
 Starting with GuardSarm 5.0, this syslog input capability has been removed from `remoted`. The module now exclusively handles encrypted agent connections. To continue collecting syslog from network devices, you must deploy rsyslog on a collection host to receive the messages, and install a GuardSarm agent on that host to forward them to the GuardSarm server.
 
@@ -17,9 +17,9 @@ This guide covers two approaches for the rsyslog-to-GuardSarm pipeline:
 | ----------------------- | ---------------------------------------------- | --------------------------------------------------- |
 | Syslog receiver | Manager `remoted` (port 514) | External syslog daemon (rsyslog) |
 | Log ingestion | Direct to `analysisd` | Via GuardSarm agent logcollector |
-| Configuration location | Manager `ossec.conf` `<remote>` block | rsyslog config + agent `ossec.conf` |
+| Configuration location | Manager `gsmsec.conf` `<remote>` block | rsyslog config + agent `gsmsec.conf` |
 | GuardSarm agent on host | Not required | Required — not installed with the manager in 5.0 |
-| IP allowlist/denylist | `<allowed-ips>` / `<denied-ips>` in `ossec.conf` | rsyslog `$AllowedSender` or host firewall rules |
+| IP allowlist/denylist | `<allowed-ips>` / `<denied-ips>` in `gsmsec.conf` | rsyslog `$AllowedSender` or host firewall rules |
 
 ## Architecture
 
@@ -62,7 +62,7 @@ Option A is simpler to operate: journald handles retention automatically and no 
 
 ## Configuration mapping (4.x → 5.x)
 
-| 4.x `ossec.conf` | 5.x equivalent | Option |
+| 4.x `gsmsec.conf` | 5.x equivalent | Option |
 | ----------------------------------------- | -------------------------------------------- | ----------- |
 | `remote.connection` = `syslog` | rsyslog `imudp` / `imtcp` input modules | Both |
 | `remote.port` | rsyslog `input` port | Both |
@@ -72,10 +72,10 @@ Option A is simpler to operate: journald handles retention automatically and no 
 | Syslog forwarded directly to `analysisd` | rsyslog `omjournal` → journald reader | Option A |
 | Syslog forwarded directly to `analysisd` | Agent `<localfile>` monitoring log files | Option B |
 
-## GuardSarm 4.x `ossec.conf` reference
+## GuardSarm 4.x `gsmsec.conf` reference
 
 ```xml
-<!-- GuardSarm 4.x manager ossec.conf -->
+<!-- GuardSarm 4.x manager gsmsec.conf -->
 <ossec_config>
   <remote>
     <connection>syslog</connection>
@@ -193,7 +193,7 @@ On the collection host, confirm the message arrived in the journal:
 journalctl -f
 ```
 
-The GuardSarm agent reads the journal — no changes to `/var/ossec/etc/ossec.conf` are needed.
+The GuardSarm agent reads the journal — no changes to `/var/gsmsec/etc/gsmsec.conf` are needed.
 
 ### 4. Verify events appear in the dashboard
 
@@ -253,7 +253,7 @@ sudo ss -tlnp | grep 514
 
 ### 2. Configure the GuardSarm agent to monitor syslog files
 
-Edit the agent's configuration file at `/var/ossec/etc/ossec.conf` and add a `<localfile>` block:
+Edit the agent's configuration file at `/var/gsmsec/etc/gsmsec.conf` and add a `<localfile>` block:
 
 ```xml
 <ossec_config>
@@ -288,7 +288,7 @@ sudo systemctl restart guardsarm-agent
 Confirm the logcollector is reading the files:
 
 ```bash
-sudo grep "logcollector" /var/ossec/logs/ossec.log | grep "remote"
+sudo grep "logcollector" /var/gsmsec/logs/gsmsec.log | grep "remote"
 ```
 
 Expected output:
@@ -323,7 +323,7 @@ ubuntu@ubu24-2:~$ i=22; while true; do logger -n 192.168.70.104 --rfc3164 -P 514
 
 #### GuardSarm manager configuration
 
-Configure `/var/ossec/etc/ossec.conf` to enable remote syslog reception:
+Configure `/var/gsmsec/etc/gsmsec.conf` to enable remote syslog reception:
 
 ```xml
 <ossec_config>
@@ -336,7 +336,7 @@ Configure `/var/ossec/etc/ossec.conf` to enable remote syslog reception:
 </ossec_config>
 ```
 
-Add a rule in `/var/ossec/etc/rules/local_rules.xml` to match the remote logs:
+Add a rule in `/var/gsmsec/etc/rules/local_rules.xml` to match the remote logs:
 
 ```xml
 <group name="syslog,remote_test,">
@@ -347,10 +347,10 @@ Add a rule in `/var/ossec/etc/rules/local_rules.xml` to match the remote logs:
 </group>
 ```
 
-Alerts appear in `/var/ossec/logs/alerts/alerts.log`:
+Alerts appear in `/var/gsmsec/logs/alerts/alerts.log`:
 
 ```
-[guardsarm-user@guardsarm-server ~]$ sudo tail -f /var/ossec/logs/alerts/alerts.log
+[guardsarm-user@guardsarm-server ~]$ sudo tail -f /var/gsmsec/logs/alerts/alerts.log
 ** Alert 1780935033.426378: - syslog,remote_test,
 2026 Jun 08 16:10:33 ubu24-2->192.168.70.105
 Rule: 100002 (level 3) -> 'Remote syslog test message from ubu24-2'
@@ -423,7 +423,7 @@ ubuntu@ubu24-2:~$ i=22; while true; do logger -n 192.168.70.104 --rfc3164 -P 514
 
 #### GuardSarm agent configuration
 
-Add a `<localfile>` block to `/var/ossec/etc/ossec.conf` on the collection host:
+Add a `<localfile>` block to `/var/gsmsec/etc/gsmsec.conf` on the collection host:
 
 ```xml
 <ossec_config>

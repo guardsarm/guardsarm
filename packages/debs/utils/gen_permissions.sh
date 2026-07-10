@@ -9,7 +9,7 @@
 # This scripts take 2 parameters, source_dir and target_dir
 # Remember: you must use gawk, be careful mawk is not compatible
 #
-# Usage: ./gen_permissions.sh /var/ossec/ ~/restore_permissions.sh
+# Usage: ./gen_permissions.sh /var/gsmsec/ ~/restore_permissions.sh
 
 set -euo pipefail
 

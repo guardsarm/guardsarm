@@ -1,6 +1,6 @@
 # Logging Configuration
 
-The `<logging>` section controls the format of manager internal log output (`/var/guardsarm-manager/logs/ossec.log`).
+The `<logging>` section controls the format of manager internal log output (`/var/guardsarm-manager/logs/gsmsec.log`).
 
 Configuration file: `/var/guardsarm-manager/etc/guardsarm-manager.conf`
 
@@ -15,7 +15,7 @@ Format for manager internal logs. Accepts a single value or a comma-separated pa
 - **Default value**: `plain`
 - **Allowed values**: `plain`, `json`, `plain,json` (or `json,plain` — order does not matter)
 
-When set to `plain,json`, the manager writes every log line in both formats. Plain output goes to `ossec.log`; JSON output goes to `ossec.json`.
+When set to `plain,json`, the manager writes every log line in both formats. Plain output goes to `gsmsec.log`; JSON output goes to `gsmsec.json`.
 
 ## Configuration Example
 

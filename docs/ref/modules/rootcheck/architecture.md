@@ -414,7 +414,7 @@ Rootcheck alerts are processed by rules in the 510-550 range:
 
 ## Internal Options
 
-Advanced tuning via `/var/ossec/etc/internal_options.conf`:
+Advanced tuning via `/var/gsmsec/etc/internal_options.conf`:
 
 ```
 # rootcheck.sleep
@@ -433,12 +433,12 @@ Enable verbose logging:
 rootcheck.debug=2
 
 # Restart agent
-/var/ossec/bin/guardsarm-control restart
+/var/gsmsec/bin/guardsarm-control restart
 ```
 
 Check rootcheck-specific logs:
 ```bash
-grep rootcheck /var/ossec/logs/ossec.log
+grep rootcheck /var/gsmsec/logs/gsmsec.log
 ```
 
 ## See Also

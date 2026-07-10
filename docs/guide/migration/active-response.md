@@ -1,12 +1,12 @@
 # Active Response migration guide (4.x to 5.x)
 
-Active Response (AR) is rebuilt in 5.x. The 4.x XML in `ossec.conf`, the agent-side `ar.conf`, rule-based matching, and the `PUT /active-response` API are all removed. 5.x replaces them with channels managed in the dashboard, an Alerting monitor that triggers them, a `guardsarm-active-responses` data stream that records executions, and a manager-side poller that dispatches to agents over `guardsarm-manager-remoted`.
+Active Response (AR) is rebuilt in 5.x. The 4.x XML in `gsmsec.conf`, the agent-side `ar.conf`, rule-based matching, and the `PUT /active-response` API are all removed. 5.x replaces them with channels managed in the dashboard, an Alerting monitor that triggers them, a `guardsarm-active-responses` data stream that records executions, and a manager-side poller that dispatches to agents over `guardsarm-manager-remoted`.
 
 > **Manual migration only.** No converter, importer, or compatibility shim is provided. Every 4.x AR must be recreated as a 5.x active response; every custom script must be rewritten for the new JSON contract.
 
 ## Breaking changes at a glance
 
-- `ossec.conf` `<command>` / `<active-response>` blocks are no longer parsed. `ar.conf` is removed from the agent.
+- `gsmsec.conf` `<command>` / `<active-response>` blocks are no longer parsed. `ar.conf` is removed from the agent.
 - AR is created under **Explore → Active Responses**. Each channel carries `name`, `description`, `enabled`, `executable`, `extra_arguments`, `type` (`stateful` / `stateless`), `stateful_timeout` (default `180s`), `location` (`local` / `defined-agent` / `all`), `agent_id`.
 - Matching (`<rules_id>` / `<level>` / `<rules_group>`) moves to the query of an Alerting monitor of type **Active Response**.
 - `PUT /active-response` is removed with no replacement. Dispatch is document-driven: a monitor action writes into `guardsarm-active-responses`; the manager polls every 60 s (batches of 100) and forwards via `guardsarm-manager-remoted`. Pre-5.0 agents are filtered out.
@@ -22,7 +22,7 @@ Active Response (AR) is rebuilt in 5.x. The 4.x XML in `ossec.conf`, the agent-s
 
 | GuardSarm Version | AR configuration source | Dashboard Platform        | Manager / Indexer |
 | ------------- | ----------------------- | ------------------------- | ----------------- |
-| 4.x           | `ossec.conf` XML blocks | OpenSearch Dashboards 2.x | GuardSarm 4.x         |
+| 4.x           | `gsmsec.conf` XML blocks | OpenSearch Dashboards 2.x | GuardSarm 4.x         |
 | 5.0.x         | Dashboard entity (UI)   | OpenSearch Dashboards 3.x | GuardSarm 5.x         |
 
 Mixed-version fleets may execute inconsistently — coordinate manager and agent upgrades.
@@ -36,11 +36,11 @@ Back up the 4.x AR state and inventory each entry before upgrading:
 ```bash
 AR_BACKUP_DIR="/root/backup-ar-$(date +%Y%m%d)"
 sudo mkdir -p "$AR_BACKUP_DIR"
-sudo cp -a /var/ossec/etc/ossec.conf "$AR_BACKUP_DIR/"
-sudo cp -a /var/ossec/active-response/bin/ "$AR_BACKUP_DIR/"
+sudo cp -a /var/gsmsec/etc/gsmsec.conf "$AR_BACKUP_DIR/"
+sudo cp -a /var/gsmsec/active-response/bin/ "$AR_BACKUP_DIR/"
 ```
 
-For each `<command>` and `<active-response>` block in `/var/ossec/etc/ossec.conf`, record the values you will need to recreate the AR as a 5.x active response:
+For each `<command>` and `<active-response>` block in `/var/gsmsec/etc/gsmsec.conf`, record the values you will need to recreate the AR as a 5.x active response:
 
 - `<command>`: `<name>`, `<executable>`, `<extra_args>`, `<timeout_allowed>`.
 - `<active-response>`: the linked command, `<location>`, `<agent_id>`, the matching condition (`<rules_id>` / `<rules_group>` / `<level>`), `<timeout>`, `<repeated_offenders>`, `<disabled>`.
@@ -48,7 +48,7 @@ For each `<command>` and `<active-response>` block in `/var/ossec/etc/ossec.conf
 Historical AR records are not migrated to the 5.x `guardsarm-active-responses` data stream. In 4.x they live in two places:
 
 - Alerts in your `guardsarm-alerts-*` indices, filtered by `rule.groups: active_response`.
-- Lines in `/var/ossec/logs/active-responses.log` on each agent.
+- Lines in `/var/gsmsec/logs/active-responses.log` on each agent.
 
 If you need long-term records, export them from your 4.x indexer using your standard data-export procedure before upgrading.
 
@@ -59,7 +59,7 @@ If you need long-term records, export them from your 4.x indexer using your stan
 | 4.x XML                                                     | 5.x equivalent                      | Notes                                                                                               |
 | ----------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `<command><name>`                                           | _(no direct field)_                 | The channel replaces the named command. Pick a descriptive **Name**.                                |
-| `<command><executable>`                                     | **Executable**                      | Discovery path preserved at `/var/ossec/active-response/bin/<executable>` on Unix agents.           |
+| `<command><executable>`                                     | **Executable**                      | Discovery path preserved at `/var/gsmsec/active-response/bin/<executable>` on Unix agents.           |
 | `<command><extra_args>`                                     | **Extra arguments**                 | Free-form string passed to the executable.                                                          |
 | `<command><timeout_allowed>`                                | _(no replacement)_                  | Reversal is driven by `type = Stateful` + **Stateful timeout**.                                     |
 | `<active-response><location>` = `local`                     | **Location** = `Local`              | Default.                                                                                            |
@@ -97,7 +97,7 @@ The 4.x numeric IDs (`5763`, `5760`, …) have no 1:1 equivalent — locate the 
 
 | Surface               | 4.x                                                                                                       | 5.x                                                                                                                                                        |
 | --------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Executions land in    | `/var/ossec/logs/active-responses.log` + events from the `active_response` rule group in `guardsarm-alerts-*` | `guardsarm-active-responses` alias (`.guardsarm-active-responses-v5` backing data stream). Agent log unchanged.                                                    |
+| Executions land in    | `/var/gsmsec/logs/active-responses.log` + events from the `active_response` rule group in `guardsarm-alerts-*` | `guardsarm-active-responses` alias (`.guardsarm-active-responses-v5` backing data stream). Agent log unchanged.                                                    |
 | Structured fields     | Free text                                                                                                 | `guardsarm.active_response.{name,type,executable,extra_arguments,stateful_timeout,location,agent_id}` + `event.doc_id` / `event.index`.                        |
 | `@timestamp`          | Event time                                                                                                | Indexing time. For event-time correlation use the linked alert via `event.doc_id`.                                                                         |
 | Default retention     | Alerts ILM policy                                                                                         | 3 days (`stream-active-responses-policy`, priority 100). Adjust the policy for longer retention.                                                           |
@@ -113,7 +113,7 @@ The 4.x numeric IDs (`5763`, `5760`, …) have no 1:1 equivalent — locate the 
 
 > Custom AR scripts from 4.x will break on 5.x without code changes.
 
-The discovery path is unchanged on Unix agents (`/var/ossec/active-response/bin/<executable>`). What changed is the JSON shape and the command vocabulary.
+The discovery path is unchanged on Unix agents (`/var/gsmsec/active-response/bin/<executable>`). What changed is the JSON shape and the command vocabulary.
 
 **4.x:**
 
@@ -128,7 +128,7 @@ The discovery path is unchanged on Unix agents (`/var/ossec/active-response/bin/
       "rule": { "id": "5763", "level": 10 },
       "data": { "srcip": "192.168.1.100", "dstuser": "root" }
     },
-    "program": "/var/ossec/active-response/bin/firewall-drop"
+    "program": "/var/gsmsec/active-response/bin/firewall-drop"
   }
 }
 ```
@@ -176,7 +176,7 @@ For each custom script:
 #!/bin/bash
 
 # Log file
-LOGFILE="/var/ossec/logs/active-responses.log"
+LOGFILE="/var/gsmsec/logs/active-responses.log"
 
 logmsg(){
   local msg="$*"
@@ -224,7 +224,7 @@ exit 0
 #!/bin/bash
 
 # Log file
-LOGFILE="/var/ossec/logs/active-responses.log"
+LOGFILE="/var/gsmsec/logs/active-responses.log"
 
 logmsg(){
   local msg="$*"
@@ -269,8 +269,8 @@ exit 0
 Ownership and permissions are unchanged:
 
 ```bash
-sudo chown root:guardsarm /var/ossec/active-response/bin/<script>
-sudo chmod 750 /var/ossec/active-response/bin/<script>
+sudo chown root:guardsarm /var/gsmsec/active-response/bin/<script>
+sudo chmod 750 /var/gsmsec/active-response/bin/<script>
 ```
 
 The 4.x manager `<command>` / `<active-response>` registration is replaced by a channel created in **Explore → Active Responses** and an Alerting monitor whose query matches the rule by `guardsarm.rule.title` over `guardsarm-findings-v5-*` (the 4.x numeric `rule.id` is gone — see [Triggering model](#triggering-model)) and whose trigger's **Add active response** action points at the channel. `<repeated_offenders>` has no direct replacement — see [`<repeated_offenders>` is gone](#repeated_offenders-is-gone).
@@ -318,7 +318,7 @@ For every migrated AR that referenced a consolidated script, set **Executable** 
    sudo systemctl restart guardsarm-manager
    ```
 
-   Generate the triggering event and open **Discover** with the `guardsarm-active-responses*` index pattern. Within ~60 s an execution document appears; expand it to confirm `guardsarm.active_response.{name,type,executable,location}` match the channel, and that `event.doc_id` / `event.index` point back to the source alert. For stateful AR, wait `stateful_timeout` seconds and verify the revert (a second log line in `/var/ossec/logs/active-responses.log` on the agent, plus restored connectivity for `block-ip`).
+   Generate the triggering event and open **Discover** with the `guardsarm-active-responses*` index pattern. Within ~60 s an execution document appears; expand it to confirm `guardsarm.active_response.{name,type,executable,location}` match the channel, and that `event.doc_id` / `event.index` point back to the source alert. For stateful AR, wait `stateful_timeout` seconds and verify the revert (a second log line in `/var/gsmsec/logs/active-responses.log` on the agent, plus restored connectivity for `block-ip`).
 
    ![Discover — Expanded active response document](../images/ar-discover-document-expanded.png)
 
@@ -332,7 +332,7 @@ Two end-to-end migrations that make every section above concrete.
 
 The most common migration: a single rule, a single agent, stateful reversal, using only default scripts. Exercises [field mapping](#field-mapping-4x-xml--5x-active-response), the [`block-ip` consolidation](#default-scripts), and monitor wiring.
 
-**Starting point (4.x `/var/ossec/etc/ossec.conf`):**
+**Starting point (4.x `/var/gsmsec/etc/gsmsec.conf`):**
 
 ```xml
 <command>
@@ -377,7 +377,7 @@ What this does in 4.x: when rule `5763` (composite SSH brute force — fires aft
 
 **Expected outcome after Step 5:**
 
-1. Agent's `/var/ossec/logs/active-responses.log` shows two lines for the same source IP: a BLOCK at firing time, then an UNBLOCK ~60 s later.
+1. Agent's `/var/gsmsec/logs/active-responses.log` shows two lines for the same source IP: a BLOCK at firing time, then an UNBLOCK ~60 s later.
 2. The indexer's `guardsarm-active-responses*` data stream gets one document. The `enable` document looks like:
 
    ```json
@@ -534,7 +534,7 @@ What this does in 4.x: when rule `5763` (composite SSH brute force — fires aft
 
 A custom script with arguments that add context-aware logging. Exercises the [JSON stdin contract](#json-stdin-contract) change and the per-channel `extra_arguments` simplification.
 
-**Starting point (4.x `/var/ossec/etc/ossec.conf`):**
+**Starting point (4.x `/var/gsmsec/etc/gsmsec.conf`):**
 
 ```xml
 <command>
@@ -555,7 +555,7 @@ A custom script with arguments that add context-aware logging. Exercises the [JS
 
 > In 4.x, supporting a second arg variant requires a **second `<command>` block** because `<extra_args>` is a child of `<command>`, not of `<active-response>`. In 5.x the same executable can serve N channels with N different `extra_arguments` — that simplification is what this example proves.
 
-**Starting point (4.x script `/var/ossec/active-response/bin/block-ssh.sh`):**
+**Starting point (4.x script `/var/gsmsec/active-response/bin/block-ssh.sh`):**
 
 ```bash
 #!/bin/bash
@@ -592,11 +592,11 @@ exit 0
 | 4 — Wire to monitor        | Monitor over `guardsarm-findings-v5-*` with a `guardsarm.rule.title` query (4.x numeric `5760` has no 5.x equivalent — see [Triggering model](#triggering-model)); trigger action = **Add active response**. |
 | 5 — Restart and smoke-test | Trigger the rule; expect the rewritten script to run and a document in `guardsarm-active-responses*`.                                                                                                                                                                            |
 
-**Step 3 — rewritten script** (`/var/ossec/active-response/bin/block-ssh.sh`, `chown root:guardsarm`, `chmod 750`):
+**Step 3 — rewritten script** (`/var/gsmsec/active-response/bin/block-ssh.sh`, `chown root:guardsarm`, `chmod 750`):
 
 ```bash
 #!/bin/bash
-LOGFILE="/var/ossec/logs/active-responses.log"
+LOGFILE="/var/gsmsec/logs/active-responses.log"
 read -r INPUT_JSON   # one line; do NOT use $(cat) — execd keeps stdin open and $(cat) hangs.
 COMMAND=$(echo "$INPUT_JSON" | jq -r '.command')
 SRC_IP=$(echo  "$INPUT_JSON" | jq -r '.source.ip')
@@ -688,8 +688,8 @@ Pick the rows that match your 4.14 inventory and validate those scenarios before
 ## Post-migration validation
 
 - Every 4.x `<active-response>` block has a matching entity in **Explore → Active Responses** with the values from the inventory.
-- Custom scripts under `/var/ossec/active-response/bin/` use the 5.x JSON contract (no references to `parameters.alert.data.*` or the `add` / `delete` inbound commands).
-- `ossec.conf` contains no `<command>` or `<active-response>` blocks.
+- Custom scripts under `/var/gsmsec/active-response/bin/` use the 5.x JSON contract (no references to `parameters.alert.data.*` or the `add` / `delete` inbound commands).
+- `gsmsec.conf` contains no `<command>` or `<active-response>` blocks.
 - The smoke test from [Migration steps](#migration-steps) (step 5) passes for at least one migrated AR.
 
 ---
@@ -714,8 +714,8 @@ Items below are specific to the 4.x → 5.x migration. For symptoms that are not
 **Permission errors on custom scripts.** Re-apply:
 
 ```bash
-sudo chown root:guardsarm /var/ossec/active-response/bin/<script>
-sudo chmod 750 /var/ossec/active-response/bin/<script>
+sudo chown root:guardsarm /var/gsmsec/active-response/bin/<script>
+sudo chmod 750 /var/gsmsec/active-response/bin/<script>
 ```
 
 ### Custom script hangs and AR queue stalls
@@ -732,7 +732,7 @@ If a custom AR script appears to do nothing on the first fire and **subsequent f
     exit 0
     ```
 
-2. **Per-AR serialization on the agent.** `guardsarm-execd` queues dispatches per AR name per agent. A hanging script holds the lock; **all subsequent fires of the same AR are silently dropped** — there is no warning in the agent's `ossec.log` and no record on the agent side. The visible symptom: the rule keeps firing on the manager (`firedtimes` increments in `guardsarm-alerts-*`), but the agent never receives the dispatch and no stdin capture file appears under `/tmp`.
+2. **Per-AR serialization on the agent.** `guardsarm-execd` queues dispatches per AR name per agent. A hanging script holds the lock; **all subsequent fires of the same AR are silently dropped** — there is no warning in the agent's `gsmsec.log` and no record on the agent side. The visible symptom: the rule keeps firing on the manager (`firedtimes` increments in `guardsarm-alerts-*`), but the agent never receives the dispatch and no stdin capture file appears under `/tmp`.
 
     Recovery on the agent:
 
@@ -764,7 +764,7 @@ To confirm the round trip: after the script sends `check_keys`, `guardsarm-execd
 
 ### Channel dispatches but the script never runs
 
-The execution record lands in `guardsarm-active-responses*` (so the monitor fired and the manager dispatched), but the agent's `active-responses.log` shows nothing and no firewall rule appears. The usual cause is a malformed **Executable** field on the channel — most often a **leading or trailing space** (e.g. `" block-ip"`). The agent looks for an executable named literally `" block-ip"` under `/var/ossec/active-response/bin/`, does not find it, and silently does nothing. Edit the channel (**Explore → Active Responses → <channel> → Actions → Edit**) and ensure **Executable** is exactly the script name with no surrounding whitespace.
+The execution record lands in `guardsarm-active-responses*` (so the monitor fired and the manager dispatched), but the agent's `active-responses.log` shows nothing and no firewall rule appears. The usual cause is a malformed **Executable** field on the channel — most often a **leading or trailing space** (e.g. `" block-ip"`). The agent looks for an executable named literally `" block-ip"` under `/var/gsmsec/active-response/bin/`, does not find it, and silently does nothing. Edit the channel (**Explore → Active Responses → <channel> → Actions → Edit**) and ensure **Executable** is exactly the script name with no surrounding whitespace.
 
 ### `block-ip` uses firewalld, not raw iptables
 

@@ -1,20 +1,20 @@
 # Migrating Remote Syslog Output to Dashboard Notifications
 
-In previous GuardSarm versions (4.x), forwarding alerts to remote log servers via Syslog was managed directly in the GuardSarm manager's `ossec.conf` file using `<syslog_output>` configuration blocks handled by the internal `csyslogd` daemon.
+In previous GuardSarm versions (4.x), forwarding alerts to remote log servers via Syslog was managed directly in the GuardSarm manager's `gsmsec.conf` file using `<syslog_output>` configuration blocks handled by the internal `csyslogd` daemon.
 
 Starting with GuardSarm 5.0, these legacy backend Syslog forwarding capabilities have been removed from the manager. Alert forwarding logic must now be configured directly through the GuardSarm dashboard using the **Notifications** and **Alerting** dashboard plugins via webhooks.
 
-> **Note:** There is no automatic upgrade tooling to migrate your existing GuardSarm 4.x `<syslog_output>` configurations. You must manually recreate your data filtering and forwarding logic in the GuardSarm dashboard. Use the mapping table below to identify which GuardSarm 5.x feature corresponds to each element in your `ossec.conf`.
+> **Note:** There is no automatic upgrade tooling to migrate your existing GuardSarm 4.x `<syslog_output>` configurations. You must manually recreate your data filtering and forwarding logic in the GuardSarm dashboard. Use the mapping table below to identify which GuardSarm 5.x feature corresponds to each element in your `gsmsec.conf`.
 
 ## Configuration mapping (4.x -> 5.x)
 
-The following table maps each `ossec.conf` element from GuardSarm 4.x to the corresponding feature in the GuardSarm 5.x dashboard. Entries use the form `section.element` - for example, `syslog_output.server` refers to `<syslog_output><server>` in your `ossec.conf`.
+The following table maps each `gsmsec.conf` element from GuardSarm 4.x to the corresponding feature in the GuardSarm 5.x dashboard. Entries use the form `section.element` - for example, `syslog_output.server` refers to `<syslog_output><server>` in your `gsmsec.conf`.
 
-> See the [ossec.conf reference](#guardsarm-4x-ossecconf-reference) below for the full XML context of this section.
+> See the [gsmsec.conf reference](#guardsarm-4x-ossecconf-reference) below for the full XML context of this section.
 
 ### Syslog output mapping
 
-| 4.x `ossec.conf`         | 5.x dashboard                                            | Guide                                                                 |
+| 4.x `gsmsec.conf`         | 5.x dashboard                                            | Guide                                                                 |
 | ------------------------ | -------------------------------------------------------- | --------------------------------------------------------------------- |
 | `syslog_output.server`   | Notifications > Channels > Custom Webhook (target host) | [Step 1](#1-setting-up-a-custom-webhook-notification-channel)         |
 | `syslog_output.port`     | Notifications > Channels > Custom Webhook (target port) | [Step 1](#1-setting-up-a-custom-webhook-notification-channel)         |
@@ -23,15 +23,15 @@ The following table maps each `ossec.conf` element from GuardSarm 4.x to the cor
 | `syslog_output.level`    | Alerting > Monitor > Trigger / data threshold filter    | [Step 2.2](#22-configuring-triggers-and-actions)                      |
 | `syslog_output.group`    | Alerting > Monitor > Query / data filter (`guardsarm.rule.tags`) | [Step 2.1](#21-creating-a-monitor)                                |
 | `syslog_output.rule_id`  | Alerting > Monitor > Query / data filter (`guardsarm.rule.id`) | [Step 2.1](#21-creating-a-monitor)                                  |
-> **Option scope note:** `protocol` is not a valid `<syslog_output>` option in GuardSarm 4.x `ossec.conf` (the documented options are `server`, `port`, `level`, `group`, `rule_id`, `location`, `use_fqdn`, and `format`).
+> **Option scope note:** `protocol` is not a valid `<syslog_output>` option in GuardSarm 4.x `gsmsec.conf` (the documented options are `server`, `port`, `level`, `group`, `rule_id`, `location`, `use_fqdn`, and `format`).
 
 > **GuardSarm 4.x protocol note:** In GuardSarm 4.x, `syslog_output` forwarding uses Syslog transport (UDP by default on port `514`). In GuardSarm 5.x, Notifications uses HTTP/HTTPS POST webhooks for outbound routing. Target endpoints must support HTTP webhook ingestion, or you must deploy a webhook-to-syslog translation layer on the receiving side.
 
 > **Note on Output Formats**: In GuardSarm 4.x, the <format> tag automatically converted the data layout into predefined profiles (json, cef, or splunk). In GuardSarm 5.x, the Notifications plugin does not include these pre-configured encoding profiles. To migrate specific formats (such as ArcSight CEF, Splunk key-value pairs, or custom JSON payloads), the structure must be manually designed inside the Message text block using Mustache syntax variables during the Action configuration phase.
 
-## GuardSarm 4.x ossec.conf reference
+## GuardSarm 4.x gsmsec.conf reference
 
-Below is a typical GuardSarm 4.x configuration block you may have in your `ossec.conf`. Use it as a reference when following the migration steps.
+Below is a typical GuardSarm 4.x configuration block you may have in your `gsmsec.conf`. Use it as a reference when following the migration steps.
 
 > **Port context:** In this legacy 4.x example, port `514` is the standard Syslog transport port (UDP/TCP). In GuardSarm 5.x webhook routing, use the HTTP/HTTPS port exposed by your receiver (for example, `10515`).
 
@@ -129,7 +129,7 @@ Triggers act as threshold selectors (similar to legacy `<level>` intent), while 
 <details>
 <summary>Example: recreating a legacy syslog forwarding filter</summary>
 
-If your GuardSarm 4.x `ossec.conf` contained:
+If your GuardSarm 4.x `gsmsec.conf` contained:
 
 ```xml
 <syslog_output>

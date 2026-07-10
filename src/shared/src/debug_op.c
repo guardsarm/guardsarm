@@ -93,7 +93,7 @@ static void _log_function(int level, const char *tag, const char * file, int lin
 
     if (!flags.initialized) {
         /* If not initialized and plain_only is true, we avoid reading the
-           the ossec.conf file due to the call to many shared libraries (XML read, etc.).
+           the gsmsec.conf file due to the call to many shared libraries (XML read, etc.).
            The module will be initialized later. */
         if(plain_only) {
             flags.log_plain = 1;

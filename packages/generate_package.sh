@@ -104,7 +104,7 @@ help() {
     echo "    -j, --jobs <number>        [Optional] Change number of parallel jobs when compiling the manager or agent. By default: 2."
     echo "    -r, --revision <rev>       [Optional] Package revision. By default: 0."
     echo "    -s, --store <path>         [Optional] Set the destination path of package. By default, an output folder will be created."
-    echo "    -p, --path <path>          [Optional] Installation path for the package. By default: /var/guardsarm-manager (manager) or /var/ossec (agent)."
+    echo "    -p, --path <path>          [Optional] Installation path for the package. By default: /var/guardsarm-manager (manager) or /var/gsmsec (agent)."
     echo "    -d, --debug                [Optional] Build the binaries with debug flags (without optimizations). By default: no."
     echo "    -c, --checksum             [Optional] Generate checksum on the same directory than the package. By default: no."
     echo "    --dont-build-docker        [Optional] Locally built docker image will be used instead of generating a new one."
@@ -115,7 +115,7 @@ help() {
     echo "    --src                      [Optional] Generate the source package in the destination directory."
     echo "    --future                   [Optional] Build test future package x.30.0 Used for development purposes."
     echo "    --verbose                  [Optional] Print commands and their arguments as they are executed."
-    echo "    --force                    [Optional] Force building manager package with /var/ossec path (not recommended)."
+    echo "    --force                    [Optional] Force building manager package with /var/gsmsec path (not recommended)."
     echo "    -h, --help                 Show this help."
     echo
     exit $1
@@ -256,21 +256,21 @@ main() {
         if [ "${TARGET}" = "manager" ]; then
             INSTALLATION_PATH="/var/guardsarm-manager"
         else
-            INSTALLATION_PATH="/var/ossec"
+            INSTALLATION_PATH="/var/gsmsec"
         fi
     fi
 
-    # Soft block: Prevent building manager package with /var/ossec path
-    if [ "${TARGET}" = "manager" ] && [ "${INSTALLATION_PATH}" = "/var/ossec" ]; then
+    # Soft block: Prevent building manager package with /var/gsmsec path
+    if [ "${TARGET}" = "manager" ] && [ "${INSTALLATION_PATH}" = "/var/gsmsec" ]; then
         if [ "${FORCE_OSSEC_PATH}" != "yes" ]; then
             echo "=============================================================="
-            echo "ERROR: Building GuardSarm Manager with /var/ossec path is not recommended."
+            echo "ERROR: Building GuardSarm Manager with /var/gsmsec path is not recommended."
             echo ""
             echo "The recommended installation path for GuardSarm Manager is /var/guardsarm-manager."
             echo ""
-            echo "If you still want to build with /var/ossec, use the --force flag:"
+            echo "If you still want to build with /var/gsmsec, use the --force flag:"
             echo ""
-            echo "    $0 -t manager -p /var/ossec --force"
+            echo "    $0 -t manager -p /var/gsmsec --force"
             echo "=============================================================="
             exit 1
         fi

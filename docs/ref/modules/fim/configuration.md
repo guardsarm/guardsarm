@@ -9,7 +9,7 @@ FIM operates in two complementary modes:
 - **Scheduled scans**: Periodic baseline comparisons triggered by the `frequency` setting.
 - **Real-time monitoring**: Continuous event-driven monitoring via `realtime` or `whodata` directory attributes.
 
-> **Note:** All configuration resides in `ossec.conf` (manager or agent) inside the `<syscheck>` XML block, or in `agent.conf` for centralized agent configuration.
+> **Note:** All configuration resides in `gsmsec.conf` (manager or agent) inside the `<syscheck>` XML block, or in `agent.conf` for centralized agent configuration.
 
 ---
 
@@ -562,7 +562,7 @@ Specific key configurations take precedence over wildcard configurations:
 
 ## Example Configurations
 
-> These are representative examples. For the exact shipped defaults, refer to `etc/ossec.conf` and `etc/ossec-agent.conf` in the GuardSarm installation directory.
+> These are representative examples. For the exact shipped defaults, refer to `etc/gsmsec.conf` and `etc/ossec-agent.conf` in the GuardSarm installation directory.
 
 ### GuardSarm Manager
 
@@ -1034,10 +1034,10 @@ The following use cases describe concrete end-to-end test scenarios for verifyin
 
 ### No alerts are generated
 
-- Confirm `<disabled>no</disabled>` in the agent's `ossec.conf`.
+- Confirm `<disabled>no</disabled>` in the agent's `gsmsec.conf`.
 - Verify the agent is connected to the manager (`guardsarm-agentd` service running, agent listed as active in the dashboard).
 - Check that the monitored path exists on the agent.
-- Confirm a baseline scan has run — new-file and modification alerts require a completed initial scan to have a baseline to compare against. Check agent logs (`/var/ossec/logs/ossec.log`) for `syscheck: INFO` messages indicating scan completion.
+- Confirm a baseline scan has run — new-file and modification alerts require a completed initial scan to have a baseline to compare against. Check agent logs (`/var/gsmsec/logs/gsmsec.log`) for `syscheck: INFO` messages indicating scan completion.
 
 ### Real-time monitoring not triggering
 
@@ -1073,7 +1073,7 @@ The following use cases describe concrete end-to-end test scenarios for verifyin
 
 ### Synchronization divergence after agent reinstall
 
-- After reinstalling an agent, the FIM database is rebuilt from scratch. The `integrity_interval` mechanism will detect the mismatch and trigger a full reconciliation. Monitor `ossec.log` for sync-related messages. If persistent divergence is suspected, reset the agent's FIM database by stopping the agent, deleting `queue/fim/db/fim.db`, and restarting.
+- After reinstalling an agent, the FIM database is rebuilt from scratch. The `integrity_interval` mechanism will detect the mismatch and trigger a full reconciliation. Monitor `gsmsec.log` for sync-related messages. If persistent divergence is suspected, reset the agent's FIM database by stopping the agent, deleting `queue/fim/db/fim.db`, and restarting.
 
 ---
 

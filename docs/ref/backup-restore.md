@@ -356,24 +356,24 @@ The following components should be included in your GuardSarm agent backup strat
 
 #### Essential Data
 
-- **Configuration files**: `/var/ossec/etc/`
-  - `ossec.conf` - Agent configuration file
+- **Configuration files**: `/var/gsmsec/etc/`
+  - `gsmsec.conf` - Agent configuration file
   - `local_internal_options.conf` - Internal configuration overrides
 
-- **Agent key**: `/var/ossec/etc/client.keys`
+- **Agent key**: `/var/gsmsec/etc/client.keys`
   - Contains the agent's encryption key for manager communication
   - Critical for maintaining agent identity
 
 #### Optional Data
 
-- **Local databases**: `/var/ossec/queue/`
+- **Local databases**: `/var/gsmsec/queue/`
   - `fim/db/fim.db` - File Integrity Monitoring database
   - `syscollector/db/local.db` - System inventory database
   - `sca/sca.db` - Security Configuration Assessment database
 
   **Note**: These databases contain local state and scan results. They can be recreated by the agent modules after a restore, but backing them up preserves historical state information.
 
-- **Logs**: `/var/ossec/logs/`
+- **Logs**: `/var/gsmsec/logs/`
   - Historical logs for troubleshooting
   - Can be large; consider retention policies
 
@@ -389,10 +389,10 @@ BACKUP_DIR="/backup/guardsarm-agent-$(date +%Y%m%d-%H%M%S)"
 sudo mkdir -p $BACKUP_DIR
 
 # Backup configuration and agent key
-sudo tar -czf $BACKUP_DIR/guardsarm-agent-etc.tar.gz -C /var/ossec etc/
+sudo tar -czf $BACKUP_DIR/guardsarm-agent-etc.tar.gz -C /var/gsmsec etc/
 
 # Optional: Backup local databases
-sudo tar -czf $BACKUP_DIR/guardsarm-agent-db.tar.gz -C /var/ossec queue/fim/db/ queue/syscollector/db/ queue/sca/ 2>/dev/null || true
+sudo tar -czf $BACKUP_DIR/guardsarm-agent-db.tar.gz -C /var/gsmsec queue/fim/db/ queue/syscollector/db/ queue/sca/ 2>/dev/null || true
 
 # Set proper permissions
 sudo chown -R $(whoami):$(whoami) $BACKUP_DIR
@@ -406,7 +406,7 @@ $BackupDir = "C:\backup\guardsarm-agent-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
 New-Item -ItemType Directory -Path $BackupDir -Force
 
 # Backup configuration
-Copy-Item -Path "C:\Program Files (x86)\ossec-agent\ossec.conf" -Destination "$BackupDir\ossec.conf"
+Copy-Item -Path "C:\Program Files (x86)\ossec-agent\gsmsec.conf" -Destination "$BackupDir\gsmsec.conf"
 Copy-Item -Path "C:\Program Files (x86)\ossec-agent\client.keys" -Destination "$BackupDir\client.keys"
 Copy-Item -Path "C:\Program Files (x86)\ossec-agent\local_internal_options.conf" -Destination "$BackupDir\local_internal_options.conf" -ErrorAction SilentlyContinue
 ```
@@ -430,13 +430,13 @@ sudo tar -czf $BACKUP_DIR/guardsarm-agent-db.tar.gz -C /Library/Ossec queue/fim/
 **Configuration and key only (Linux/macOS):**
 
 ```bash
-sudo tar -czf guardsarm-agent-config-$(date +%Y%m%d).tar.gz -C /var/ossec etc/ossec.conf etc/client.keys etc/local_internal_options.conf
+sudo tar -czf guardsarm-agent-config-$(date +%Y%m%d).tar.gz -C /var/gsmsec etc/gsmsec.conf etc/client.keys etc/local_internal_options.conf
 ```
 
 **Agent key only (Linux):**
 
 ```bash
-sudo cp /var/ossec/etc/client.keys guardsarm-agent-key-$(date +%Y%m%d).backup
+sudo cp /var/gsmsec/etc/client.keys guardsarm-agent-key-$(date +%Y%m%d).backup
 ```
 
 ### Agent Restore Procedures
@@ -459,18 +459,18 @@ Before restoring an agent from backup:
 sudo systemctl stop guardsarm-agent
 
 # Backup current configuration (optional)
-sudo mv /var/ossec/etc /var/ossec/etc.old.$(date +%Y%m%d)
+sudo mv /var/gsmsec/etc /var/gsmsec/etc.old.$(date +%Y%m%d)
 
 # Restore from backup
-sudo tar -xzf $BACKUP_DIR/guardsarm-agent-etc.tar.gz -C /var/ossec
+sudo tar -xzf $BACKUP_DIR/guardsarm-agent-etc.tar.gz -C /var/gsmsec
 
 # Optional: Restore databases
-sudo tar -xzf $BACKUP_DIR/guardsarm-agent-db.tar.gz -C /var/ossec 2>/dev/null || true
+sudo tar -xzf $BACKUP_DIR/guardsarm-agent-db.tar.gz -C /var/gsmsec 2>/dev/null || true
 
 # Set proper permissions
-sudo chown -R root:guardsarm /var/ossec/etc
-sudo chmod 640 /var/ossec/etc/client.keys
-sudo chmod 640 /var/ossec/etc/ossec.conf
+sudo chown -R root:guardsarm /var/gsmsec/etc
+sudo chmod 640 /var/gsmsec/etc/client.keys
+sudo chmod 640 /var/gsmsec/etc/gsmsec.conf
 
 # Start the agent
 sudo systemctl start guardsarm-agent
@@ -486,7 +486,7 @@ sudo systemctl status guardsarm-agent
 Stop-Service -Name guardsarm
 
 # Restore configuration files
-Copy-Item -Path "$BackupDir\ossec.conf" -Destination "C:\Program Files (x86)\ossec-agent\ossec.conf" -Force
+Copy-Item -Path "$BackupDir\gsmsec.conf" -Destination "C:\Program Files (x86)\ossec-agent\gsmsec.conf" -Force
 Copy-Item -Path "$BackupDir\client.keys" -Destination "C:\Program Files (x86)\ossec-agent\client.keys" -Force
 Copy-Item -Path "$BackupDir\local_internal_options.conf" -Destination "C:\Program Files (x86)\ossec-agent\local_internal_options.conf" -Force -ErrorAction SilentlyContinue
 
@@ -604,43 +604,43 @@ sudo /var/guardsarm-manager/bin/cluster_control -l
 
 ```bash
 # Check permissions (Linux)
-sudo chown -R root:guardsarm /var/ossec/etc
-sudo chmod 640 /var/ossec/etc/client.keys
+sudo chown -R root:guardsarm /var/gsmsec/etc
+sudo chmod 640 /var/gsmsec/etc/client.keys
 
 # Check logs
-sudo tail -50 /var/ossec/logs/ossec.log
+sudo tail -50 /var/gsmsec/logs/gsmsec.log
 ```
 
 **Issue: Agent not connecting to manager after restore**
 
 ```bash
 # Verify client.keys exists and has correct permissions
-sudo ls -l /var/ossec/etc/client.keys
+sudo ls -l /var/gsmsec/etc/client.keys
 
 # Check manager IP configuration
-sudo grep "<address>" /var/ossec/etc/ossec.conf
+sudo grep "<address>" /var/gsmsec/etc/gsmsec.conf
 
 # Restart agent
 sudo systemctl restart guardsarm-agent
 
 # Check connection logs
-sudo tail -f /var/ossec/logs/ossec.log | grep "Connected to"
+sudo tail -f /var/gsmsec/logs/gsmsec.log | grep "Connected to"
 ```
 
 **Issue: Agent databases not accessible after restore**
 
 ```bash
 # Check database file permissions
-sudo ls -l /var/ossec/queue/fim/db/
-sudo ls -l /var/ossec/queue/syscollector/db/
+sudo ls -l /var/gsmsec/queue/fim/db/
+sudo ls -l /var/gsmsec/queue/syscollector/db/
 
 # Set proper permissions
-sudo chown -R root:guardsarm /var/ossec/queue
+sudo chown -R root:guardsarm /var/gsmsec/queue
 
 # If databases are corrupted, remove them to allow recreation
-sudo rm /var/ossec/queue/fim/db/*.db
-sudo rm /var/ossec/queue/syscollector/db/*.db
-sudo rm /var/ossec/queue/sca/*.db
+sudo rm /var/gsmsec/queue/fim/db/*.db
+sudo rm /var/gsmsec/queue/syscollector/db/*.db
+sudo rm /var/gsmsec/queue/sca/*.db
 
 # Restart agent to recreate databases
 sudo systemctl restart guardsarm-agent

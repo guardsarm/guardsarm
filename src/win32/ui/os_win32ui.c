@@ -11,7 +11,7 @@
 #include "../os_win.h"
 #include "dll_load_notify.h"
 
-ossec_config config_inst;
+guardsarm_config config_inst;
 HWND hStatus;
 
 /* Dialog -- About GUARDSARM */

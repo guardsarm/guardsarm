@@ -53,7 +53,7 @@ Independently of the trust model, the DAPI does enforce a small set of
 restrictions on operations between nodes:
 
 - **Local configuration**: a node will not accept remote modifications to its
-  local  `guardsarm-manager.conf` (previously `ossec.conf`).
+  local  `guardsarm-manager.conf` (previously `gsmsec.conf`).
 - **Authority context boundary**: operations outside the scope of the GuardSarm
   product (i.e. outside the GuardSarm authority context) are not executed through
   the DAPI.

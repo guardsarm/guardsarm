@@ -316,25 +316,19 @@ Copyright (C) 2026 GuardSarm, Inc. All rights reserved.\n"
 #ifndef GUARDSARMCONF
 #ifndef WIN32
 #ifdef CLIENT
-#define GUARDSARMCONF "etc/ossec.conf"
+#define GUARDSARMCONF "etc/gsmsec.conf"
 #else
 #define GUARDSARMCONF "etc/guardsarm-manager.conf"
 #endif
 #else
-#define GUARDSARMCONF "ossec.conf"
+#define GUARDSARMCONF "gsmsec.conf"
 #endif
 #endif
 
 #ifndef GUARDSARMCONFIG
-#ifndef WIN32
-#ifdef CLIENT
-#define GUARDSARMCONFIG "ossec_config"
-#else
+/* Config root element. Manager + agent + Windows all use <guardsarm_config>.
+   Coordinated with agent config templates, unit-test fixtures, and win32 UI. */
 #define GUARDSARMCONFIG "guardsarm_config"
-#endif
-#else
-#define GUARDSARMCONFIG "ossec_config"
-#endif
 #endif
 
 #define SHAREDCFG_FILE     SHAREDCFG_DIR "/merged.mg"

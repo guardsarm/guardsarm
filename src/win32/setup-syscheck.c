@@ -9,14 +9,14 @@
 #include "os_xml.h"
 #include "error_messages.h"
 #include <errno.h>
-#define OSSEC_CONFIG_TMP  ".tmp.ossec.conf"
+#define OSSEC_CONFIG_TMP  ".tmp.gsmsec.conf"
 
 
 /* Enable Syscheck */
 int main(int argc, char **argv)
 {
     char *status;
-    const char *(xml_syscheck_status[]) = {"ossec_config", "syscheck", "disabled", NULL};
+    const char *(xml_syscheck_status[]) = {"guardsarm_config", "syscheck", "disabled", NULL};
 
     if (argc < 3) {
         printf("%s: Invalid syntax.\n", argv[0]);

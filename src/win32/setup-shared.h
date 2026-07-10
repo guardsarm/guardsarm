@@ -17,9 +17,9 @@
 #include <windows.h>
 #include <winsock2.h>
 
-#define GUARDSARMCONF  "ossec.conf"
-#define OSSECDEF   "default-ossec.conf"
-#define OSSECLAST  "ossec.conf.bak"
+#define GUARDSARMCONF  "gsmsec.conf"
+#define OSSECDEF   "default-gsmsec.conf"
+#define OSSECLAST  "gsmsec.conf.bak"
 #define CLIENTKEYS "client.keys"
 #define OS_MAXSTR  1024
 

@@ -377,7 +377,7 @@ Execd logs script exit status but does not propagate errors to the manager.
 - **Process Model**: Fork/exec model
 - **Privileges**: Requires root for most operations
 - **Sockets**: Unix domain sockets for inter-process communication
-- **Logs**: `/var/ossec/logs/active-responses.log`
+- **Logs**: `/var/gsmsec/logs/active-responses.log`
 
 ### macOS
 
@@ -452,13 +452,13 @@ IP blocking scripts implement safety measures:
 
 **AR script not executing**:
 - Check execd is running: `ps aux | grep execd`
-- Verify script permissions: `ls -la /var/ossec/active-response/bin/`
-- Review logs: `tail -f /var/ossec/logs/active-responses.log`
+- Verify script permissions: `ls -la /var/gsmsec/active-response/bin/`
+- Review logs: `tail -f /var/gsmsec/logs/active-responses.log`
 
 **Firewall commands failing**:
 - Verify root/Administrator privileges
 - Check firewall tool availability: `which iptables` / `which firewalld-cmd`
-- Test manually: `/var/ossec/active-response/bin/block-ip < test.json`
+- Test manually: `/var/gsmsec/active-response/bin/block-ip < test.json`
 
 **Duplicate not detected**:
 - Verify keys are correctly extracted in script

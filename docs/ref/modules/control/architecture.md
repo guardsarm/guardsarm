@@ -111,7 +111,7 @@ The socket listener is the main entry point for control commands on Unix (both m
 **Socket Path** (both manager and agent): `CONTROL_SOCK = "queue/sockets/control"`, resolved relative to `GUARDSARM_HOME`.
 
 - Default manager path: `/var/guardsarm-manager/queue/sockets/control`
-- Default agent path: `/var/ossec/queue/sockets/control`
+- Default agent path: `/var/gsmsec/queue/sockets/control`
 
 **Functionality**:
 - Binds to the Unix domain socket
@@ -437,7 +437,7 @@ No dedicated thread. `control_dispatch()` is called synchronously from the reque
 ### Previous Architecture (v4.x)
 
 **Component**: `guardsarm-execd` daemon
-- **Socket**: `/var/ossec/queue/sockets/com`
+- **Socket**: `/var/gsmsec/queue/sockets/com`
 - **Commands**: restart, reload, getconfig, check-manager-configuration, unmerge, uncompress, lock_restart
 - **Agent restart/reload**: Via Active Response scripts (`restart.sh`, `restart-guardsarm.exe`)
 - **Responsibilities**:

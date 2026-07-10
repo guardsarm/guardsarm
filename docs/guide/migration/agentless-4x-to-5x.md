@@ -10,19 +10,19 @@ guide describes what Agentless did, identifies the most common use cases, and
 maps each one to a supported alternative available in 5.0.
 
 > **Manual migration required.** There is no automated converter. Every
-> agentless entry in `ossec.conf` must be replaced by an equivalent 5.x
+> agentless entry in `gsmsec.conf` must be replaced by an equivalent 5.x
 > mechanism.
 
 ## What Agentless did in 4.x
 
 The `guardsarm-agentlessd` daemon was configured through `<agentless>` blocks in
-the manager's `ossec.conf`. Each block described a remote host (or set of
+the manager's `gsmsec.conf`. Each block described a remote host (or set of
 hosts), a built-in SSH script, and an operational mode.
 
 ### Configuration format
 
 ```xml
-<!-- GuardSarm 4.x: ossec.conf (manager) -->
+<!-- GuardSarm 4.x: gsmsec.conf (manager) -->
 <agentless>
   <type>ssh_integrity_check_linux</type>
   <frequency>3600</frequency>
@@ -65,7 +65,7 @@ Hosts with password authentication were registered using the manager-side
 helper:
 
 ```sh
-/var/ossec/agentless/register_host.sh add user@192.168.1.10 password
+/var/gsmsec/agentless/register_host.sh add user@192.168.1.10 password
 ```
 
 SSH-key authentication (passphrase-less keys) required no registration.
@@ -103,7 +103,7 @@ and enroll agents.
 ### FIM configuration replacing ssh_integrity_check_linux
 
 ```xml
-<!-- GuardSarm 5.0: agent ossec.conf -->
+<!-- GuardSarm 5.0: agent gsmsec.conf -->
 <syscheck>
   <disabled>no</disabled>
   <frequency>3600</frequency>
@@ -114,10 +114,10 @@ and enroll agents.
 ### SCA configuration replacing periodic configuration auditing
 
 Enable SCA on the agent and choose a policy for the OS. Built-in policies are
-located in `/var/ossec/ruleset/sca/` on the agent.
+located in `/var/gsmsec/ruleset/sca/` on the agent.
 
 ```xml
-<!-- GuardSarm 5.0: agent ossec.conf -->
+<!-- GuardSarm 5.0: agent gsmsec.conf -->
 <sca>
   <enabled>yes</enabled>
   <scan_on_start>yes</scan_on_start>
@@ -150,16 +150,16 @@ relay agent. Place the logic in a dedicated script so the XML stays clean:
 
 ```sh
 #!/bin/bash
-# /var/ossec/agentless/agentless_fim.sh
+# /var/gsmsec/agentless/agentless_fim.sh
 # Usage: agentless_fim.sh <ssh_target> <dir1> [dir2 ...]
 
 TARGET="$1"
 shift
 DIRS="$*"
 
-ssh -i /var/ossec/agentless/keys/relay_key \
+ssh -i /var/gsmsec/agentless/keys/relay_key \
     -o StrictHostKeyChecking=yes \
-    -o UserKnownHostsFile=/var/ossec/agentless/keys/known_hosts \
+    -o UserKnownHostsFile=/var/gsmsec/agentless/keys/known_hosts \
     -o BatchMode=yes \
     "$TARGET" \
     "find $DIRS -type f 2>/dev/null | while IFS= read -r i; do
@@ -177,10 +177,10 @@ ssh -i /var/ossec/agentless/keys/relay_key \
 > the remote commands before deploying the script.
 
 ```xml
-<!-- GuardSarm 5.0: relay agent ossec.conf -->
+<!-- GuardSarm 5.0: relay agent gsmsec.conf -->
 <localfile>
   <log_format>command</log_format>
-  <command>/var/ossec/agentless/agentless_fim.sh user@192.168.1.10 /etc /usr/bin /usr/sbin</command>
+  <command>/var/gsmsec/agentless/agentless_fim.sh user@192.168.1.10 /etc /usr/bin /usr/sbin</command>
   <alias>agentless_fim_192.168.1.10</alias>
   <frequency>3600</frequency>
 </localfile>
@@ -205,14 +205,14 @@ snapshot, emit the diff if changed:
 
 ```sh
 #!/bin/bash
-# /var/ossec/agentless/agentless_diff.sh
+# /var/gsmsec/agentless/agentless_diff.sh
 # Usage: agentless_diff.sh <ssh_target> <remote_command> <snapshot_path>
 
 TARGET="$1"
 REMOTE_CMD="$2"
 SNAPSHOT="$3"
-CURRENT=$(ssh -i /var/ossec/agentless/keys/relay_key -o StrictHostKeyChecking=yes \
-              -o UserKnownHostsFile=/var/ossec/agentless/keys/known_hosts \
+CURRENT=$(ssh -i /var/gsmsec/agentless/keys/relay_key -o StrictHostKeyChecking=yes \
+              -o UserKnownHostsFile=/var/gsmsec/agentless/keys/known_hosts \
               -o BatchMode=yes "$TARGET" "$REMOTE_CMD" 2>/dev/null)
 
 if [ $? -ne 0 ] || [ -z "$CURRENT" ]; then
@@ -233,10 +233,10 @@ echo "$CURRENT" > "$SNAPSHOT"
 ```
 
 ```xml
-<!-- GuardSarm 5.0: relay agent ossec.conf -->
+<!-- GuardSarm 5.0: relay agent gsmsec.conf -->
 <localfile>
   <log_format>full_command</log_format>
-  <command>/var/ossec/agentless/agentless_diff.sh admin@192.168.1.1 "show running-config" /var/ossec/agentless/snapshots/firewall_192.168.1.1.snap</command>
+  <command>/var/gsmsec/agentless/agentless_diff.sh admin@192.168.1.1 "show running-config" /var/gsmsec/agentless/snapshots/firewall_192.168.1.1.snap</command>
   <alias>agentless_diff_firewall_192.168.1.1</alias>
   <frequency>3600</frequency>
 </localfile>
@@ -261,7 +261,7 @@ stripped the uptime and last-reload timestamp from the output so that the diff
 would not fire an alert on every run simply because the device had been up one
 hour longer.
 
-The two-password model mapped to the `<host>` field in `ossec.conf`: the first
+The two-password model mapped to the `<host>` field in `gsmsec.conf`: the first
 password (SSH login) and a second password (enable mode) were both stored in
 `.passlist` via `register_host.sh`.
 
@@ -291,14 +291,14 @@ Example for a Cisco ASA using `sshpass` (install it on the relay host first:
 
 ```sh
 #!/bin/bash
-# /var/ossec/agentless/asa_diff.sh
+# /var/gsmsec/agentless/asa_diff.sh
 
 HOST="$1"
 SNAPSHOT="$2"
 
-CURRENT=$(sshpass -f /var/ossec/agentless/keys/asa_pass \
+CURRENT=$(sshpass -f /var/gsmsec/agentless/keys/asa_pass \
     ssh -c aes256-ctr -o StrictHostKeyChecking=yes \
-        -o UserKnownHostsFile=/var/ossec/agentless/keys/known_hosts \
+        -o UserKnownHostsFile=/var/gsmsec/agentless/keys/known_hosts \
         admin@"$HOST" \
     "term pager 0
 show version | grep -v 'Configuration last\|up '
@@ -338,11 +338,11 @@ For periodic command execution with checksum-verified scripts, use
 events rather than plain log lines.
 
 ```xml
-<!-- GuardSarm 5.0: relay agent ossec.conf -->
+<!-- GuardSarm 5.0: relay agent gsmsec.conf -->
 <wodle name="command">
   <disabled>no</disabled>
   <tag>agentless_remote_check</tag>
-  <command>/var/ossec/agentless/agentless_diff.sh admin@192.168.1.1 "show running-config" /var/ossec/agentless/snapshots/asa.snap</command>
+  <command>/var/gsmsec/agentless/agentless_diff.sh admin@192.168.1.1 "show running-config" /var/gsmsec/agentless/snapshots/asa.snap</command>
   <interval>1h</interval>
   <ignore_output>no</ignore_output>
   <run_on_start>yes</run_on_start>
@@ -369,27 +369,27 @@ events rather than plain log lines.
 ## Security considerations
 
 The 4.x Agentless module stored SSH passwords in plaintext in
-`/var/ossec/agentless/.passlist`. When migrating to SSH key–based authentication
+`/var/gsmsec/agentless/.passlist`. When migrating to SSH key–based authentication
 on the relay host:
 
 1. Create the directory and generate a dedicated key pair for the relay host:
    ```sh
-   mkdir -p /var/ossec/agentless/keys
-   chown guardsarm:guardsarm /var/ossec/agentless/keys
-   chmod 700 /var/ossec/agentless/keys
-   ssh-keygen -t ed25519 -f /var/ossec/agentless/keys/relay_key -N ""
+   mkdir -p /var/gsmsec/agentless/keys
+   chown guardsarm:guardsarm /var/gsmsec/agentless/keys
+   chmod 700 /var/gsmsec/agentless/keys
+   ssh-keygen -t ed25519 -f /var/gsmsec/agentless/keys/relay_key -N ""
    ```
 2. Install the public key on each monitored host:
    ```sh
-   ssh-copy-id -i /var/ossec/agentless/keys/relay_key.pub user@192.168.1.10
+   ssh-copy-id -i /var/gsmsec/agentless/keys/relay_key.pub user@192.168.1.10
    ```
 3. Collect the SSH host key of each monitored host into the dedicated
    `known_hosts` file **before** running any script with
    `StrictHostKeyChecking=yes`:
    ```sh
-   ssh-keyscan -H 192.168.1.10 >> /var/ossec/agentless/keys/known_hosts
-   chown guardsarm:guardsarm /var/ossec/agentless/keys/known_hosts
-   chmod 600 /var/ossec/agentless/keys/known_hosts
+   ssh-keyscan -H 192.168.1.10 >> /var/gsmsec/agentless/keys/known_hosts
+   chown guardsarm:guardsarm /var/gsmsec/agentless/keys/known_hosts
+   chmod 600 /var/gsmsec/agentless/keys/known_hosts
    ```
    Without this step, the first connection attempt fails with "Host key
    verification failed" even when credentials and key pairs are correct.
@@ -410,16 +410,16 @@ on the relay host:
    configurations and can contain sensitive data (credentials, ACLs). Set
    ownership and mode immediately after creating the snapshot directory:
    ```sh
-   mkdir -p /var/ossec/agentless/snapshots
-   chown guardsarm:guardsarm /var/ossec/agentless/snapshots
-   chmod 700 /var/ossec/agentless/snapshots
+   mkdir -p /var/gsmsec/agentless/snapshots
+   chown guardsarm:guardsarm /var/gsmsec/agentless/snapshots
+   chmod 700 /var/gsmsec/agentless/snapshots
    ```
    Any snapshot file written by the scripts (e.g. `firewall_192.168.1.1.snap`)
    will inherit the directory's restricted access. If you create snapshot files
    manually or outside the scripts, set their permissions explicitly:
    ```sh
-   chown guardsarm:guardsarm /var/ossec/agentless/snapshots/*.snap
-   chmod 600 /var/ossec/agentless/snapshots/*.snap
+   chown guardsarm:guardsarm /var/gsmsec/agentless/snapshots/*.snap
+   chmod 600 /var/gsmsec/agentless/snapshots/*.snap
    ```
 
 ---

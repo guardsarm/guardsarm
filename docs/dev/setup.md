@@ -103,7 +103,7 @@ The following workspace settings are recommended for consistency with GuardSarm 
     "workbench.editor.enablePreview": false,
     "files.associations": {
         "guardsarm-manager.conf": "xml",
-        "ossec.conf": "xml",
+        "gsmsec.conf": "xml",
         "agent.conf": "xml"
     },
     "terminal.integrated.allowChords": false,

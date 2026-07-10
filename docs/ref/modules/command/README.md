@@ -6,13 +6,13 @@ For the full per-option reference (all options, defaults and allowed values veri
 
 The GuardSarm command module executes configured operating system commands at scheduled intervals and can forward their output for analysis. It runs as the `<wodle name="command">` module inside `guardsarm-modulesd` on agents and inside `guardsarm-manager-modulesd` on the manager.
 
-Use this module for periodic command-based telemetry when a native collector is not available. The module executes the configured command locally on the host where the configuration is applied. On agents the configuration lives in `ossec.conf` (root tag `<ossec_config>`); on the manager it lives in `etc/guardsarm-manager.conf` (root tag `<guardsarm_config>`), and the log file is `/var/guardsarm-manager/logs/guardsarm-manager.log` instead of `/var/ossec/logs/ossec.log`.
+Use this module for periodic command-based telemetry when a native collector is not available. The module executes the configured command locally on the host where the configuration is applied. On agents the configuration lives in `gsmsec.conf` (root tag `<ossec_config>`); on the manager it lives in `etc/guardsarm-manager.conf` (root tag `<guardsarm_config>`), and the log file is `/var/guardsarm-manager/logs/guardsarm-manager.log` instead of `/var/gsmsec/logs/gsmsec.log`.
 
 ## How it works
 
 For each configured command wodle, `guardsarm-modulesd`:
 
-1. Reads the `<wodle name="command">` configuration from `ossec.conf` or `agent.conf`.
+1. Reads the `<wodle name="command">` configuration from `gsmsec.conf` or `agent.conf`.
 2. Builds the command schedule from `interval`, `day`, `wday`, and `time`.
 3. Optionally validates the executable checksum before execution.
 4. Executes the command with the configured timeout.
@@ -152,7 +152,7 @@ If the output is too large for a single queue message, the module attempts to tr
 Check the module logs:
 
 ```bash
-grep "guardsarm-modulesd:command" /var/ossec/logs/ossec.log
+grep "guardsarm-modulesd:command" /var/gsmsec/logs/gsmsec.log
 ```
 
 Common messages:

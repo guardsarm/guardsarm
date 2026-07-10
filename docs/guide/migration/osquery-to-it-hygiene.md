@@ -76,10 +76,10 @@ indicates the GuardSarm version in which that category was introduced.
 
 In GuardSarm 4.x, OSquery had to be installed separately on each endpoint. Once
 installed, you enabled the wodle by adding a `<wodle name="osquery">` block to
-the agent's `ossec.conf`:
+the agent's `gsmsec.conf`:
 
 ```xml
-<!-- GuardSarm 4.x: ossec.conf (agent) -->
+<!-- GuardSarm 4.x: gsmsec.conf (agent) -->
 <wodle name="osquery">
     <disabled>no</disabled>
     <run_daemon>yes</run_daemon>
@@ -217,14 +217,14 @@ with query results under `data.osquery.columns.*` and metadata fields
 ### GuardSarm 5.0 Syscollector (IT Hygiene)
 
 All inventory categories that cover OSquery data are available from GuardSarm 4.14
-onwards. Enable them in the agent's `ossec.conf`:
+onwards. Enable them in the agent's `gsmsec.conf`:
 
 > **Note:** All categories shown below are enabled by default in new
 > installations. You only need to explicitly set them if they were previously
 > disabled in your configuration.
 
 ```xml
-<!-- ossec.conf (agent) -->
+<!-- gsmsec.conf (agent) -->
 <wodle name="syscollector">
     <disabled>no</disabled>
     <interval>1h</interval>
@@ -1066,7 +1066,7 @@ in the saved objects export.
 ### Step 2 – Enable IT Hygiene categories in agent configuration
 
 Identify the OSquery tables your packs query, then verify that the corresponding
-Syscollector categories are enabled in each agent's `ossec.conf` (or via
+Syscollector categories are enabled in each agent's `gsmsec.conf` (or via
 centralized configuration with agent groups). All categories are enabled by
 default, so in most cases no configuration change is needed:
 
@@ -1116,11 +1116,11 @@ Before checking the dashboard, confirm that the agent has completed its
 evaluation and synchronization cycle. On **Linux**, tail the agent log:
 
 ```bash
-tail -f /var/ossec/logs/ossec.log | grep "syscollector:"
+tail -f /var/gsmsec/logs/gsmsec.log | grep "syscollector:"
 ```
 
 On **Windows**, check the equivalent log at
-`C:\Program Files (x86)\ossec-agent\ossec.log`.
+`C:\Program Files (x86)\ossec-agent\gsmsec.log`.
 
 A successful sync produces output similar to:
 
@@ -1189,7 +1189,7 @@ remove the `<wodle name="osquery">` block from the agent configuration.
 The OSquery wodle has been fully removed in GuardSarm 5.0: a leftover block is ignored and the agent logs `INFO: The 'osquery' module is deprecated. Use the Syscollector module instead.` It does not prevent the agent from starting, but it no longer provides any functionality, so delete it:
 
 ```xml
-<!-- Remove this block entirely from ossec.conf -->
+<!-- Remove this block entirely from gsmsec.conf -->
 <wodle name="osquery">
     ...
 </wodle>

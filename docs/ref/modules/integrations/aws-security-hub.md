@@ -15,7 +15,7 @@ GuardSarm subscribes to an SQS queue that receives Security Hub findings notific
 
 ## Configuration
 
-Configure the AWS module in the GuardSarm agent `ossec.conf` file using the `subscriber` element with `type="security_hub"`:
+Configure the AWS module in the GuardSarm agent `gsmsec.conf` file using the `subscriber` element with `type="security_hub"`:
 
 ```xml
   <wodle name="aws-s3">
@@ -97,7 +97,7 @@ systemctl restart guardsarm-agent
 Check the module logs:
 
 ```bash
-grep "aws-s3" /var/ossec/logs/ossec.log
+grep "aws-s3" /var/gsmsec/logs/gsmsec.log
 ```
 
 Security Hub findings generate alerts with the `aws` data field containing the original finding information.

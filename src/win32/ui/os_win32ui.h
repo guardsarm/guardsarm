@@ -15,10 +15,10 @@
 #include <commctrl.h>
 
 /* Default values */
-#define CONFIG          "ossec.conf"
-#define LASTCONFIG      "last-ossec.conf"
+#define CONFIG          "gsmsec.conf"
+#define LASTCONFIG      "last-gsmsec.conf"
 #define VERSION_FILE    "VERSION.json"
-#define OSSECLOGS       "ossec.log"
+#define OSSECLOGS       "gsmsec.log"
 #define HELPTXT         "help.txt"
 #define SENDER_FILE     "rids\\sender_counter"
 #define DEFDIR          "C:\\Program Files\\ossec-agent"
@@ -44,7 +44,7 @@
 #define SERVER_HOST_USED    2
 
 /* Global ossec config structure */
-typedef struct _ossec_config {
+typedef struct _guardsarm_config {
     unsigned short int server_type;
     unsigned short int admin_access;
     unsigned long int msg_sent;
@@ -60,13 +60,13 @@ typedef struct _ossec_config {
     char *version;
     char *revision;
     char *status;
-} ossec_config;
+} guardsarm_config;
 
 
 /** Global variables **/
 
 /* Configuration */
-extern ossec_config config_inst;
+extern guardsarm_config config_inst;
 
 /* Status bar */
 extern HWND hStatus;

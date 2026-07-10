@@ -18,7 +18,7 @@
 #include "os_regex.h"
 
 
-#define GUARDSARMCONF   "ossec.conf"
+#define GUARDSARMCONF   "gsmsec.conf"
 #define OS_MAXSTR   1024
 
 #define localtime_r(x, y) localtime_s(y, x)
@@ -120,12 +120,12 @@ int config_dir(char *name, char *dir, char *vfile)
     fprintf(fp, "\r\n"
             "\r\n"
             "<!-- IIS log file -->\r\n"
-            "<ossec_config>\r\n"
+            "<guardsarm_config>\r\n"
             "  <localfile>\r\n"
             "    <location>%s</location>\r\n"
             "    <log_format>iis</log_format>\r\n"
             "  </localfile>\r\n"
-            "</ossec_config>\r\n\r\n", vfile);
+            "</guardsarm_config>\r\n\r\n", vfile);
 
     printf("%s: Action completed.\n", name);
 
@@ -164,12 +164,12 @@ int config_iis(char *name, char *file, char *vfile)
     fprintf(fp, "\r\n"
             "\r\n"
             "<!-- IIS log file -->\r\n"
-            "<ossec_config>\r\n"
+            "<guardsarm_config>\r\n"
             "  <localfile>\r\n"
             "    <location>%s</location>\r\n"
             "    <log_format>iis</log_format>\r\n"
             "  </localfile>\r\n"
-            "</ossec_config>\r\n\r\n", vfile);
+            "</guardsarm_config>\r\n\r\n", vfile);
 
     printf("%s: Action completed.\n", name);
     fclose(fp);

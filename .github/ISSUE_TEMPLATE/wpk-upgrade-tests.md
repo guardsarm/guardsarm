@@ -159,7 +159,7 @@ For each operating system and version, check the following points and add a comm
 - [ ] Init file runs guardsarm-control (`cat /etc/rc.d/init.d/guardsarm-agent`)
 - [ ] Init file runs ossec-control (`cat /etc/rc.d/init.d/guardsarm-agent`)
 - [ ] GuardSarm as service is enabled `chkconfig --list` 
-- [ ] GuardSarm starts and connects when the backup is restored (`cat /var/ossec/var/run/ossec-agentd.state`)
+- [ ] GuardSarm starts and connects when the backup is restored (`cat /var/gsmsec/var/run/ossec-agentd.state`)
 - [ ] GuardSarm starts and connects automatically when the system is rebooted.
 - [ ] Restore SELinux policies (`semodule -l | grep -i guardsarm`) (DISABLED)
 
@@ -171,7 +171,7 @@ For each operating system and version, check the following points and add a comm
 
 ## Windows:
 ### UPGRADE FAIL
-- [ ] GuardSarm-Agent folder tree:  No files are lost after the rollback. The logs of the failed upgrade (`ossec.log`) are kept.
+- [ ] GuardSarm-Agent folder tree:  No files are lost after the rollback. The logs of the failed upgrade (`gsmsec.log`) are kept.
 - [ ] After the rollback the agent connects to the manager
 - [ ] After reboot, the GuardSarm-Agent starts and connects to the manager.
 - [ ] The correct GuardSarm-Agent version is shown in the list of Windows' `programs and features`.
@@ -186,7 +186,7 @@ For each operating system and version, check the following points and add a comm
 ## MacOS:
 ### UPGRADE FAIL
 
-- [ ] GuardSarm-Agent folder tree:  No files are lost after the rollback. The logs of the failed upgrade (`ossec.log`) are kept.
+- [ ] GuardSarm-Agent folder tree:  No files are lost after the rollback. The logs of the failed upgrade (`gsmsec.log`) are kept.
 - [ ] After the rollback the agent connects to the manager
 - [ ] After reboot, the GuardSarm-Agent starts and connects to the manager.
 

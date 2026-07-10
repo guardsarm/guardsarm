@@ -297,7 +297,7 @@ This section covers agent upgrades across all supported platforms.
 
 Before upgrading agents:
 
-1. Back up agent configuration as a precaution (`ossec.conf` and `client.keys` are preserved automatically, but an external backup is still recommended)
+1. Back up agent configuration as a precaution (`gsmsec.conf` and `client.keys` are preserved automatically, but an external backup is still recommended)
 2. Plan upgrades in batches to avoid upgrading all agents simultaneously
 3. Test on non-production agents first
 4. Verify manager compatibility with the new agent version
@@ -310,11 +310,11 @@ During a 5.x to 5.x agent upgrade the package scripts apply a **preserve / resto
 
 | Path | Result after upgrade |
 |---|---|
-| `etc/` (`ossec.conf`, `client.keys`, `local_internal_options.conf`, `localtime`, ...) | Preserved from the previous installation. |
+| `etc/` (`gsmsec.conf`, `client.keys`, `local_internal_options.conf`, `localtime`, ...) | Preserved from the previous installation. |
 | `bin/`, libraries | Replaced by the new package. |
 
 
-On DEB upgrades a `ossec.conf.new` side-file is written with the new default config for comparison.
+On DEB upgrades a `gsmsec.conf.new` side-file is written with the new default config for comparison.
 
 As with server upgrades, file contents, permissions, and ownership are preserved for the paths listed above. The upgrade does not normalize or reset any permissions or ownership set by the administrator.
 
@@ -322,8 +322,8 @@ Preserve directory locations for recovery:
 
 | Stack | Preserve directory |
 |---|---|
-| DEB | `/var/ossec/packages_files/agent_upgrade_preserve` |
-| RPM | `/var/ossec/tmp/agent_upgrade_preserve` |
+| DEB | `/var/gsmsec/packages_files/agent_upgrade_preserve` |
+| RPM | `/var/gsmsec/tmp/agent_upgrade_preserve` |
 | Source | `${TMPDIR:-/tmp}/guardsarm-agent-upgrade-preserve.*` |
 
 ### Download package
@@ -605,20 +605,20 @@ sudo rm -rf /var/guardsarm-manager/packages_files/manager_upgrade_preserve
 
 ```bash
 # Check logs
-sudo tail -50 /var/ossec/logs/ossec.log
+sudo tail -50 /var/gsmsec/logs/gsmsec.log
 
 # Verify client.keys exists
-sudo ls -l /var/ossec/etc/client.keys
+sudo ls -l /var/gsmsec/etc/client.keys
 
 # Check permissions
-sudo chown -R root:guardsarm /var/ossec/etc
+sudo chown -R root:guardsarm /var/gsmsec/etc
 ```
 
 **Issue: Agent not connecting after upgrade**
 
 ```bash
 # Verify manager address in configuration
-sudo grep "<address>" /var/ossec/etc/ossec.conf
+sudo grep "<address>" /var/gsmsec/etc/gsmsec.conf
 
 # Check network connectivity to manager
 ping <manager_ip>

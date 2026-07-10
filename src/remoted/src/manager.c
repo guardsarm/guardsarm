@@ -29,7 +29,7 @@
 
 // Redefine guardsarm_version
   #undef __guardsarm_version
-  #define __guardsarm_version "v5.0.0"
+  #define __guardsarm_version "v2.0.0"
 #else
   #define STATIC static
 #endif
@@ -455,7 +455,7 @@ int validate_control_msg(const keyentry * key, char *r_msg, size_t msg_length, c
             void *deleted = OSHash_Delete_ex(agent_data_hash, key->id);
             os_free(deleted);
 
-            /* Log agent shutdown event to ossec.log */
+            /* Log agent shutdown event to gsmsec.log */
             minfo(OS_AG_STOPPED, atoi(key->id), key->name);
         }
     } else {

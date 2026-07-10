@@ -4,7 +4,7 @@ GuardSarm 5.0 introduces breaking changes to the manager configuration that requ
 
 This guide covers the four configuration files that changed between versions:
 
-- [`ossec.conf`](#osseconf--guardsarm-managerconf) → `guardsarm-manager.conf`
+- [`gsmsec.conf`](#osseconf--guardsarm-managerconf) → `guardsarm-manager.conf`
 - [`internal_options.conf`](#internal_optionsconf--guardsarm-manager-internal-optionsconf) → `guardsarm-manager-internal-options.conf`
 - [`api.yaml`](#apiyaml)
 - [`cluster.json`](#clusterjson)
@@ -13,13 +13,13 @@ This guide covers the four configuration files that changed between versions:
 
 | Area | 4.x | 5.0 |
 |------|-----|-----|
-| Installation path | `/var/ossec/` | `/var/guardsarm-manager/` |
-| Main configuration file | `etc/ossec.conf` | `etc/guardsarm-manager.conf` |
+| Installation path | `/var/gsmsec/` | `/var/guardsarm-manager/` |
+| Main configuration file | `etc/gsmsec.conf` | `etc/guardsarm-manager.conf` |
 | Root XML element | `<ossec_config>` | `<guardsarm_config>` |
 | Internal options file | `etc/internal_options.conf` + `etc/local_internal_options.conf` | `etc/guardsarm-manager-internal-options.conf` |
 | System user / group | `guardsarm` | `guardsarm-manager` |
-| Manager log file | `logs/ossec.log` | `logs/guardsarm-manager.log` |
-| Manager JSON log file | `logs/ossec.json` | `logs/guardsarm-manager.json` |
+| Manager log file | `logs/gsmsec.log` | `logs/guardsarm-manager.log` |
+| Manager JSON log file | `logs/gsmsec.json` | `logs/guardsarm-manager.json` |
 
 ## Migration procedure
 
@@ -29,26 +29,26 @@ On the running **4.x manager**, export the configuration files you will need to 
 
 ```bash
 mkdir -p /tmp/guardsarm-4x-backup
-cp /var/ossec/etc/ossec.conf                    /tmp/guardsarm-4x-backup/
-cp /var/ossec/etc/internal_options.conf         /tmp/guardsarm-4x-backup/
-cp /var/ossec/etc/local_internal_options.conf   /tmp/guardsarm-4x-backup/
-cp /var/ossec/api/configuration/api.yaml        /tmp/guardsarm-4x-backup/
+cp /var/gsmsec/etc/gsmsec.conf                    /tmp/guardsarm-4x-backup/
+cp /var/gsmsec/etc/internal_options.conf         /tmp/guardsarm-4x-backup/
+cp /var/gsmsec/etc/local_internal_options.conf   /tmp/guardsarm-4x-backup/
+cp /var/gsmsec/api/configuration/api.yaml        /tmp/guardsarm-4x-backup/
 ```
 
 Also back up any custom rules, decoders, and lists:
 
 ```bash
 tar -czf /tmp/guardsarm-4x-backup/custom-ruleset.tar.gz \
-    /var/ossec/etc/rules/ \
-    /var/ossec/etc/decoders/ \
-    /var/ossec/etc/lists/
+    /var/gsmsec/etc/rules/ \
+    /var/gsmsec/etc/decoders/ \
+    /var/gsmsec/etc/lists/
 ```
 
 Keep these files somewhere that survives the reinstall (external storage or a remote location).
 
 ### 2. Uninstall the 4.x manager
 
-Follow the official GuardSarm documentation to uninstall the 4.x manager package for your distribution. This removes the 4.x binaries and the `/var/ossec/` directory.
+Follow the official GuardSarm documentation to uninstall the 4.x manager package for your distribution. This removes the 4.x binaries and the `/var/gsmsec/` directory.
 
 ### 3. Install the 5.0 manager
 
@@ -60,7 +60,7 @@ Do not copy the 4.x configuration files directly into the 5.0 installation. Inst
 
 ---
 
-## `ossec.conf` → `guardsarm-manager.conf`
+## `gsmsec.conf` → `guardsarm-manager.conf`
 
 The main configuration file is renamed and its XML root element changed. Several sections that were manager-side in 4.x have been removed; their functionality either moved to the agent, was replaced by a new subsystem, or was deprecated.
 
@@ -165,8 +165,8 @@ The section is preserved. Update the certificate paths to reflect the new instal
 ```xml
 <auth>
   ...
-  <ssl_manager_cert>/var/ossec/etc/sslmanager.cert</ssl_manager_cert>
-  <ssl_manager_key>/var/ossec/etc/sslmanager.key</ssl_manager_key>
+  <ssl_manager_cert>/var/gsmsec/etc/sslmanager.cert</ssl_manager_cert>
+  <ssl_manager_key>/var/gsmsec/etc/sslmanager.key</ssl_manager_key>
   ...
 </auth>
 ```
@@ -551,7 +551,7 @@ The list of paths synchronized from master to worker nodes has changed.
 
 | 4.x | 5.0 |
 |-----|-----|
-| `ar.conf`, `ossec.conf` | `guardsarm-manager.conf` |
+| `ar.conf`, `gsmsec.conf` | `guardsarm-manager.conf` |
 
 ### New master intervals
 

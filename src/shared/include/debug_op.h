@@ -26,15 +26,15 @@
 #ifndef LOGFILE
 #ifndef WIN32
 #ifdef CLIENT
-#define LOGFILE   "logs/ossec.log"
-#define LOGJSONFILE "logs/ossec.json"
+#define LOGFILE   "logs/gsmsec.log"
+#define LOGJSONFILE "logs/gsmsec.json"
 #else
 #define LOGFILE   "logs/guardsarm-manager.log"
 #define LOGJSONFILE "logs/guardsarm-manager.json"
 #endif
 #else
-#define LOGFILE "ossec.log"
-#define LOGJSONFILE "ossec.json"
+#define LOGFILE "gsmsec.log"
+#define LOGJSONFILE "gsmsec.json"
 #endif
 #endif
 

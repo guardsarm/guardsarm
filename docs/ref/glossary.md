@@ -15,7 +15,7 @@ enrollment.
 
 **`agent.conf`** — Shared configuration file distributed per agent group from
 `etc/shared/<group>/` on the manager; its values take precedence over the agent's
-local `ossec.conf`.
+local `gsmsec.conf`.
 
 **Cluster** — Set of manager nodes (one master, multiple workers) that share
 agent keys, group configuration, and runtime state through
@@ -89,7 +89,7 @@ across 5.0 indices and event payloads, e.g. `source.ip`, `user.name`,
 
 **`guardsarm-manager.conf`** — Main manager configuration file
 (`/var/guardsarm-manager/etc/guardsarm-manager.conf`, root tag `<guardsarm_config>`); the
-5.0 rename of the manager-side `ossec.conf`.
+5.0 rename of the manager-side `gsmsec.conf`.
 
 **Wodle** — Pluggable module configured as `<wodle name="...">` and executed by
 `guardsarm-manager-modulesd` (manager) or `guardsarm-modulesd` (agent), e.g. `command`,

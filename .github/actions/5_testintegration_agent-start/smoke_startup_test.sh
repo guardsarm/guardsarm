@@ -58,7 +58,7 @@ test_daemons(){
 
     for daemon in $daemons; do
         log_info "Testing ${daemon}..."
-        if ! "/var/ossec/bin/${daemon}" -t 2>&1; then
+        if ! "/var/gsmsec/bin/${daemon}" -t 2>&1; then
             log_error "${daemon} -t failed"
         fi
         log_success "${daemon} -t passed"
@@ -67,7 +67,7 @@ test_daemons(){
 
 start_agent(){
     log_info "Starting GuardSarm agent..."
-    if ! /var/ossec/bin/guardsarm-control start 2>&1; then
+    if ! /var/gsmsec/bin/guardsarm-control start 2>&1; then
         log_error "Failed to start GuardSarm agent"
     fi
     log_success "GuardSarm agent started"
@@ -78,7 +78,7 @@ start_agent(){
 
 verify_agent_running(){
     log_info "Verifying agent is running..."
-    if ! /var/ossec/bin/guardsarm-control status 2>&1; then
+    if ! /var/gsmsec/bin/guardsarm-control status 2>&1; then
         log_error "Agent status check failed"
     fi
     log_success "Agent is running"
@@ -86,7 +86,7 @@ verify_agent_running(){
 
 stop_agent(){
     log_info "Stopping GuardSarm agent..."
-    if ! /var/ossec/bin/guardsarm-control stop 2>&1; then
+    if ! /var/gsmsec/bin/guardsarm-control stop 2>&1; then
         log_error "Failed to stop GuardSarm agent"
     fi
     log_success "GuardSarm agent stopped successfully"

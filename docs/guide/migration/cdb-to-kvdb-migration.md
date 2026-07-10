@@ -1,6 +1,6 @@
 # Migrating CDB lists to KVDB
 
-In GuardSarm 4.x,  rules looked up threat data using CDB (Constant Database) lists stored in `/var/ossec/etc/lists/`. In GuardSarm 5.0, the Engine replaces these rules and uses KVDB (Key-Value Database) for the same purpose. CDB lists are not carried over automatically — you must convert each list to a KVDB and rewrite the rules that used it as decoder `check` and `map` stages.
+In GuardSarm 4.x,  rules looked up threat data using CDB (Constant Database) lists stored in `/var/gsmsec/etc/lists/`. In GuardSarm 5.0, the Engine replaces these rules and uses KVDB (Key-Value Database) for the same purpose. CDB lists are not carried over automatically — you must convert each list to a KVDB and rewrite the rules that used it as decoder `check` and `map` stages.
 
 ## 0. Migration prerequisites
 
@@ -10,7 +10,7 @@ In order to have a better experience on migrating your custom decoders, please t
 
 - In 4.x, CDB lookups appeared in rules (`<list>` tag) and decoders. In 5.x, all KVDB lookups live in decoders. Rule-level CDB lookup logic must be moved into the decoder that processes those events.
 - CDB lists had no defined schema. KVDBs are YAML documents with explicit `content` entries.
-- CDB lists were files in `/var/ossec/etc/lists/`. KVDBs are defined in YAML, bundled inside an integration, stored in guardsarm-indexer, and synced to the Engine automatically.
+- CDB lists were files in `/var/gsmsec/etc/lists/`. KVDBs are defined in YAML, bundled inside an integration, stored in guardsarm-indexer, and synced to the Engine automatically.
 - Both use a `key: value` structure. KVDBs additionally support nested fields and arrays as values.
 
 ## 2. Implementation equivalences
@@ -33,8 +33,8 @@ In order to have a better experience on migrating your custom decoders, please t
 
 ```bash
 sudo mkdir -p /tmp/cdb-migration
-cp -r /var/ossec/etc/lists /tmp/cdb-migration
-cp -r /var/ossec/etc/rules/ /tmp/cdb-migration
+cp -r /var/gsmsec/etc/lists /tmp/cdb-migration
+cp -r /var/gsmsec/etc/rules/ /tmp/cdb-migration
 ```
 
 2. **Structure**: Write the skeletal structure of your kvdb:

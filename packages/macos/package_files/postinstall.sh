@@ -25,8 +25,8 @@ if [ -f "${UPGRADE_FILE_FLAG}" ]; then
     upgrade="true"
     rm -f ${UPGRADE_FILE_FLAG}
     echo "Restoring configuration files from ${DIR}/config_files/ to ${DIR}/etc/"
-    rm -rf ${DIR}/etc/{ossec.conf,client.keys,local_internal_options.conf,shared}
-    cp -rf ${DIR}/config_files/{ossec.conf,client.keys,local_internal_options.conf,shared} ${DIR}/etc/
+    rm -rf ${DIR}/etc/{gsmsec.conf,client.keys,local_internal_options.conf,shared}
+    cp -rf ${DIR}/config_files/{gsmsec.conf,client.keys,local_internal_options.conf,shared} ${DIR}/etc/
     rm -rf ${DIR}/config_files/
 fi
 
@@ -65,8 +65,8 @@ chmod 640 ${DIR}/etc/localtime
 chmod 770 ${DIR}/etc/shared # ossec must be able to write to it
 chown -R root:${GROUP} ${DIR}/etc/shared
 find ${DIR}/etc/shared/ -type f -exec chmod 660 {} \;
-chown root:${GROUP} ${DIR}/etc/ossec.conf
-chmod 640 ${DIR}/etc/ossec.conf
+chown root:${GROUP} ${DIR}/etc/gsmsec.conf
+chmod 640 ${DIR}/etc/gsmsec.conf
 chown root:${GROUP} ${DIR}/etc/wpk_root.pem
 chmod 640 ${DIR}/etc/wpk_root.pem
 
@@ -90,9 +90,9 @@ if [ -z "${upgrade}" ]; then
     echo "Generating GuardSarm configuration for a fresh installation."
 
     if [ -f "${INSTALLATION_SCRIPTS_DIR}/src/init/gen_guardsarm.sh" ]; then
-        ${INSTALLATION_SCRIPTS_DIR}/src/init/gen_guardsarm.sh conf agent ${DIST_NAME} ${DIST_VER}.${DIST_SUBVER} ${DIR} > ${DIR}/etc/ossec.conf
-        chown root:guardsarm ${DIR}/etc/ossec.conf
-        chmod 0640 ${DIR}/etc/ossec.conf
+        ${INSTALLATION_SCRIPTS_DIR}/src/init/gen_guardsarm.sh conf agent ${DIST_NAME} ${DIST_VER}.${DIST_SUBVER} ${DIR} > ${DIR}/etc/gsmsec.conf
+        chown root:guardsarm ${DIR}/etc/gsmsec.conf
+        chmod 0640 ${DIR}/etc/gsmsec.conf
     else
         echo "Error: ${INSTALLATION_SCRIPTS_DIR}/src/init/gen_guardsarm.sh script not found."
     fi

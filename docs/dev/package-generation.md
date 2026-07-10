@@ -33,7 +33,7 @@ guardsarm# cd packages
 | -j, --jobs           | Number of parallel jobs (optional)                                  | 2                       |
 | -r, --revision       | Package revision (optional)                                         | 0                       |
 | -s, --store          | Destination path for the package (optional)                         | (output folder created) |
-| -p, --path           | Installation path for the package (optional)                        | /var/ossec              |
+| -p, --path           | Installation path for the package (optional)                        | /var/gsmsec              |
 | -d, --debug          | Build binaries with debug symbols (optional)                        | no                      |
 | -c, --checksum       | Generate checksum on the same directory (optional)                  | no                      |
 | --dont-build-docker  | Use a locally built Docker image (optional)                         | no                      |

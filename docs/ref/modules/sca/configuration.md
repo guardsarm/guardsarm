@@ -26,8 +26,8 @@ This enables the SCA module with default settings:
   <interval>12h</interval>
   <max_eps>100</max_eps>
   <policies>
-    <policy>/var/ossec/etc/shared/cis_debian10.yml</policy>
-    <policy>/var/ossec/etc/shared/cis_apache_24.yml</policy>
+    <policy>/var/gsmsec/etc/shared/cis_debian10.yml</policy>
+    <policy>/var/gsmsec/etc/shared/cis_apache_24.yml</policy>
     <policy enabled="no">/custom/policies/disabled_policy.yml</policy>
   </policies>
   <synchronization>
@@ -99,7 +99,7 @@ Policy files are YAML documents containing:
 
 ### Policy Paths
 Policies can be specified using:
-- **Absolute paths**: `/var/ossec/etc/policies/custom.yml`
+- **Absolute paths**: `/var/gsmsec/etc/policies/custom.yml`
 - **Relative paths**: `etc/shared/cis_debian10.yml` (relative to GuardSarm installation)
 - **Shared paths**: Policies in the shared folder distributed by manager
 

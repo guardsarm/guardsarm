@@ -32,7 +32,7 @@ Rootcheck operates by inspecting system internals using various techniques to de
 
 ### Basic Configuration
 
-Add to your agent's `ossec.conf`:
+Add to your agent's `gsmsec.conf`:
 
 ```xml
 <rootcheck>
@@ -57,12 +57,12 @@ Add to your agent's `ossec.conf`:
 
 Check that rootcheck is running:
 ```bash
-grep rootcheck /var/ossec/logs/ossec.log
+grep rootcheck /var/gsmsec/logs/gsmsec.log
 ```
 
 Force an immediate scan:
 ```bash
-/var/ossec/bin/guardsarm-control restart
+/var/gsmsec/bin/guardsarm-control restart
 ```
 
 ## Detection Capabilities

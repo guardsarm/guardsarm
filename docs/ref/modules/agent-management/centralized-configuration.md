@@ -4,14 +4,14 @@
 
 The GuardSarm manager can push configuration settings to registered agents using the `agent.conf` file. This centralized approach simplifies managing large deployments by allowing administrators to define monitoring policies once on the manager and distribute them automatically to agents based on group membership.
 
-Configuration values defined in `agent.conf` take precedence over the local `ossec.conf` on each agent. This ensures consistent policy enforcement across all managed endpoints.
+Configuration values defined in `agent.conf` take precedence over the local `gsmsec.conf` on each agent. This ensures consistent policy enforcement across all managed endpoints.
 
 ## How it works
 
 1. The administrator creates or edits the `agent.conf` file on the GuardSarm manager.
 2. The file is placed in the appropriate group's shared directory on the manager.
 3. When agents connect (or reconnect), the manager distributes the updated configuration.
-4. The agent merges the received `agent.conf` settings with its local `ossec.conf`, with `agent.conf` values taking precedence.
+4. The agent merges the received `agent.conf` settings with its local `gsmsec.conf`, with `agent.conf` values taking precedence.
 
 ## File location
 
@@ -25,7 +25,7 @@ The default group is named `default`. All agents belong to the `default` group u
 
 ## Configuration format
 
-The `agent.conf` file uses the same XML syntax as `ossec.conf`. Wrap the configuration inside `<agent_config>` tags.
+The `agent.conf` file uses the same XML syntax as `gsmsec.conf`. Wrap the configuration inside `<agent_config>` tags.
 
 ### Basic example
 
@@ -77,7 +77,7 @@ Use the `name` attribute to apply settings to a specific agent:
 
 ### Targeting specific agents by profile
 
-Use the `profile` attribute to target agents that have a matching profile defined in their local `ossec.conf`:
+Use the `profile` attribute to target agents that have a matching profile defined in their local `gsmsec.conf`:
 
 ```xml
 <agent_config profile="database-servers">
@@ -126,6 +126,6 @@ Agents receive the updated configuration automatically on their next connection 
 When the same setting is defined in multiple places, the following precedence applies (highest to lowest):
 
 1. `agent.conf` (centralized configuration from the manager)
-2. `ossec.conf` (local configuration on the agent)
+2. `gsmsec.conf` (local configuration on the agent)
 
 If an agent belongs to multiple groups, the configurations from all groups are merged. In case of conflicts between groups, the configuration from the group with the lowest alphabetical order takes precedence.

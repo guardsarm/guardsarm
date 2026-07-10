@@ -329,10 +329,10 @@ int get_ossec_server()
     int success = 0;
 
     /* Definitions */
-    const char *(xml_manageraddr[]) = {"ossec_config", "client", "manager", "address", NULL};
-    const char *(xml_serverip[]) = {"ossec_config", "client", "server-ip", NULL};
-    const char *(xml_serverhost[]) = {"ossec_config", "client", "server-hostname", NULL};
-    const char *(xml_serveraddr[]) = {"ossec_config", "client", "server", "address", NULL};
+    const char *(xml_manageraddr[]) = {"guardsarm_config", "client", "manager", "address", NULL};
+    const char *(xml_serverip[]) = {"guardsarm_config", "client", "server-ip", NULL};
+    const char *(xml_serverhost[]) = {"guardsarm_config", "client", "server-hostname", NULL};
+    const char *(xml_serveraddr[]) = {"guardsarm_config", "client", "server", "address", NULL};
 
     /* Read XML */
     if (OS_ReadXML(CONFIG, &xml) < 0) {
@@ -452,8 +452,8 @@ int set_ossec_server(char *ip, HWND hwnd)
     const char **xml_alt_pt = NULL;
     OS_XML xml;
     char *str = NULL;
-    const char *(xml_manageraddr[]) = {"ossec_config", "client", "manager", "address", NULL};
-    const char *(xml_serveraddr[]) = {"ossec_config", "client", "server", "address", NULL};
+    const char *(xml_manageraddr[]) = {"guardsarm_config", "client", "manager", "address", NULL};
+    const char *(xml_serveraddr[]) = {"guardsarm_config", "client", "server", "address", NULL};
     char config_tmp[] = CONFIG;
     char *conf_file = basename_ex(config_tmp);
 

@@ -48,8 +48,8 @@ and the `%05hu%010u:%04u:` counter format; ports **1514** (remoted), **1515**
 (authd), **1516** (cluster); `client.keys` `ID NAME IP KEY`; routing headers
 `u:`/`s:`/`5:`. *Changing any breaks every deployed agent.*
 
-**Filesystem / OS identity** — `/var/ossec` (agent), `/var/wazuh-manager`
-(manager), `queue/sockets/*`, `etc/ossec.conf`, `etc/wazuh-manager.conf`,
+**Filesystem / OS identity** — `/var/gsmsec` (agent), `/var/wazuh-manager`
+(manager), `queue/sockets/*`, `etc/gsmsec.conf`, `etc/wazuh-manager.conf`,
 `etc/client.keys`, `etc/shared`; users/groups **`wazuh`** and **`wazuh-manager`**.
 
 **Process / service registry** — daemon `ARGV0` names (`wazuh-agentd`,

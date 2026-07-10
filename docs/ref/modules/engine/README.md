@@ -98,7 +98,7 @@ Input event example:
   "guardsarm": {
     "protocol": {
       "queue": 49,
-      "location": "/var/ossec/logs/active-responses.log"
+      "location": "/var/gsmsec/logs/active-responses.log"
     },
     "agent": {
       "host": {
@@ -136,7 +136,7 @@ Processed event:
   "guardsarm": {
     "protocol": {
       "queue": 49,
-      "location": "/var/ossec/logs/active-responses.log"
+      "location": "/var/gsmsec/logs/active-responses.log"
     },
     "agent": {
       "host": {

@@ -53,7 +53,7 @@ MQ_Functions mqFuncs = {
 // Create protocol instance
 auto protocol = std::make_unique<AgentSyncProtocol>(
     "FIM",                              // Module name
-    "/var/ossec/queue/fim/fim_sync.db", // Database path
+    "/var/gsmsec/queue/fim/fim_sync.db", // Database path
     mqFuncs,                            // MQ functions
     logger                              // Logger callback
 );
@@ -80,7 +80,7 @@ MQ_Functions mq_funcs = {
 // Create protocol handle
 AgentSyncProtocolHandle* handle = asp_create(
     "SCA",
-    "/var/ossec/queue/sca/sca_sync.db",
+    "/var/gsmsec/queue/sca/sca_sync.db",
     &mq_funcs,
     module_logger
 );

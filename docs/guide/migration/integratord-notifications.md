@@ -1,19 +1,19 @@
 # Migrating Integratord to Dashboard Notifications
 
-In GuardSarm 4.x, third-party integrations were configured directly in `ossec.conf` on the manager using `<integration>` blocks, handled by the `integratord` daemon.
+In GuardSarm 4.x, third-party integrations were configured directly in `gsmsec.conf` on the manager using `<integration>` blocks, handled by the `integratord` daemon.
 
 GuardSarm 5.x replaces this approach with two dashboard plugins:
 
 - **Notifications** — manages shared channels and connection settings for third-party services.
 - **Alerting** — creates monitors that scan data and send messages through those channels.
 
-All integration configuration is now done from the dashboard, with no changes required to `ossec.conf`.
+All integration configuration is now done from the dashboard, with no changes required to `gsmsec.conf`.
 
 ---
 
 > **⚠️ Warning:** The Notifications plugin does not support bi-directional integrations such as Maltiverse or Virustotal, which were previously supported by `integratord`. See [Security Analytics enrichments](#enrichment-integrations).
 
-> **Note:** This migration must be performed manually. There is no automatic tool to convert `<integration>` blocks from `ossec.conf` to the GuardSarm 5.x dashboard configuration.
+> **Note:** This migration must be performed manually. There is no automatic tool to convert `<integration>` blocks from `gsmsec.conf` to the GuardSarm 5.x dashboard configuration.
 
 ## Configuration mapping 4.x → 5.x
 
@@ -74,10 +74,10 @@ Below there is a set of configurations made in GuardSarm 4.x, you can use it as 
 <details>
 <summary>Creating the custom-jira script for GuardSarm 4.x</summary>
 
-1. Create the script file at `/var/ossec/integrations/custom-jira`:
+1. Create the script file at `/var/gsmsec/integrations/custom-jira`:
 
 ```python
-#!/var/ossec/framework/python/bin/python3
+#!/var/gsmsec/framework/python/bin/python3
 
 import sys
 import json
@@ -146,11 +146,11 @@ sys.exit(0)
 2. Set the correct permissions:
 
 ```bash
-chmod 750 /var/ossec/integrations/custom-jira
-chown root:guardsarm /var/ossec/integrations/custom-jira
+chmod 750 /var/gsmsec/integrations/custom-jira
+chown root:guardsarm /var/gsmsec/integrations/custom-jira
 ```
 
-3. Add the `<integration>` block to `ossec.conf` referencing the script name (`custom-jira`).
+3. Add the `<integration>` block to `gsmsec.conf` referencing the script name (`custom-jira`).
 
 </details>
 

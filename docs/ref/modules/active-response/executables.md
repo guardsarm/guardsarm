@@ -66,7 +66,7 @@ GuardSarm provides **5 Active Response executables** covering IP blocking and ac
 - `0`: Success (IP blocked/unblocked)
 - `1`: Failure (invalid input or all methods failed)
 
-**Logging**: All operations logged to `/var/ossec/logs/active-responses.log`
+**Logging**: All operations logged to `/var/gsmsec/logs/active-responses.log`
 
 ---
 
@@ -129,7 +129,7 @@ block in quick from <guardsarm_fwtable>
 - `0`: Success (IP blocked/unblocked)
 - `1`: Failure (invalid input or all methods failed)
 
-**Logging**: All operations logged to `/var/ossec/logs/active-responses.log`
+**Logging**: All operations logged to `/var/gsmsec/logs/active-responses.log`
 
 ---
 
@@ -249,7 +249,7 @@ block in quick from <guardsarm_fwtable>
 - `0`: Success (account disabled/re-enabled)
 - `1`: Failure (invalid input, command not found, or operation failed)
 
-**Logging**: All operations logged to `/var/ossec/logs/active-responses.log`
+**Logging**: All operations logged to `/var/gsmsec/logs/active-responses.log`
 
 ---
 
@@ -357,13 +357,13 @@ Users can create custom Active Response scripts following these guidelines:
 ### Requirements
 
 1. **Executable**: Script must have execute permissions (chmod 750)
-2. **Location**: Place in `/var/ossec/active-response/bin/` (without file extension)
+2. **Location**: Place in `/var/gsmsec/active-response/bin/` (without file extension)
 3. **Ownership**: Set owner to `root:guardsarm`
 4. **Shebang**: Include proper shebang line (e.g., `#!/bin/bash` or `#!/usr/bin/python3`)
 5. **JSON Input**: Read JSON from stdin using `read -r` (bash) or `sys.stdin` (Python)
 6. **Commands**: Support both `enable` and `disable` commands
 7. **Exit Codes**: Return 0 on success, 1 on failure
-8. **Logging**: Write to `/var/ossec/logs/active-responses.log`
+8. **Logging**: Write to `/var/gsmsec/logs/active-responses.log`
 
 ### Example 1: Stateful Bash Script (FIM Response)
 
@@ -372,10 +372,10 @@ This example demonstrates a complete stateful Active Response script for FIM eve
 ```bash
 #!/bin/bash
 # Custom Active Response for FIM events
-# Save as: /var/ossec/active-response/bin/custom-fim-response
+# Save as: /var/gsmsec/active-response/bin/custom-fim-response
 
 # Log file path
-LOG_FILE="/var/ossec/logs/active-responses.log"
+LOG_FILE="/var/gsmsec/logs/active-responses.log"
 
 # Function to write log messages
 log_message() {
@@ -475,7 +475,7 @@ This example uses a custom Python script:
 
 ```python
 #!/usr/bin/python3
-# Save as: /var/ossec/active-response/bin/custom-ar
+# Save as: /var/gsmsec/active-response/bin/custom-ar
 
 import os
 import sys
@@ -489,7 +489,7 @@ if os.name == 'nt':
 elif platform.system() == 'Darwin':
     LOG_FILE = "/Library/Ossec/logs/active-responses.log"
 else:
-    LOG_FILE = "/var/ossec/logs/active-responses.log"
+    LOG_FILE = "/var/gsmsec/logs/active-responses.log"
 
 ENABLE_COMMAND = 0
 DISABLE_COMMAND = 1
@@ -675,21 +675,21 @@ if __name__ == "__main__":
 
 ```bash
 # Bash script (Example 1)
-sudo cp custom-fim-response.sh /var/ossec/active-response/bin/custom-fim-response
-sudo chmod 750 /var/ossec/active-response/bin/custom-fim-response
-sudo chown root:guardsarm /var/ossec/active-response/bin/custom-fim-response
+sudo cp custom-fim-response.sh /var/gsmsec/active-response/bin/custom-fim-response
+sudo chmod 750 /var/gsmsec/active-response/bin/custom-fim-response
+sudo chown root:guardsarm /var/gsmsec/active-response/bin/custom-fim-response
 
 # Python script (Example 2)
-sudo cp custom-ar.py /var/ossec/active-response/bin/custom-ar
-sudo chmod 750 /var/ossec/active-response/bin/custom-ar
-sudo chown root:guardsarm /var/ossec/active-response/bin/custom-ar
+sudo cp custom-ar.py /var/gsmsec/active-response/bin/custom-ar
+sudo chmod 750 /var/gsmsec/active-response/bin/custom-ar
+sudo chown root:guardsarm /var/gsmsec/active-response/bin/custom-ar
 ```
 
 ### Best Practices
 
 - **⚠️ stdin Reading**: ALWAYS use `read -r INPUT` in bash (never `$(</dev/stdin)` - causes deadlock)
 - **Python stdin**: Use `for line in sys.stdin: input_str = line; break` or `sys.stdin.readline()`
-- **No File Extension**: Save scripts without extension in `/var/ossec/active-response/bin/`
+- **No File Extension**: Save scripts without extension in `/var/gsmsec/active-response/bin/`
 - **Path Processing**: Use `PurePosixPath(PureWindowsPath())` for cross-platform path handling
 - **Validate Input**: Check JSON structure and required fields before processing
 - **Implement Deduplication**: For stateful scripts, always use the keys protocol
@@ -713,11 +713,11 @@ Test AR scripts directly:
 ```bash
 # Test enable command
 echo '{"guardsarm":{"active_response":{"name":"block-ip","executable":"block-ip","type":"stateless"}},"source":{"ip":"192.168.1.100"},"command":"enable"}' | \
-  /var/ossec/active-response/bin/block-ip
+  /var/gsmsec/active-response/bin/block-ip
 
 # Test disable command
 echo '{"guardsarm":{"active_response":{"name":"block-ip","executable":"block-ip","type":"stateless"}},"source":{"ip":"192.168.1.100"},"command":"disable"}' | \
-  /var/ossec/active-response/bin/block-ip
+  /var/gsmsec/active-response/bin/block-ip
 ```
 
 ### Verify Firewall Changes
@@ -745,7 +745,7 @@ netsh advfirewall firewall show rule name="GuardSarm AR: 192.168.1.100"
 ### Check Logs
 
 ```bash
-tail -f /var/ossec/logs/active-responses.log
+tail -f /var/gsmsec/logs/active-responses.log
 ```
 
 ---

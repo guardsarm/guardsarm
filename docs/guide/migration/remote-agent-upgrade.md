@@ -325,6 +325,6 @@ After triggering the upgrade, confirm all conditions below are met before declar
 - `GET /agents/upgrade_result?agents_list=<id>` returns `"status": "Updated"` for every upgraded agent (or the binary exited with `Agent upgraded successfully`).
 - Agent version reported in `GET /agents/<id>` matches `5.0.0`.
 - Agent connection status is `active`.
-- `ossec.log` on the agent contains no errors related to the upgrade (`grep -i "upgrade" /var/ossec/logs/ossec.log`).
+- `gsmsec.log` on the agent contains no errors related to the upgrade (`grep -i "upgrade" /var/gsmsec/logs/gsmsec.log`).
 
 ---

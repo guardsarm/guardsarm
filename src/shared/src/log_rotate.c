@@ -72,7 +72,7 @@ void w_rotate_log(int compress, int keep_log_days, int new_day, int rotate_json,
 #ifdef WIN32
     // guardsarm log file
     snprintf(old_path, PATH_MAX, "%s", LOGFILE);
-    // ossec.json
+    // gsmsec.json
     snprintf(old_path_json, PATH_MAX, "%s", LOGJSONFILE);
     // logs
     strcpy(base_dir, "logs");

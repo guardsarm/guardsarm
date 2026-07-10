@@ -1,10 +1,10 @@
 # Migrating from CIS-CAT and OpenSCAP to SCA
 
-In previous GuardSarm versions (4.x), configuration and policy assessment could be performed with two integration wodles configured in the agent's `ossec.conf`: CIS-CAT (`<wodle name="cis-cat">`), which ran the external CIS-CAT Assessor against CIS benchmark content, and OpenSCAP (`<wodle name="open-scap">`), which ran the external OpenSCAP scanner against SCAP content (XCCDF profiles and OVAL definitions).
+In previous GuardSarm versions (4.x), configuration and policy assessment could be performed with two integration wodles configured in the agent's `gsmsec.conf`: CIS-CAT (`<wodle name="cis-cat">`), which ran the external CIS-CAT Assessor against CIS benchmark content, and OpenSCAP (`<wodle name="open-scap">`), which ran the external OpenSCAP scanner against SCAP content (XCCDF profiles and OVAL definitions).
 
 Starting with GuardSarm 5.0, both wodles have been **removed**. The agent no longer ships the CIS-CAT or OpenSCAP integrations, and no module is registered under those names. Configuration assessment is now performed natively by the **Security Configuration Assessment (SCA)** module, which evaluates the system against YAML policies bundled with the agent — no Java runtime, no external CIS-CAT Assessor, and no `openscap-scanner` package are required.
 
-> **Note:** If a `<wodle name="cis-cat">` or `<wodle name="open-scap">` block is left in `ossec.conf` (or in a shared `agent.conf`) after upgrading to 5.0, the block is ignored and the agent logs an informational message: `INFO: The 'cis-cat' module is deprecated. Use the SCA module instead.` or `INFO: The 'open-scap' module is deprecated. Use the SCA module instead.` The configuration still loads and the agent starts, but the wodles no longer run, so remove these blocks as part of the migration.
+> **Note:** If a `<wodle name="cis-cat">` or `<wodle name="open-scap">` block is left in `gsmsec.conf` (or in a shared `agent.conf`) after upgrading to 5.0, the block is ignored and the agent logs an informational message: `INFO: The 'cis-cat' module is deprecated. Use the SCA module instead.` or `INFO: The 'open-scap' module is deprecated. Use the SCA module instead.` The configuration still loads and the agent starts, but the wodles no longer run, so remove these blocks as part of the migration.
 
 > **Note:** There is no automatic tool to convert XCCDF, SCAP, or OVAL content into SCA policies. The CIS benchmarks you previously assessed with CIS-CAT or OpenSCAP are, in most cases, already covered by the SCA policies bundled under `ruleset/sca`. Custom XCCDF content must be re-authored as SCA YAML policies, and OVAL/CVE content is handled by a different module — see the mapping below.
 
@@ -24,12 +24,12 @@ The following table maps each CIS-CAT and OpenSCAP capability from GuardSarm 4.x
 
 > **Important:** SCA replaces the **configuration-assessment** (XCCDF) side of CIS-CAT and OpenSCAP only. The **vulnerability-assessment** (OVAL/CVE) side of OpenSCAP has no SCA equivalent. In GuardSarm, CVE detection is a separate capability (Vulnerability Detector in 4.x, the [Vulnerability Detection module](../../ref/modules/vulnerability-scanner/README.md) in 5.x). If your OpenSCAP configuration included `<content type="oval">` blocks, do not expect SCA to reproduce them — enable Vulnerability Detection instead.
 
-## GuardSarm 4.x ossec.conf reference
+## GuardSarm 4.x gsmsec.conf reference
 
-Below are the typical GuardSarm 4.x wodle blocks you may have in your `ossec.conf`. Use them as a reference when following the migration steps.
+Below are the typical GuardSarm 4.x wodle blocks you may have in your `gsmsec.conf`. Use them as a reference when following the migration steps.
 
 ```xml
-<!-- GuardSarm 4.x ossec.conf -->
+<!-- GuardSarm 4.x gsmsec.conf -->
 
 <!-- CIS-CAT: runs the external CIS-CAT Assessor against a CIS benchmark profile -->
 <wodle name="cis-cat">
@@ -64,20 +64,20 @@ Below are the typical GuardSarm 4.x wodle blocks you may have in your `ossec.con
 Before proceeding, make sure you have:
 
 - GuardSarm 5.0 or later deployed (indexer, manager, dashboard) and the agents upgraded.
-- Access to each agent's local `ossec.conf`, and to the GuardSarm manager, where shared `agent.conf` files are edited (one per agent group, under `etc/shared/<group>/`) before being pushed to agents.
+- Access to each agent's local `gsmsec.conf`, and to the GuardSarm manager, where shared `agent.conf` files are edited (one per agent group, under `etc/shared/<group>/`) before being pushed to agents.
 - A list of the benchmarks and profiles you previously assessed with CIS-CAT and OpenSCAP, so you can match them to the equivalent SCA policies.
 
-> These steps remove the deprecated wodles and replace them with SCA. Apply them wherever the wodles were configured: in each agent's local `ossec.conf`, and in any shared `agent.conf` on the manager.
+> These steps remove the deprecated wodles and replace them with SCA. Apply them wherever the wodles were configured: in each agent's local `gsmsec.conf`, and in any shared `agent.conf` on the manager.
 
 ## 1. Inventory your CIS-CAT and OpenSCAP configuration
 
-Locate every `<wodle name="cis-cat">` and `<wodle name="open-scap">` block. Check the local `ossec.conf` on each agent **and** the shared `agent.conf` of each agent group on the manager (under `etc/shared/<group>/agent.conf`), since a single shared configuration is distributed to every agent in the group and can carry the deprecated wodles to many agents at once.
+Locate every `<wodle name="cis-cat">` and `<wodle name="open-scap">` block. Check the local `gsmsec.conf` on each agent **and** the shared `agent.conf` of each agent group on the manager (under `etc/shared/<group>/agent.conf`), since a single shared configuration is distributed to every agent in the group and can carry the deprecated wodles to many agents at once.
 
 For each block, note the benchmark content and profile it referenced (the `<content>` `path` and `<profile>` values). You will use this to select the matching SCA policy in [Step 3](#3-map-your-benchmarks-to-sca-policies). For OpenSCAP, record any `<content type="oval">` entries separately — those map to Vulnerability Detection ([Step 6](#6-move-ovalcve-scanning-to-vulnerability-detection-openscap-only)), not SCA.
 
 ## 2. Remove the cis-cat and open-scap wodle blocks
 
-Delete the `<wodle name="cis-cat">` and `<wodle name="open-scap">` blocks. Edit the local `ossec.conf` directly on each agent, and edit any shared `agent.conf` on the manager (in the group's `etc/shared/<group>/` directory) — not on the agents, which receive that file from the manager.
+Delete the `<wodle name="cis-cat">` and `<wodle name="open-scap">` blocks. Edit the local `gsmsec.conf` directly on each agent, and edit any shared `agent.conf` on the manager (in the group's `etc/shared/<group>/` directory) — not on the agents, which receive that file from the manager.
 
 GuardSarm 5.0 no longer registers a runnable module under either name: leftover blocks are ignored with an INFO deprecation message and provide no assessment, so remove them to keep the configuration clean.
 
@@ -89,7 +89,7 @@ Identify the SCA policy that corresponds to each benchmark you recorded in [Step
 
 ## 4. Enable and configure SCA
 
-Add or update the `<sca>` block in `ossec.conf`. SCA is enabled by default and auto-loads the bundled policies for the platform; the `<policies>` section lets you enable specific policies explicitly or disable ones you do not need.
+Add or update the `<sca>` block in `gsmsec.conf`. SCA is enabled by default and auto-loads the bundled policies for the platform; the `<policies>` section lets you enable specific policies explicitly or disable ones you do not need.
 
 ```xml
 <sca>
@@ -131,7 +131,7 @@ If the deprecated wodles were distributed through a shared `agent.conf`, push th
 
 Confirm that the migration succeeded on a representative agent:
 
-1. Check the agent log (`/var/ossec/logs/ossec.log`) and verify there are **no** `The 'cis-cat' module is deprecated` or `The 'open-scap' module is deprecated` messages, which would indicate a leftover wodle block.
+1. Check the agent log (`/var/gsmsec/logs/gsmsec.log`) and verify there are **no** `The 'cis-cat' module is deprecated` or `The 'open-scap' module is deprecated` messages, which would indicate a leftover wodle block.
 2. Confirm SCA runs. The log shows the scan boundaries:
 
    ```

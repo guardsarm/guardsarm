@@ -37,7 +37,7 @@ void Monitord()
     /* /var/guardsarm-manager/logs/guardsarm-manager.json */
     snprintf(path_json, PATH_MAX, "%s", LOGJSONFILE);
 
-    /* Log monitord startup message to ossec.log */
+    /* Log monitord startup message to gsmsec.log */
     minfo(OS_MG_STARTED);
 
     // Start com request thread

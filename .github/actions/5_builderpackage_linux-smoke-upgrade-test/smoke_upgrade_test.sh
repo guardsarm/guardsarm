@@ -40,7 +40,7 @@ package_operation(){
 }
 
 set_dummy_manager_ip(){
-    sed -i 's/MANAGER_IP/1.1.1.1/g' /var/ossec/etc/ossec.conf
+    sed -i 's/MANAGER_IP/1.1.1.1/g' /var/gsmsec/etc/gsmsec.conf
 }
 
 download_package(){
@@ -60,21 +60,21 @@ save_package_manager_upgraded_version(){
 }
 
 save_agent_reported_version(){
-    if ! output=$(/var/ossec/bin/guardsarm-control info); then
+    if ! output=$(/var/gsmsec/bin/guardsarm-control info); then
         log_error "Failed to get agent info"
     fi
     echo "$output" | tee /packages/agent_reported_version.log
 }
 
 save_agent_daemons_status(){
-    if ! output=$(/var/ossec/bin/guardsarm-control status); then
+    if ! output=$(/var/gsmsec/bin/guardsarm-control status); then
         log_error "Error: Failed to get agent status"
     fi
     echo "$output" | tee /packages/agent_daemon_status.log
 }
 
 start_agent(){
-    /var/ossec/bin/guardsarm-control start
+    /var/gsmsec/bin/guardsarm-control start
 }
 
 check_test_results(){

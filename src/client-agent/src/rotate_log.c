@@ -44,14 +44,14 @@ void * w_rotate_log_thread(__attribute__((unused)) void * arg) {
     today = tm.tm_mday;
 
 #ifdef WIN32
-    // ossec.log
+    // gsmsec.log
     snprintf(path, PATH_MAX, "%s", LOGFILE);
-    // /var/ossec/logs/ossec.json
+    // /var/gsmsec/logs/gsmsec.json
     snprintf(path_json, PATH_MAX, "%s", LOGJSONFILE);
 #else
     // <guardsarm-home>/logs/<guardsarm log file>
     snprintf(path, PATH_MAX, "%s", LOGFILE);
-    // /var/ossec/logs/ossec.json
+    // /var/gsmsec/logs/gsmsec.json
     snprintf(path_json, PATH_MAX, "%s", LOGJSONFILE);
 #endif
 
@@ -61,7 +61,7 @@ void * w_rotate_log_thread(__attribute__((unused)) void * arg) {
 
         if (today != tm.tm_mday) {
             sleep(day_wait);
-            /* Daily rotation and compression of ossec.log/ossec.json */
+            /* Daily rotation and compression of gsmsec.log/gsmsec.json */
             w_rotate_log(log_compress, keep_log_days, 1, 0, daily_rotations);
             today = tm.tm_mday;
         }
@@ -69,7 +69,7 @@ void * w_rotate_log_thread(__attribute__((unused)) void * arg) {
         if (size_rotate > 0) {
             if (w_stat(path, &buf) == 0) {
                 size = buf.st_size;
-                /* If log file reachs maximum size, rotate ossec.log */
+                /* If log file reachs maximum size, rotate gsmsec.log */
                 if ( (unsigned long) size >= size_rotate) {
                     w_rotate_log(log_compress, keep_log_days, 0, 0, daily_rotations);
                 }
@@ -77,7 +77,7 @@ void * w_rotate_log_thread(__attribute__((unused)) void * arg) {
 
             if (w_stat(path_json, &buf) == 0) {
                 size = buf.st_size;
-                /* If log file reachs maximum size, rotate ossec.json */
+                /* If log file reachs maximum size, rotate gsmsec.json */
                 if ( (unsigned long) size >= size_rotate) {
                     w_rotate_log(log_compress, keep_log_days, 0, 1, daily_rotations);
                 }

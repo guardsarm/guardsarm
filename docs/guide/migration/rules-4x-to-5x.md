@@ -61,7 +61,7 @@ The promotion path for user-created content is: **Draft → Test → Custom**.
 
 | Aspect | 4.x (XML) | 5.x (YAML) |
 |---|---|---|
-| **Format** | XML files on disk (`/var/ossec/ruleset/rules/`) | JSON documents in GuardSarm indices (`guardsarm-threatintel-rules`) |
+| **Format** | XML files on disk (`/var/gsmsec/ruleset/rules/`) | JSON documents in GuardSarm indices (`guardsarm-threatintel-rules`) |
 | **Processing** | Single analysis daemon handles decoding + rule matching | GuardSarm Engine decodes and indexes events; Security Analytics detectors match rules via percolator queries |
 | **Output** | Alerts | Events (all decoded logs) + Findings (events that matched a rule) |
 | **Rule identification** | Numeric ID (1–999999) | UUID, auto-assigned by the system on creation |
@@ -73,7 +73,7 @@ The promotion path for user-created content is: **Draft → Test → Custom**.
 | **Compliance mapping** | Embedded in `<group>` tag as CSV | Dedicated `compliance` object with structured fields |
 | **MITRE mapping** | `<mitre><id>` tags inside rule | Dedicated `mitre` object with arrays of tactic, technique, and subtechnique IDs |
 | **Management** | File edits + manager restart | API / index operations, no restart required |
-| **Custom rules** | `/var/ossec/etc/rules/local_rules.xml` | Documents promoted through Draft → Test → Custom spaces |
+| **Custom rules** | `/var/gsmsec/etc/rules/local_rules.xml` | Documents promoted through Draft → Test → Custom spaces |
 | **Rule state** | Active when loaded (or `noalert`) | `enabled: true/false` field per rule |
 
 ---
@@ -162,9 +162,9 @@ List all custom rules you need to migrate:
 
 ```bash
 # On the 4.x GuardSarm manager
-find /var/ossec/etc/rules/ -name "*.xml" -exec grep -l '<rule ' {} \;
+find /var/gsmsec/etc/rules/ -name "*.xml" -exec grep -l '<rule ' {} \;
 # Also check default rules you may have overridden
-grep -r 'overwrite="yes"' /var/ossec/etc/rules/
+grep -r 'overwrite="yes"' /var/gsmsec/etc/rules/
 ```
 
 For each rule, note:

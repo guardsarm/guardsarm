@@ -6,18 +6,18 @@ You can use a local configuration file on the GuardSarm agent or GuardSarm serve
 
 ## Local configuration
 
-The `ossec.conf` file is the main configuration file on the GuardSarm agent. The GuardSarm agent collects logs from monitored endpoints and forwards these logs to the GuardSarm server for analysis. You can configure the agent to collect logs from specific files.
+The `gsmsec.conf` file is the main configuration file on the GuardSarm agent. The GuardSarm agent collects logs from monitored endpoints and forwards these logs to the GuardSarm server for analysis. You can configure the agent to collect logs from specific files.
 
-### Location of `ossec.conf`
+### Location of `gsmsec.conf`
 
 | Operating system | Location |
 |------------------|----------|
-| Windows | `C:\Program Files (x86)\ossec-agent\ossec.conf` |
-| Linux / Unix | `/var/ossec/etc/ossec.conf` |
-| macOS | `/Library/Ossec/etc/ossec.conf` |
+| Windows | `C:\Program Files (x86)\ossec-agent\gsmsec.conf` |
+| Linux / Unix | `/var/gsmsec/etc/gsmsec.conf` |
+| macOS | `/Library/Ossec/etc/gsmsec.conf` |
 
 !!! note
-    The `agent.conf` file on the GuardSarm server allows centralized distribution of configuration settings to multiple monitored endpoints. Configuration values defined in `agent.conf` take precedence over `ossec.conf`.
+    The `agent.conf` file on the GuardSarm server allows centralized distribution of configuration settings to multiple monitored endpoints. Configuration values defined in `agent.conf` take precedence over `gsmsec.conf`.
 
 ---
 
@@ -152,7 +152,7 @@ Additional channels can be configured.
 
 ## Monitoring the Windows event channel
 
-To monitor a specific event channel, configure the following in `ossec.conf`:
+To monitor a specific event channel, configure the following in `gsmsec.conf`:
 
 ```xml
 <localfile>
@@ -375,7 +375,7 @@ After this change, all new containers send their logs to the systemd journal.
 
 ### Configure GuardSarm to collect Docker logs from journald
 
-Add the following configuration to the GuardSarm agent's `ossec.conf`:
+Add the following configuration to the GuardSarm agent's `gsmsec.conf`:
 
 ```xml
 <localfile>

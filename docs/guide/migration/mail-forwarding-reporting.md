@@ -1,20 +1,20 @@
 # Migrating Mail Forwarding and Reporting to dashboard Notifications
 
-In previous GuardSarm versions (4.x), email alerts and reporting were configured directly in the GuardSarm manager's `ossec.conf` file using the `<email_alerts>`, `<reports>`, and related global SMTP configuration blocks.
+In previous GuardSarm versions (4.x), email alerts and reporting were configured directly in the GuardSarm manager's `gsmsec.conf` file using the `<email_alerts>`, `<reports>`, and related global SMTP configuration blocks.
 
 Starting with GuardSarm 5.0, these backend mail forwarding capabilities have been removed from the manager. Mail forwarding and scheduled reporting must now be configured directly through the GuardSarm dashboard using the **Notifications**, **Alerting**, and **Reporting** dashboard plugins.
 
-> **Note:** There is no automatic upgrade tooling to migrate your existing GuardSarm 4.x email configurations. You must manually recreate your alerting and reporting logic in the GuardSarm dashboard. Use the mapping tables below to identify which GuardSarm 5.x feature corresponds to each element in your `ossec.conf`.
+> **Note:** There is no automatic upgrade tooling to migrate your existing GuardSarm 4.x email configurations. You must manually recreate your alerting and reporting logic in the GuardSarm dashboard. Use the mapping tables below to identify which GuardSarm 5.x feature corresponds to each element in your `gsmsec.conf`.
 
 ## Configuration mapping (4.x -> 5.x)
 
-The following table maps each `ossec.conf` element from GuardSarm 4.x to the corresponding feature in the GuardSarm 5.x dashboard. Entries use the form `section.element` - for example, `global.smtp_server` refers to `<global><smtp_server>` in your `ossec.conf`.
+The following table maps each `gsmsec.conf` element from GuardSarm 4.x to the corresponding feature in the GuardSarm 5.x dashboard. Entries use the form `section.element` - for example, `global.smtp_server` refers to `<global><smtp_server>` in your `gsmsec.conf`.
 
-> See the [ossec.conf reference](#guardsarm-4x-ossecconf-reference) below for the full XML context of each section.
+> See the [gsmsec.conf reference](#guardsarm-4x-ossecconf-reference) below for the full XML context of each section.
 
 ### Email alerts mapping
 
-| 4.x `ossec.conf`              | 5.x dashboard                                    | Guide                                                                         |
+| 4.x `gsmsec.conf`              | 5.x dashboard                                    | Guide                                                                         |
 | ----------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------------- |
 | `global.smtp_server`          | Notifications > Email Senders (SMTP host/port)   | [Step 1](#1-creating-an-email-sender)                                         |
 | `global.email_from`           | Notifications > Email Senders (outbound address) | [Step 1](#1-creating-an-email-sender)                                         |
@@ -24,18 +24,18 @@ The following table maps each `ossec.conf` element from GuardSarm 4.x to the cor
 
 ### Reports mapping
 
-| 4.x `ossec.conf`   | 5.x dashboard                                            | Guide                                     |
+| 4.x `gsmsec.conf`   | 5.x dashboard                                            | Guide                                     |
 | ------------------ | -------------------------------------------------------- | ----------------------------------------- |
 | `reports.title`    | Reporting > Report Definition > Name                     | [Step 5](#5-recreating-scheduled-reports) |
 | `reports.email_to` | Reporting > Report Definition > Notification > Channels  | [Step 5](#5-recreating-scheduled-reports) |
 | `reports.showlogs` | Reporting > Report Definition > (include details toggle) | [Step 5](#5-recreating-scheduled-reports) |
 
-## GuardSarm 4.x ossec.conf reference
+## GuardSarm 4.x gsmsec.conf reference
 
-Below are the typical GuardSarm 4.x configuration blocks you may have in your `ossec.conf`. Use them as a reference when following the migration steps.
+Below are the typical GuardSarm 4.x configuration blocks you may have in your `gsmsec.conf`. Use them as a reference when following the migration steps.
 
 ```xml
-<!-- GuardSarm 4.x ossec.conf -->
+<!-- GuardSarm 4.x gsmsec.conf -->
 <global>
   <smtp_server>mail.example.com</smtp_server>
   <email_from>guardsarm@example.com</email_from>
@@ -78,7 +78,7 @@ Before proceeding, make sure you have:
 
 Before creating an email channel, you must set up an outbound email server by creating a sender. You can choose to configure either an SMTP or an Amazon SES sender.
 
-In your GuardSarm 4.x `ossec.conf`, the [`global.smtp_server`](#email-alerts-mapping) and [`global.email_from`](#email-alerts-mapping) settings configured the SMTP relay and outbound email address used for all alerts. In GuardSarm 5.0, both values are now part of the email sender configuration below.
+In your GuardSarm 4.x `gsmsec.conf`, the [`global.smtp_server`](#email-alerts-mapping) and [`global.email_from`](#email-alerts-mapping) settings configured the SMTP relay and outbound email address used for all alerts. In GuardSarm 5.0, both values are now part of the email sender configuration below.
 
 1. Open the GuardSarm dashboard and navigate to the **Notifications** plugin.
 2. Go to **Email senders**.
@@ -129,7 +129,7 @@ In your GuardSarm 4.x `ossec.conf`, the [`global.smtp_server`](#email-alerts-map
 
 To easily manage multiple destination email addresses, you can configure an Email Recipient Group.
 
-Where in GuardSarm 4.x you set [`email_alerts.email_to`](#email-alerts-mapping) directly in `ossec.conf`, in GuardSarm 5.0 email destinations are managed as reusable recipient groups that can be shared across multiple channels and report definitions.
+Where in GuardSarm 4.x you set [`email_alerts.email_to`](#email-alerts-mapping) directly in `gsmsec.conf`, in GuardSarm 5.0 email destinations are managed as reusable recipient groups that can be shared across multiple channels and report definitions.
 
 1. In the **Notifications** plugin, go to **Email recipient groups**.
 
@@ -170,7 +170,7 @@ With your sender and recipient group created, you can now set up the Notificatio
 
 ## 4. Recreating Email Alerts with Monitors
 
-In GuardSarm 4.x, you used [`<email_alerts>`](#email-alerts-mapping) blocks in `ossec.conf` with filters like `<level>`, `<group>`, `<rule_id>`, and `<event_location>` to determine which alerts triggered email notifications. In GuardSarm 5.0, there is no separate "alerts" entity - the Alerting plugin operates on **monitor queries** that can target any index pattern you choose.
+In GuardSarm 4.x, you used [`<email_alerts>`](#email-alerts-mapping) blocks in `gsmsec.conf` with filters like `<level>`, `<group>`, `<rule_id>`, and `<event_location>` to determine which alerts triggered email notifications. In GuardSarm 5.0, there is no separate "alerts" entity - the Alerting plugin operates on **monitor queries** that can target any index pattern you choose.
 
 > **Monitor data sources:** In GuardSarm 4.x, alerts were stored in a dedicated alerts index (`guardsarm-alerts-*`). In GuardSarm 5.0, that index no longer exists. Instead, the Alerting plugin can query any index pattern you configure - for example, `guardsarm-findings-v5*`, `guardsarm-events-v5*`, or a custom index. If your query relies on rule metadata fields (`guardsarm.rule.*`), you must target a findings index, since only findings carry those fields. For other use cases, you can create monitors against other index patterns.
 
@@ -215,7 +215,7 @@ When adding a trigger, configure the action to use your notification channel. Th
 <details>
 <summary>Example: recreating an `sshd` rule from GuardSarm 4.x</summary>
 
-If your GuardSarm 4.x `ossec.conf` had a block like:
+If your GuardSarm 4.x `gsmsec.conf` had a block like:
 
 ```xml
 <email_alerts>
@@ -251,9 +251,9 @@ You can recreate it with the following monitor configuration:
 
 ## 5. Recreating Scheduled Reports
 
-If you previously used the [`<reports>`](#reports-mapping) block in `ossec.conf` to generate daily or weekly summaries, you can replicate this behavior using the GuardSarm dashboard **Reporting** plugin.
+If you previously used the [`<reports>`](#reports-mapping) block in `gsmsec.conf` to generate daily or weekly summaries, you can replicate this behavior using the GuardSarm dashboard **Reporting** plugin.
 
-In your GuardSarm 4.x `ossec.conf`, the `<reports>` block defined the report content with filters like `<group>`, `<rule>`, `<level>`, `<srcip>`, `<location>`, and `<user>`, plus the [`<email_to>`](#reports-mapping) destination and [`<showlogs>`](#reports-mapping) toggle. In GuardSarm 5.0, these are split into two parts:
+In your GuardSarm 4.x `gsmsec.conf`, the `<reports>` block defined the report content with filters like `<group>`, `<rule>`, `<level>`, `<srcip>`, `<location>`, and `<user>`, plus the [`<email_to>`](#reports-mapping) destination and [`<showlogs>`](#reports-mapping) toggle. In GuardSarm 5.0, these are split into two parts:
 
 - **Report content**: Instead of XML filters, you select a source dashboard or visualization - the filtering is inherent to the source.
 - **Delivery**: The [`<email_to>`](#reports-mapping) is now handled by the notification channel you created in [Step 3](#3-setting-up-an-email-notification-channel).
@@ -297,4 +297,4 @@ Create a report definition configured to your needs, then set up email notificat
 
 ![Report Email Received](../../images/email-forwarding-reporting/received-mail-final.png)
 
-You have now migrated your email alerts and scheduled reports from `ossec.conf` to the GuardSarm dashboard.
+You have now migrated your email alerts and scheduled reports from `gsmsec.conf` to the GuardSarm dashboard.

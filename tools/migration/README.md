@@ -17,7 +17,7 @@ idempotent, reversible, and non-destructive. They never delete user data.
 |------|---------|-------|
 | `path-symlink.sh`   | Create bidirectional symlinks between legacy and GuardSarm install paths (e.g. `/var/guardsarm-manager` <-> `/var/guardsarm-manager`). | stub / inactive |
 | `service-alias.md`  | Design + template for systemd/launchd/Windows service alias units so both legacy and new service names resolve. | design |
-| `dual-read-config.md` | Design for loaders that accept both `ossec.conf`/`guardsarm-manager.conf` and any future GuardSarm-named config, preferring the existing file. | design |
+| `dual-read-config.md` | Design for loaders that accept both `gsmsec.conf`/`guardsarm-manager.conf` and any future GuardSarm-named config, preferring the existing file. | design |
 
 ## Non-negotiable rules for any R2 migration
 

@@ -10,7 +10,7 @@ A key feature of the `agent_info` module is its **coordination protocol**. When 
 
 ## Configuration
 
-The module is configured in the `ossec.conf` file within an `<agent-info>` block.
+The module is configured in the `gsmsec.conf` file within an `<agent-info>` block.
 
 ```xml
 <agent-info>

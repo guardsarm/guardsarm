@@ -51,7 +51,7 @@ Syscollector performs periodic scans to gather inventory data and only sends cha
 
 ### Basic Configuration
 
-Add to your agent's `ossec.conf`:
+Add to your agent's `gsmsec.conf`:
 
 ```xml
 <wodle name="syscollector">
@@ -78,7 +78,7 @@ Add to your agent's `ossec.conf`:
 
 Check that syscollector is running:
 ```bash
-grep syscollector /var/ossec/logs/ossec.log
+grep syscollector /var/gsmsec/logs/gsmsec.log
 ```
 
 ## Documentation

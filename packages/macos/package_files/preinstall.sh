@@ -112,7 +112,7 @@ Upgrade to GuardSarm 5.0.0 is only supported from version 4.14.0 or later."
 
     echo "Backing up configuration files to ${DIR}/config_files/"
     mkdir -p ${DIR}/config_files/
-    cp -r ${DIR}/etc/{ossec.conf,client.keys,local_internal_options.conf,shared} ${DIR}/config_files/
+    cp -r ${DIR}/etc/{gsmsec.conf,client.keys,local_internal_options.conf,shared} ${DIR}/config_files/
 
     if [ -d ${DIR}/logs/ossec ]; then
         echo "Renaming ${DIR}/logs/ossec to ${DIR}/logs/guardsarm"

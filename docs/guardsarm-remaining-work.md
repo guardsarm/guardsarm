@@ -18,10 +18,10 @@ chain outweighs cosmetic benefit).
 
 Each class is independent; ship/skip individually.
 
-1. **Filesystem paths** (`/var/wazuh-manager`, `/var/ossec`, config/log filenames)
+1. **Filesystem paths** (`/var/wazuh-manager`, `/var/gsmsec`, config/log filenames)
    - Approach: install to the new path; create bidirectional symlinks
      (`tools/migration/path-symlink.sh`); dual-read config
-     (`ossec.conf`/`wazuh-manager.conf` still honored). Touch `install.sh`,
+     (`gsmsec.conf`/`wazuh-manager.conf` still honored). Touch `install.sh`,
      `src/init/shared.sh`/`inst-functions.sh`, `common.py` path constants,
      postinst/spec scriptlets.
    - Risk: file ownership, IPC socket paths, SELinux contexts. Test upgrade both ways.

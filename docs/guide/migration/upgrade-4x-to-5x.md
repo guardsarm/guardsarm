@@ -3,7 +3,7 @@
 This guide describes how to migrate GuardSarm agents from 4.X to 5.0.0, including:
 
 - Required upgrade path when the current agent is older than 4.14.X.
-- Invalid and deprecated configuration elements in `ossec.conf`.
+- Invalid and deprecated configuration elements in `gsmsec.conf`.
 - Observed startup warnings and errors and their corresponding workarounds.
 - Notes about `local_internal_options.conf` compatibility.
 
@@ -51,10 +51,10 @@ installer: The upgrade failed. (The Installer encountered an error that caused t
 1. Upgrade the agent to the latest available `4.14.X` package.
 2. Validate the agent starts without new errors on `4.14.X`.
 3. Upgrade from `4.14.X` to `5.0.0`.
-4. Review `ossec.log` and fix any invalid/deprecated configuration elements listed below.
+4. Review `gsmsec.log` and fix any invalid/deprecated configuration elements listed below.
 5. Restart the agent and verify healthy connectivity and module startup.
 
-## Configuration migration (`ossec.conf`)
+## Configuration migration (`gsmsec.conf`)
 
 The following changes were identified during agent startup validation after upgrading to 5.0.0.
 
@@ -76,13 +76,13 @@ The following changes were identified during agent startup validation after upgr
 When invalid rootcheck/syscheck options remain in the configuration, the agent may also report:
 
 ```console
-INFO: (1202): Configuration error at 'etc/ossec.conf'.
-INFO: (1207): guardsarm-rootcheck remote configuration in 'etc/ossec.conf' is corrupted.
+INFO: (1202): Configuration error at 'etc/gsmsec.conf'.
+INFO: (1207): guardsarm-rootcheck remote configuration in 'etc/gsmsec.conf' is corrupted.
 ```
 
 These messages are resolved by removing the invalid elements listed above.
 
-## `ossec.conf` quick before/after examples
+## `gsmsec.conf` quick before/after examples
 
 ### Client connection block
 
@@ -117,7 +117,7 @@ The `cis-cat` and `osquery` modules are removed in 5.0, but their capabilities a
 - `cis-cat` -> SCA. See [Migrating from CIS-CAT and OpenSCAP to SCA](ciscat-openscap-to-sca.md).
 - `osquery` -> IT Hygiene. See [Migrating from OSquery to IT Hygiene](osquery-to-it-hygiene.md).
 
-Once the functionality is migrated, remove the blocks from `ossec.conf`:
+Once the functionality is migrated, remove the blocks from `gsmsec.conf`:
 
 ```xml
 <wodle name="cis-cat">...</wodle>

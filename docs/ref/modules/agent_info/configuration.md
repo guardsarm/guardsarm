@@ -1,6 +1,6 @@
 # Configuration
 
-The `agent_info` module is configured in the `ossec.conf` file. It defines the scan intervals, synchronization parameters, and module behavior.
+The `agent_info` module is configured in the `gsmsec.conf` file. It defines the scan intervals, synchronization parameters, and module behavior.
 
 ---
 

@@ -4,7 +4,7 @@ This document describes all configuration options for the rootcheck module.
 
 ## Configuration Location
 
-Rootcheck is configured in the agent's `ossec.conf` file within the `<rootcheck>` section:
+Rootcheck is configured in the agent's `gsmsec.conf` file within the `<rootcheck>` section:
 
 ```xml
 <rootcheck>
@@ -322,12 +322,12 @@ Rootcheck scans can be resource-intensive. Consider your system's capabilities w
 
 Check if rootcheck is enabled:
 ```bash
-grep -A 5 "<rootcheck>" /var/ossec/etc/ossec.conf
+grep -A 5 "<rootcheck>" /var/gsmsec/etc/gsmsec.conf
 ```
 
 Check logs for errors:
 ```bash
-grep rootcheck /var/ossec/logs/ossec.log
+grep rootcheck /var/gsmsec/logs/gsmsec.log
 ```
 
 ### No Alerts Generated
@@ -336,7 +336,7 @@ grep rootcheck /var/ossec/logs/ossec.log
 2. Check scan frequency - wait for next scheduled scan
 3. Force immediate scan:
    ```bash
-   /var/ossec/bin/guardsarm-control restart
+   /var/gsmsec/bin/guardsarm-control restart
    ```
 4. Check agent connection to manager
 

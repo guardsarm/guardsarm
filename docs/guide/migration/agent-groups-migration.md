@@ -1,8 +1,8 @@
 # Migrating Agent Groups to GuardSarm 5.0
 
-In GuardSarm 4.x, agent group assignments were stored in the manager's `global.db` database and shared group configurations lived under `/var/ossec/etc/shared/`. Each group folder contained an `agent.conf` and a compiled `merged.mg` file that the manager pushed to agents on check-in.
+In GuardSarm 4.x, agent group assignments were stored in the manager's `global.db` database and shared group configurations lived under `/var/gsmsec/etc/shared/`. Each group folder contained an `agent.conf` and a compiled `merged.mg` file that the manager pushed to agents on check-in.
 
-Starting with GuardSarm 5.0, the manager installation path changed from `/var/ossec/` to `/var/guardsarm-manager/`. Group configurations still reside under the same relative path (`etc/shared/`), but the absolute paths have changed. Group membership is also no longer inferred by the manager: the agent declares its group during the **enrollment handshake**, and the manager stores that assignment in `global.db`. This means an agent will only be placed in its original group if that group is configured on the agent **before** it (re)enrolls. There is no automatic checksum-based group guessing in GuardSarm 5.0. The full mechanism is covered in [How group assignment works](#how-group-assignment-works) below.
+Starting with GuardSarm 5.0, the manager installation path changed from `/var/gsmsec/` to `/var/guardsarm-manager/`. Group configurations still reside under the same relative path (`etc/shared/`), but the absolute paths have changed. Group membership is also no longer inferred by the manager: the agent declares its group during the **enrollment handshake**, and the manager stores that assignment in `global.db`. This means an agent will only be placed in its original group if that group is configured on the agent **before** it (re)enrolls. There is no automatic checksum-based group guessing in GuardSarm 5.0. The full mechanism is covered in [How group assignment works](#how-group-assignment-works) below.
 
 > There is no automatic migration tooling for agent groups. You must manually transfer your group configuration files to the new manager before reconnecting any agents.
 
@@ -10,12 +10,12 @@ Starting with GuardSarm 5.0, the manager installation path changed from `/var/os
 
 Group assignment in GuardSarm 5.0 is driven by the agent's enrollment:
 
-1. **Enrollment (the handshake that carries the group).** When an agent enrolls (registers) with the manager, it includes the group(s) configured in its `ossec.conf` under `<enrollment><groups>`. The manager's enrollment service (`guardsarm-manager-authd`) validates the group and writes the assignment into `global.db`. If the declared group does not exist on the manager, **enrollment is rejected and the agent cannot connect**.
+1. **Enrollment (the handshake that carries the group).** When an agent enrolls (registers) with the manager, it includes the group(s) configured in its `gsmsec.conf` under `<enrollment><groups>`. The manager's enrollment service (`guardsarm-manager-authd`) validates the group and writes the assignment into `global.db`. If the declared group does not exist on the manager, **enrollment is rejected and the agent cannot connect**.
 2. **Persistence.** The assignment persists in `global.db` and survives agent and manager restarts, so it does not need to be resent on every connection.
 3. **Reconnection.** On each keepalive, the manager looks up the agent's group in `global.db` and, if found, compiles and pushes that group's shared configuration. If no group is recorded for the agent, the manager assigns the `default` group.
 
 > [!IMPORTANT]
-> Earlier GuardSarm versions could *guess* an agent's group by matching its `merged.mg` checksum against the groups present on the manager (the `remoted.guess_agent_group` internal option). **This mechanism has been removed in GuardSarm 5.0.** A reconnecting agent that has no group configured in its `ossec.conf` and no prior assignment in `global.db` will be placed in the `default` group. To restore its original group you must either re-enroll the agent with the group configured, or assign the group manually (see [Workaround: manual group assignment](#workaround-manual-group-assignment)).
+> Earlier GuardSarm versions could *guess* an agent's group by matching its `merged.mg` checksum against the groups present on the manager (the `remoted.guess_agent_group` internal option). **This mechanism has been removed in GuardSarm 5.0.** A reconnecting agent that has no group configured in its `gsmsec.conf` and no prior assignment in `global.db` will be placed in the `default` group. To restore its original group you must either re-enroll the agent with the group configured, or assign the group manually (see [Workaround: manual group assignment](#workaround-manual-group-assignment)).
 
 ## Prerequisites
 
@@ -24,7 +24,7 @@ This guide assumes you will **back up the group configurations from the 4.x mana
 Before proceeding, make sure you have:
 
 - Root or terminal access to the manager host
-- The group configured on each agent's `ossec.conf` under `<enrollment><groups>`, so the group is sent on enrollment (recommended, not a blocker)
+- The group configured on each agent's `gsmsec.conf` under `<enrollment><groups>`, so the group is sent on enrollment (recommended, not a blocker)
 - **Agents stopped**, and kept stopped until the group folders are restored and each agent's group is configured. Otherwise, an agent that reconnects mid-migration is either assigned the `default` group (if it declares no group) or has its enrollment rejected and cannot connect (if it declares a group that does not yet exist on the manager).
   To turn off an agent:
   ```bash
@@ -40,7 +40,7 @@ Before proceeding, make sure you have:
 On the **4.x manager**, archive the group folders under `shared/`, excluding the runtime-generated `merged.mg`:
 
 ```bash
-cd /var/ossec/etc
+cd /var/gsmsec/etc
 tar -cvzf /tmp/guardsarm_groups_backup.tar.gz --exclude='*/merged.mg' shared/*/
 ```
 
@@ -49,7 +49,7 @@ The `shared/*/` glob matches only the group folders, so non-group files in `shar
 To migrate only specific groups, replace `shared/*/` with the folder names:
 
 ```bash
-cd /var/ossec/etc
+cd /var/gsmsec/etc
 tar -cvzf /tmp/guardsarm_groups_backup.tar.gz --exclude='*/merged.mg' \
     shared/<group-name-1>/ shared/<group-name-2>/
 ```
@@ -81,7 +81,7 @@ ls /var/guardsarm-manager/etc/shared/
 
 ### 3. Ensure each agent has its group configured
 
-On every **agent** that should belong to a non-default group, confirm the group is set in `/var/ossec/etc/ossec.conf`:
+On every **agent** that should belong to a non-default group, confirm the group is set in `/var/gsmsec/etc/gsmsec.conf`:
 
 ```xml
 <enrollment>
@@ -91,7 +91,7 @@ On every **agent** that should belong to a non-default group, confirm the group 
 ```
 
 > [!IMPORTANT]
-> An agent showing a group on the 4.x dashboard does **not** necessarily mean that group is in its `ossec.conf`. Depending on how it was deployed or assigned, the membership may exist only on the manager. Check the agent's `ossec.conf` rather than relying on the dashboard.
+> An agent showing a group on the 4.x dashboard does **not** necessarily mean that group is in its `gsmsec.conf`. Depending on how it was deployed or assigned, the membership may exist only on the manager. Check the agent's `gsmsec.conf` rather than relying on the dashboard.
 >
 > If an agent starts without a group configured, it will fall into the `default` group and you must [assign its group manually](#workaround-manual-group-assignment).
 
@@ -103,7 +103,7 @@ Clear its key first, then start it:
 
 ```bash
 # On each agent
-rm -f /var/ossec/etc/client.keys
+rm -f /var/gsmsec/etc/client.keys
 systemctl start guardsarm-agent
 ```
 
@@ -169,11 +169,11 @@ To add the configuration afterward, either complete the migration of that group 
 
 ### Option 3: Drop the group from the agent
 
-Remove the `<groups>` tag from the agent's `ossec.conf` so it lands in `default`, then restart the agent and [assign the group manually](#workaround-manual-group-assignment).
+Remove the `<groups>` tag from the agent's `gsmsec.conf` so it lands in `default`, then restart the agent and [assign the group manually](#workaround-manual-group-assignment).
 
 ## Workaround: manual group assignment
 
-If an agent started without its group configured in `ossec.conf` (so no group was sent during enrollment), it will be in the `default` group. Assign the correct group manually after the agents have reconnected.
+If an agent started without its group configured in `gsmsec.conf` (so no group was sent during enrollment), it will be in the `default` group. Assign the correct group manually after the agents have reconnected.
 
 From the dashboard, go to **Agents management -> Summary**. In the **Actions** column, click the `...` icon for the agent, then select **Edit groups**. In the popup window, type the group name or pick it from the dropdown list, then click **Save**.
 
@@ -200,14 +200,14 @@ After manual assignment, restart each agent or wait for the next keepalive cycle
 
 ## Migration example
 
-The following example walks through a complete migration of a group called `linux-servers` that has a custom `agent.conf`. It uses two agents to show both outcomes: one with the group set in `ossec.conf` (assigned automatically on enrollment) and one without it (which lands in `default` and is fixed with the [manual workaround](#workaround-manual-group-assignment)).
+The following example walks through a complete migration of a group called `linux-servers` that has a custom `agent.conf`. It uses two agents to show both outcomes: one with the group set in `gsmsec.conf` (assigned automatically on enrollment) and one without it (which lands in `default` and is fixed with the [manual workaround](#workaround-manual-group-assignment)).
 
 ### 4.x state
 
-Group folder on the 4.x manager at `/var/ossec/etc/shared/linux-servers/`:
+Group folder on the 4.x manager at `/var/gsmsec/etc/shared/linux-servers/`:
 
 ```bash
-# ls -la /var/ossec/etc/shared/linux-servers/
+# ls -la /var/gsmsec/etc/shared/linux-servers/
 total 8
 drwx------ 1 guardsarm guardsarm  38 Jun  2 18:39 .
 drwxrwx--- 1 root  guardsarm  92 Jun  2 18:38 ..
@@ -218,7 +218,7 @@ drwxrwx--- 1 root  guardsarm  92 Jun  2 18:38 ..
 Example `agent.conf`:
 
 ```bash
-# cat /var/ossec/etc/shared/linux-servers/agent.conf
+# cat /var/gsmsec/etc/shared/linux-servers/agent.conf
   <agent_config>
     <localfile>
       <log_format>syslog</log_format>
@@ -233,7 +233,7 @@ Example `agent.conf`:
 Agents 001 (`web-server-01`) and 002 (`web-server-02`) are members of `linux-servers`.
 
 ```bash
-# /var/ossec/bin/agent_groups -l -g linux-servers
+# /var/gsmsec/bin/agent_groups -l -g linux-servers
 2 agent(s) in group 'linux-servers':
   ID: 001  Name: web-server-01.
   ID: 002  Name: web-server-02.
@@ -242,7 +242,7 @@ Agents 001 (`web-server-01`) and 002 (`web-server-02`) are members of `linux-ser
 ### Step 1: Export from 4.x
 
 ```bash
-# cd /var/ossec/etc
+# cd /var/gsmsec/etc
 # tar -cvzf /tmp/guardsarm_groups_backup.tar.gz --exclude='*/merged.mg' shared/linux-servers/
 shared/linux-servers/
 shared/linux-servers/agent.conf
@@ -279,10 +279,10 @@ The groups are now visible from the dashboard in **Agents management -> Groups**
 
 To show both outcomes, the group is configured only on **agent 001**.
 
-**Agent 001** (`web-server-01`) is pointed at the 5.0 manager and its group set under `<enrollment>` in `/var/ossec/etc/ossec.conf`:
+**Agent 001** (`web-server-01`) is pointed at the 5.0 manager and its group set under `<enrollment>` in `/var/gsmsec/etc/gsmsec.conf`:
 
 ```bash
-# sed -n '/<enrollment>/,/<\/enrollment>/p' /var/ossec/etc/ossec.conf
+# sed -n '/<enrollment>/,/<\/enrollment>/p' /var/gsmsec/etc/gsmsec.conf
     <enrollment>
       <enabled>yes</enabled>
       <agent_name>web-server-01</agent_name>
@@ -294,7 +294,7 @@ To show both outcomes, the group is configured only on **agent 001**.
 **Agent 002** (`web-server-02`) is pointed at the same manager **without** the `<groups>` tag. It will land in the `default` group, which is later fixed in [Step 6](#step-6-assign-the-remaining-agent-manually).
 
 ```bash
-# sed -n '/<enrollment>/,/<\/enrollment>/p' /var/ossec/etc/ossec.conf
+# sed -n '/<enrollment>/,/<\/enrollment>/p' /var/gsmsec/etc/gsmsec.conf
     <enrollment>
       <enabled>yes</enabled>
       <agent_name>web-server-02</agent_name>
@@ -308,7 +308,7 @@ The group is sent during the enrollment handshake; the agent performs a fresh en
 
 On each agent:
 ```bash
-# rm -f /var/ossec/etc/client.keys
+# rm -f /var/gsmsec/etc/client.keys
 # systemctl start guardsarm-agent
 ```
 
@@ -346,7 +346,7 @@ Agent 001 enrolled with its group and was assigned `linux-servers`; agent 002 ha
 
 ### Step 6: Assign the remaining agent manually
 
-Agent 002 landed in `default` because its group was not in `ossec.conf`. From the dashboard, it is assigned to `linux-servers` through **Agents management -> Summary -> Actions -> Edit groups**, where the group is added in the popup and saved:
+Agent 002 landed in `default` because its group was not in `gsmsec.conf`. From the dashboard, it is assigned to `linux-servers` through **Agents management -> Summary -> Actions -> Edit groups**, where the group is added in the popup and saved:
 
 ![Editing an agent's groups from the GuardSarm 5.0 dashboard](../../images/agent-groups-migration/dashboard-edit-groups.png)
 

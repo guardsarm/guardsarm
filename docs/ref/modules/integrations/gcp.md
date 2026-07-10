@@ -18,7 +18,7 @@ The GCP module runs as a GuardSarm wodle on the GuardSarm agent. It invokes the 
 
 ## Configuration
 
-The GCP module is configured inside the `<ossec_config>` block of the GuardSarm agent configuration file (`ossec.conf`).
+The GCP module is configured inside the `<ossec_config>` block of the GuardSarm agent configuration file (`gsmsec.conf`).
 
 ### Pub/Sub configuration
 
@@ -27,7 +27,7 @@ The GCP module is configured inside the `<ossec_config>` block of the GuardSarm 
     <enabled>yes</enabled>
     <project_id>my-gcp-project</project_id>
     <subscription_name>guardsarm-subscription</subscription_name>
-    <credentials_file>/var/ossec/etc/credentials.json</credentials_file>
+    <credentials_file>/var/gsmsec/etc/credentials.json</credentials_file>
     <max_messages>100</max_messages>
     <num_threads>1</num_threads>
     <pull_on_start>yes</pull_on_start>
@@ -57,7 +57,7 @@ The GCP module is configured inside the `<ossec_config>` block of the GuardSarm 
     <interval>1h</interval>
     <bucket type="access_logs">
       <name>my-gcp-bucket</name>
-      <credentials_file>/var/ossec/etc/credentials.json</credentials_file>
+      <credentials_file>/var/gsmsec/etc/credentials.json</credentials_file>
       <path>logs/</path>
       <only_logs_after>2024-01-01</only_logs_after>
       <remove_from_bucket>no</remove_from_bucket>
@@ -107,7 +107,7 @@ systemctl restart guardsarm-agent
 Check the GuardSarm agent logs for GCP module activity:
 
 ```bash
-grep "gcp" /var/ossec/logs/ossec.log
+grep "gcp" /var/gsmsec/logs/gsmsec.log
 ```
 
 GCP events appear in the GuardSarm alerts with the `gcp` data field populated.

@@ -25,7 +25,7 @@ The module runs on the GuardSarm agent and periodically queries the Office 365 A
 
 ## Configuration
 
-Configure the Office 365 module in the GuardSarm agent `ossec.conf` file:
+Configure the Office 365 module in the GuardSarm agent `gsmsec.conf` file:
 
 ```xml
   <office365>
@@ -36,7 +36,7 @@ Configure the Office 365 module in the GuardSarm agent `ossec.conf` file:
     <api_auth>
       <tenant_id>YOUR_TENANT_ID</tenant_id>
       <client_id>YOUR_CLIENT_ID</client_id>
-      <client_secret_path>/var/ossec/etc/office365_secret</client_secret_path>
+      <client_secret_path>/var/gsmsec/etc/office365_secret</client_secret_path>
     </api_auth>
     <subscriptions>
       <subscription>Audit.AzureActiveDirectory</subscription>
@@ -82,7 +82,7 @@ For US Government Cloud environments, set the `api_type` option:
 <api_auth>
   <tenant_id>YOUR_TENANT_ID</tenant_id>
   <client_id>YOUR_CLIENT_ID</client_id>
-  <client_secret_path>/var/ossec/etc/office365_secret</client_secret_path>
+  <client_secret_path>/var/gsmsec/etc/office365_secret</client_secret_path>
   <api_type>gcc-high</api_type>
 </api_auth>
 ```
@@ -98,7 +98,7 @@ systemctl restart guardsarm-agent
 Check the module logs:
 
 ```bash
-grep "office365" /var/ossec/logs/ossec.log
+grep "office365" /var/gsmsec/logs/gsmsec.log
 ```
 
 Office 365 audit events generate alerts with the `office365` data field populated.

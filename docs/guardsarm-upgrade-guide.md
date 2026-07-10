@@ -20,7 +20,7 @@ or protocol constant. No data migration is required or performed.
 - **Agents:** existing Wazuh agents connect unchanged (ports 1514/1515, `OSSEC
   A/K/PASS` enrollment, `#AES` crypto, `client.keys`, keepalive version parse all
   frozen). No re-enrollment needed.
-- **Filesystem:** `/var/ossec`, `/var/wazuh-manager`, `etc/ossec.conf`,
+- **Filesystem:** `/var/gsmsec`, `/var/wazuh-manager`, `etc/gsmsec.conf`,
   `etc/wazuh-manager.conf`, `client.keys` unchanged; file ownership (`wazuh`,
   `wazuh-manager`) unchanged.
 - **Services/packages:** `wazuh-agent`/`wazuh-manager` package IDs, `WazuhSvc`,

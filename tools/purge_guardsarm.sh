@@ -12,7 +12,7 @@
 #   3. If no packages are installed, treat the system as a source/manual
 #      installation and perform the same full cleanup directly.
 
-readonly DEFAULT_GUARDSARM_AGENT_DIR="/var/ossec"
+readonly DEFAULT_GUARDSARM_AGENT_DIR="/var/gsmsec"
 readonly DEFAULT_GUARDSARM_MANAGER_DIR="/var/guardsarm-manager"
 
 PKG_MANAGER=""

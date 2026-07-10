@@ -18,7 +18,7 @@ The module runs as a GuardSarm wodle on the GuardSarm agent. It invokes the `wod
 
 ## Configuration
 
-The Azure module is configured inside the `<ossec_config>` block of the GuardSarm agent configuration file (`ossec.conf`).
+The Azure module is configured inside the `<ossec_config>` block of the GuardSarm agent configuration file (`gsmsec.conf`).
 
 ### Log Analytics configuration
 
@@ -28,7 +28,7 @@ The Azure module is configured inside the `<ossec_config>` block of the GuardSar
     <run_on_start>yes</run_on_start>
     <interval>1h</interval>
     <log_analytics>
-      <auth_path>/var/ossec/etc/azure_auth.json</auth_path>
+      <auth_path>/var/gsmsec/etc/azure_auth.json</auth_path>
       <tenantdomain>my-tenant.onmicrosoft.com</tenantdomain>
       <request>
         <tag>azure-activity</tag>
@@ -48,7 +48,7 @@ The Azure module is configured inside the `<ossec_config>` block of the GuardSar
     <run_on_start>yes</run_on_start>
     <interval>1h</interval>
     <graph>
-      <auth_path>/var/ossec/etc/azure_auth.json</auth_path>
+      <auth_path>/var/gsmsec/etc/azure_auth.json</auth_path>
       <tenantdomain>my-tenant.onmicrosoft.com</tenantdomain>
       <request>
         <tag>azure-graph</tag>
@@ -67,7 +67,7 @@ The Azure module is configured inside the `<ossec_config>` block of the GuardSar
     <run_on_start>yes</run_on_start>
     <interval>1h</interval>
     <storage>
-      <auth_path>/var/ossec/etc/azure_storage_auth.json</auth_path>
+      <auth_path>/var/gsmsec/etc/azure_storage_auth.json</auth_path>
       <tag>azure-storage</tag>
       <container name="insights-logs-networksecuritygroupflowevent">
         <blobs>.json</blobs>
@@ -163,7 +163,7 @@ systemctl restart guardsarm-agent
 Check the module logs:
 
 ```bash
-grep "azure" /var/ossec/logs/ossec.log
+grep "azure" /var/gsmsec/logs/gsmsec.log
 ```
 
 Azure events generate alerts with the `azure` data field populated.

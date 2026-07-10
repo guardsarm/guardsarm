@@ -94,7 +94,7 @@ occurrences of `wazuh` across **3,765** files.
 | Location | Identifier | Cat | Action |
 |---|---|---|---|
 | `etc/templates/config/generic/header-comments.template` | header text/URLs | A | **Done** |
-| `etc/**/ossec.conf`, XML tags `<ossec_config>`/`<wazuh_config>`, internal_options keys | C/D | Frozen |
+| `etc/**/gsmsec.conf`, XML tags `<ossec_config>`/`<wazuh_config>`, internal_options keys | C/D | Frozen |
 | `ruleset/**` rule `<description>`/`<info>` prose | A/B | Reword-able *(remaining, low priority)* |
 | `ruleset/**` rule IDs, decoder names, SCA policy/check IDs | D | Frozen |
 | `wodles/**` output prose | A | *(remaining)*; AWS/GCP/Azure names E |

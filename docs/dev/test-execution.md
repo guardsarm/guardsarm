@@ -445,6 +445,6 @@ optional arguments:
 ```
 
 The `run_test.py` script does not show the tests' full output. The full reports are saved 
-at `guardsarm/api/test/integration/_test_results`. Containers' logs (`ossec.log`, `api.log` and `cluster.log`) are stored 
+at `guardsarm/api/test/integration/_test_results`. Containers' logs (`gsmsec.log`, `api.log` and `cluster.log`) are stored 
 at `_test_results/logs`. Reports in HTML format are also generated and can be found at `_test_results/html_reports`.
 

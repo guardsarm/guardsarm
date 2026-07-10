@@ -15,7 +15,7 @@ GuardSarm subscribes to an SQS queue that receives notifications when new data i
 
 ## Configuration
 
-Configure the AWS module in the GuardSarm agent `ossec.conf` file using the `subscriber` element with `type="security_lake"`:
+Configure the AWS module in the GuardSarm agent `gsmsec.conf` file using the `subscriber` element with `type="security_lake"`:
 
 ```xml
   <wodle name="aws-s3">
@@ -117,7 +117,7 @@ systemctl restart guardsarm-agent
 Check the module logs:
 
 ```bash
-grep "aws-s3" /var/ossec/logs/ossec.log
+grep "aws-s3" /var/gsmsec/logs/gsmsec.log
 ```
 
 Security Lake events generate alerts with the `aws` data field containing the OCSF-formatted event data.
