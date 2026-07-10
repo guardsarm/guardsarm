@@ -330,40 +330,41 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_router_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\014router.proto\022\033com.guardsarm.api.engine.rou"
-  "ter\032\014engine.proto\"j\n\tEntryPost\022\014\n\004name\030\001"
-  " \001(\t\022\023\n\013namespaceId\030\002 \001(\t\022\020\n\010priority\030\003 "
-  "\001(\r\022\030\n\013description\030\004 \001(\tH\000\210\001\001B\016\n\014_descri"
-  "ption\"\260\001\n\005Entry\022\014\n\004name\030\001 \001(\t\022\023\n\013namespa"
-  "ceId\030\002 \001(\t\022\020\n\010priority\030\003 \001(\r\022\030\n\013descript"
-  "ion\030\004 \001(\tH\000\210\001\001\0228\n\014entry_status\030\005 \001(\0162\".c"
-  "om.guardsarm.api.engine.router.State\022\016\n\006upti"
-  "me\030\006 \001(\rB\016\n\014_description\"Y\n\021RoutePost_Re"
-  "quest\022:\n\005route\030\001 \001(\0132&.com.guardsarm.api.eng"
-  "ine.router.EntryPostH\000\210\001\001B\010\n\006_route\"#\n\023R"
-  "outeDelete_Request\022\014\n\004name\030\001 \001(\t\" \n\020Rout"
-  "eGet_Request\022\014\n\004name\030\001 \001(\t\"\247\001\n\021RouteGet_"
-  "Response\0222\n\006status\030\001 \001(\0162\".com.guardsarm.api"
-  ".engine.ReturnStatus\022\022\n\005error\030\002 \001(\tH\000\210\001\001"
-  "\0226\n\005route\030\003 \001(\0132\".com.guardsarm.api.engine.r"
-  "outer.EntryH\001\210\001\001B\010\n\006_errorB\010\n\006_route\"#\n\023"
-  "RouteReload_Request\022\014\n\004name\030\001 \001(\t\"<\n\032Rou"
-  "tePatchPriority_Request\022\014\n\004name\030\001 \001(\t\022\020\n"
-  "\010priority\030\002 \001(\r\"\022\n\020TableGet_Request\"\230\001\n\021"
-  "TableGet_Response\0222\n\006status\030\001 \001(\0162\".com."
-  "guardsarm.api.engine.ReturnStatus\022\022\n\005error\030\002"
-  " \001(\tH\000\210\001\001\0221\n\005table\030\003 \003(\0132\".com.guardsarm.api"
-  ".engine.router.EntryB\010\n\006_error\"5\n\021QueueP"
-  "ost_Request\022\023\n\013guardsarm_event\030\001 \001(\tJ\004\010\002\020\003R\005"
-  "event*5\n\005State\022\021\n\rSTATE_UNKNOWN\020\000\022\014\n\010DIS"
-  "ABLED\020\001\022\013\n\007ENABLED\020\002b\006proto3"
+  "\n\014router.proto\022\037com.guardsarm.api.engine"
+  ".router\032\014engine.proto\"j\n\tEntryPost\022\014\n\004na"
+  "me\030\001 \001(\t\022\023\n\013namespaceId\030\002 \001(\t\022\020\n\010priorit"
+  "y\030\003 \001(\r\022\030\n\013description\030\004 \001(\tH\000\210\001\001B\016\n\014_de"
+  "scription\"\264\001\n\005Entry\022\014\n\004name\030\001 \001(\t\022\023\n\013nam"
+  "espaceId\030\002 \001(\t\022\020\n\010priority\030\003 \001(\r\022\030\n\013desc"
+  "ription\030\004 \001(\tH\000\210\001\001\022<\n\014entry_status\030\005 \001(\016"
+  "2&.com.guardsarm.api.engine.router.State"
+  "\022\016\n\006uptime\030\006 \001(\rB\016\n\014_description\"]\n\021Rout"
+  "ePost_Request\022>\n\005route\030\001 \001(\0132*.com.guard"
+  "sarm.api.engine.router.EntryPostH\000\210\001\001B\010\n"
+  "\006_route\"#\n\023RouteDelete_Request\022\014\n\004name\030\001"
+  " \001(\t\" \n\020RouteGet_Request\022\014\n\004name\030\001 \001(\t\"\257"
+  "\001\n\021RouteGet_Response\0226\n\006status\030\001 \001(\0162&.c"
+  "om.guardsarm.api.engine.ReturnStatus\022\022\n\005"
+  "error\030\002 \001(\tH\000\210\001\001\022:\n\005route\030\003 \001(\0132&.com.gu"
+  "ardsarm.api.engine.router.EntryH\001\210\001\001B\010\n\006"
+  "_errorB\010\n\006_route\"#\n\023RouteReload_Request\022"
+  "\014\n\004name\030\001 \001(\t\"<\n\032RoutePatchPriority_Requ"
+  "est\022\014\n\004name\030\001 \001(\t\022\020\n\010priority\030\002 \001(\r\"\022\n\020T"
+  "ableGet_Request\"\240\001\n\021TableGet_Response\0226\n"
+  "\006status\030\001 \001(\0162&.com.guardsarm.api.engine"
+  ".ReturnStatus\022\022\n\005error\030\002 \001(\tH\000\210\001\001\0225\n\005tab"
+  "le\030\003 \003(\0132&.com.guardsarm.api.engine.rout"
+  "er.EntryB\010\n\006_error\"9\n\021QueuePost_Request\022"
+  "\027\n\017guardsarm_event\030\001 \001(\tJ\004\010\002\020\003R\005event*5\n"
+  "\005State\022\021\n\rSTATE_UNKNOWN\020\000\022\014\n\010DISABLED\020\001\022"
+  "\013\n\007ENABLED\020\002b\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_router_2eproto_deps[1] = {
   &::descriptor_table_engine_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_router_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_router_2eproto = {
-    false, false, 1068, descriptor_table_protodef_router_2eproto,
+    false, false, 1100, descriptor_table_protodef_router_2eproto,
     "router.proto",
     &descriptor_table_router_2eproto_once, descriptor_table_router_2eproto_deps, 1, 11,
     schemas, file_default_instances, TableStruct_router_2eproto::offsets,

@@ -112,18 +112,19 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_request_5fresponse_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\026request_response.proto\022\031com.guardsarm.api."
-  "engine.test\032\014engine.proto\032\034google/protob"
-  "uf/struct.proto\"\252\001\n\007Request\022\022\n\ndefaultSt"
-  "r\030\001 \001(\t\022\022\n\ndefaultInt\030\002 \001(\005\022\023\n\013defaultBo"
-  "ol\030\003 \001(\010\022\030\n\013valueString\030\004 \001(\tH\000\210\001\001\022,\n\007an"
-  "yJSON\030\005 \001(\0132\026.google.protobuf.ValueH\001\210\001\001"
-  "B\016\n\014_valueStringB\n\n\010_anyJSON\"\302\001\n\010Respons"
-  "e\0222\n\006status\030\001 \001(\0162\".com.guardsarm.api.engine"
-  ".ReturnStatus\022\022\n\005error\030\002 \001(\tH\000\210\001\001\022-\n\010val"
-  "ueObj\030\003 \001(\0132\026.google.protobuf.ValueH\001\210\001\001"
-  "\022\030\n\013valueString\030\004 \001(\tH\002\210\001\001B\010\n\006_errorB\013\n\t"
-  "_valueObjB\016\n\014_valueStringb\006proto3"
+  "\n\026request_response.proto\022\035com.guardsarm."
+  "api.engine.test\032\014engine.proto\032\034google/pr"
+  "otobuf/struct.proto\"\252\001\n\007Request\022\022\n\ndefau"
+  "ltStr\030\001 \001(\t\022\022\n\ndefaultInt\030\002 \001(\005\022\023\n\013defau"
+  "ltBool\030\003 \001(\010\022\030\n\013valueString\030\004 \001(\tH\000\210\001\001\022,"
+  "\n\007anyJSON\030\005 \001(\0132\026.google.protobuf.ValueH"
+  "\001\210\001\001B\016\n\014_valueStringB\n\n\010_anyJSON\"\306\001\n\010Res"
+  "ponse\0226\n\006status\030\001 \001(\0162&.com.guardsarm.ap"
+  "i.engine.ReturnStatus\022\022\n\005error\030\002 \001(\tH\000\210\001"
+  "\001\022-\n\010valueObj\030\003 \001(\0132\026.google.protobuf.Va"
+  "lueH\001\210\001\001\022\030\n\013valueString\030\004 \001(\tH\002\210\001\001B\010\n\006_e"
+  "rrorB\013\n\t_valueObjB\016\n\014_valueStringb\006proto"
+  "3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_request_5fresponse_2eproto_deps[2] = {
   &::descriptor_table_engine_2eproto,
@@ -131,7 +132,7 @@ static const ::_pbi::DescriptorTable* const descriptor_table_request_5fresponse_
 };
 static ::_pbi::once_flag descriptor_table_request_5fresponse_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_request_5fresponse_2eproto = {
-    false, false, 473, descriptor_table_protodef_request_5fresponse_2eproto,
+    false, false, 481, descriptor_table_protodef_request_5fresponse_2eproto,
     "request_response.proto",
     &descriptor_table_request_5fresponse_2eproto_once, descriptor_table_request_5fresponse_2eproto_deps, 2, 2,
     schemas, file_default_instances, TableStruct_request_5fresponse_2eproto::offsets,

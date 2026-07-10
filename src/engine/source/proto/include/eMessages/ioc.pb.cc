@@ -114,20 +114,20 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_ioc_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\tioc.proto\022\030com.guardsarm.api.engine.ioc\032\014e"
-  "ngine.proto\"/\n\021UpdateIoc_Request\022\014\n\004path"
-  "\030\001 \001(\t\022\014\n\004hash\030\002 \001(\t\"\025\n\023GetIocState_Requ"
-  "est\"}\n\024GetIocState_Response\0222\n\006status\030\001 "
-  "\001(\0162\".com.guardsarm.api.engine.ReturnStatus\022"
-  "\014\n\004hash\030\002 \001(\t\022\020\n\010updating\030\003 \001(\010\022\021\n\tlastE"
-  "rror\030\004 \001(\tb\006proto3"
+  "\n\tioc.proto\022\034com.guardsarm.api.engine.io"
+  "c\032\014engine.proto\"/\n\021UpdateIoc_Request\022\014\n\004"
+  "path\030\001 \001(\t\022\014\n\004hash\030\002 \001(\t\"\025\n\023GetIocState_"
+  "Request\"\201\001\n\024GetIocState_Response\0226\n\006stat"
+  "us\030\001 \001(\0162&.com.guardsarm.api.engine.Retu"
+  "rnStatus\022\014\n\004hash\030\002 \001(\t\022\020\n\010updating\030\003 \001(\010"
+  "\022\021\n\tlastError\030\004 \001(\tb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_ioc_2eproto_deps[1] = {
   &::descriptor_table_engine_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_ioc_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_ioc_2eproto = {
-    false, false, 258, descriptor_table_protodef_ioc_2eproto,
+    false, false, 267, descriptor_table_protodef_ioc_2eproto,
     "ioc.proto",
     &descriptor_table_ioc_2eproto_once, descriptor_table_ioc_2eproto_deps, 1, 3,
     schemas, file_default_instances, TableStruct_ioc_2eproto::offsets,

@@ -228,36 +228,37 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_status_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\014status.proto\022\033com.guardsarm.api.engine.sta"
-  "tus\032\014engine.proto\"\023\n\021StatusGet_Request\"n"
-  "\n\nSpaceState\022\021\n\tavailable\030\001 \001(\010\022\017\n\007enabl"
-  "ed\030\002 \001(\010\022\016\n\006status\030\003 \001(\t\022\014\n\004hash\030\004 \001(\t\022\036"
-  "\n\026last_successful_update\030\005 \001(\r\"`\n\rResour"
-  "ceState\022\021\n\tavailable\030\001 \001(\010\022\016\n\006status\030\002 \001"
-  "(\t\022\014\n\004hash\030\003 \001(\t\022\036\n\026last_successful_upda"
-  "te\030\004 \001(\r\"\330\004\n\022StatusGet_Response\0222\n\006statu"
-  "s\030\001 \001(\0162\".com.guardsarm.api.engine.ReturnSta"
-  "tus\022\022\n\005error\030\002 \001(\tH\000\210\001\001\022\r\n\005ready\030\003 \001(\010\022K"
-  "\n\006spaces\030\004 \003(\0132;.com.guardsarm.api.engine.st"
-  "atus.StatusGet_Response.SpacesEntry\022E\n\003i"
-  "oc\030\005 \003(\01328.com.guardsarm.api.engine.status.S"
-  "tatusGet_Response.IocEntry\022E\n\003geo\030\006 \003(\0132"
-  "8.com.guardsarm.api.engine.status.StatusGet_"
-  "Response.GeoEntry\032V\n\013SpacesEntry\022\013\n\003key\030"
-  "\001 \001(\t\0226\n\005value\030\002 \001(\0132\'.com.guardsarm.api.eng"
-  "ine.status.SpaceState:\0028\001\032V\n\010IocEntry\022\013\n"
-  "\003key\030\001 \001(\t\0229\n\005value\030\002 \001(\0132*.com.guardsarm.ap"
-  "i.engine.status.ResourceState:\0028\001\032V\n\010Geo"
-  "Entry\022\013\n\003key\030\001 \001(\t\0229\n\005value\030\002 \001(\0132*.com."
-  "guardsarm.api.engine.status.ResourceState:\0028"
-  "\001B\010\n\006_errorb\006proto3"
+  "\n\014status.proto\022\037com.guardsarm.api.engine"
+  ".status\032\014engine.proto\"\023\n\021StatusGet_Reque"
+  "st\"n\n\nSpaceState\022\021\n\tavailable\030\001 \001(\010\022\017\n\007e"
+  "nabled\030\002 \001(\010\022\016\n\006status\030\003 \001(\t\022\014\n\004hash\030\004 \001"
+  "(\t\022\036\n\026last_successful_update\030\005 \001(\r\"`\n\rRe"
+  "sourceState\022\021\n\tavailable\030\001 \001(\010\022\016\n\006status"
+  "\030\002 \001(\t\022\014\n\004hash\030\003 \001(\t\022\036\n\026last_successful_"
+  "update\030\004 \001(\r\"\364\004\n\022StatusGet_Response\0226\n\006s"
+  "tatus\030\001 \001(\0162&.com.guardsarm.api.engine.R"
+  "eturnStatus\022\022\n\005error\030\002 \001(\tH\000\210\001\001\022\r\n\005ready"
+  "\030\003 \001(\010\022O\n\006spaces\030\004 \003(\0132\?.com.guardsarm.a"
+  "pi.engine.status.StatusGet_Response.Spac"
+  "esEntry\022I\n\003ioc\030\005 \003(\0132<.com.guardsarm.api"
+  ".engine.status.StatusGet_Response.IocEnt"
+  "ry\022I\n\003geo\030\006 \003(\0132<.com.guardsarm.api.engi"
+  "ne.status.StatusGet_Response.GeoEntry\032Z\n"
+  "\013SpacesEntry\022\013\n\003key\030\001 \001(\t\022:\n\005value\030\002 \001(\013"
+  "2+.com.guardsarm.api.engine.status.Space"
+  "State:\0028\001\032Z\n\010IocEntry\022\013\n\003key\030\001 \001(\t\022=\n\005va"
+  "lue\030\002 \001(\0132..com.guardsarm.api.engine.sta"
+  "tus.ResourceState:\0028\001\032Z\n\010GeoEntry\022\013\n\003key"
+  "\030\001 \001(\t\022=\n\005value\030\002 \001(\0132..com.guardsarm.ap"
+  "i.engine.status.ResourceState:\0028\001B\010\n\006_er"
+  "rorb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_status_2eproto_deps[1] = {
   &::descriptor_table_engine_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_status_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_status_2eproto = {
-    false, false, 899, descriptor_table_protodef_status_2eproto,
+    false, false, 931, descriptor_table_protodef_status_2eproto,
     "status.proto",
     &descriptor_table_status_2eproto_once, descriptor_table_status_2eproto_deps, 1, 7,
     schemas, file_default_instances, TableStruct_status_2eproto::offsets,

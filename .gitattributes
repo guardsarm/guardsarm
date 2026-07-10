@@ -1,0 +1,11 @@
+# Enforce LF on scripts + shebang/text formats the build and runtime execute (gap M13):
+# a CRLF shebang makes dash/sh look for "/bin/sh" and silently fail install steps,
+# which the manager Dockerfile currently strips at build time. Committing LF here makes
+# the image build a plain compile.
+*.sh    text eol=lf
+*.bash  text eol=lf
+install.sh text eol=lf
+*.py    text eol=lf
+*.pl    text eol=lf
+Makefile text eol=lf
+*.mk    text eol=lf

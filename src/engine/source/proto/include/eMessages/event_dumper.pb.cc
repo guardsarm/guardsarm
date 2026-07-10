@@ -130,21 +130,21 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_event_5fdumper_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\022event_dumper.proto\022!com.guardsarm.api.engi"
-  "ne.event_dumper\032\014engine.proto\"\035\n\033EventDu"
-  "mperActivate_Request\"\037\n\035EventDumperDeact"
-  "ivate_Request\"\033\n\031EventDumperStatus_Reque"
-  "st\"~\n\032EventDumperStatus_Response\0222\n\006stat"
-  "us\030\001 \001(\0162\".com.guardsarm.api.engine.ReturnSt"
-  "atus\022\022\n\005error\030\002 \001(\tH\000\210\001\001\022\016\n\006active\030\003 \001(\010"
-  "B\010\n\006_errorb\006proto3"
+  "\n\022event_dumper.proto\022%com.guardsarm.api."
+  "engine.event_dumper\032\014engine.proto\"\035\n\033Eve"
+  "ntDumperActivate_Request\"\037\n\035EventDumperD"
+  "eactivate_Request\"\033\n\031EventDumperStatus_R"
+  "equest\"\202\001\n\032EventDumperStatus_Response\0226\n"
+  "\006status\030\001 \001(\0162&.com.guardsarm.api.engine"
+  ".ReturnStatus\022\022\n\005error\030\002 \001(\tH\000\210\001\001\022\016\n\006act"
+  "ive\030\003 \001(\010B\010\n\006_errorb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_event_5fdumper_2eproto_deps[1] = {
   &::descriptor_table_engine_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_event_5fdumper_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_event_5fdumper_2eproto = {
-    false, false, 298, descriptor_table_protodef_event_5fdumper_2eproto,
+    false, false, 307, descriptor_table_protodef_event_5fdumper_2eproto,
     "event_dumper.proto",
     &descriptor_table_event_5fdumper_2eproto_once, descriptor_table_event_5fdumper_2eproto_deps, 1, 4,
     schemas, file_default_instances, TableStruct_event_5fdumper_2eproto::offsets,

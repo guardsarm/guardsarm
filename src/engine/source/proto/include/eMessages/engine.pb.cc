@@ -68,15 +68,16 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_engine_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\014engine.proto\022\024com.guardsarm.api.engine\"j\n\026"
-  "GenericStatus_Response\0222\n\006status\030\001 \001(\0162\""
-  ".com.guardsarm.api.engine.ReturnStatus\022\022\n\005er"
-  "ror\030\002 \001(\tH\000\210\001\001B\010\n\006_error*.\n\014ReturnStatus"
-  "\022\013\n\007UNKNOWN\020\000\022\006\n\002OK\020\001\022\t\n\005ERROR\020\002b\006proto3"
+  "\n\014engine.proto\022\030com.guardsarm.api.engine"
+  "\"n\n\026GenericStatus_Response\0226\n\006status\030\001 \001"
+  "(\0162&.com.guardsarm.api.engine.ReturnStat"
+  "us\022\022\n\005error\030\002 \001(\tH\000\210\001\001B\010\n\006_error*.\n\014Retu"
+  "rnStatus\022\013\n\007UNKNOWN\020\000\022\006\n\002OK\020\001\022\t\n\005ERROR\020\002"
+  "b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_engine_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_engine_2eproto = {
-    false, false, 200, descriptor_table_protodef_engine_2eproto,
+    false, false, 208, descriptor_table_protodef_engine_2eproto,
     "engine.proto",
     &descriptor_table_engine_2eproto_once, nullptr, 0, 1,
     schemas, file_default_instances, TableStruct_engine_2eproto::offsets,

@@ -92,20 +92,20 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_rawevtindexer_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\023rawevtindexer.proto\022\"com.guardsarm.api.eng"
-  "ine.rawevtindexer\032\014engine.proto\"\035\n\033RawEv"
-  "tIndexerStatus_Request\"\201\001\n\034RawEvtIndexer"
-  "Status_Response\0222\n\006status\030\001 \001(\0162\".com.wa"
-  "zuh.api.engine.ReturnStatus\022\022\n\005error\030\002 \001"
-  "(\tH\000\210\001\001\022\017\n\007enabled\030\003 \001(\010B\010\n\006_errorb\006prot"
-  "o3"
+  "\n\023rawevtindexer.proto\022&com.guardsarm.api"
+  ".engine.rawevtindexer\032\014engine.proto\"\035\n\033R"
+  "awEvtIndexerStatus_Request\"\205\001\n\034RawEvtInd"
+  "exerStatus_Response\0226\n\006status\030\001 \001(\0162&.co"
+  "m.guardsarm.api.engine.ReturnStatus\022\022\n\005e"
+  "rror\030\002 \001(\tH\000\210\001\001\022\017\n\007enabled\030\003 \001(\010B\010\n\006_err"
+  "orb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_rawevtindexer_2eproto_deps[1] = {
   &::descriptor_table_engine_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_rawevtindexer_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_rawevtindexer_2eproto = {
-    false, false, 242, descriptor_table_protodef_rawevtindexer_2eproto,
+    false, false, 250, descriptor_table_protodef_rawevtindexer_2eproto,
     "rawevtindexer.proto",
     &descriptor_table_rawevtindexer_2eproto_once, descriptor_table_rawevtindexer_2eproto_deps, 1, 2,
     schemas, file_default_instances, TableStruct_rawevtindexer_2eproto::offsets,

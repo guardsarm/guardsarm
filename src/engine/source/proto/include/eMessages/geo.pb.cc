@@ -170,19 +170,19 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_geo_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\tgeo.proto\022\030com.guardsarm.api.engine.geo\032\014e"
-  "ngine.proto\032\034google/protobuf/struct.prot"
-  "o\"T\n\007DbEntry\022\014\n\004name\030\001 \001(\t\022\014\n\004path\030\002 \001(\t"
-  "\022\014\n\004hash\030\003 \001(\t\022\021\n\tcreatedAt\030\004 \001(\003\022\014\n\004typ"
-  "e\030\005 \001(\t\"\033\n\rDbGet_Request\022\n\n\002ip\030\001 \001(\t\"z\n\016"
-  "DbGet_Response\0222\n\006status\030\001 \001(\0162\".com.waz"
-  "uh.api.engine.ReturnStatus\022\r\n\005error\030\002 \001("
-  "\t\022%\n\004data\030\003 \001(\0132\027.google.protobuf.Struct"
-  "\"\020\n\016DbList_Request\"\227\001\n\017DbList_Response\0222"
-  "\n\006status\030\001 \001(\0162\".com.guardsarm.api.engine.Re"
-  "turnStatus\022\022\n\005error\030\002 \001(\tH\000\210\001\001\0222\n\007entrie"
-  "s\030\003 \003(\0132!.com.guardsarm.api.engine.geo.DbEnt"
-  "ryB\010\n\006_errorb\006proto3"
+  "\n\tgeo.proto\022\034com.guardsarm.api.engine.ge"
+  "o\032\014engine.proto\032\034google/protobuf/struct."
+  "proto\"T\n\007DbEntry\022\014\n\004name\030\001 \001(\t\022\014\n\004path\030\002"
+  " \001(\t\022\014\n\004hash\030\003 \001(\t\022\021\n\tcreatedAt\030\004 \001(\003\022\014\n"
+  "\004type\030\005 \001(\t\"\033\n\rDbGet_Request\022\n\n\002ip\030\001 \001(\t"
+  "\"~\n\016DbGet_Response\0226\n\006status\030\001 \001(\0162&.com"
+  ".guardsarm.api.engine.ReturnStatus\022\r\n\005er"
+  "ror\030\002 \001(\t\022%\n\004data\030\003 \001(\0132\027.google.protobu"
+  "f.Struct\"\020\n\016DbList_Request\"\237\001\n\017DbList_Re"
+  "sponse\0226\n\006status\030\001 \001(\0162&.com.guardsarm.a"
+  "pi.engine.ReturnStatus\022\022\n\005error\030\002 \001(\tH\000\210"
+  "\001\001\0226\n\007entries\030\003 \003(\0132%.com.guardsarm.api."
+  "engine.geo.DbEntryB\010\n\006_errorb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_geo_2eproto_deps[2] = {
   &::descriptor_table_engine_2eproto,
@@ -190,7 +190,7 @@ static const ::_pbi::DescriptorTable* const descriptor_table_geo_2eproto_deps[2]
 };
 static ::_pbi::once_flag descriptor_table_geo_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_geo_2eproto = {
-    false, false, 500, descriptor_table_protodef_geo_2eproto,
+    false, false, 516, descriptor_table_protodef_geo_2eproto,
     "geo.proto",
     &descriptor_table_geo_2eproto_once, descriptor_table_geo_2eproto_deps, 2, 5,
     schemas, file_default_instances, TableStruct_geo_2eproto::offsets,

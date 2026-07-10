@@ -1959,7 +1959,7 @@ class QueuePost_Request final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kGuardSarmEventFieldNumber = 1,
+    kGuardsarmEventFieldNumber = 1,
   };
   // string guardsarm_event = 1;
   void clear_guardsarm_event();
