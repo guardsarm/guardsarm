@@ -1,5 +1,5 @@
 ' Script for configuration Windows agent.
-Copyright (C) 2026 GuardSarm, Inc.
+' Copyright (C) 2026 GuardSarm, Inc.
 '
 ' Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc. as published by
 ' the Free Software Foundation; either version 3 of the License, or
