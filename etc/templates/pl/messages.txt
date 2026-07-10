@@ -101,8 +101,8 @@ updatefailed="Aktualizacja ukończona niepowodzeniem."
 updaterules="Czy chcesz zaktualizować reguły?"
 updatingrules="Aktualizacja reguł."
 notupdatingrules="Bez aktualizacji reguł."
-update_rev_newconf1="Kopia zapasowa z ossec.conf został stworzony w $INSTALLDIR/etc/ossec.conf.orig."
-update_rev_newconf2="Proszę sprawdzić konfigurację ossec.conf na $INSTALLDIR/etc/ossec.conf."
+update_rev_newconf1="Kopia zapasowa z gsmsec.conf został stworzony w $INSTALLDIR/etc/gsmsec.conf.orig."
+update_rev_newconf2="Proszę sprawdzić konfigurację gsmsec.conf na $INSTALLDIR/etc/gsmsec.conf."
 
 # Wsparcie dla Pf
 pfenable="Chcesz uywa firewall'a PF jako aktywnej ochrony?"

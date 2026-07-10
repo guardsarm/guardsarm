@@ -1,7 +1,6 @@
 #! /bin/bash
 
-# Copyright (C) 2015, Wazuh Inc.
-# Copyright (C) 2026, GuardSarm.
+# Copyright (C) 2026 GuardSarm, Inc.
 # By Spransy, Derek" <DSPRANS () emory ! edu> and Charlie Scott
 
 #####

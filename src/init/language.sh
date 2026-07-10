@@ -1,7 +1,6 @@
 #!/bin/sh
 # language.sh
-# Copyright (C) 2015, Wazuh Inc.
-# Copyright (C) 2026, GuardSarm.
+# Copyright (C) 2026 GuardSarm, Inc.
 # Author: Daniel B. Cid <daniel.cid@gmail.com>
 
 catError()

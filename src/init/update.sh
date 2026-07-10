@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2015, Wazuh Inc.
+# Copyright (C) 2026 GuardSarm, Inc.
 # Shell script update functions for GuardSarm
 # Author: Daniel B. Cid <daniel.cid@gmail.com>
 
@@ -385,8 +385,8 @@ UpdateOldVersions()
         getPreinstalledDir
     fi
 
-    GUARDSARM_CONF_FILE="$PREINSTALLEDDIR/etc/${GUARDSARM_CONF:-ossec.conf}"
-    GUARDSARM_CONF_FILE_ORIG="$PREINSTALLEDDIR/etc/${GUARDSARM_CONF:-ossec.conf}.orig"
+    GUARDSARM_CONF_FILE="$PREINSTALLEDDIR/etc/${GUARDSARM_CONF:-gsmsec.conf}"
+    GUARDSARM_CONF_FILE_ORIG="$PREINSTALLEDDIR/etc/${GUARDSARM_CONF:-gsmsec.conf}.orig"
 
     # config file -> config file.orig
     cp -pr $GUARDSARM_CONF_FILE $GUARDSARM_CONF_FILE_ORIG

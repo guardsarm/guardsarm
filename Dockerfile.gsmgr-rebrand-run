@@ -1,0 +1,28 @@
+# GuardSarm manager 2.0.0 — rebranded runtime image.
+# Built FROM a snapshot of the working gsmgr whose install tree was MOVED
+# /var/ossec -> /var/guardsarm-manager (state-preserving: keeps the 52 engine
+# decoders, indexer client certs, manager keystore, RBAC db, and agent client.keys).
+# w_homedir() honors GUARDSARM_MANAGER_HOME, so every daemon/framework/engine roots
+# at the branded path. Carries forward all prior runtime fixes unchanged.
+# Copyright (C) 2026 GuardSarm, Inc.
+FROM guardsarm-manager:2.0.0-moved-base
+
+ENV GUARDSARM_MANAGER_HOME=/var/guardsarm-manager
+ENV LD_LIBRARY_PATH=/var/guardsarm-manager/lib:/var/guardsarm-manager/framework/python/lib
+WORKDIR /var/guardsarm-manager
+EXPOSE 7514 7515 7516 7550
+
+# Reset the ENTRYPOINT: the moved-base snapshot was captured from a temp container
+# started with `--entrypoint sleep`, which baked ["sleep"] into the image config.
+ENTRYPOINT []
+
+CMD bash -c '\
+  ( /var/guardsarm-manager/bin/guardsarm-manager-control start || true ); \
+  for i in $(seq 1 40); do [ -S /var/guardsarm-manager/queue/sockets/analysis ] && break; sleep 2; done; \
+  sleep 5; \
+  if ! curl -s --unix-socket /var/guardsarm-manager/queue/sockets/analysis -H "Content-Type: text/plain" -X POST -d "{}" http://localhost/_internal/router/table/get 2>/dev/null | grep -q "\"name\""; then \
+    echo "[self-heal] no active route -> activating local default route"; \
+    python3 /var/guardsarm-manager/bin/activate_routes.py 2>&1 | tail -3; \
+  else echo "[self-heal] route already active"; fi; \
+  echo "=== GuardSarm daemons ==="; /var/guardsarm-manager/bin/guardsarm-manager-control status 2>/dev/null || ps -e; \
+  touch /var/guardsarm-manager/logs/guardsarm-manager.log; tail -f /var/guardsarm-manager/logs/guardsarm-manager.log'

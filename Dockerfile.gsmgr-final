@@ -1,6 +1,20 @@
 # Final GuardSarm manager image, built FROM the already-compiled debug base
 # (guardsarm-mgr-base:dbg) so there is zero recompile — just the dependency-alias
 # shim + full install + runtime entrypoint.
+#
+# =============================================================================
+# !!! DEV / DEMO IMAGE ONLY — DO NOT USE IN PRODUCTION !!!
+# -----------------------------------------------------------------------------
+# This image is hardened for NOTHING. It exists to make the local stack run:
+#   * TLS is DISABLED — the framework/engine talk plain HTTP to the indexer.
+#   * Default admin/admin credentials are seeded into the manager keystore.
+#   * A throwaway self-signed cert set is generated only to pass config
+#     validation (not for real transport security).
+#   * The container runs as ROOT and has NO healthcheck.
+# Using this in production would expose unauthenticated, cleartext control-plane
+# traffic and default credentials. For a real deployment use the hardened path
+# (guardsarm-deploy/ — TLS, externally-managed secrets, non-root, healthchecks).
+# =============================================================================
 FROM guardsarm-mgr-base:dbg
 
 # Compat shim (GuardSarm dependency-mirror workaround): the full Wazuh->GuardSarm
@@ -66,9 +80,9 @@ RUN sed -i \
 
 # --- RUNTIME FIX 2: point the engine's indexer connector at the host OpenSearch.
 # install.sh ships https://localhost:9200; from inside the container the indexer is
-# reachable at http://host.docker.internal:9200. Rewrite the <host> line.
+# reachable at http://host.docker.internal:7500. Rewrite the <host> line.
 RUN sed -i \
-      's#<host>https\?://[^<]*</host>#<host>http://host.docker.internal:9200</host>#' \
+      's#<host>https\?://[^<]*</host>#<host>http://host.docker.internal:7500</host>#' \
       /var/ossec/etc/guardsarm-manager.conf \
  && grep -n '<host>' /var/ossec/etc/guardsarm-manager.conf
 

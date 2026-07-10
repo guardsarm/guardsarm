@@ -65,14 +65,13 @@ extern "C" {
 
             if (!validator)
             {
-                // No validator for this index: be restrictive and reject the message
-                // instead of letting it through unvalidated.
-                if (errorMessage)
-                {
-                    *errorMessage = strdup("No schema validator found for index");
-                }
-
-                return false;
+                // GuardSarm: no validator registered for this index -> fail OPEN (treat as
+                // valid) rather than discarding real telemetry. Mirrors the
+                // factory-not-initialized case above and the syscollector
+                // validateSchemaAndLog fail-open. Without this, FIM (registry/file) and
+                // SCA events are silently dropped whenever their index has no registered
+                // schema validator, which is exactly what happened on the Windows agent.
+                return true;
             }
 
             auto result = validator->validate(std::string(message));

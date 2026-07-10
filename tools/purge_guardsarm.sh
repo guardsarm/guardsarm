@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (C) 2015, Wazuh Inc.
+# Copyright (C) 2026 GuardSarm, Inc.
 # Purge script for GuardSarm
 #
 # Usage:

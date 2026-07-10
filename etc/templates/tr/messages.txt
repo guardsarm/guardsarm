@@ -101,8 +101,8 @@ updatefailed="Güncelleme başarısız oldu."
 updaterules="Kuralları güncellemek ister misiniz?"
 updatingrules="Kurallar güncelleniyor."
 notupdatingrules="Kurallar güncellenmiyor."
-update_rev_newconf1="Ossec.conf dosyanızdaki yedekleme, $INSTALLDIR/etc/ossec.conf.orig dosyasında oluşturuldu."
-update_rev_newconf2="Lütfen ossec.conf yapılandırmasını $INSTALLDIR/etc/ossec.conf dosyasında doğrulayın."
+update_rev_newconf1="Ossec.conf dosyanızdaki yedekleme, $INSTALLDIR/etc/gsmsec.conf.orig dosyasında oluşturuldu."
+update_rev_newconf2="Lütfen gsmsec.conf yapılandırmasını $INSTALLDIR/etc/gsmsec.conf dosyasında doğrulayın."
 
 # Pf support
 pfenable="Etkin yanıtlarda PF güvenlik duvarını kullanmak istiyor musunuz?"

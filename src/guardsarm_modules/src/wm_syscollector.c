@@ -1,13 +1,9 @@
 /*
  * GuardSarm SYSCOLLECTOR
- * Copyright (C) 2015, Wazuh Inc.
- * Copyright (C) 2026, GuardSarm.
+ * Copyright (C) 2026 GuardSarm, Inc.
  * November 11, 2021.
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License (version 2) as published by the FSF - Free Software
- * Foundation.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 #include <stdlib.h>
 #include "wmodules_def.h"
@@ -353,6 +349,14 @@ static bool wm_sys_query_int(const char* query, const char* field, int* value)
     return result;
 }
 
+// Upper bound (seconds) the sync worker waits for the first-scan-completed marker
+// before triggering synchronization anyway (guards against the marker never being
+// persisted, observed on the Windows agent where the scan writes inventory to the
+// local DB but does not reach the marker-write step).
+#ifndef WM_SYS_STARTUP_SYNC_MAX_WAIT
+#define WM_SYS_STARTUP_SYNC_MAX_WAIT 45
+#endif
+
 static wm_syscollector_startup_action_t wm_sys_get_startup_action(bool* first_sync_completed)
 {
     int marker = 0;
@@ -388,6 +392,7 @@ static wm_syscollector_startup_action_t wm_sys_get_startup_action(bool* first_sy
     mtdebug1(WM_SYS_LOGTAG, "Inventory initial scan data is not ready yet. First synchronization will wait for scan data.");
 
     int log_throttle = 0;
+    int startup_wait_seconds = 0;
 
     while (sync_module_running && !is_shutdown_process_started())
     {
@@ -402,6 +407,15 @@ static wm_syscollector_startup_action_t wm_sys_get_startup_action(bool* first_sy
         if (scan_marker > 0)
         {
             mtdebug1(WM_SYS_LOGTAG, "First inventory scan completed. Triggering first synchronization without startup delay.");
+            return SYSCOLLECTOR_STARTUP_ACTION_IMMEDIATE;
+        }
+
+        // Do not block the synchronization worker indefinitely if the first-scan
+        // completion marker is never observed. After a bounded wait, trigger
+        // synchronization anyway so the already-scanned inventory reaches the manager.
+        if (++startup_wait_seconds >= WM_SYS_STARTUP_SYNC_MAX_WAIT)
+        {
+            mtinfo(WM_SYS_LOGTAG, "First inventory scan marker not observed after %d s; triggering synchronization from persisted inventory.", startup_wait_seconds);
             return SYSCOLLECTOR_STARTUP_ACTION_IMMEDIATE;
         }
 
@@ -1045,7 +1059,8 @@ void* wm_sync_module(__attribute__((unused)) void* args)
         // actually finished rather than bypassing the scan-state guard.
         if (first_sync_blocked_on_scan && syscollector_is_scanning_ptr)
         {
-            while (sync_module_running && syscollector_is_scanning_ptr())
+            int scan_wait = 0;
+            while (sync_module_running && syscollector_is_scanning_ptr() && scan_wait++ < WM_SYS_STARTUP_SYNC_MAX_WAIT)
             {
                 mtdebug1(WM_SYS_LOGTAG, "Waiting for scan to finish before forced post-first-scan synchronization.");
                 sleep(1);

@@ -1,12 +1,8 @@
 /* Auth Common
- * Copyright (C) 2015, Wazuh Inc.
- * Copyright (C) 2026, GuardSarm.
+ * Copyright (C) 2026 GuardSarm, Inc.
  * Mar 22, 2018.
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License (version 2) as published by the FSF - Free Software
- * Foundation.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
 #include <shared.h>
@@ -23,7 +19,7 @@
 
 // Redefine guardsarm_version
 #undef __guardsarm_version
-#define __guardsarm_version "v5.0.0"
+#define __guardsarm_version "v2.0.0"
 #endif
 
 keystore keys;

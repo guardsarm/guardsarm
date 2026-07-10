@@ -1,7 +1,5 @@
-# Copyright (C) 2015, Wazuh Inc.
-# Copyright (C) 2026, GuardSarm.
-# Created by Wazuh, Inc. <info@wazuh.com>.
-# This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
+# Copyright (C) 2026 GuardSarm, Inc.
+# Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
 
 import asyncio
 import sys
@@ -30,8 +28,7 @@ def test_print_version(print_mock):
     with patch('guardsarm.core.cluster.__version__', 'TEST'):
         guardsarm_manager_clusterd.print_version()
         print_mock.assert_called_once_with(
-            '\nWazuh TEST - Wazuh Inc\n\nThis program is free software; you can redistribute it and/or modify\n'
-            'it under the terms of the GNU General Public License (version 2) as \npublished by the '
+            '\nWazuh TEST - Wazuh Inc\n\nProprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.) as \npublished by the '
             'Free Software Foundation. For more details, go to \nhttps://www.gnu.org/licenses/gpl.html\n')
 
 

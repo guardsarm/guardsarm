@@ -1,17 +1,13 @@
 /*
  * GuardSarm Module for native EDR telemetry (process + network)
- * Copyright (C) 2015, Wazuh Inc.
- * Copyright (C) 2026, GuardSarm.
+ * Copyright (C) 2026 GuardSarm, Inc.
  *
  * See wm_edr.h for a description. Native, self-contained: no external library,
  * no dbsync — a lightweight /proc sweeper that streams JSON telemetry to the
  * manager through the standard agent queue (and mirrors it to a local log the
  * host applier already ingests).
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License (version 2) as published by the FSF - Free Software
- * Foundation.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
 #ifndef WIN32   // Linux/Unix agent module (native /proc telemetry).
@@ -488,3 +484,452 @@ static cJSON *wm_edr_dump(const wm_edr_t *edr) {
 }
 
 #endif // !WIN32
+
+#ifdef WIN32   /* ---------- Windows agent module (native Win32 telemetry) ---------- */
+
+// This TU is compiled into guardsarm_modulesd_lib, which does not inherit the win32
+// agent target's -D_WIN32_WINNT=0x600. QueryFullProcessImageNameA and inet_ntop are
+// __stdcall (WINAPI) and only declared when _WIN32_WINNT >= 0x0600; without the
+// prototype the compiler emits an implicit cdecl call and corrupts the stack. Force it.
+#if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0600)
+#undef _WIN32_WINNT
+#define _WIN32_WINNT 0x0600
+#endif
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <time.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
+#include <tlhelp32.h>
+#include <psapi.h>
+#include <iphlpapi.h>
+
+#include "wmodules.h"
+#include "wm_edr.h"
+#include "defs.h"
+#include "mq_op.h"
+#include "cJSON.h"
+#include "sha256_op.h"
+
+static void* wm_edr_main(wm_edr_t *edr);
+static void wm_edr_destroy(wm_edr_t *edr);
+static cJSON *wm_edr_dump(const wm_edr_t *edr);
+
+const wm_context WM_EDR_CONTEXT = {
+    .name = WM_EDR_CONTEXT_NAME,
+    .start = (wm_routine)wm_edr_main,
+    .destroy = (void(*)(void *))wm_edr_destroy,
+    .dump = (cJSON *(*)(const void *))wm_edr_dump,
+    .sync = NULL,
+    .stop = NULL,
+    .query = NULL,
+};
+
+static int queue_fd = 0;
+static FILE *edr_log = NULL;
+static OSHash *seen_procs = NULL;
+static OSHash *seen_conns = NULL;
+static OSHash *seen_persist = NULL;
+
+static void now_iso(char *ts, size_t n) {
+    time_t now = time(NULL);
+    struct tm *t = gmtime(&now);
+    if (t) {
+        strftime(ts, n, "%Y-%m-%dT%H:%M:%SZ", t);
+    } else {
+        ts[0] = '\0';
+    }
+}
+
+static void wm_edr_emit(wm_edr_t *edr, cJSON *event) {
+    char *msg = cJSON_PrintUnformatted(event);
+    if (!msg) {
+        return;
+    }
+    const int eps = edr->max_eps > 0 ? (1000000 / (int)edr->max_eps) : 0;
+    if (wm_sendmsg(eps, queue_fd, msg, WM_EDR_CONTEXT_NAME, LOCALFILE_MQ) < 0) {
+        mterror(WM_EDR_LOGTAG, "Unable to send message to '%s'", DEFAULTQUEUE);
+        if ((queue_fd = StartMQ(DEFAULTQUEUE, WRITE, 1)) >= 0) {
+            wm_sendmsg(eps, queue_fd, msg, WM_EDR_CONTEXT_NAME, LOCALFILE_MQ);
+        }
+    }
+    if (edr_log) {
+        fprintf(edr_log, "%s\n", msg);
+        fflush(edr_log);
+    }
+    free(msg);
+}
+
+// A process whose executable basename is a known interpreter / LOLBin (MITRE T1059).
+static int is_interpreter_win(const char *name) {
+    static const char *I[] = {"powershell.exe", "pwsh.exe", "cmd.exe", "wscript.exe",
+                              "cscript.exe", "mshta.exe", "python.exe", "python3.exe",
+                              "wmic.exe", "rundll32.exe", "regsvr32.exe", "bitsadmin.exe",
+                              "certutil.exe", "msbuild.exe", "installutil.exe", NULL};
+    for (int i = 0; I[i]; i++) {
+        if (!_stricmp(name, I[i])) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// Resolve the token user of a process handle to "DOMAIN\\user".
+static void user_of_process(HANDLE hProc, char *out, size_t n) {
+    out[0] = '\0';
+    HANDLE tok = NULL;
+    if (!OpenProcessToken(hProc, TOKEN_QUERY, &tok)) {
+        return;
+    }
+    DWORD len = 0;
+    GetTokenInformation(tok, TokenUser, NULL, 0, &len);
+    if (len) {
+        TOKEN_USER *tu = (TOKEN_USER *)malloc(len);
+        if (tu && GetTokenInformation(tok, TokenUser, tu, len, &len)) {
+            char name[256] = "", dom[256] = "";
+            DWORD nl = sizeof(name), dl = sizeof(dom);
+            SID_NAME_USE use;
+            if (LookupAccountSidA(NULL, tu->User.Sid, name, &nl, dom, &dl, &use)) {
+                snprintf(out, n, "%s\\%s", dom, name);
+            }
+        }
+        free(tu);
+    }
+    CloseHandle(tok);
+}
+
+// Emit an edr_process event for a newly-seen (pid,createtime) process.
+static void emit_process_win(wm_edr_t *edr, DWORD pid, DWORD ppid, const char *name) {
+    if (pid == 0) {
+        return;
+    }
+    HANDLE hProc = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+    unsigned long long start_ull = 0;
+    char exe[MAX_PATH] = "", user[256] = "", startiso[32] = "";
+
+    if (hProc) {
+        DWORD sz = MAX_PATH;
+        QueryFullProcessImageNameA(hProc, 0, exe, &sz);
+        FILETIME ct, et, kt, ut;
+        if (GetProcessTimes(hProc, &ct, &et, &kt, &ut)) {
+            ULARGE_INTEGER u;
+            u.LowPart = ct.dwLowDateTime;
+            u.HighPart = ct.dwHighDateTime;
+            start_ull = u.QuadPart;
+            SYSTEMTIME s;
+            if (FileTimeToSystemTime(&ct, &s)) {
+                snprintf(startiso, sizeof(startiso), "%04d-%02d-%02dT%02d:%02d:%02dZ",
+                         s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond);
+            }
+        }
+        user_of_process(hProc, user, sizeof(user));
+    }
+
+    // Dedup by pid + creation time (survives PID reuse).
+    char key[64];
+    snprintf(key, sizeof(key), "%lu:%llu", (unsigned long)pid, start_ull);
+    if (OSHash_Get(seen_procs, key)) {
+        if (hProc) CloseHandle(hProc);
+        return;
+    }
+    if (OSHash_Add(seen_procs, key, (void *)1) != 2) {
+        if (OSHash_Get(seen_procs, key) == NULL) {
+            OSHash_Free(seen_procs);
+            seen_procs = OSHash_Create();
+            OSHash_Add(seen_procs, key, (void *)1);
+        }
+    }
+    if (!startiso[0]) {
+        now_iso(startiso, sizeof(startiso));
+    }
+
+    cJSON *event = cJSON_CreateObject();
+    cJSON_AddStringToObject(event, "collector", "edr_process");
+    cJSON *data = cJSON_AddObjectToObject(event, "data");
+    cJSON *proc = cJSON_AddObjectToObject(data, "process");
+    cJSON_AddNumberToObject(proc, "pid", (double)pid);
+    cJSON *parent = cJSON_AddObjectToObject(proc, "parent");
+    cJSON_AddNumberToObject(parent, "pid", (double)ppid);
+    cJSON_AddStringToObject(proc, "name", name);
+    cJSON_AddStringToObject(proc, "command_line", exe[0] ? exe : name);
+    cJSON_AddStringToObject(proc, "user", user);
+    cJSON_AddStringToObject(proc, "start", startiso);
+    if (exe[0]) {
+        cJSON_AddStringToObject(proc, "executable", exe);
+        os_sha256 sha = {0};
+        if (OS_SHA256_File(exe, sha, OS_BINARY) == 0) {
+            cJSON *h = cJSON_AddObjectToObject(proc, "hash");
+            cJSON_AddStringToObject(h, "sha256", sha);
+        }
+    }
+    if (is_interpreter_win(name)) {
+        cJSON_AddBoolToObject(proc, "is_script", 1);
+    }
+
+    wm_edr_emit(edr, event);
+    cJSON_Delete(event);
+    if (hProc) CloseHandle(hProc);
+}
+
+static void scan_processes(wm_edr_t *edr) {
+    HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snap == INVALID_HANDLE_VALUE) {
+        return;
+    }
+    PROCESSENTRY32 pe;
+    pe.dwSize = sizeof(pe);
+    if (Process32First(snap, &pe)) {
+        do {
+            emit_process_win(edr, pe.th32ProcessID, pe.th32ParentProcessID, pe.szExeFile);
+        } while (Process32Next(snap, &pe));
+    }
+    CloseHandle(snap);
+}
+
+static const char *tcp_state_win(DWORD s) {
+    switch (s) {
+        case MIB_TCP_STATE_ESTAB: return "established";
+        case MIB_TCP_STATE_LISTEN: return "listening";
+        case MIB_TCP_STATE_SYN_SENT: return "syn_sent";
+        case MIB_TCP_STATE_SYN_RCVD: return "syn_recv";
+        case MIB_TCP_STATE_TIME_WAIT: return "time_wait";
+        case MIB_TCP_STATE_CLOSE_WAIT: return "close_wait";
+        default: return "other";
+    }
+}
+
+static void emit_conn(wm_edr_t *edr, const char *proto, const char *lip, unsigned lport,
+                      const char *rip, unsigned rport, const char *state, DWORD pid) {
+    char key[160];
+    snprintf(key, sizeof(key), "%s-%s:%u-%s:%u", proto, lip, lport, rip, rport);
+    if (OSHash_Get(seen_conns, key)) {
+        return;
+    }
+    OSHash_Add(seen_conns, key, (void *)1);
+
+    cJSON *event = cJSON_CreateObject();
+    cJSON_AddStringToObject(event, "collector", "edr_network");
+    cJSON *data = cJSON_AddObjectToObject(event, "data");
+    cJSON *port = cJSON_AddObjectToObject(data, "port");
+    cJSON_AddStringToObject(port, "protocol", proto);
+    cJSON *local = cJSON_AddObjectToObject(port, "local");
+    cJSON_AddStringToObject(local, "ip", lip);
+    cJSON_AddNumberToObject(local, "port", lport);
+    cJSON *remote = cJSON_AddObjectToObject(port, "remote");
+    cJSON_AddStringToObject(remote, "ip", rip);
+    cJSON_AddNumberToObject(remote, "port", rport);
+    cJSON_AddStringToObject(port, "state", state);
+    cJSON *proc = cJSON_AddObjectToObject(data, "process");
+    cJSON_AddNumberToObject(proc, "pid", (double)pid);
+    wm_edr_emit(edr, event);
+    cJSON_Delete(event);
+}
+
+static void scan_network(wm_edr_t *edr) {
+    // IPv4 TCP with owning PID.
+    DWORD sz = 0;
+    GetExtendedTcpTable(NULL, &sz, FALSE, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
+    if (sz) {
+        MIB_TCPTABLE_OWNER_PID *t = (MIB_TCPTABLE_OWNER_PID *)malloc(sz);
+        if (t && GetExtendedTcpTable(t, &sz, FALSE, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0) == NO_ERROR) {
+            for (DWORD i = 0; i < t->dwNumEntries; i++) {
+                MIB_TCPROW_OWNER_PID *r = &t->table[i];
+                if (r->dwState != MIB_TCP_STATE_ESTAB && r->dwState != MIB_TCP_STATE_LISTEN) {
+                    continue;
+                }
+                unsigned char *la = (unsigned char *)&r->dwLocalAddr;
+                unsigned char *ra = (unsigned char *)&r->dwRemoteAddr;
+                char lip[64], rip[64];
+                snprintf(lip, sizeof(lip), "%u.%u.%u.%u", la[0], la[1], la[2], la[3]);
+                snprintf(rip, sizeof(rip), "%u.%u.%u.%u", ra[0], ra[1], ra[2], ra[3]);
+                unsigned lport = ntohs((u_short)r->dwLocalPort);
+                unsigned rport = ntohs((u_short)r->dwRemotePort);
+                emit_conn(edr, "tcp", lip, lport, rip, rport, tcp_state_win(r->dwState), r->dwOwningPid);
+            }
+        }
+        free(t);
+    }
+    // IPv6 TCP with owning PID.
+    sz = 0;
+    GetExtendedTcpTable(NULL, &sz, FALSE, AF_INET6, TCP_TABLE_OWNER_PID_ALL, 0);
+    if (sz) {
+        MIB_TCP6TABLE_OWNER_PID *t = (MIB_TCP6TABLE_OWNER_PID *)malloc(sz);
+        if (t && GetExtendedTcpTable(t, &sz, FALSE, AF_INET6, TCP_TABLE_OWNER_PID_ALL, 0) == NO_ERROR) {
+            for (DWORD i = 0; i < t->dwNumEntries; i++) {
+                MIB_TCP6ROW_OWNER_PID *r = &t->table[i];
+                if (r->dwState != MIB_TCP_STATE_ESTAB && r->dwState != MIB_TCP_STATE_LISTEN) {
+                    continue;
+                }
+                char lip[64] = "", rip[64] = "";
+                inet_ntop(AF_INET6, r->ucLocalAddr, lip, sizeof(lip));
+                inet_ntop(AF_INET6, r->ucRemoteAddr, rip, sizeof(rip));
+                unsigned lport = ntohs((u_short)r->dwLocalPort);
+                unsigned rport = ntohs((u_short)r->dwRemotePort);
+                emit_conn(edr, "tcp6", lip, lport, rip, rport, tcp_state_win(r->dwState), r->dwOwningPid);
+            }
+        }
+        free(t);
+    }
+    if (seen_conns && OSHash_Get_Elem_ex(seen_conns) > 50000) {
+        OSHash_Free(seen_conns);
+        seen_conns = OSHash_Create();
+    }
+}
+
+/* ---------------------------------------------------------- persistence sweep */
+
+static void emit_persistence(wm_edr_t *edr, const char *type, const char *path_val) {
+    if (!path_val || !path_val[0] || OSHash_Get(seen_persist, path_val)) {
+        return;
+    }
+    if (OSHash_Add(seen_persist, path_val, (void *)1) != 2) {
+        if (seen_persist && OSHash_Get_Elem_ex(seen_persist) > 20000) {
+            OSHash_Free(seen_persist);
+            seen_persist = OSHash_Create();
+        }
+        return;
+    }
+    char ts[32];
+    now_iso(ts, sizeof(ts));
+    cJSON *event = cJSON_CreateObject();
+    cJSON_AddStringToObject(event, "collector", "edr_persistence");
+    cJSON *data = cJSON_AddObjectToObject(event, "data");
+    cJSON *p = cJSON_AddObjectToObject(data, "persistence");
+    cJSON_AddStringToObject(p, "type", type);
+    cJSON_AddStringToObject(p, "path", path_val);
+    cJSON_AddStringToObject(p, "detected", ts);
+    wm_edr_emit(edr, event);
+    cJSON_Delete(event);
+}
+
+// Enumerate the string values of an autostart registry key (Run / RunOnce).
+static void scan_reg_run(wm_edr_t *edr, HKEY root, const char *subkey, const char *label) {
+    HKEY hk;
+    if (RegOpenKeyExA(root, subkey, 0, KEY_READ | KEY_WOW64_64KEY, &hk) != ERROR_SUCCESS) {
+        return;
+    }
+    DWORD idx = 0;
+    char name[256], val[1024];
+    while (1) {
+        DWORD nl = sizeof(name), vl = sizeof(val), type = 0;
+        if (RegEnumValueA(hk, idx++, name, &nl, NULL, &type, (LPBYTE)val, &vl) != ERROR_SUCCESS) {
+            break;
+        }
+        if (type == REG_SZ || type == REG_EXPAND_SZ) {
+            char path[1400];
+            snprintf(path, sizeof(path), "%s\\%s => %s", label, name, val);
+            emit_persistence(edr, "registry-run", path);
+        }
+    }
+    RegCloseKey(hk);
+}
+
+// Enumerate files in a Startup folder.
+static void scan_startup_dir(wm_edr_t *edr, const char *dir) {
+    char pattern[MAX_PATH];
+    snprintf(pattern, sizeof(pattern), "%s\\*", dir);
+    WIN32_FIND_DATAA fd;
+    HANDLE h = FindFirstFileA(pattern, &fd);
+    if (h == INVALID_HANDLE_VALUE) {
+        return;
+    }
+    do {
+        if (fd.cFileName[0] == '.') {
+            continue;
+        }
+        char full[MAX_PATH];
+        snprintf(full, sizeof(full), "%s\\%s", dir, fd.cFileName);
+        emit_persistence(edr, "startup-folder", full);
+    } while (FindNextFileA(h, &fd));
+    FindClose(h);
+}
+
+static void scan_persistence(wm_edr_t *edr) {
+    scan_reg_run(edr, HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", "HKLM\\...\\Run");
+    scan_reg_run(edr, HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce", "HKLM\\...\\RunOnce");
+    scan_reg_run(edr, HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", "HKCU\\...\\Run");
+    scan_reg_run(edr, HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce", "HKCU\\...\\RunOnce");
+
+    char *pd = getenv("ProgramData");
+    if (pd) {
+        char sd[MAX_PATH];
+        snprintf(sd, sizeof(sd), "%s\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp", pd);
+        scan_startup_dir(edr, sd);
+    }
+    char *ap = getenv("APPDATA");
+    if (ap) {
+        char sd[MAX_PATH];
+        snprintf(sd, sizeof(sd), "%s\\Microsoft\\Windows\\Start Menu\\Programs\\Startup", ap);
+        scan_startup_dir(edr, sd);
+    }
+}
+
+/* --------------------------------------------------------------------- main */
+
+void* wm_edr_main(wm_edr_t *edr) {
+    if (!edr->flags.enabled) {
+        mtinfo(WM_EDR_LOGTAG, "Module disabled. Exiting.");
+        return NULL;
+    }
+
+    seen_procs = OSHash_Create();
+    seen_conns = OSHash_Create();
+    seen_persist = OSHash_Create();
+
+    edr_log = fopen(WM_EDR_LOG_PATH, "a");
+
+    if ((queue_fd = StartMQ(DEFAULTQUEUE, WRITE, INFINITE_OPENQ_ATTEMPTS)) < 0) {
+        mterror(WM_EDR_LOGTAG, "Can't connect to queue '%s'.", DEFAULTQUEUE);
+    }
+
+    edr->flags.running = 1;
+    mtinfo(WM_EDR_LOGTAG, "Native EDR telemetry started (interval %us, processes=%u network=%u persistence=%u).",
+           edr->interval, edr->flags.processes, edr->flags.network, edr->flags.persistence);
+
+    unsigned int cycle = 0;
+    while (edr->flags.running) {
+        if (edr->flags.processes) {
+            scan_processes(edr);
+        }
+        if (edr->flags.network) {
+            scan_network(edr);
+        }
+        if (edr->flags.persistence && (cycle == 0 || cycle % 12 == 0)) {
+            scan_persistence(edr);
+        }
+        cycle++;
+        Sleep(edr->interval * 1000);
+    }
+
+    return NULL;
+}
+
+static void wm_edr_destroy(wm_edr_t *edr) {
+    if (edr_log) {
+        fclose(edr_log);
+        edr_log = NULL;
+    }
+    if (seen_procs) { OSHash_Free(seen_procs); seen_procs = NULL; }
+    if (seen_conns) { OSHash_Free(seen_conns); seen_conns = NULL; }
+    if (seen_persist) { OSHash_Free(seen_persist); seen_persist = NULL; }
+    free(edr);
+}
+
+static cJSON *wm_edr_dump(const wm_edr_t *edr) {
+    cJSON *root = cJSON_CreateObject();
+    cJSON *wm_edr = cJSON_CreateObject();
+    cJSON_AddStringToObject(wm_edr, "enabled", edr->flags.enabled ? "yes" : "no");
+    cJSON_AddStringToObject(wm_edr, "processes", edr->flags.processes ? "yes" : "no");
+    cJSON_AddStringToObject(wm_edr, "network", edr->flags.network ? "yes" : "no");
+    cJSON_AddStringToObject(wm_edr, "persistence", edr->flags.persistence ? "yes" : "no");
+    cJSON_AddNumberToObject(wm_edr, "interval", edr->interval);
+    cJSON_AddNumberToObject(wm_edr, "max_eps", edr->max_eps);
+    cJSON_AddItemToObject(root, "edr", wm_edr);
+    return root;
+}
+
+#endif // WIN32

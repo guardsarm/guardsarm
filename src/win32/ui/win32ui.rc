@@ -1,10 +1,7 @@
 /* Copyright (C) 2009 Trend Micro Inc.
  * All rights reserved.
  *
- * This program is a free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License (version 2) as published by the FSF - Free Software
- * Foundation.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
 #include <windows.h>
@@ -25,10 +22,7 @@ BEGIN
     DEFPUSHBUTTON  "&Close",UI_ID_CLOSE,90,90,50,14
     GROUPBOX       " Copyright (C) 2023, Wazuh Inc.",
                    IDC_STATIC,7,7,245,82
-    CTEXT   "This program is a free software; you can redistribute it" \
-            " and/or modify it under the terms of the GNU General" \
-            " Public License (version 2) as published by the FSF" \
-            " - Free Software Foundation\r\n\r\n" \
+    CTEXT   "Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.\r\n\r\n" \
             "For more information, visit us online at https://guardsarmsiem.com/",
             IDC_STATIC,16,18,200,63
 END

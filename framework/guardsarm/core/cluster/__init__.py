@@ -1,16 +1,13 @@
 
 
-# Copyright (C) 2015, Wazuh Inc.
-# Copyright (C) 2026, GuardSarm.
-# Created by Wazuh, Inc. <info@wazuh.com>.
-# This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
+# Copyright (C) 2026 GuardSarm, Inc.
+# Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
 
 __version__ = '2.0.0'
 __revision__ = '40000'
 __author__ = "Wazuh Inc"
 __guardsarm_name__ = "GuardSarm"
 __licence__ = "\
-This program is free software; you can redistribute it and/or modify\n\
-it under the terms of the GNU General Public License (version 2) as \n\
+Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.) as \n\
 published by the Free Software Foundation. For more details, go to \n\
 https://www.gnu.org/licenses/gpl.html\n"

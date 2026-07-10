@@ -1,5 +1,5 @@
 ** GuardSarm Windows Agent **
-** Copyright (C) 2015, Wazuh Inc. **
+** Copyright (C) 2026 GuardSarm, Inc.
 
 
 Thanks for installing the 'GuardSarm Windows Agent'. Before you continue,

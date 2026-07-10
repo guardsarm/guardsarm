@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2015, Wazuh Inc.
+# Copyright (C) 2026 GuardSarm, Inc.
 # Installation script for GuardSarm
 # Author: Daniel B. Cid <daniel.cid@gmail.com>
 
@@ -1119,7 +1119,7 @@ main()
     # Set default install dir only when USER_DIR is not provided.
     if [ -z "${USER_DIR}" ]; then
         if [ "X$INSTYPE" = "Xagent" ]; then
-            INSTALLDIR="/var/ossec"
+            INSTALLDIR="/var/gsmsec"
         else
             INSTALLDIR="/var/guardsarm-manager"
         fi

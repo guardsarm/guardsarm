@@ -100,8 +100,8 @@ updatefailed="Aggiornamento fallito."
 updaterules="Si desidera aggiornare le regole ?"
 updatingrules="Aggiornamento delle regole in corso."
 notupdatingrules="Nessun aggiornamento delle regole in corso."
-update_rev_newconf1="Backup dal ossec.conf è stato creato nel file $INSTALLDIR/etc/ossec.conf.orig."
-update_rev_newconf2="Si prega di verificare la configurazione da ossec.conf a $INSTALLDIR/etc/ossec.conf."
+update_rev_newconf1="Backup dal gsmsec.conf è stato creato nel file $INSTALLDIR/etc/gsmsec.conf.orig."
+update_rev_newconf2="Si prega di verificare la configurazione da gsmsec.conf a $INSTALLDIR/etc/gsmsec.conf."
 
 # Pf support
 pfenable="Vuoi utilizzare il firewall PF nella risposta attiva?"

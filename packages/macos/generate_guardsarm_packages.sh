@@ -2,13 +2,9 @@
 set -e
 # Program to build and package OSX guardsarm-agent
 # GuardSarm package generator
-# Copyright (C) 2015, Wazuh Inc.
-# Copyright (C) 2026, GuardSarm.
+# Copyright (C) 2026 GuardSarm, Inc.
 #
-# This program is a free software; you can redistribute it
-# and/or modify it under the terms of the GNU General Public
-# License (version 2) as published by the FSF - Free Software
-# Foundation.
+# Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
 
 export PATH=/usr/local/bin:/Applications/CMake.app/Contents/bin:/opt/homebrew/bin:/opt/homebrew/sbin:$PATH
 CURRENT_PATH="$( cd $(dirname ${0}) ; pwd -P )"

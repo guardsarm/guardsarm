@@ -1,13 +1,9 @@
 /*
  * GuardSarm-DB settings manager
- * Copyright (C) 2015, Wazuh Inc.
- * Copyright (C) 2026, GuardSarm.
+ * Copyright (C) 2026 GuardSarm, Inc.
  * Dec 17, 2021.
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License (version 2) as published by the FSF - Free Software
- * Foundation.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
 #ifndef GUARDSARM_DB_CONFIG_H

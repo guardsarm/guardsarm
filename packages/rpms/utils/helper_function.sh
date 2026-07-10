@@ -3,13 +3,9 @@
 # RPM helper functions
 
 # GuardSarm package builder
-# Copyright (C) 2015, Wazuh Inc.
-# Copyright (C) 2026, GuardSarm.
+# Copyright (C) 2026 GuardSarm, Inc.
 #
-# This program is a free software; you can redistribute it
-# and/or modify it under the terms of the GNU General Public
-# License (version 2) as published by the FSF - Free Software
-# Foundation.
+# Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
 
 rpmbuild="rpmbuild"
 rpm_build_dir="" # To be define on setup_build

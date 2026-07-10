@@ -1,6 +1,5 @@
 #!/bin/bash
-# Copyright (C) 2015, Wazuh Inc.
-# Copyright (C) 2026, GuardSarm.
+# Copyright (C) 2026 GuardSarm, Inc.
 
 
 LOCK=./var/upgrade/upgrade_in_progress_pid

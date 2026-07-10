@@ -1,23 +1,19 @@
 /*
  * GuardSarm Module Config for native EDR telemetry
- * Copyright (C) 2015, Wazuh Inc.
- * Copyright (C) 2026, GuardSarm.
+ * Copyright (C) 2026 GuardSarm, Inc.
  *
  * Parses the <wodle name="edr"> block: enable/disable, sweep interval, and the
  * process / network feature switches.
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License (version 2) as published by the FSF - Free Software
- * Foundation.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
 #include "wmodules.h"
 
-// The native EDR module (guardsarm_modules/edr) reads /proc and is Linux-only; its
-// WM_EDR_CONTEXT is not linked into the Windows agent. The config reader is only
-// invoked off-Windows (see wmodules-config.c), so exclude it from the WIN32 build.
-#ifndef WIN32
+// The native EDR module has both a Linux (/proc) and a Windows (Win32) implementation
+// (see wm_edr.c). The <wodle name="edr"> config reader is agent-only (CLIENT) and
+// platform-independent, so it is built for both the Linux and Windows agents.
+#if defined(CLIENT)
 
 static const char *XML_DISABLED = "disabled";
 static const char *XML_INTERVAL = "interval";
@@ -102,4 +98,4 @@ int wm_edr_read(const OS_XML *xml, XML_NODE node, wmodule *module) {
     return 0;
 }
 
-#endif  // !WIN32
+#endif  // CLIENT

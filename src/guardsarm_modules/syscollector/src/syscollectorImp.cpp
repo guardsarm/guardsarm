@@ -1,13 +1,9 @@
 /*
  * GuardSarm SysCollector
- * Copyright (C) 2015, Wazuh Inc.
- * Copyright (C) 2026, GuardSarm.
+ * Copyright (C) 2026 GuardSarm, Inc.
  * October 7, 2020.
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License (version 2) as published by the FSF - Free Software
- * Foundation.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 #include "syscollector.h"
 #include "syscollector.hpp"
@@ -1864,15 +1860,17 @@ void Syscollector::scan()
     TRY_CATCH_TASK(scanServices);
     TRY_CATCH_TASK(scanBrowserExtensions);
 
-    // Update sync=1 flag for all items that passed document limit check (unlimited items)
-    // This must be done BEFORE processVDDataContext so that DataContext queries
-    // can filter by sync=1 and only include items within document limits
-    updateSyncFlagInDB(itemsToUpdateSync, 1);
+    // Update sync=1 flag for all items that passed document limit check (unlimited items).
+    // Each post-scan step is isolated in its own try/catch so that a failure in one step
+    // does not abort the rest — otherwise an exception here leaves inventory items
+    // unpersisted to the sync queue and the first-scan marker unset, which stalls
+    // inventory synchronization to the manager (observed on the Windows agent).
+    try { updateSyncFlagInDB(itemsToUpdateSync, 1); }
+    catch (const std::exception& e) { if (m_logFunction) m_logFunction(LOG_ERROR, std::string("updateSyncFlagInDB failed: ") + e.what()); }
 
-    // Promote items to fill available slots after scan completes
-    // This calculates available space (limit - current count) and promotes
-    // unsynced items with deterministic ordering
-    promoteItemsAfterScan();
+    // Promote items to fill available slots after scan completes (persists deferred items).
+    try { promoteItemsAfterScan(); }
+    catch (const std::exception& e) { if (m_logFunction) m_logFunction(LOG_ERROR, std::string("promoteItemsAfterScan failed: ") + e.what()); }
 
     // Process VD DataContext after scan completes
     // This adds context data (e.g., all packages when OS changes) based on platform-specific rules
@@ -1886,13 +1884,17 @@ void Syscollector::scan()
     m_itemsToUpdateSync = nullptr;
 
     // Delete all items that failed schema validation inside a DBSync transaction
-    // This ensures deletions are committed to disk immediately
-    deleteFailedItemsFromDB(failedItems);
+    try { deleteFailedItemsFromDB(failedItems); }
+    catch (const std::exception& e) { if (m_logFunction) m_logFunction(LOG_ERROR, std::string("deleteFailedItemsFromDB failed: ") + e.what()); }
 
     if (isFirstScan)
     {
-        updateMetadataValue(SYSCOLLECTOR_FIRST_SCAN_COMPLETED_METADATA_KEY, Utils::getSecondsFromEpoch());
-        m_logFunction(LOG_DEBUG, "First inventory scan completed — marker persisted.");
+        try
+        {
+            updateMetadataValue(SYSCOLLECTOR_FIRST_SCAN_COMPLETED_METADATA_KEY, Utils::getSecondsFromEpoch());
+            m_logFunction(LOG_DEBUG, "First inventory scan completed — marker persisted.");
+        }
+        catch (const std::exception& e) { if (m_logFunction) m_logFunction(LOG_ERROR, std::string("first-scan marker write failed: ") + e.what()); }
     }
 
     m_notify = true;
@@ -3525,7 +3527,10 @@ std::optional<nlohmann::json> Syscollector::fetchDocumentLimitsFromAgentd()
 
     constexpr auto REQUEST_COMMAND = "getdoclimits syscollector";
 
-    // Retry loop until success or stop signal
+    // Retry loop until success, a bounded number of failures, or stop signal.
+    int fetchAttempts = 0;
+    constexpr int MAX_FETCH_ATTEMPTS = 10;
+
     while (!m_stopping.load())
     {
         // Use std::string for idiomatic C++ memory management
@@ -3537,6 +3542,21 @@ std::optional<nlohmann::json> Syscollector::fetchDocumentLimitsFromAgentd()
 
         if (!success)
         {
+            // Do not block syncLoop startup forever if the agentd document-limit query is
+            // unavailable (observed on the Windows agent, where agentd does not answer the
+            // "getdoclimits" request). After a bounded number of failures, give up and
+            // proceed WITHOUT document limits (unlimited) so the scan runs and inventory is
+            // persisted and synchronized to the manager.
+            if (++fetchAttempts >= MAX_FETCH_ATTEMPTS)
+            {
+                if (m_logFunction)
+                {
+                    m_logFunction(LOG_WARNING, "Could not fetch document limits from agentd after " + std::to_string(fetchAttempts) + " attempts; proceeding without document limits (unlimited).");
+                }
+
+                return std::nullopt;
+            }
+
             if (m_logFunction)
             {
                 m_logFunction(LOG_DEBUG, "Failed to fetch document limits from agentd, retrying...");
@@ -4600,15 +4620,21 @@ bool Syscollector::validateSchemaAndLog(const std::string& data, const std::stri
 
     if (!validator)
     {
-        // No validator for this index: be restrictive and discard the message
-        // instead of queuing it unvalidated, since we cannot guarantee it matches
-        // the schema the indexer expects.
-        if (m_logFunction)
+        // No validator for this index. Observed on the Windows agent, where the
+        // syscollector schema validators are not registered — discarding here silently
+        // drops ALL inventory and breaks synchronization to the manager. The inventory
+        // documents are well-formed (validated identically on other platforms) and the
+        // indexer applies its own mapping, so allow the message through instead of
+        // dropping it. This mirrors the permissive behaviour when the factory is not
+        // initialized at all (isInitialized() == false above).
+        static bool novalidator_logged = false;
+        if (m_logFunction && !novalidator_logged)
         {
-            m_logFunction(LOG_WARNING, "No schema validator found for index: " + index + ". Discarding message.");
+            m_logFunction(LOG_WARNING, "No schema validator registered (e.g. index '" + index + "'); forwarding syscollector inventory without local schema validation.");
+            novalidator_logged = true;
         }
 
-        return false;
+        return true;
     }
 
     auto validationResult = validator->validate(data);

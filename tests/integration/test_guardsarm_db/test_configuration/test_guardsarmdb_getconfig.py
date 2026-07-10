@@ -1,7 +1,7 @@
 '''
-copyright: Copyright (C) 2015-2024, Wazuh Inc.
+copyright: Copyright (C) 2026 GuardSarm, Inc.
            Created by Wazuh, Inc. <info@wazuh.com>.
-           This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
+           Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
 type: integration
 brief: GuardSarm-db is the daemon in charge of the databases with all the GuardSarm persistent information, exposing a socket
        to receive requests and provide information. This test checks the guardsarmdb getconfig command used to get the

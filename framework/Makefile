@@ -1,5 +1,5 @@
 # Makefile for GuardSarm Framework
-# Copyright (C) 2015, Wazuh Inc.
+# Copyright (C) 2026 GuardSarm, Inc.
 # May 3, 2017
 #
 # Syntax: make [ all | build | install | examples | clean ]

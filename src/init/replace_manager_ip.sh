@@ -1,18 +1,14 @@
 #!/bin/bash
 
-# Copyright (C) 2015, Wazuh Inc.
-# Copyright (C) 2026, GuardSarm.
+# Copyright (C) 2026 GuardSarm, Inc.
 # All rights reserved.
 # GuardSarmsiem.com
 
-# This program is free software; you can redistribute it
-# and/or modify it under the terms of the GNU General Public
-# License (version 2) as published by the FSF - Free Software
-# Foundation.
+# Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
 
 # Just for agents
-# Prints the current ossec.conf with <address> of ossec.conf specified as first argument.
-# Example: ./replace_manager_ip.sh /var/guardsarm-manager/etc/ossec.conf.rpmorig
+# Prints the current gsmsec.conf with <address> of gsmsec.conf specified as first argument.
+# Example: ./replace_manager_ip.sh /var/guardsarm-manager/etc/gsmsec.conf.rpmorig
 
 # Aux functions
 check_tag_in_file() {  # tag file
@@ -52,7 +48,7 @@ replace(){  # tag olf_file new_file
     manager_ip=$(get_value_tag $1 $2)
 
     if [ "$manager_ip" == "0" ]; then
-        echo "Error updating ossec.conf with previous IP or host: IP or hostname not found."
+        echo "Error updating gsmsec.conf with previous IP or host: IP or hostname not found."
         exit 1
     fi
 
@@ -73,7 +69,7 @@ main() {
     fi
 
     if [ "$status" == "1" ]; then
-        echo "Error updating ossec.conf with previous IP or host."
+        echo "Error updating gsmsec.conf with previous IP or host."
         exit 1
     fi
 
@@ -84,6 +80,6 @@ main() {
 if [ "$#" = "2" ]; then
     main $1 $2
 else
-      echo " USE: ./replace_manager_ip.sh previous_ossec.conf new_ossec.conf"
+      echo " USE: ./replace_manager_ip.sh previous_gsmsec.conf new_gsmsec.conf"
       exit 2
 fi

@@ -1,14 +1,10 @@
 #!/bin/sh
 
 # GuardSarm Installer Functions
-# Copyright (C) 2015, Wazuh Inc.
-# Copyright (C) 2026, GuardSarm.
+# Copyright (C) 2026 GuardSarm, Inc.
 # November 18, 2016.
 #
-# This program is free software; you can redistribute it
-# and/or modify it under the terms of the GNU General Public
-# License (version 2) as published by the FSF - Free Software
-# Foundation.
+# Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
 
 # File dependencies:
 # ./src/init/shared.sh
@@ -316,7 +312,7 @@ WriteAgent()
     echo "$HEADERS" > $NEWCONFIG
     echo "" >> $NEWCONFIG
 
-    echo "<ossec_config>" >> $NEWCONFIG
+    echo "<guardsarm_config>" >> $NEWCONFIG
     echo "  <client>" >> $NEWCONFIG
     echo "    <manager>" >> $NEWCONFIG
     if [ "X${HNAME}" = "X" ]; then
@@ -415,7 +411,7 @@ WriteAgent()
     cat ${LOGGING_TEMPLATE} >> $NEWCONFIG
     echo "" >> $NEWCONFIG
 
-    echo "</ossec_config>" >> $NEWCONFIG
+    echo "</guardsarm_config>" >> $NEWCONFIG
 }
 
 
@@ -486,7 +482,7 @@ InstallCommon()
       GUARDSARM_CONF_SRC='../etc/guardsarm-manager.conf'
   elif [ ${INSTYPE} = 'agent' ]; then
       GUARDSARM_CONTROL_SRC='./init/guardsarm-client.sh'
-      GUARDSARM_CONF_SRC='../etc/ossec-agent.conf'
+      GUARDSARM_CONF_SRC='../etc/gsmsec-agent.conf'
   fi
 
   if [ ${INSTYPE} = 'manager' ]; then
@@ -494,9 +490,9 @@ InstallCommon()
       GUARDSARM_LOGFILE="guardsarm-manager.log"
       GUARDSARM_LOGJSON="guardsarm-manager.json"
   else
-      GUARDSARM_CONF="ossec.conf"
-      GUARDSARM_LOGFILE="ossec.log"
-      GUARDSARM_LOGJSON="ossec.json"
+      GUARDSARM_CONF="gsmsec.conf"
+      GUARDSARM_LOGFILE="gsmsec.log"
+      GUARDSARM_LOGJSON="gsmsec.json"
   fi
 
   ./init/adduser.sh ${GUARDSARM_USER} ${GUARDSARM_GROUP} ${INSTALLDIR}

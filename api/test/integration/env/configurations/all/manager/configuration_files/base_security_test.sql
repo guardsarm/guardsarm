@@ -1,9 +1,8 @@
 /*
  * SQL Schema all denied tests
- * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026 GuardSarm, Inc.
  * February 12, 2021.
- * This program is a free software, you can redistribute it
- * and/or modify it under the terms of GPLv2.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
 PRAGMA foreign_keys=OFF;

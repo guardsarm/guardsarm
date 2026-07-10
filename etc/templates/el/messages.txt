@@ -101,8 +101,8 @@ updatefailed="Η ενημέρωσε απέτυχε."
 updaterules="Θέλετε να ενημερώσετε τους κανόνες (rules);"
 updatingrules="Οι κανόνες (rules) ενημερώνονται."
 notupdatingrules="Οι κανόνες (rules) δεν ενημερώνονται."
-update_rev_newconf1="Δημιουργία αντιγράφων ασφαλείας από ossec.conf σας έχει δημιουργηθεί σε $INSTALLDIR/etc/ossec.conf.orig."
-update_rev_newconf2="Παρακαλούμε επιβεβαιώστε τη διαμόρφωση ossec.conf σας στο $INSTALLDIR/etc/ossec.conf."
+update_rev_newconf1="Δημιουργία αντιγράφων ασφαλείας από gsmsec.conf σας έχει δημιουργηθεί σε $INSTALLDIR/etc/gsmsec.conf.orig."
+update_rev_newconf2="Παρακαλούμε επιβεβαιώστε τη διαμόρφωση gsmsec.conf σας στο $INSTALLDIR/etc/gsmsec.conf."
 
 # Pf support
 pfenable="Θέλετε να χρησιμοποιήσετε το PF firewall για ενεργή αντίδραση (active response);"

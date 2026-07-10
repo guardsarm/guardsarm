@@ -1,64 +1,44 @@
-import json, socket, sys
+#!/usr/bin/env python3
+# Rebuild the engine 'standard' namespace from the on-disk ruleset files and import it,
+# restoring all decoders (incl the Windows event decoders) into the live engine, then
+# (re)create the default route. Runs INSIDE the manager container.
+# Copyright (C) 2026 GuardSarm, Inc.
+import json, os, socket
 
-SOCK = "/var/ossec/queue/sockets/analysis"
+SOCK = "/var/guardsarm-manager/queue/sockets/analysis"
+RS = "/var/guardsarm-manager/data/ruleset/standard"
 
 def post(path, body):
     data = json.dumps(body)
-    req = (
-        f"POST {path} HTTP/1.1\r\n"
-        f"Host: localhost\r\n"
-        f"Content-Type: text/plain\r\n"
-        f"Content-Length: {len(data)}\r\n"
-        f"Connection: close\r\n"
-        f"\r\n"
-        f"{data}"
-    )
+    req = (f"POST {path} HTTP/1.1\r\nHost: localhost\r\nContent-Type: text/plain\r\n"
+           f"Content-Length: {len(data)}\r\nConnection: close\r\n\r\n{data}")
     s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    s.connect(SOCK)
-    s.sendall(req.encode())
+    s.connect(SOCK); s.sendall(req.encode())
     resp = b""
     while True:
-        chunk = s.recv(65536)
-        if not chunk:
+        c = s.recv(65536)
+        if not c:
             break
-        resp += chunk
+        resp += c
     s.close()
-    txt = resp.decode(errors="replace")
-    # split headers/body
-    parts = txt.split("\r\n\r\n", 1)
-    body_txt = parts[1] if len(parts) > 1 else txt
-    return txt.split("\r\n",1)[0], body_txt.strip()
+    t = resp.decode(errors="replace")
+    p = t.split("\r\n\r\n", 1)
+    return t.split("\r\n", 1)[0], (p[1] if len(p) > 1 else t).strip()
 
-DEC = "11111111-1111-4111-8111-111111111111"
-OUT = "22222222-2222-4222-8222-222222222222"
-INT = "33333333-3333-4333-8333-333333333333"
-POL = "44444444-4444-4444-8444-444444444444"
+decoders = [json.load(open(f"{RS}/decoders/{f}")) for f in os.listdir(f"{RS}/decoders") if f.endswith(".json")]
+integrations = [json.load(open(f"{RS}/integrations/{f}")) for f in os.listdir(f"{RS}/integrations") if f.endswith(".json")]
+policy = json.load(open(f"{RS}/policy.json"))
+policy["integrations"] = [i["id"] for i in integrations]
+policy.setdefault("type", "policy")
+policy.setdefault("outputs", [])
+policy.setdefault("filters", [])
+policy.setdefault("enrichments", [])
+bundle = {"policy": policy, "resources": {"kvdbs": [], "decoders": decoders, "filters": [], "outputs": [], "integrations": integrations}}
 
-decoder = {"name":"decoder/local-root/0","id":DEC,"enabled":True}
-output = {
-  "name":"output/indexer/0","id":OUT,"enabled":True,
-  "outputs":[{"guardsarm-indexer":{"index":"guardsarm-events-v5-unclassified"}}]
-}
-integration = {"id":INT,"metadata":{"title":"local-core"},"enabled":True,"category":"unclassified","default_parent":DEC,"decoders":[DEC],"kvdbs":[]}
-policy = {
-  "type":"policy","metadata":{"title":"local default policy"},"enabled":True,
-  "root_decoder":DEC,"origin_space":"standard","index_unclassified_events":True,
-  "index_discarded_events":False,"cleanup_decoder_variables":True,"filters":[],"enrichments":[],"integrations":[INT],"outputs":[],"id":POL
-}
-bundle = {"policy":policy,"resources":{"kvdbs":[],"decoders":[decoder],"filters":[],"outputs":[],"integrations":[integration]}}
-
-print("== namespace/list (before) ==")
-print(post("/_internal/content/namespace/list", {}))
-
-print("== namespace/delete (cleanup) ==")
-print(post("/_internal/content/namespace/delete", {"space":"standard"}))
-print("== namespace/import ==")
-line, body = post("/_internal/content/namespace/import", {"space":"standard","force":True,"jsonContent":json.dumps(bundle)})
-print(line); print(body)
-
-print("== router/route/post ==")
-line, body = post("/_internal/router/route/post", {"route":{"name":"local_default","namespaceId":"standard","priority":1,"description":"local default route"}})
-print(line); print(body)
-
-print("== router/table/get (after) ==")
-print(post("/_internal/router/table/get", {}))
+print("decoders=%d integrations=%d" % (len(decoders), len(integrations)))
+print("delete:", post("/_internal/content/namespace/delete", {"space": "standard"}))
+print("import:", post("/_internal/content/namespace/import", {"space": "standard", "force": True, "jsonContent": json.dumps(bundle)}))
+post("/_internal/router/route/delete", {"name": "local_default"})
+print("route :", post("/_internal/router/route/post", {"route": {"name": "local_default", "namespaceId": "standard", "priority": 1, "description": "local default route"}}))
+print("table :", post("/_internal/router/table/get", {})[1][:220])
+print("ondisk decoders after import:", len(os.listdir(f"{RS}/decoders")))

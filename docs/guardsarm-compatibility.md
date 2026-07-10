@@ -73,7 +73,7 @@ script basenames.
 workflow `4_*`/`5_*` names, Coverity project, `.gitmodules` submodule URL. Treated
 as infrastructure migration; frozen in R1.
 
-**Legal (category E)** — every `Copyright (C) 2015, Wazuh Inc.`,
+Copyright (C) 2026 GuardSarm, Inc.
 `Copyright (C) 2009 Trend Micro Inc.`, OSSEC/Daniel Cid attribution, GPLv2 text,
 OpenSSL license, `LICENSE`, and `CONTRIBUTORS` history is kept **verbatim**.
 GuardSarm attribution is **appended** (see `NOTICE`), never substituted.

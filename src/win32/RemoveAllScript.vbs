@@ -1,8 +1,7 @@
 ' Script for configuration Windows agent.
-' Copyright (C) 2015, Wazuh Inc. <support@wazuh.com>
+Copyright (C) 2026 GuardSarm, Inc.
 '
-' This program is free software; you can redistribute it and/or modify
-' it under the terms of the GNU General Public License as published by
+' Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc. as published by
 ' the Free Software Foundation; either version 3 of the License, or
 ' (at your option) any later version.
 '
@@ -30,8 +29,8 @@ public function removeAll()
 
    Set objSFO = CreateObject("Scripting.FileSystemObject")
 
-   If objSFO.fileExists(home_dir & "ossec.conf.save") AND objSFO.fileExists(home_dir & "ossec.conf") Then
-      objSFO.DeleteFile(home_dir & "ossec.conf.save")
+   If objSFO.fileExists(home_dir & "gsmsec.conf.save") AND objSFO.fileExists(home_dir & "gsmsec.conf") Then
+      objSFO.DeleteFile(home_dir & "gsmsec.conf.save")
    End If
 
    If objSFO.fileExists(home_dir & "client.keys.save") AND objSFO.fileExists(home_dir & "client.keys") Then
@@ -46,8 +45,8 @@ public function removeAll()
       objSFO.DeleteFile(home_dir & "installer.log.save")
    End If
 
-   If objSFO.fileExists(home_dir & "ossec.conf") Then
-      objSFO.GetFile(home_dir + "\ossec.conf").Name = "ossec.conf.save"
+   If objSFO.fileExists(home_dir & "gsmsec.conf") Then
+      objSFO.GetFile(home_dir + "\gsmsec.conf").Name = "gsmsec.conf.save"
    End If
 
    If objSFO.fileExists(home_dir & "client.keys") Then
@@ -67,7 +66,7 @@ public function removeAll()
 
       ' Everything in the application's root folder will be deleted.
       ' *BUT*, the files specified here *will not* be deleted
-       Dim filesToKeep: filesToKeep = Array("ossec.conf.save", "client.keys.save", _
+       Dim filesToKeep: filesToKeep = Array("gsmsec.conf.save", "client.keys.save", _
                                             "local_internal_options.conf.save", "installer.log.save")
 
       ' Construct a simple dictionary to check out later whether a file is in

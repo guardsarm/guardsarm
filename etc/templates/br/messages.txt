@@ -102,8 +102,8 @@ updatefailed="Erro na atualizacao."
 updaterules="Voce deseja atualizar as regras?"
 updatingrules="Atualizando as regras."
 notupdatingrules="Nao atualizando as regras."
-update_rev_newconf1="O backup do seu ossec.conf foi criado no $INSTALLDIR/etc/ossec.conf.orig."
-update_rev_newconf2="Verifique a configuração ossec.conf em $INSTALLDIR/etc/ossec.conf."
+update_rev_newconf1="O backup do seu gsmsec.conf foi criado no $INSTALLDIR/etc/gsmsec.conf.orig."
+update_rev_newconf2="Verifique a configuração gsmsec.conf em $INSTALLDIR/etc/gsmsec.conf."
 
 # Pf support
 pfenable="Deseja utilizar o firewall PF nas respostas automaticas?"

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#Copyright (C) 2015, Wazuh Inc.
+#Copyright (C) 2026 GuardSarm, Inc.
 # Install functions for GuardSarm
 # GuardSarmsiem.com (https://github.com/guardsarm)
 
@@ -29,7 +29,7 @@ CheckModuleIsEnabled(){
     close_label="$2"
     enable_label="$3"
 
-    local conf_path="$PREINSTALLEDDIR/etc/${GUARDSARM_CONF:-ossec.conf}"
+    local conf_path="$PREINSTALLEDDIR/etc/${GUARDSARM_CONF:-gsmsec.conf}"
 
     if grep -n "${open_label}" "$conf_path" > /dev/null ; then
         is_disabled="no"

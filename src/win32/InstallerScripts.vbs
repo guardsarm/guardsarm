@@ -1,9 +1,8 @@
 
 ' Script for configuration Windows agent.
-' Copyright (C) 2015, Wazuh Inc. <support@wazuh.com>
+Copyright (C) 2026 GuardSarm, Inc.
 '
-' This program is free software; you can redistribute it and/or modify
-' it under the terms of the GNU General Public License as published by
+' Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc. as published by
 ' the Free Software Foundation; either version 3 of the License, or
 ' (at your option) any later version.
 '
@@ -65,9 +64,9 @@ public function config()
         objFSO.CreateTextFile(home_dir & "client.keys")
     End If
 
-    If objFSO.fileExists(home_dir & "ossec.conf") Then
-        ' Reading ossec.conf file
-        Set objFile = objFSO.OpenTextFile(home_dir & "ossec.conf", ForReading)
+    If objFSO.fileExists(home_dir & "gsmsec.conf") Then
+        ' Reading gsmsec.conf file
+        Set objFile = objFSO.OpenTextFile(home_dir & "gsmsec.conf", ForReading)
 
         strText = objFile.ReadAll
         objFile.Close
@@ -174,8 +173,8 @@ public function config()
 
         End If
 
-        ' Writing the ossec.conf file
-        Set objFile = objFSO.OpenTextFile(home_dir & "ossec.conf", ForWriting)
+        ' Writing the gsmsec.conf file
+        Set objFile = objFSO.OpenTextFile(home_dir & "gsmsec.conf", ForWriting)
         objFile.WriteLine strText
         objFile.Close
 
@@ -198,7 +197,7 @@ public function config()
                 objFile.WriteLine("# This file should be handled with care. It contains")
                 objFile.WriteLine("# run time modifications that can affect the use")
                 objFile.WriteLine("# of OSSEC. Only change it if you know what you")
-                objFile.WriteLine("# are doing. Look first at ossec.conf")
+                objFile.WriteLine("# are doing. Look first at gsmsec.conf")
                 objFile.WriteLine("# for most of the things you want to change.")
                 objFile.WriteLine("#")
                 objFile.WriteLine("# This file will not be overwritten during upgrades")
@@ -211,7 +210,7 @@ public function config()
     End If
 
     ' Replace templates
-    Set objFile = objFSO.OpenTextFile(home_dir & "ossec.conf", ForReading)
+    Set objFile = objFSO.OpenTextFile(home_dir & "gsmsec.conf", ForReading)
     Set re = new regexp
 
     strNewText = objFile.ReadAll
@@ -307,8 +306,8 @@ public function config()
         strNewText = re.Replace(strNewText, "$1" & newline & vbCrLf & "$2")
     End If
 
-    ' Writing the ossec.conf file
-    Set objFile = objFSO.OpenTextFile(home_dir & "ossec.conf", ForWriting)
+    ' Writing the gsmsec.conf file
+    Set objFile = objFSO.OpenTextFile(home_dir & "gsmsec.conf", ForWriting)
     objFile.WriteLine strNewText
     objFile.Close
 
@@ -402,8 +401,8 @@ Public Function SetGuardSarmPermissions()
         grantAuthenticatedUsersPermFolder = "icacls """ & install_dir & """ /grant *S-1-5-11:RX"
         WshShell.run grantAuthenticatedUsersPermFolder, 0, True
 
-        ' Remove Authenticated Users group for ossec.conf, last-ossec.conf, client.keys and authd.pass
-        remAuthenticatedUsersPermsConf = "icacls """ & home_dir & "*ossec.conf" & """ /remove *S-1-5-11 /q"
+        ' Remove Authenticated Users group for gsmsec.conf, last-gsmsec.conf, client.keys and authd.pass
+        remAuthenticatedUsersPermsConf = "icacls """ & home_dir & "*gsmsec.conf" & """ /remove *S-1-5-11 /q"
         WshShell.run remAuthenticatedUsersPermsConf, 0, True
 
         remAuthenticatedUsersPermsKeys = "icacls """ & home_dir & "client.keys" & """ /remove *S-1-5-11 /q"
@@ -413,7 +412,7 @@ Public Function SetGuardSarmPermissions()
         WshShell.run remAuthenticatedUsersPermsAuthd, 0, True
 
         ' Remove the Authenticated Users group from the tmp directory to avoid
-        ' inherited permissions on client.keys and ossec.conf when using win32ui.
+        ' inherited permissions on client.keys and gsmsec.conf when using win32ui.
         remAuthenticatedUsersPermsTmpDir = "icacls """ & home_dir & "tmp" & """ /remove:g *S-1-5-11 /q"
         WshShell.run remAuthenticatedUsersPermsTmpDir, 0, True
 

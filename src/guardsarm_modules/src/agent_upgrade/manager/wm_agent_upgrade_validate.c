@@ -1,13 +1,9 @@
 /*
  * GuardSarm Module for Agent Upgrading
- * Copyright (C) 2015, Wazuh Inc.
- * Copyright (C) 2026, GuardSarm.
+ * Copyright (C) 2026 GuardSarm, Inc.
  * July 20, 2020.
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License (version 2) as published by the FSF - Free Software
- * Foundation.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
 #include "guardsarmdb_queries_op.h"
@@ -17,7 +13,7 @@
 #ifdef GUARDSARM_UNIT_TESTING
 // Redefine guardsarm_version
 #undef __guardsarm_version
-#define __guardsarm_version "v5.0.0"
+#define __guardsarm_version "v2.0.0"
 #endif
 
 // Mutex needed to download a WPK file

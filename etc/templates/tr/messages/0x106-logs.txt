@@ -1,5 +1,5 @@
  - Eğer başka bir dosyayı daha gözlemek isterseniz
-   ossec.conf dosyasına yeni bir localfile girdisi ekleyin.
+   gsmsec.conf dosyasına yeni bir localfile girdisi ekleyin.
    Yapılandırma hakkındaki herhangi bir sorunuzu cevaplamak için
    https://documentation.guardsarmsiem.com/ dresini ziyaret edebilirsiniz.
 

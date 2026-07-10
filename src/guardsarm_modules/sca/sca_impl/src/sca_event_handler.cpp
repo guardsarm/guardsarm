@@ -979,10 +979,11 @@ bool SCAEventHandler::ValidateAndHandleStatefulMessage(const nlohmann::json& sta
 
     if (!validator)
     {
-        // No validator for this index: be restrictive and discard the message.
+        // GuardSarm: no validator registered for this index -> fail OPEN (persist) rather
+        // than discarding real SCA telemetry, matching the syscollector/FIM fail-open.
         LoggingHelper::getInstance().log(LOG_WARNING,
-                                         "No schema validator found for index: " + std::string(SCA_SYNC_INDEX) + ". Discarding message.");
-        return false;
+                                         "No schema validator found for index: " + std::string(SCA_SYNC_INDEX) + " — persisting anyway (fail-open).");
+        return true;
     }
 
     std::string statefulData = statefulEvent.dump();

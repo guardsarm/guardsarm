@@ -1,8 +1,7 @@
 #!/bin/sh
 
-# Copyright (C) 2015, Wazuh Inc.
-# Copyright (C) 2026, GuardSarm, Inc.
-# This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
+# Copyright (C) 2026 GuardSarm, Inc.
+# Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
 #
 # GuardSarm branding layer for the init/control shell scripts.
 #

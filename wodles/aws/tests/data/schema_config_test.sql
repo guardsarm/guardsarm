@@ -1,9 +1,8 @@
 /*
  * SQL Schema AWS tests
- * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2026 GuardSarm, Inc.
  * April 15, 2019.
- * This program is a free software, you can redistribute it
- * and/or modify it under the terms of GPLv2.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
 CREATE TABLE 'config' (

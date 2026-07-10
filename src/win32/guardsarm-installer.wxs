@@ -53,7 +53,7 @@
         <Property Id="DEFAULT_GENERATE_DUMP" Value="1" />
         <Property Id="ARPNOMODIFY" Value="yes" />
         <Property Id="ARPNOREPAIR" Value="yes" />
-        <Property Id="ApplicationFolderName" Value="ossec-agent" />
+        <Property Id="ApplicationFolderName" Value="gsmsec-agent" />
         <Property Id="MAJORVERSION" Value="0">
             <RegistrySearch Id="CurrentMajorVersion" Root="HKLM" Key="SOFTWARE\Microsoft\Windows NT\CurrentVersion" Type="raw" Name="CurrentMajorVersionNumber" />
         </Property>
@@ -82,7 +82,7 @@
         <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixQuietExec"/>
 
         <!-- This script will remove all of the files and folders from the root folder on uninstall, *except* some files indicated in RemoveAllScript.vbs. -->
-        <!-- Especially, "ossec.conf" and "client.keys" will be kept, and a couple of other files too. -->
+        <!-- Especially, "gsmsec.conf" and "client.keys" will be kept, and a couple of other files too. -->
         <Binary Id="RemoveAllScript" SourceFile="RemoveAllScript.vbs" />
 
         <CustomAction Id="SetOSVersion0" Property="OS_VERSION" Value="2008"/>
@@ -201,7 +201,7 @@
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFilesFolder" Name="PFiles">
-                <Directory Id="APPLICATIONFOLDER" Name="ossec-agent">
+                <Directory Id="APPLICATIONFOLDER" Name="gsmsec-agent">
                     <Component Id="REGISTRY_INSTALL_DIR" Guid="63E18998-4DBB-4C34-A1AD-09AA809A1C15" KeyPath="yes">
                         <RegistryValue Root="HKLM" Key="SOFTWARE\[Manufacturer]\[ProductName]" Id="GuardSarmInstallDirProperty" Name="GuardSarmInstallDir" Type="string" Value="[APPLICATIONFOLDER]" />
                     </Component>
@@ -241,7 +241,7 @@
                         <File Id="LOCAL_INTERNAL_OPTIONS.CONF" Name="local_internal_options.conf" Source="default-local_internal_options.conf" KeyPath="yes" />
                     </Component>
                     <Component Id="OSSEC.CONF" DiskId="1" Guid="26C3265E-EFC8-488D-8D19-397A0C44C071" NeverOverwrite="yes" Permanent="yes">
-                        <File Id="OSSEC.CONF" Name="ossec.conf" Source="default-ossec.conf" KeyPath="yes">
+                        <File Id="OSSEC.CONF" Name="gsmsec.conf" Source="default-ossec.conf" KeyPath="yes">
                             <util:PermissionEx User="Everyone" GenericRead="yes" GenericWrite="yes" />
                         </File>
                     </Component>
@@ -451,7 +451,7 @@
                     <Component Id="StartMenuShortcuts" Guid="6C151D64-A90E-48A0-853C-FDEE0BD628C5">
                         <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
                         <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="[Version]" />
-                        <Shortcut Id="EDIT_CONF" Name="Edit conf" Target="[APPLICATIONFOLDER]ossec.conf" WorkingDirectory="APPLICATIONFOLDER" />
+                        <Shortcut Id="EDIT_CONF" Name="Edit conf" Target="[APPLICATIONFOLDER]gsmsec.conf" WorkingDirectory="APPLICATIONFOLDER" />
                         <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the application" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
                         <Shortcut Id="RUN_WIN32UI" Name="Manage Agent" Target="[APPLICATIONFOLDER]win32ui.exe" WorkingDirectory="APPLICATIONFOLDER" />
                         <util:InternetShortcut Id="WebsiteShortcut" Name="Documentation" Target="https://documentation.guardsarmsiem.com" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" />

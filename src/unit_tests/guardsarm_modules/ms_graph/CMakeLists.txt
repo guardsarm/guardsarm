@@ -1,9 +1,6 @@
 # Copyright (C) 2023, InfoDefense Inc.
 #
-# This program is free software; you can redistribute it
-# and/or modify it under the terms of the GNU General Public
-# License (version 2) as published by the FSF - Free Software
-# Foundation.
+# Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
 
 #include wrappers
 include(${SRC_FOLDER}/unit_tests/wrappers/guardsarm/shared/shared.cmake)

@@ -1,9 +1,9 @@
 {
-    "product_name": "GuardSarm",
-    "product_short_name": "GuardSarm",
+    "product_name": "GuardsArm",
+    "product_short_name": "GuardsArm",
     "product_id": "guardsarm",
     "product_upper": "GUARDSARM",
-    "product_version": "1.0.0",
+    "product_version": "2.0.0",
     "vendor_name": "GuardSarm",
     "legal_entity": "GuardSarm, Inc.",
     "author": "GuardSarm",

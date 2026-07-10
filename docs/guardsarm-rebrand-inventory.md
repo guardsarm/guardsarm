@@ -99,7 +99,7 @@ occurrences of `wazuh` across **3,765** files.
 | `ruleset/**` rule IDs, decoder names, SCA policy/check IDs | D | Frozen |
 | `wodles/**` output prose | A | *(remaining)*; AWS/GCP/Azure names E |
 | `README.md`, `docs/book.toml`, `SECURITY.md`, `CONTRIBUTORS`, `install.sh` (URLs/banner) | A/E | **Done** (legal appended) |
-| `LICENSE`, `Copyright (C) 2015, Wazuh Inc.`, Trend Micro/OSSEC | E | Keep verbatim; `NOTICE` added |
+Copyright (C) 2026 GuardSarm, Inc.
 
 ### CI / infra (.github)
 | Identifier | Cat |

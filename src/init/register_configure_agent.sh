@@ -1,16 +1,12 @@
 #!/bin/bash
 
-# Copyright (C) 2015, Wazuh Inc.
-# Copyright (C) 2026, GuardSarm.
+# Copyright (C) 2026 GuardSarm, Inc.
 #
-# This program is free software; you can redistribute it
-# and/or modify it under the terms of the GNU General Public
-# License (version 2) as published by the FSF - Free Software
-# Foundation.
+# Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
 
 # Global variables
 INSTALLDIR=${1}
-CONF_FILE="${INSTALLDIR}/etc/ossec.conf"
+CONF_FILE="${INSTALLDIR}/etc/gsmsec.conf"
 TMP_ENROLLMENT="${INSTALLDIR}/tmp/enrollment-configuration"
 TMP_SERVER="${INSTALLDIR}/tmp/server-configuration"
 GUARDSARM_REGISTRATION_PASSWORD_PATH="etc/authd.pass"
@@ -42,7 +38,7 @@ edit_value_tag() {
     fi
 
     if [ "$?" != "0" ]; then
-        echo "$(date '+%Y/%m/%d %H:%M:%S') Error updating $2 with variable $1." >> "${INSTALLDIR}/logs/ossec.log"
+        echo "$(date '+%Y/%m/%d %H:%M:%S') Error updating $2 with variable $1." >> "${INSTALLDIR}/logs/gsmsec.log"
     fi
 
 }
@@ -194,7 +190,7 @@ add_auto_enrollment () {
     if [ -n "${start_config}" ] && [ -n "${end_config}" ]; then
         start_config=$(( start_config + 1 ))
         end_config=$(( end_config - 1 ))
-        sed -n "${start_config},${end_config}p" "${INSTALLDIR}/etc/ossec.conf" >> "${TMP_ENROLLMENT}"
+        sed -n "${start_config},${end_config}p" "${INSTALLDIR}/etc/gsmsec.conf" >> "${TMP_ENROLLMENT}"
     else
         # Write the client configuration block
         {
@@ -252,10 +248,10 @@ main () {
     get_deprecated_vars
 
     if [ -n "${GUARDSARM_MANAGER}" ]; then
-        if [ ! -f "${INSTALLDIR}/logs/ossec.log" ]; then
-            touch -f "${INSTALLDIR}/logs/ossec.log"
-            chmod 660 "${INSTALLDIR}/logs/ossec.log"
-            chown root:guardsarm "${INSTALLDIR}/logs/ossec.log"
+        if [ ! -f "${INSTALLDIR}/logs/gsmsec.log" ]; then
+            touch -f "${INSTALLDIR}/logs/gsmsec.log"
+            chmod 660 "${INSTALLDIR}/logs/gsmsec.log"
+            chown root:guardsarm "${INSTALLDIR}/logs/gsmsec.log"
         fi
 
         # Check if multiples IPs are defined in variable GUARDSARM_MANAGER

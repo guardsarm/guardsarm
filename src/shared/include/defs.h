@@ -1,11 +1,8 @@
-/* Copyright (C) 2015, Wazuh Inc.
+/* Copyright (C) 2026 GuardSarm, Inc.
  * Copyright (C) 2009-2012 Trend Micro Inc.
  * All rights reserved.
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License (version 2) as published by the FSF - Free Software
- * Foundation.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
 /* Global Definitions */
@@ -80,15 +77,15 @@
  * User-visible branding lives in the PRODUCT_* macros (branding.h), NOT here. */
 #define __guardsarm_name    "GuardSarm"       /* FROZEN: wire/DB/metadata literal -- see note above */
 #define __guardsarm_version "v2.0.0"      /* FROZEN: version compat literal -- see note above */
-#define __author        "Wazuh Inc."
+#define __author        "GuardSarm, Inc."
 #define __contact       "info@guardsarmsiem.com"
 #define __site          "http://www.guardsarmsiem.com"
 #define __license                                                                                                      \
     "\
-This program is free software; you can redistribute it and/or modify\n\
-it under the terms of the GNU General Public License (version 2) as \n\
-published by the Free Software Foundation. For more details, go to \n\
-https://www.gnu.org/licenses/gpl.html\n"
+This software is proprietary and confidential. Unauthorized copying,\n\
+distribution, modification, or use is prohibited except under a written\n\
+license agreement with GuardSarm, Inc.\n\
+Copyright (C) 2026 GuardSarm, Inc. All rights reserved.\n"
 
 /* GuardSarm user-visible branding layer (PRODUCT_* display macros). Included
  * after the frozen literals above so PRODUCT_VERSION can fall back to

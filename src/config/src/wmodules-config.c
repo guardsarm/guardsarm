@@ -1,13 +1,9 @@
 /*
  * GuardSarm Module Configuration
- * Copyright (C) 2015, Wazuh Inc.
- * Copyright (C) 2026, GuardSarm.
+ * Copyright (C) 2026 GuardSarm, Inc.
  * April 25, 2016.
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License (version 2) as published by the FSF - Free Software
- * Foundation.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
 #include "wmodules.h"
@@ -96,7 +92,7 @@ int Read_WModule(const OS_XML *xml, xml_node *node, void *d1, void *d2)
         mwarn("The '%s' module only works for the agent", node->values[0]);
 #endif
     }
-#if defined(CLIENT) && !defined(WIN32)
+#if defined(CLIENT)
     else if (!strcmp(node->values[0], WM_EDR_CONTEXT.name)) {
         if (wm_edr_read(xml, children, cur_wmodule) < 0) {
             OS_ClearNode(children);

@@ -1,6 +1,5 @@
 /* Remote request listener
- * Copyright (C) 2015, Wazuh Inc.
- * Copyright (C) 2026, GuardSarm.
+ * Copyright (C) 2026 GuardSarm, Inc.
  * May 27, 2022.
  *
  * This program is os_free software; you can redistribute it

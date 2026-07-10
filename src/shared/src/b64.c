@@ -1,11 +1,9 @@
 /*
- * Copyright (C) 2015, Wazuh Inc.
- * Copyright (C) 2026, GuardSarm.
+ * Copyright (C) 2026 GuardSarm, Inc.
  * Copyright (C), 2000-2004 by the monit project group.
  * All Rights Reserved.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc. as
  * published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *

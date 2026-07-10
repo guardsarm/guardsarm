@@ -1,12 +1,8 @@
 /*
  * GuardSarm Vulnerability scanner - InventorySync Integration Test Tool
- * Copyright (C) 2015, Wazuh Inc.
- * Copyright (C) 2026, GuardSarm.
+ * Copyright (C) 2026 GuardSarm, Inc.
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License (version 2) as published by the FSF - Free Software
- * Foundation.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 #include "external/nlohmann/json.hpp"
 #include "flatbuffers/include/inventorySync_generated.h"

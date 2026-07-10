@@ -1182,10 +1182,12 @@ bool SecurityConfigurationAssessment::synchronizeDatabaseSnapshot(bool increaseV
                 }
                 else
                 {
-                    // No validator for this index: be restrictive and discard the message.
+                    // GuardSarm: no validator registered for this index -> fail OPEN
+                    // (persist) rather than discarding real SCA telemetry, matching the
+                    // syscollector/FIM schema-validator fail-open.
                     LoggingHelper::getInstance().log(LOG_WARNING,
-                                                     "No schema validator found for index: " + std::string(SCA_SYNC_INDEX) + ". Discarding message.");
-                    shouldPersist = false;
+                                                     "No schema validator found for index: " + std::string(SCA_SYNC_INDEX) + " — persisting anyway (fail-open).");
+                    shouldPersist = true;
                 }
             }
 

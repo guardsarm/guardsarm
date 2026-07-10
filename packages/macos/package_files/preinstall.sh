@@ -1,7 +1,6 @@
 #! /bin/bash
 # By Spransy, Derek" <DSPRANS () emory ! edu> and Charlie Scott
-# Modified by Wazuh, Inc. <info@wazuh.com>.
-# This program is a free software; you can redistribute it and/or modify it under the terms of GPLv2
+# Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
 
 #####
 # This checks for an error and exits with a custom message

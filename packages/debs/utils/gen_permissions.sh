@@ -2,12 +2,9 @@
 #
 # GuardSarm restore permissions script generator (ver 0.1)
 # Copyright (C) 2019 Wazuh Inc.
-# Copyright (C) 2026, GuardSarm.
+# Copyright (C) 2026 GuardSarm, Inc.
 #
-# This program is a free software; you can redistribute it
-# and/or modify it under the terms of the GNU General Public
-# License (version 2) as published by the FSF - Free Software
-# Foundation.
+# Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
 #
 # This scripts take 2 parameters, source_dir and target_dir
 # Remember: you must use gawk, be careful mawk is not compatible

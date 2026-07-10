@@ -1,7 +1,6 @@
 /*
  * GuardSarm Module for native EDR telemetry (process + network)
- * Copyright (C) 2015, Wazuh Inc.
- * Copyright (C) 2026, GuardSarm.
+ * Copyright (C) 2026 GuardSarm, Inc.
  *
  * Native on-agent endpoint telemetry collector. Watches /proc for short-lived
  * process executions (with parent lineage + command line + user) and active
@@ -9,10 +8,7 @@
  * the standard agent message queue. Replaces the external Python collector with
  * a first-class agent module compiled into guardsarm-modulesd.
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License (version 2) as published by the FSF - Free Software
- * Foundation.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
 #ifndef WM_EDR_H

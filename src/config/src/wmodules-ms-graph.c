@@ -3,10 +3,7 @@
  * Copyright (C) 2023, InfoDefense Inc.
  * March, 2023.
  *
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License (version 2) as published by the FSF - Free Software
- * Foundation.
+ * Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
  */
 
 #if defined WIN32 || defined __linux__ || defined __MACH__

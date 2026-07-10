@@ -1,8 +1,7 @@
 """
-Copyright (C) 2015-2024, Wazuh Inc.
-Copyright (C) 2026, GuardSarm.
+Copyright (C) 2026 GuardSarm, Inc.
 Created by Wazuh, Inc. <info@wazuh.com>.
-This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
+Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
 """
 
 from time import sleep

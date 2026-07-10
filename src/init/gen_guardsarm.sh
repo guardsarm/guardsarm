@@ -1,14 +1,10 @@
 #!/bin/sh
 
 # GuardSarm Configuration & Init Files Generator
-# Copyright (C) 2015, Wazuh Inc.
-# Copyright (C) 2026, GuardSarm.
+# Copyright (C) 2026 GuardSarm, Inc.
 # November 24, 2016.
 #
-# This program is free software; you can redistribute it
-# and/or modify it under the terms of the GNU General Public
-# License (version 2) as published by the FSF - Free Software
-# Foundation.
+# Proprietary and confidential property of GuardSarm, Inc. Unauthorized copying, distribution, modification, or use is prohibited except under a written license agreement with GuardSarm, Inc.
 
 # Looking up for the execution directory
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
@@ -21,7 +17,7 @@ Use()
   echo "   - install_type: manager, agent"
   echo "   - distribution: rhel, debian, ubuntu, ..."
   echo "   - version: 6, 7, 16.04, ..."
-  echo "   - installation_path (optional): changes the default path '/var/guardsarm-manager' for server and '/var/ossec' for agent"
+  echo "   - installation_path (optional): changes the default path '/var/guardsarm-manager' for server and '/var/gsmsec' for agent"
 }
 
 # Read script values
