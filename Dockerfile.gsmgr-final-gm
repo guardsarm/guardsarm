@@ -124,6 +124,17 @@ ENV LD_LIBRARY_PATH=/var/guardsarm-manager/lib:/var/guardsarm-manager/framework/
 # lets startup re-create it automatically (idempotent — only when the router table is empty).
 COPY activate_routes.py /var/guardsarm-manager/bin/activate_routes.py
 
+# Bake the shared agent.conf so every enrolled agent reports its ESTABLISHED network
+# connections out of the box (syscollector <ports all="yes">). This is what feeds the
+# Command Center Endpoint Threat Map from real agent telemetry (the applier's
+# apply_endpoint_threats job reads guardsarm-states-inventory-ports). Baking it here
+# makes it survive `docker rm`+`run`; the stale merged.mg is removed so the manager
+# regenerates it from this agent.conf at startup and agents pull it on next sync.
+COPY shared-agent.conf /var/guardsarm-manager/etc/shared/default/agent.conf
+RUN chown guardsarm-manager:guardsarm-manager /var/guardsarm-manager/etc/shared/default/agent.conf \
+ && chmod 660 /var/guardsarm-manager/etc/shared/default/agent.conf \
+ && rm -f /var/guardsarm-manager/etc/shared/default/merged.mg
+
 # reset ENTRYPOINT (the gm base was docker-committed from a sleep-infinity
 # container, which baked ENTRYPOINT ["sh"] and mangles the shell-form CMD).
 ENTRYPOINT []
