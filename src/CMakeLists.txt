@@ -110,6 +110,27 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   # response files
   add_compile_options(${MINGW_SYSTEM_INCLUDES})
 
+  # The mingw g++ cross-compiler driver on this toolchain does NOT append the C++
+  # runtime (libstdc++) to Windows shared-library (-shared) links, so C++ modules
+  # that use std::thread / std::condition_variable (agent_info.dll, sca.dll, ...)
+  # fail at link with "undefined reference to std::condition_variable::...". The
+  # original build only linked by accident because its CI image shipped a gcc whose
+  # driver did add it. Resolve it deterministically: append the compiler's own
+  # static libstdc++.a to CMAKE_CXX_STANDARD_LIBRARIES, which CMake always emits at
+  # the very end of every link line (correct static-link order, after the module
+  # archives that need it). Using the static .a also drops the external
+  # libstdc++-6.dll runtime dependency from the distributed agent. libgcc / winpthread
+  # are already supplied by the driver (-pthread) and other module import libs, so
+  # adding them here would duplicate unwind symbols (_Unwind_Resume) — do not.
+  execute_process(
+    COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=libstdc++.a
+    OUTPUT_VARIABLE GUARDSARM_LIBSTDCXX_A
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(EXISTS "${GUARDSARM_LIBSTDCXX_A}")
+    string(APPEND CMAKE_CXX_STANDARD_LIBRARIES " ${GUARDSARM_LIBSTDCXX_A}")
+    message(STATUS "GuardSarm: appended static libstdc++ to link: ${GUARDSARM_LIBSTDCXX_A}")
+  endif()
+
   # Disable response files for scan-build compatibility
   set(CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES OFF)
   set(CMAKE_C_USE_RESPONSE_FILE_FOR_INCLUDES OFF)
