@@ -361,6 +361,27 @@
                             <Component Id="BLOCK_IP.EXE" DiskId="1" Guid="249F3287-B69D-46F0-9EB8-3FED24998E07">
                                 <File Id="BLOCK_IP.EXE" Name="block-ip.exe" Source="..\build\bin\block-ip.exe" />
                             </Component>
+                            <Component Id="ISOLATE.EXE" DiskId="1" Guid="7A9E1C40-1001-4B21-9C3D-3FED24990001">
+                                <File Id="ISOLATE.EXE" Name="isolate.exe" Source="..\build\bin\isolate.exe" />
+                            </Component>
+                            <Component Id="KILL_PROCESS.EXE" DiskId="1" Guid="7A9E1C40-1002-4B21-9C3D-3FED24990002">
+                                <File Id="KILL_PROCESS.EXE" Name="kill-process.exe" Source="..\build\bin\kill-process.exe" />
+                            </Component>
+                            <Component Id="QUARANTINE_FILE.EXE" DiskId="1" Guid="7A9E1C40-1003-4B21-9C3D-3FED24990003">
+                                <File Id="QUARANTINE_FILE.EXE" Name="quarantine-file.exe" Source="..\build\bin\quarantine-file.exe" />
+                            </Component>
+                            <Component Id="BLOCK_HASH.EXE" DiskId="1" Guid="7A9E1C40-1004-4B21-9C3D-3FED24990004">
+                                <File Id="BLOCK_HASH.EXE" Name="block-hash.exe" Source="..\build\bin\block-hash.exe" />
+                            </Component>
+                            <Component Id="BLOCK_DOMAIN.EXE" DiskId="1" Guid="7A9E1C40-1005-4B21-9C3D-3FED24990005">
+                                <File Id="BLOCK_DOMAIN.EXE" Name="block-domain.exe" Source="..\build\bin\block-domain.exe" />
+                            </Component>
+                            <Component Id="REMOVE_PERSISTENCE.EXE" DiskId="1" Guid="7A9E1C40-1006-4B21-9C3D-3FED24990006">
+                                <File Id="REMOVE_PERSISTENCE.EXE" Name="remove-persistence.exe" Source="..\build\bin\remove-persistence.exe" />
+                            </Component>
+                            <Component Id="COLLECT_FORENSIC.EXE" DiskId="1" Guid="7A9E1C40-1007-4B21-9C3D-3FED24990007">
+                                <File Id="COLLECT_FORENSIC.EXE" Name="collect-forensic.exe" Source="..\build\bin\collect-forensic.exe" />
+                            </Component>
                             <Component Id="REMOVE_OLD_AR" Guid="E1915364-2E49-4B74-8DF9-5D6CC3B27DF0">
                                 <RemoveFile Id="AR_RESTART_OSSEC_CMD" Name="restart-ossec.cmd" On="install" />
                                 <RemoveFile Id="AR_RESTART_GUARDSARM_EXE" Name="restart-guardsarm.exe" On="install" />
@@ -632,6 +653,13 @@
             <ComponentRef Id="GUARDSARM_AGENT.EXE" />
             <ComponentRef Id="VISTA_SEC.TXT" />
             <ComponentRef Id="BLOCK_IP.EXE" />
+            <ComponentRef Id="ISOLATE.EXE" />
+            <ComponentRef Id="KILL_PROCESS.EXE" />
+            <ComponentRef Id="QUARANTINE_FILE.EXE" />
+            <ComponentRef Id="BLOCK_HASH.EXE" />
+            <ComponentRef Id="BLOCK_DOMAIN.EXE" />
+            <ComponentRef Id="REMOVE_PERSISTENCE.EXE" />
+            <ComponentRef Id="COLLECT_FORENSIC.EXE" />
             <ComponentRef Id="ACTIVE_RESPONSES.LOG" />
             <ComponentRef Id="StartMenuShortcuts" />
             <ComponentRef Id="WIN32UI.EXE" />
