@@ -34,19 +34,45 @@ int main(int argc, char **argv) {
 
 #ifdef WIN32
     // Windows: block all inbound+outbound via Defender Firewall (restore = allow).
+    // NOTE: resolve "netsh.exe" (with extension, as block-ip-windows.c does) — a bare
+    // "netsh" may not resolve for CreateProcess, and check the child exit code so a failed
+    // netsh is reported instead of silently claiming isolation. Absolute System32 fallback.
     char *cmd_path = NULL;
-    if (get_binary_path("netsh", &cmd_path) < 0) {
+    if (get_binary_path("netsh.exe", &cmd_path) < 0) {
+        os_free(cmd_path);
+        cmd_path = NULL;
+        char sysdir[OS_MAXSTR] = {0};
+        if (GetSystemDirectory(sysdir, OS_MAXSTR)) {
+            char full[OS_MAXSTR];
+            snprintf(full, OS_MAXSTR - 1, "%s\\netsh.exe", sysdir);
+            os_strdup(full, cmd_path);
+        }
+    }
+    if (!cmd_path) {
         write_debug_file(argv[0], "netsh not found");
-        cJSON_Delete(input_json); os_free(cmd_path); return OS_INVALID;
+        cJSON_Delete(input_json); return OS_INVALID;
+    }
+    {
+        char dbg[OS_MAXSTR];
+        snprintf(dbg, OS_MAXSTR - 1, "Using netsh at '%s'", cmd_path);
+        write_debug_file(argv[0], dbg);
     }
     const char *policy = (action == ENABLE_COMMAND) ? "blockinbound,blockoutbound" : "blockinbound,allowoutbound";
-    char *nargs[6] = { cmd_path, "advfirewall", "set", "allprofiles", "firewallpolicy", NULL };
-    // firewallpolicy takes the value as the next token
     char *pargs[7] = { cmd_path, "advfirewall", "set", "allprofiles", "firewallpolicy", (char *)policy, NULL };
-    (void)nargs;
+    int rc = -1;
     wfd_t *wfd = wpopenv(cmd_path, pargs, W_BIND_STDERR);
-    if (wfd) wpclose(wfd);
-    write_debug_file(argv[0], action == ENABLE_COMMAND ? "Isolated (firewall block policy)" : "Un-isolated (firewall restored)");
+    if (wfd) {
+        rc = wpclose(wfd);
+    } else {
+        write_debug_file(argv[0], "Unable to execute netsh advfirewall set firewallpolicy");
+    }
+    if (rc == 0) {
+        write_debug_file(argv[0], action == ENABLE_COMMAND ? "Isolated (firewall block policy)" : "Un-isolated (firewall restored)");
+    } else {
+        char m[OS_MAXSTR];
+        snprintf(m, OS_MAXSTR - 1, "netsh firewallpolicy set returned exit code %d", rc);
+        write_debug_file(argv[0], m);
+    }
     os_free(cmd_path);
 #else
     char *bin = NULL;
