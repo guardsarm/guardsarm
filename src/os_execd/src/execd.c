@@ -255,9 +255,21 @@ void ExecdRun(char *exec_msg, int *childcount)
         return;
     }
 
-    /* Build full command path */
+    /* Build full command path. The executable name in the AR message is extensionless
+     * (e.g. "kill-process"); on Windows the installed AR binaries carry a .exe suffix, so
+     * append it (idempotently) — otherwise the wfopen() existence check below fails and
+     * every AR is rejected as "Invalid command name" (1311). POSIX binaries are
+     * extensionless, so the suffix is only added on Windows. */
     static char cmd_path[OS_FLSIZE];
-    if (snprintf(cmd_path, sizeof(cmd_path), "%s/%s", AR_BINDIR, name) >= (int)sizeof(cmd_path)) {
+    int cmd_path_len;
+#ifdef WIN32
+    size_t name_len = strlen(name);
+    int has_exe = (name_len >= 4) && (strcasecmp(name + name_len - 4, ".exe") == 0);
+    cmd_path_len = snprintf(cmd_path, sizeof(cmd_path), "%s/%s%s", AR_BINDIR, name, has_exe ? "" : ".exe");
+#else
+    cmd_path_len = snprintf(cmd_path, sizeof(cmd_path), "%s/%s", AR_BINDIR, name);
+#endif
+    if (cmd_path_len >= (int)sizeof(cmd_path)) {
         merror("Active response command path too long for '%s'. Ignoring.", name);
         cJSON_Delete(json_root);
         return;

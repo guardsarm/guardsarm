@@ -11,8 +11,12 @@
 #include "active_responses.h"
 #include <time.h>
 
-#ifndef WIN32
+#ifdef WIN32
+#include <direct.h>
+#define ar_mkdir(d) _mkdir(d)
+#else
 #include <sys/stat.h>
+#define ar_mkdir(d) mkdir((d), 0700)
 #endif
 
 #define FORENSIC_DIR "forensics"
@@ -50,9 +54,7 @@ int main(int argc, char **argv) {
         return OS_SUCCESS;
     }
 
-#ifndef WIN32
-    mkdir(FORENSIC_DIR, 0700);
-#endif
+    ar_mkdir(FORENSIC_DIR);
     time_t now = time(NULL);
     memset(path, '\0', OS_MAXSTR);
     snprintf(path, OS_MAXSTR - 1, "%s/triage-%ld.txt", FORENSIC_DIR, (long)now);

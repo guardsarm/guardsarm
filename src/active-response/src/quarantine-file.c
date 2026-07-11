@@ -10,8 +10,12 @@
 
 #include "active_responses.h"
 
-#ifndef WIN32
+#ifdef WIN32
+#include <direct.h>
+#define ar_mkdir(d) _mkdir(d)
+#else
 #include <sys/stat.h>
+#define ar_mkdir(d) mkdir((d), 0700)
 #endif
 
 #define QUARANTINE_DIR "quarantine"
@@ -46,9 +50,7 @@ int main(int argc, char **argv) {
     snprintf(dest, OS_MAXSTR - 1, "%s/%s.quarantined", QUARANTINE_DIR, base);
 
     if (action == ENABLE_COMMAND) {
-#ifndef WIN32
-        mkdir(QUARANTINE_DIR, 0700);
-#endif
+        ar_mkdir(QUARANTINE_DIR);
         if (rename(path, dest) != 0) {
             memset(log_msg, '\0', OS_MAXSTR);
             snprintf(log_msg, OS_MAXSTR - 1, "Failed to quarantine '%s': %s", path, strerror(errno));
