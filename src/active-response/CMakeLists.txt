@@ -99,6 +99,15 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows" AND NOT CMAKE_SYSTEM_NAME STREQUAL "
   # Build other Unix/Linux/BSD active response programs
   add_active_response_executable(
     disable-account ${CMAKE_CURRENT_SOURCE_DIR}/src/disable-account.c)
+
+  # GuardSarm Response 2.0 active responses
+  add_active_response_executable(kill-process ${CMAKE_CURRENT_SOURCE_DIR}/src/kill-process.c)
+  add_active_response_executable(quarantine-file ${CMAKE_CURRENT_SOURCE_DIR}/src/quarantine-file.c)
+  add_active_response_executable(block-domain ${CMAKE_CURRENT_SOURCE_DIR}/src/block-domain.c)
+  add_active_response_executable(block-hash ${CMAKE_CURRENT_SOURCE_DIR}/src/block-hash.c)
+  add_active_response_executable(isolate ${CMAKE_CURRENT_SOURCE_DIR}/src/isolate.c)
+  add_active_response_executable(remove-persistence ${CMAKE_CURRENT_SOURCE_DIR}/src/remove-persistence.c)
+  add_active_response_executable(collect-forensic ${CMAKE_CURRENT_SOURCE_DIR}/src/collect-forensic.c)
 endif()
 
 # Build macOS-specific block-ip active response
@@ -119,6 +128,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   # Build other macOS active response programs
   add_active_response_executable(
     disable-account ${CMAKE_CURRENT_SOURCE_DIR}/src/disable-account.c)
+
+  # GuardSarm Response 2.0 active responses
+  add_active_response_executable(kill-process ${CMAKE_CURRENT_SOURCE_DIR}/src/kill-process.c)
+  add_active_response_executable(quarantine-file ${CMAKE_CURRENT_SOURCE_DIR}/src/quarantine-file.c)
+  add_active_response_executable(block-domain ${CMAKE_CURRENT_SOURCE_DIR}/src/block-domain.c)
+  add_active_response_executable(block-hash ${CMAKE_CURRENT_SOURCE_DIR}/src/block-hash.c)
+  add_active_response_executable(isolate ${CMAKE_CURRENT_SOURCE_DIR}/src/isolate.c)
+  add_active_response_executable(remove-persistence ${CMAKE_CURRENT_SOURCE_DIR}/src/remove-persistence.c)
+  add_active_response_executable(collect-forensic ${CMAKE_CURRENT_SOURCE_DIR}/src/collect-forensic.c)
 endif()
 
 # Build Windows active responses
@@ -140,4 +158,20 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     block-ip PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/bin
                        OUTPUT_NAME block-ip)
   target_link_libraries(block-ip PRIVATE guardsarm ${GUARDSARM_WINDOWS_LIBS})
+
+  # GuardSarm Response 2.0 active responses (Windows).
+  function(add_windows_ar name source)
+    add_executable(${name} ${source} $<TARGET_OBJECTS:win32_stubs> ${RESOURCE_OBJ_APP})
+    target_compile_definitions(${name} PRIVATE ARGV0="${name}" PLATFORM_WINDOWS=1)
+    set_target_properties(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/bin
+                         OUTPUT_NAME ${name})
+    target_link_libraries(${name} PRIVATE guardsarm ${GUARDSARM_WINDOWS_LIBS})
+  endfunction()
+  add_windows_ar(kill-process ${CMAKE_CURRENT_SOURCE_DIR}/src/kill-process.c)
+  add_windows_ar(quarantine-file ${CMAKE_CURRENT_SOURCE_DIR}/src/quarantine-file.c)
+  add_windows_ar(block-domain ${CMAKE_CURRENT_SOURCE_DIR}/src/block-domain.c)
+  add_windows_ar(block-hash ${CMAKE_CURRENT_SOURCE_DIR}/src/block-hash.c)
+  add_windows_ar(isolate ${CMAKE_CURRENT_SOURCE_DIR}/src/isolate.c)
+  add_windows_ar(remove-persistence ${CMAKE_CURRENT_SOURCE_DIR}/src/remove-persistence.c)
+  add_windows_ar(collect-forensic ${CMAKE_CURRENT_SOURCE_DIR}/src/collect-forensic.c)
 endif()

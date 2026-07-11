@@ -838,6 +838,12 @@ InstallCommon()
     ${INSTALL} -d -m 0750 -o root -g ${GUARDSARM_GROUP} ${INSTALLDIR}/active-response/bin
     ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} build/bin/block-ip ${INSTALLDIR}/active-response/bin/
     ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} build/bin/disable-account ${INSTALLDIR}/active-response/bin/
+    # GuardSarm Response 2.0 active responses (installed when built).
+    for _ar in kill-process quarantine-file block-domain block-hash isolate remove-persistence collect-forensic; do
+      if [ -f "build/bin/${_ar}" ]; then
+        ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} "build/bin/${_ar}" ${INSTALLDIR}/active-response/bin/
+      fi
+    done
   fi
 
   ${INSTALL} -d -m 0750 -o root -g ${GUARDSARM_GROUP} ${INSTALLDIR}/var

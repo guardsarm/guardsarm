@@ -1,0 +1,80 @@
+# GuardSarm agent image (updated) — built FROM the CURRENT gm base (latest source:
+# gm_ rename, relicense, protobuf/bootstrap fixes). Compiles the agent target,
+# installs as an agent, and enrolls to the running gm manager at startup.
+#
+# The agent-only external deps (libdb/popt/lua/rpm/dbus/libbpf-bootstrap) can no
+# longer be fetched (the RESOURCES_URL mirror is gone), but the prior native agent
+# image already has them built — so we copy them in and skip `make deps`.
+FROM guardsarm-agent:2.0.0-native AS agentdeps
+
+FROM guardsarm-mgr-base:2.0.0-gm
+
+# Bring in the pre-built agent external deps that the manager base never fetched.
+COPY --from=agentdeps /build/guardsarm/src/external/popt            /build/guardsarm/src/external/popt
+COPY --from=agentdeps /build/guardsarm/src/external/libdb           /build/guardsarm/src/external/libdb
+COPY --from=agentdeps /build/guardsarm/src/external/lua             /build/guardsarm/src/external/lua
+COPY --from=agentdeps /build/guardsarm/src/external/rpm             /build/guardsarm/src/external/rpm
+COPY --from=agentdeps /build/guardsarm/src/external/dbus            /build/guardsarm/src/external/dbus
+COPY --from=agentdeps /build/guardsarm/src/external/libbpf-bootstrap /build/guardsarm/src/external/libbpf-bootstrap
+
+# LF line endings + libwazuhext soname alias (same as the manager image).
+RUN find /build/guardsarm -name '*.sh' -exec sed -i 's/\r$//' {} + \
+ && sed -i 's/\r$//' /build/guardsarm/install.sh
+RUN cp /build/guardsarm/src/build/lib/libguardsarmext.so /build/guardsarm/src/build/lib/libwazuhext.so 2>/dev/null || true
+
+# Rebrand the indexer-plugin schema JSONs BEFORE the agent build: CMake embeds these
+# into libschema_validator.so and the agent validates every stateful message locally
+# against them before transmission. Without this the validator keys stay wazuh-* and
+# the agent discards ALL guardsarm-states-* data ("No schema validator found …").
+RUN sed -i 's/wazuh/guardsarm/g' /build/guardsarm/src/external/indexer-plugins/*.json \
+ && ! grep -l wazuh /build/guardsarm/src/external/indexer-plugins/*.json
+
+# Overlay the current active-response source (new Response 2.0 AR scripts +
+# CMakeLists) and the installer over the base image's baked source, so the new
+# AR executables compile and get installed. The base has the older tree.
+COPY src/active-response/src/ /build/guardsarm/src/active-response/src/
+COPY src/active-response/CMakeLists.txt /build/guardsarm/src/active-response/CMakeLists.txt
+COPY src/init/inst-functions.sh /build/guardsarm/src/init/inst-functions.sh
+RUN sed -i 's/\r$//' /build/guardsarm/src/init/inst-functions.sh
+
+WORKDIR /build/guardsarm/src
+# Deps already present (copied above) — compile the agent target directly.
+RUN make TARGET=agent INDEXER_PLUGINS_REFS=main -j"$(nproc)" 2>&1 | tail -5
+
+WORKDIR /build/guardsarm
+# Install to the REBRANDED agent home /var/gsmsec (install.sh already defaults the
+# agent here; the old Dockerfile wrongly forced /var/ossec). Paths below match.
+ENV LD_LIBRARY_PATH=/build/guardsarm/src/build/lib:/build/guardsarm/src/external/jemalloc/lib:/var/gsmsec/lib
+RUN USER_LANGUAGE=en USER_NO_STOP=y USER_INSTALL_TYPE=agent USER_DIR=/var/gsmsec \
+    USER_ENABLE_SYSCHECK=y USER_ENABLE_ROOTCHECK=y USER_ENABLE_SYSCOLLECTOR=y \
+    USER_ENABLE_ACTIVE_RESPONSE=y USER_AGENT_SERVER_IP=host.docker.internal \
+    USER_AUTO_START=n USER_BINARYINSTALL=yes \
+    bash install.sh
+
+RUN ln -sf libguardsarmext.so /var/gsmsec/lib/libwazuhext.so 2>/dev/null || true; \
+    cp -a /build/guardsarm/src/external/jemalloc/lib/libjemalloc.so.2 /var/gsmsec/lib/ 2>/dev/null || true
+
+# Branded agent home: w_homedir() honors GUARDSARM_AGENT_HOME before resolving
+# /proc/self/exe (mirrors the manager's GUARDSARM_MANAGER_HOME).
+ENV GUARDSARM_AGENT_HOME=/var/gsmsec
+ENV LD_LIBRARY_PATH=/var/gsmsec/lib
+
+# Reset the ENTRYPOINT (the gm base was docker-committed with ENTRYPOINT ["sh"],
+# which mangles the shell-form CMD below).
+ENTRYPOINT []
+# Enrollment password (authd use_password=yes) — NOT baked in (no secrets in the image).
+# Pass at runtime: docker run -e GS_ENROLL_PASS="$(docker exec gsmgr cat /var/guardsarm-manager/etc/authd.pass)"
+ENV GS_ENROLL_PASS=""
+# Config-based enroll to the gm manager (authd 7515) + connect (remoted 7514), then run.
+# NOTE: authd.pass MUST be written with printf (no trailing newline) and be readable by
+# the guardsarm user, else agentd reports "No authentication password provided".
+CMD bash -c '\
+  CONF=/var/gsmsec/etc/gsmsec.conf; \
+  sed -i "s#<address>[^<]*</address>#<address>host.docker.internal</address>#" "$CONF"; \
+  sed -i "0,/<port>1514</s//<port>7514</" "$CONF"; \
+  grep -q "<enrollment>" "$CONF" || sed -i "s#</manager>#</manager>\n    <enrollment><enabled>yes</enabled><manager_address>host.docker.internal</manager_address><port>7515</port><authorization_pass_path>etc/authd.pass</authorization_pass_path></enrollment>#" "$CONF"; \
+  printf "%s" "$GS_ENROLL_PASS" > /var/gsmsec/etc/authd.pass; chmod 644 /var/gsmsec/etc/authd.pass; \
+  ( /var/gsmsec/bin/guardsarm-control start || true ); \
+  sleep 5; \
+  echo "=== agent daemons ==="; /var/gsmsec/bin/guardsarm-control status 2>/dev/null || ps -e | grep -i guardsarm; \
+  touch /var/gsmsec/logs/gsmsec.log; tail -f /var/gsmsec/logs/gsmsec.log'
