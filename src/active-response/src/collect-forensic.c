@@ -9,10 +9,10 @@
  * Message may carry a top-level "target" label. ENABLE collects; DISABLE is a no-op. */
 
 #include "active_responses.h"
+#include <time.h>
 
 #ifndef WIN32
 #include <sys/stat.h>
-#include <time.h>
 #endif
 
 #define FORENSIC_DIR "forensics"

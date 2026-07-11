@@ -10,18 +10,30 @@
  * DISABLE is a no-op (removal is not auto-reversible). */
 
 #include "active_responses.h"
+#include <ctype.h>
 
 #ifndef WIN32
 #include <sys/stat.h>
 #endif
 
+// Portable case-insensitive substring search (mingw has no strcasestr).
+static const char *ci_strstr(const char *hay, const char *needle) {
+    if (!*needle) return hay;
+    for (; *hay; hay++) {
+        const char *h = hay, *n = needle;
+        while (*h && *n && tolower((unsigned char)*h) == tolower((unsigned char)*n)) { h++; n++; }
+        if (!*n) return hay;
+    }
+    return NULL;
+}
+
 // Only allow removal under recognised persistence locations (defence-in-depth:
 // never let a malformed message delete arbitrary system files).
 static int is_persistence_path(const char *p) {
 #ifdef WIN32
-    return (strcasestr(p, "\\Startup\\") != NULL) ||
-           (strcasestr(p, "\\Start Menu\\Programs\\Startup") != NULL) ||
-           (strcasestr(p, "Microsoft\\Windows\\Start Menu") != NULL);
+    return (ci_strstr(p, "\\Startup\\") != NULL) ||
+           (ci_strstr(p, "\\Start Menu\\Programs\\Startup") != NULL) ||
+           (ci_strstr(p, "Microsoft\\Windows\\Start Menu") != NULL);
 #else
     const char *dirs[] = {
         "/etc/cron", "/var/spool/cron", "/etc/systemd/system", "/lib/systemd/system",
