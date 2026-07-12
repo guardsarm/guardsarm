@@ -4,7 +4,7 @@
          Software\[Manufacturer]\[ProductName] (see RegistrySearch below) that do_upgrade.ps1
          reads to locate an install - keep the two in sync. A fresh UpgradeCode is used since
          GuardSarm is a distinct product from the upstream lineage. -->
-    <Product Id="*" Name="GuardSarm Agent" Language="1033" Version="2.0.0" Manufacturer="GuardSarm, Inc." UpgradeCode="B99F1031-0B64-47A3-A0D6-75F7962E3A80">
+    <Product Id="*" Name="GuardSarm Agent" Language="1033" Version="2.4.0" Manufacturer="GuardSarm, Inc." UpgradeCode="B99F1031-0B64-47A3-A0D6-75F7962E3A80">
         <Package Description="GuardSarm helps you to gain security visibility into your infrastructure by monitoring hosts at an operating system and application level. It provides the following capabilities: log analysis, file integrity monitoring, intrusions detection and policy and compliance monitoring" Comments="guardsarm-agent" InstallerVersion="200" Compressed="yes" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" CompressionLevel="high" />
 
@@ -382,6 +382,9 @@
                             <Component Id="COLLECT_FORENSIC.EXE" DiskId="1" Guid="7A9E1C40-1007-4B21-9C3D-3FED24990007">
                                 <File Id="COLLECT_FORENSIC.EXE" Name="collect-forensic.exe" Source="..\build\bin\collect-forensic.exe" />
                             </Component>
+                            <Component Id="REPAIR_NETWORK.EXE" DiskId="1" Guid="7A9E1C40-1008-4B21-9C3D-3FED24990008">
+                                <File Id="REPAIR_NETWORK.EXE" Name="repair-network.exe" Source="..\build\bin\repair-network.exe" />
+                            </Component>
                             <Component Id="REMOVE_OLD_AR" Guid="E1915364-2E49-4B74-8DF9-5D6CC3B27DF0">
                                 <RemoveFile Id="AR_RESTART_OSSEC_CMD" Name="restart-ossec.cmd" On="install" />
                                 <RemoveFile Id="AR_RESTART_GUARDSARM_EXE" Name="restart-guardsarm.exe" On="install" />
@@ -660,6 +663,7 @@
             <ComponentRef Id="BLOCK_DOMAIN.EXE" />
             <ComponentRef Id="REMOVE_PERSISTENCE.EXE" />
             <ComponentRef Id="COLLECT_FORENSIC.EXE" />
+            <ComponentRef Id="REPAIR_NETWORK.EXE" />
             <ComponentRef Id="ACTIVE_RESPONSES.LOG" />
             <ComponentRef Id="StartMenuShortcuts" />
             <ComponentRef Id="WIN32UI.EXE" />

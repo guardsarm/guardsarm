@@ -161,8 +161,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
   # GuardSarm Response 2.0 active responses (Windows).
   function(add_windows_ar name source)
-    add_executable(${name} ${source} $<TARGET_OBJECTS:win32_stubs> ${RESOURCE_OBJ_APP})
+    add_executable(${name} ${source} ${ARGN} $<TARGET_OBJECTS:win32_stubs> ${RESOURCE_OBJ_APP})
     target_compile_definitions(${name} PRIVATE ARGV0="${name}" PLATFORM_WINDOWS=1)
+    target_include_directories(${name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     set_target_properties(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/bin
                          OUTPUT_NAME ${name})
     target_link_libraries(${name} PRIVATE guardsarm ${GUARDSARM_WINDOWS_LIBS})
@@ -171,7 +172,19 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   add_windows_ar(quarantine-file ${CMAKE_CURRENT_SOURCE_DIR}/src/quarantine-file.c)
   add_windows_ar(block-domain ${CMAKE_CURRENT_SOURCE_DIR}/src/block-domain.c)
   add_windows_ar(block-hash ${CMAKE_CURRENT_SOURCE_DIR}/src/block-hash.c)
-  add_windows_ar(isolate ${CMAKE_CURRENT_SOURCE_DIR}/src/isolate.c)
   add_windows_ar(remove-persistence ${CMAKE_CURRENT_SOURCE_DIR}/src/remove-persistence.c)
   add_windows_ar(collect-forensic ${CMAKE_CURRENT_SOURCE_DIR}/src/collect-forensic.c)
+
+  # Endpoint isolation (WFP) + the standalone network-repair / recovery watchdog.
+  # Both compile the WFP engine and link the Windows Filtering Platform user-mode
+  # client (fwpuclnt) + Winsock (ws2_32) for connectivity probing/allow-list parse.
+  add_windows_ar(isolate
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/isolate.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/helpers/wfp_isolation.c)
+  target_link_libraries(isolate PRIVATE fwpuclnt ws2_32 iphlpapi)
+
+  add_windows_ar(repair-network
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/repair-network.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/helpers/wfp_isolation.c)
+  target_link_libraries(repair-network PRIVATE fwpuclnt ws2_32 iphlpapi advapi32)
 endif()
