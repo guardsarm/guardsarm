@@ -7,4 +7,4 @@ guardsarm-agent: non-standard-dir-in-var
 guardsarm-agent: file-in-unusual-dir
 guardsarm-agent: hardening-no-fortify-functions
 guardsarm-agent: hardening-no-relro
-guardsarm-agent: binary-from-other-architecture var/ossec/lib/modern.bpf.o
+guardsarm-agent: binary-from-other-architecture var/gsmsec/lib/modern.bpf.o

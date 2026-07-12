@@ -289,6 +289,56 @@ static DWORD add_permit_port(HANDLE engine, const GUID *layer, UINT8 proto,
     return add_permit(engine, layer, conds, 2, added);
 }
 
+/* Permit (protocol + remote port) but ONLY to a specific allow-list host/CIDR.
+ * Combines the remote-address condition (v4/v6, honouring the CIDR prefix) with
+ * protocol + remote port, so a "manager port" is scoped to the manager and never
+ * opened to the whole internet. FwpmFilterAdd0 consumes the conditions synchronously,
+ * so the static mask structs (shared with add_permit_addr_*) are safe here too. */
+static DWORD add_permit_addr_port(HANDLE engine, const GUID *layer,
+                                  const wfp_allow_entry *e, UINT8 proto,
+                                  UINT16 port, int *added) {
+    FWPM_FILTER_CONDITION0 conds[3];
+    memset(conds, 0, sizeof(conds));
+    conds[0].fieldKey  = FWPM_CONDITION_IP_REMOTE_ADDRESS;
+    conds[0].matchType = FWP_MATCH_EQUAL;
+    if (e->family == AF_INET) {
+        UINT32 host = ((UINT32)e->addr[0] << 24) | ((UINT32)e->addr[1] << 16) |
+                      ((UINT32)e->addr[2] << 8)  |  (UINT32)e->addr[3];
+        if (e->prefix >= 32) {
+            conds[0].conditionValue.type   = FWP_UINT32;
+            conds[0].conditionValue.uint32 = host;
+        } else {
+            static FWP_V4_ADDR_AND_MASK am;
+            am.addr = host;
+            am.mask = (e->prefix == 0) ? 0 : (0xFFFFFFFFu << (32 - e->prefix));
+            conds[0].conditionValue.type       = FWP_V4_ADDR_MASK;
+            conds[0].conditionValue.v4AddrMask = &am;
+        }
+    } else {
+        if (e->prefix >= 128) {
+            static FWP_BYTE_ARRAY16 b16;
+            memcpy(b16.byteArray16, e->addr, 16);
+            conds[0].conditionValue.type        = FWP_BYTE_ARRAY16_TYPE;
+            conds[0].conditionValue.byteArray16 = &b16;
+        } else {
+            static FWP_V6_ADDR_AND_MASK am6;
+            memcpy(am6.addr, e->addr, 16);
+            am6.prefixLength = (UINT8)e->prefix;
+            conds[0].conditionValue.type       = FWP_V6_ADDR_MASK;
+            conds[0].conditionValue.v6AddrMask = &am6;
+        }
+    }
+    conds[1].fieldKey             = FWPM_CONDITION_IP_PROTOCOL;
+    conds[1].matchType            = FWP_MATCH_EQUAL;
+    conds[1].conditionValue.type  = FWP_UINT8;
+    conds[1].conditionValue.uint8 = proto;
+    conds[2].fieldKey              = FWPM_CONDITION_IP_REMOTE_PORT;
+    conds[2].matchType             = FWP_MATCH_EQUAL;
+    conds[2].conditionValue.type   = FWP_UINT16;
+    conds[2].conditionValue.uint16 = port;
+    return add_permit(engine, layer, conds, 3, added);
+}
+
 /* --------------------------------------------------------------------------- */
 /* Remove all GuardsArm filters (by provider), then sub-layer + provider.      */
 /* Must run inside a transaction.                                              */
@@ -362,9 +412,20 @@ int wfp_isolate(const wfp_isolation_cfg *cfg, wfp_report *rep) {
             if (!is_v4 && e->family == AF_INET6){ if ((op = add_permit_addr_v6(engine, layer, e, &added)) != ERROR_SUCCESS) { rep_add(rep, "v6 allow add failed (0x%lX). ", op); goto abort; } }
         }
 
-        /* 3) permit explicit manager ports (both directions cover mgr-initiated) */
-        for (size_t p = 0; p < cfg->port_count; p++) {
-            add_permit_port(engine, layer, IPPROTO_TCP, (UINT16)cfg->ports[p], 0, &added);
+        /* 3) permit the manager ports, but ONLY to the allow-listed hosts. A global
+         *    port permit (no address condition) would open that port to the ENTIRE
+         *    internet — for 443 that means isolation never blocks HTTPS at all, a
+         *    complete containment bypass (proven in VM testing). We scope every port
+         *    to each allow-list address so "manager ports" means "these ports, to the
+         *    manager". Note the address permit in (2) already allows ALL ports to the
+         *    manager, so this is defence-in-depth / explicitness rather than strictly
+         *    required — but it must never be a bare global port opening. */
+        for (size_t a = 0; a < cfg->allow_count; a++) {
+            const wfp_allow_entry *e = &cfg->allow[a];
+            if (is_v4 != (e->family == AF_INET)) continue;   /* family must match layer */
+            for (size_t p = 0; p < cfg->port_count; p++) {
+                add_permit_addr_port(engine, layer, e, IPPROTO_TCP, (UINT16)cfg->ports[p], &added);
+            }
         }
 
         /* 4) optional DNS (remote 53, udp+tcp) — only on outbound layers */

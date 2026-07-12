@@ -43,7 +43,7 @@ RUN make TARGET=agent INDEXER_PLUGINS_REFS=main -j"$(nproc)" 2>&1 | tail -5
 
 WORKDIR /build/guardsarm
 # Install to the REBRANDED agent home /var/gsmsec (install.sh already defaults the
-# agent here; the old Dockerfile wrongly forced /var/ossec). Paths below match.
+# agent here; the old Dockerfile wrongly forced /var/gsmsec). Paths below match.
 ENV LD_LIBRARY_PATH=/build/guardsarm/src/build/lib:/build/guardsarm/src/external/jemalloc/lib:/var/gsmsec/lib
 RUN USER_LANGUAGE=en USER_NO_STOP=y USER_INSTALL_TYPE=agent USER_DIR=/var/gsmsec \
     USER_ENABLE_SYSCHECK=y USER_ENABLE_ROOTCHECK=y USER_ENABLE_SYSCOLLECTOR=y \

@@ -285,7 +285,7 @@ jobs:
           sudo docker run \
             -v $TESTS_PATH/:/tests \
             -v /tmp/:/packages \
-            -v /var/ossec:/var/ossec \
+            -v /var/gsmsec:/var/gsmsec \
             -e ARCH="$ARCH" \
             -e SYSTEM="$SYSTEM" \
             --entrypoint '/tests/install_component.sh' \
@@ -309,7 +309,7 @@ jobs:
         uses: ./.github/actions/check_files
         with:
           expected_files: ${{ env.CSV_FILENAME }}
-          installation_directory: /var/ossec
+          installation_directory: /var/gsmsec
           guardsarm_uid: ${{ env.GUARDSARM_UID }}
           guardsarm_gid: ${{ env.GUARDSARM_GID }}
 

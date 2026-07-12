@@ -133,21 +133,21 @@ jobs:
             /<\/rootcheck>/ && in_block { in_block=0; print "    <disabled>yes</disabled>"; print; next }
             in_block { next }
             { print }
-          ' /var/ossec/etc/ossec.conf > /tmp/ossec.conf.fixed && sudo mv /tmp/ossec.conf.fixed /var/ossec/etc/ossec.conf
+          ' /var/gsmsec/etc/ossec.conf > /tmp/ossec.conf.fixed && sudo mv /tmp/ossec.conf.fixed /var/gsmsec/etc/ossec.conf
 
           sudo awk '
             /<syscheck>/ { in_block=1; print; next }
             /<\/syscheck>/ && in_block { in_block=0; print "    <disabled>yes</disabled>"; print; next }
             in_block { next }
             { print }
-          ' /var/ossec/etc/ossec.conf > /tmp/ossec.conf.fixed && sudo mv /tmp/ossec.conf.fixed /var/ossec/etc/ossec.conf
+          ' /var/gsmsec/etc/ossec.conf > /tmp/ossec.conf.fixed && sudo mv /tmp/ossec.conf.fixed /var/gsmsec/etc/ossec.conf
 
           sudo awk '
             /<sca>/ { in_block=1; next }
             /<\/sca>/ && in_block { in_block=0; next }
             in_block { next }
             { print }
-          ' /var/ossec/etc/ossec.conf > /tmp/ossec.conf.fixed && sudo mv /tmp/ossec.conf.fixed /var/ossec/etc/ossec.conf
+          ' /var/gsmsec/etc/ossec.conf > /tmp/ossec.conf.fixed && sudo mv /tmp/ossec.conf.fixed /var/gsmsec/etc/ossec.conf
 
       - name: Download and install integration tests framework
         uses: ./.github/actions/install_qa_framework
@@ -191,7 +191,7 @@ jobs:
         if: failure()
         run: |
           sudo journalctl -xeu guardsarm-agent.service || true
-          sudo tail -n 200 /var/ossec/logs/ossec.log || true
+          sudo tail -n 200 /var/gsmsec/logs/ossec.log || true
 
       - name: Upload failed test results
         if: failure()

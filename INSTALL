@@ -25,12 +25,12 @@ Fast way steps:
 1- Run the script ./install.sh. It will guide you through the
    installation process.
 
-2- The script will create everything in /var/ossec and try to
+2- The script will create everything in /var/gsmsec and try to
    create the initialization script in your system (/etc/rc.local
    or /etc/rc.d/init.d/ossec). If the init script is not created,
    make sure to follow the instructions from the install.sh to make
    OSSEC HIDS start during the boot. To start it by hand, just run
-   /var/ossec/bin/guardsarm-control start
+   /var/gsmsec/bin/guardsarm-control start
 
 3- If you are running it on multiple clients, make sure to install
    the server first. Use the manage_agents tool
@@ -44,7 +44,7 @@ Fast way steps:
 
 By Hand Installation steps:
 
-1- Create the necessary directories (by default /var/ossec).
+1- Create the necessary directories (by default /var/gsmsec).
 2- Move the necessary files to the ossec directory.
 3- Compile everything.
 4- Move the binaries to the default directory.

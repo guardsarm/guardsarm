@@ -68,7 +68,7 @@ jobs:
         # GuardSarm daemons. Patching guardsarm-control directly ensures the export survives restarts.
         # 127.0.0.1 is explicit to avoid localhost→::1 resolution ambiguity.
         run: |
-          sudo sed -i '/^#!/a export http_proxy=http://127.0.0.1:8000' /var/ossec/bin/guardsarm-control
+          sudo sed -i '/^#!/a export http_proxy=http://127.0.0.1:8000' /var/gsmsec/bin/guardsarm-control
           echo "http_proxy=http://127.0.0.1:8000" >> $GITHUB_ENV
       - name: Run msgraph integration tests
         run: |

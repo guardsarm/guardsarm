@@ -1,6 +1,6 @@
 # GuardSarm manager 2.0.0 — rebranded runtime image.
 # Built FROM a snapshot of the working gsmgr whose install tree was MOVED
-# /var/ossec -> /var/guardsarm-manager (state-preserving: keeps the 52 engine
+# /var/gsmsec -> /var/guardsarm-manager (state-preserving: keeps the 52 engine
 # decoders, indexer client certs, manager keystore, RBAC db, and agent client.keys).
 # w_homedir() honors GUARDSARM_MANAGER_HOME, so every daemon/framework/engine roots
 # at the branded path. Carries forward all prior runtime fixes unchanged.

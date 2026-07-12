@@ -33,7 +33,7 @@ RUN find /build/guardsarm -name '*.sh' -exec sed -i 's/\r$//' {} + \
  && sed -i 's/\r$//' /build/guardsarm/install.sh
 
 WORKDIR /build/guardsarm
-ENV LD_LIBRARY_PATH=/build/guardsarm/src/build/lib:/build/guardsarm/src/external/jemalloc/lib:/var/ossec/lib:/var/ossec/framework/python/lib
+ENV LD_LIBRARY_PATH=/build/guardsarm/src/build/lib:/build/guardsarm/src/external/jemalloc/lib:/var/gsmsec/lib:/var/gsmsec/framework/python/lib
 
 # --- ENGINE FIX: the full wazuh->guardsarm rename corrupted the checked-in generated
 # protobuf .pb.cc (they embed length-prefixed serialized FileDescriptorProto bytes, so
@@ -52,18 +52,18 @@ RUN sed -i 's/wazuh/guardsarm/g' /build/guardsarm/src/external/indexer-plugins/*
       --cpp_out=/build/guardsarm/src/engine/source/proto/include/eMessages *.proto \
  && cd /build/guardsarm/src/build && make -j"$(nproc)" 2>&1 | tail -3
 
-RUN USER_LANGUAGE=en USER_NO_STOP=y USER_INSTALL_TYPE=server USER_DIR=/var/ossec \
+RUN USER_LANGUAGE=en USER_NO_STOP=y USER_INSTALL_TYPE=server USER_DIR=/var/gsmsec \
     USER_ENABLE_EMAIL=n USER_ENABLE_SYSCHECK=y USER_ENABLE_ROOTCHECK=y \
     USER_ENABLE_ACTIVE_RESPONSE=y USER_ENABLE_SYSLOG=n USER_ENABLE_AUTHD=y \
     USER_AUTO_START=n USER_BINARYINSTALL=yes \
     bash install.sh \
  && echo "=== install OK ===" \
- && ls -la /var/ossec/bin/guardsarm-manager-authd /var/ossec/bin/guardsarm-manager-apid 2>&1 | head
+ && ls -la /var/gsmsec/bin/guardsarm-manager-authd /var/gsmsec/bin/guardsarm-manager-apid 2>&1 | head
 
 # Persist required libs into the installed tree so daemons/API resolve them at runtime.
-RUN ln -sf libguardsarmext.so /var/ossec/lib/libwazuhext.so 2>/dev/null || true; \
-    cp -a /build/guardsarm/src/external/jemalloc/lib/libjemalloc.so.2 /var/ossec/lib/ 2>/dev/null || true; \
-    cp -a /build/guardsarm/src/build/lib/libpython3.12.so.1.0 /var/ossec/lib/ 2>/dev/null || true
+RUN ln -sf libguardsarmext.so /var/gsmsec/lib/libwazuhext.so 2>/dev/null || true; \
+    cp -a /build/guardsarm/src/external/jemalloc/lib/libjemalloc.so.2 /var/gsmsec/lib/ 2>/dev/null || true; \
+    cp -a /build/guardsarm/src/build/lib/libpython3.12.so.1.0 /var/gsmsec/lib/ 2>/dev/null || true
 
 # --- RUNTIME FIX 1: framework indexer client must speak plain HTTP to OpenSearch.
 # The local OpenSearch runs with security DISABLED (plain HTTP, no auth), but the
@@ -74,36 +74,36 @@ RUN ln -sf libguardsarmext.so /var/ossec/lib/libwazuhext.so 2>/dev/null || true;
 RUN sed -i \
       -e 's/^\(\s*\)use_ssl=True,/\1use_ssl=False,/' \
       -e 's/^\(\s*\)verify_certs=True,/\1verify_certs=False,/' \
-      /var/ossec/framework/python/lib/python3.12/site-packages/guardsarm/core/indexer/indexer.py \
+      /var/gsmsec/framework/python/lib/python3.12/site-packages/guardsarm/core/indexer/indexer.py \
  && grep -n 'use_ssl=\|verify_certs=' \
-      /var/ossec/framework/python/lib/python3.12/site-packages/guardsarm/core/indexer/indexer.py
+      /var/gsmsec/framework/python/lib/python3.12/site-packages/guardsarm/core/indexer/indexer.py
 
 # --- RUNTIME FIX 2: point the engine's indexer connector at the host OpenSearch.
 # install.sh ships https://localhost:9200; from inside the container the indexer is
 # reachable at http://host.docker.internal:7500. Rewrite the <host> line.
 RUN sed -i \
       's#<host>https\?://[^<]*</host>#<host>http://host.docker.internal:7500</host>#' \
-      /var/ossec/etc/guardsarm-manager.conf \
- && grep -n '<host>' /var/ossec/etc/guardsarm-manager.conf
+      /var/gsmsec/etc/guardsarm-manager.conf \
+ && grep -n '<host>' /var/gsmsec/etc/guardsarm-manager.conf
 
 # --- RUNTIME FIX 3: seed indexer credentials into the manager keystore (RocksDB).
 # The framework/engine read the indexer user/pass from the keystore. Security is
 # disabled so the values are effectively unused, but the entries must EXIST or the
 # keystore lookup errors. Values match the working live setup (admin/admin).
-RUN /var/ossec/bin/guardsarm-manager-keystore -f indexer -k username -v admin \
- && /var/ossec/bin/guardsarm-manager-keystore -f indexer -k password -v admin
+RUN /var/gsmsec/bin/guardsarm-manager-keystore -f indexer -k username -v admin \
+ && /var/gsmsec/bin/guardsarm-manager-keystore -f indexer -k password -v admin
 
 # --- RUNTIME FIX 4: the <indexer><ssl> block references etc/certs/*.pem for config
 # validation even over plain HTTP; install.sh never creates them, so modulesd aborts
 # ("File 'etc/certs/root-ca.pem' not found") and takes the whole manager down at start.
 # Generate a self-signed set so config validation passes.
-RUN mkdir -p /var/ossec/etc/certs \
+RUN mkdir -p /var/gsmsec/etc/certs \
  && openssl req -x509 -newkey rsa:2048 -days 3650 -nodes \
-      -keyout /var/ossec/etc/certs/manager-key.pem -out /var/ossec/etc/certs/manager.pem \
+      -keyout /var/gsmsec/etc/certs/manager-key.pem -out /var/gsmsec/etc/certs/manager.pem \
       -subj "/CN=guardsarm.manager/O=GuardSarm/C=US" >/dev/null 2>&1 \
- && cp /var/ossec/etc/certs/manager.pem /var/ossec/etc/certs/root-ca.pem \
- && chown -R guardsarm-manager:guardsarm-manager /var/ossec/etc/certs \
- && chmod 640 /var/ossec/etc/certs/*
+ && cp /var/gsmsec/etc/certs/manager.pem /var/gsmsec/etc/certs/root-ca.pem \
+ && chown -R guardsarm-manager:guardsarm-manager /var/gsmsec/etc/certs \
+ && chmod 640 /var/gsmsec/etc/certs/*
 
 # --- RUNTIME FIX 5: mirror the frozen wazuh.integration.* WCS fields as
 # guardsarm.integration.* in the engine store schema. The engine's AssetBuilder writes
@@ -113,7 +113,7 @@ RUN mkdir -p /var/ossec/etc/certs \
 # Add the guardsarm.integration.* keyword fields so a default route can be created.
 RUN python3 - <<'PYEOF'
 import json,glob
-for p in glob.glob('/var/ossec/data/store/schema/engine-schema/*'):
+for p in glob.glob('/var/gsmsec/data/store/schema/engine-schema/*'):
     try: d=json.load(open(p))
     except Exception: continue
     f=d.get('fields')
@@ -127,21 +127,21 @@ for p in glob.glob('/var/ossec/data/store/schema/engine-schema/*'):
 PYEOF
 
 EXPOSE 1514 1515 1516 55000
-ENV LD_LIBRARY_PATH=/var/ossec/lib:/var/ossec/framework/python/lib
+ENV LD_LIBRARY_PATH=/var/gsmsec/lib:/var/gsmsec/framework/python/lib
 
 # Bake the local route activator so a FRESH container self-heals its default route.
 # The active route persists in the container FS (data/store/router) and survives daemon
 # and `docker restart`, but a `docker rm`+`run` starts from the image with no route; this
 # lets startup re-create it automatically (idempotent — only when the router table is empty).
-COPY activate_routes.py /var/ossec/bin/activate_routes.py
+COPY activate_routes.py /var/gsmsec/bin/activate_routes.py
 
 CMD bash -c '\
-  ( /var/ossec/bin/guardsarm-manager-control start || true ); \
-  for i in $(seq 1 40); do [ -S /var/ossec/queue/sockets/analysis ] && break; sleep 2; done; \
+  ( /var/gsmsec/bin/guardsarm-manager-control start || true ); \
+  for i in $(seq 1 40); do [ -S /var/gsmsec/queue/sockets/analysis ] && break; sleep 2; done; \
   sleep 5; \
-  if ! curl -s --unix-socket /var/ossec/queue/sockets/analysis -H "Content-Type: text/plain" -X POST -d "{}" http://localhost/_internal/router/table/get 2>/dev/null | grep -q "\"name\""; then \
+  if ! curl -s --unix-socket /var/gsmsec/queue/sockets/analysis -H "Content-Type: text/plain" -X POST -d "{}" http://localhost/_internal/router/table/get 2>/dev/null | grep -q "\"name\""; then \
     echo "[self-heal] no active route -> activating local default route"; \
-    python3 /var/ossec/bin/activate_routes.py 2>&1 | tail -3; \
+    python3 /var/gsmsec/bin/activate_routes.py 2>&1 | tail -3; \
   else echo "[self-heal] route already active"; fi; \
-  echo "=== GuardSarm daemons ==="; /var/ossec/bin/guardsarm-manager-control status 2>/dev/null || ps -e; \
-  touch /var/ossec/logs/ossec.log; tail -f /var/ossec/logs/ossec.log'
+  echo "=== GuardSarm daemons ==="; /var/gsmsec/bin/guardsarm-manager-control status 2>/dev/null || ps -e; \
+  touch /var/gsmsec/logs/ossec.log; tail -f /var/gsmsec/logs/ossec.log'

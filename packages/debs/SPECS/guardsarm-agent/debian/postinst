@@ -9,7 +9,7 @@ case "$1" in
 
     OS=$(. /etc/os-release && printf '%s\n' "$ID" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')
     VER=$(. /etc/os-release && echo "${VERSION_ID}")
-    DIR="/var/ossec"
+    DIR="/var/gsmsec"
     USER="guardsarm"
     GROUP="guardsarm"
     GUARDSARM_GLOBAL_TMP_DIR="${DIR}/packages_files"

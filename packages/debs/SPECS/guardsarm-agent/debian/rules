@@ -19,7 +19,7 @@ export DH_OPTIONS
 export TARGET_DIR=${CURDIR}/debian/guardsarm-agent
 
 # Package build options
-export INSTALLATION_DIR="/var/ossec"
+export INSTALLATION_DIR="/var/gsmsec"
 export INSTALLATION_SCRIPTS_DIR="${INSTALLATION_DIR}/packages_files/agent_installation_scripts"
 export JOBS="5"
 export DEBUG_ENABLED="no"

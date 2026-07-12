@@ -96,8 +96,8 @@ static void port_add(wfp_isolation_cfg *cfg, int port) {
  * the agent is the authority on its own manager, so isolation must never sever the live
  * agent<->manager channel — regardless of what ports/addresses the manager injected (the
  * AR default of 1514/1515 is wrong on deployments that remap the manager ports). Reads
- * <client><server><address> and <client><server><port>; tries the known config filenames
- * + root element names across rebrand states. Best-effort. */
+ * <client><manager><address> / <port> (rebranded) or <client><server><...> (classic);
+ * tries the known config filenames + root element names across rebrand states. Best-effort. */
 static void cfg_from_config(wfp_isolation_cfg *cfg) {
     const char *files[] = { "etc/gsmsec.conf", "gsmsec.conf", "etc/ossec.conf", "ossec.conf", NULL };
     const char *roots[] = { "guardsarm_config", "ossec_config", NULL };
@@ -105,8 +105,12 @@ static void cfg_from_config(wfp_isolation_cfg *cfg) {
         OS_XML xml;
         if (OS_ReadXML(files[fi], &xml) < 0) continue;
         int matched = 0;
-        for (int ri = 0; roots[ri] && cfg->allow_count < WFP_ISO_MAX_ALLOW; ri++) {
-            const char *path[] = { roots[ri], "client", "server", "address", NULL };
+        /* The rebranded agent config nests the endpoint under <client><manager>, while
+         * classic configs used <client><server>. Try both. */
+        const char *mids[] = { "manager", "server", NULL };
+        for (int ri = 0; roots[ri] && cfg->allow_count < WFP_ISO_MAX_ALLOW; ri++)
+        for (int mi = 0; mids[mi] && cfg->allow_count < WFP_ISO_MAX_ALLOW; mi++) {
+            const char *path[] = { roots[ri], "client", mids[mi], "address", NULL };
             char **vals = OS_GetContents(&xml, (const char **)path);   /* <address> contents */
             if (!vals) continue;
             matched = 1;
@@ -141,7 +145,7 @@ static void cfg_from_config(wfp_isolation_cfg *cfg) {
 
             /* Always permit the agent's actual manager port so the live channel
              * survives isolation even when the AR message carried the wrong ports. */
-            const char *pp[] = { roots[ri], "client", "server", "port", NULL };
+            const char *pp[] = { roots[ri], "client", mids[mi], "port", NULL };
             char **pv = OS_GetContents(&xml, (const char **)pp);
             if (pv) {
                 for (int i = 0; pv[i]; i++) { port_add(cfg, atoi(pv[i])); os_free(pv[i]); }

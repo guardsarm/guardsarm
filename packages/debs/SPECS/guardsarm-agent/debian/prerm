@@ -3,7 +3,7 @@
 
 set -e
 
-DIR="/var/ossec"
+DIR="/var/gsmsec"
 GUARDSARM_TMP_DIR="${DIR}/packages_files/agent_config_files"
 
 # environment configuration
