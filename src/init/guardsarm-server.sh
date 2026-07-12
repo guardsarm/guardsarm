@@ -14,7 +14,7 @@ PLIST=${DIR}/bin/.process_list;
 GUARDSARM_CONF="${GUARDSARM_CONF:-guardsarm-manager.conf}"
 
 # Installation info
-VERSION="v2.0.0"
+VERSION="v2.4.0"
 REVISION="alpha0"
 TYPE="manager"
 
