@@ -100,5 +100,14 @@ int  wfp_repair_network(bool reset_winsock, wfp_report *rep);
  * into an allow entry. Returns 0 on success, negative on parse failure. */
 int  wfp_parse_allow(const char *text, wfp_allow_entry *out);
 
+/* Non-destructive engine self-test (safe to run on any host, incl. production):
+ * creates the GuardsArm provider + sub-layer and a handful of PERMIT-ONLY filters
+ * (NO block-all, so it cannot isolate anything), verifies they were added and are
+ * enumerable, then removes everything and confirms cleanup. Exercises the full
+ * add -> enumerate -> delete lifecycle + transactions + every condition type.
+ * Returns 0 if the engine round-trips correctly, negative otherwise. Requires
+ * admin/SYSTEM (WFP write access). */
+int  wfp_selftest(wfp_report *rep);
+
 #endif /* WIN32 */
 #endif /* WFP_ISOLATION_H */

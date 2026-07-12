@@ -294,30 +294,30 @@ static DWORD add_permit_port(HANDLE engine, const GUID *layer, UINT8 proto,
 /* Must run inside a transaction.                                              */
 /* --------------------------------------------------------------------------- */
 static DWORD remove_all_filters(HANDLE engine, int *removed) {
-    FWPM_FILTER_ENUM_TEMPLATE0 tmpl;
-    memset(&tmpl, 0, sizeof(tmpl));
-    tmpl.providerKey        = (GUID *)&GUARDSARM_WFP_PROVIDER;   /* only ours */
-    tmpl.numFilterConditions = 0;
-    tmpl.actionMask         = 0xFFFFFFFF;
-
+    /* Enumerate ALL filters (NULL template) and match ours by provider in code.
+     * NOTE: a filter-enum template REQUIRES a valid layerKey — a zeroed template's
+     * null-GUID layerKey yields FWP_E_LAYER_NOT_FOUND (0x80320004), so we cannot use
+     * providerKey-only filtering. Our filters live across 4 layers, so a NULL template
+     * + in-code provider match is the correct way to reach all of them. */
     HANDLE en = NULL;
-    DWORD st = FwpmFilterCreateEnumHandle0(engine, &tmpl, &en);
-    if (st != ERROR_SUCCESS) {
-        /* No provider yet -> nothing to remove. */
-        if (st == FWP_E_PROVIDER_NOT_FOUND) return ERROR_SUCCESS;
-        return st;
-    }
+    DWORD st = FwpmFilterCreateEnumHandle0(engine, NULL, &en);
+    if (st != ERROR_SUCCESS) return st;
 
     for (;;) {
         FWPM_FILTER0 **arr = NULL;
         UINT32 count = 0;
-        st = FwpmFilterEnum0(engine, en, 64, &arr, &count);
+        st = FwpmFilterEnum0(engine, en, 128, &arr, &count);
         if (st != ERROR_SUCCESS || count == 0) { if (arr) FwpmFreeMemory0((void **)&arr); break; }
         for (UINT32 i = 0; i < count; i++) {
-            if (FwpmFilterDeleteById0(engine, arr[i]->filterId) == ERROR_SUCCESS && removed) (*removed)++;
+            /* Match our provider. Use memcmp directly rather than IsEqualGUID —
+             * that macro takes GUID *values* on MSVC but *pointers* on mingw. */
+            if (arr[i]->providerKey &&
+                memcmp(arr[i]->providerKey, &GUARDSARM_WFP_PROVIDER, sizeof(GUID)) == 0) {
+                if (FwpmFilterDeleteById0(engine, arr[i]->filterId) == ERROR_SUCCESS && removed) (*removed)++;
+            }
         }
         FwpmFreeMemory0((void **)&arr);
-        if (count < 64) break;
+        if (count < 128) break;
     }
     FwpmFilterDestroyEnumHandle0(engine, en);
     return ERROR_SUCCESS;
@@ -492,6 +492,49 @@ int wfp_repair_network(bool reset_winsock, wfp_report *rep) {
     rep_add(rep, "connectivity probe (1.1.1.1:443): %s. ", net ? "REACHABLE" : "no route (may be offline)");
     if (rep) rep->ok = (r == 0);
     return r;
+}
+
+/* --------------------------------------------------------------------------- */
+/* Non-destructive engine self-test (permit-only; never isolates)              */
+/* --------------------------------------------------------------------------- */
+int wfp_selftest(wfp_report *rep) {
+    rep_reset(rep);
+    HANDLE engine = NULL;
+    DWORD st = engine_open(&engine);
+    if (st != ERROR_SUCCESS) { rep_add(rep, "engine open failed (0x%lX). ", st); return -1; }
+
+    st = FwpmTransactionBegin0(engine, 0);
+    if (st != ERROR_SUCCESS) { rep_add(rep, "TransactionBegin failed (0x%lX) — needs admin/SYSTEM. ", st); FwpmEngineClose0(engine); return -1; }
+
+    int added = 0;
+    DWORD op = ensure_identity(engine);
+    if (op != ERROR_SUCCESS) { rep_add(rep, "provider/sublayer add failed (0x%lX). ", op); FwpmTransactionAbort0(engine); FwpmEngineClose0(engine); return -1; }
+
+    /* PERMIT-ONLY filters — deliberately NO block-all, so nothing is ever blocked.
+     * Exercises the loopback-flag, v4-addr, and protocol+port condition builders. */
+    add_permit_loopback(engine, &FWPM_LAYER_ALE_AUTH_CONNECT_V4, &added);
+    wfp_allow_entry e; memset(&e, 0, sizeof(e));
+    e.family = AF_INET; e.prefix = 32; e.addr[0] = 127; e.addr[3] = 1;   /* 127.0.0.1 */
+    add_permit_addr_v4(engine, &FWPM_LAYER_ALE_AUTH_CONNECT_V4, &e, &added);
+    add_permit_port(engine, &FWPM_LAYER_ALE_AUTH_CONNECT_V4, IPPROTO_TCP, 443, 0, &added);
+
+    st = FwpmTransactionCommit0(engine);
+    if (st != ERROR_SUCCESS) { rep_add(rep, "TransactionCommit failed (0x%lX). ", st); FwpmTransactionAbort0(engine); FwpmEngineClose0(engine); return -1; }
+    FwpmEngineClose0(engine);
+
+    int present = wfp_is_isolated();          /* our sub-layer should now exist */
+
+    wfp_report r2;
+    int removed_ok = (wfp_unisolate(&r2) == 0);  /* exercises the FIXED enumerate+delete */
+    int gone = !wfp_is_isolated();
+
+    rep->ok = (added >= 3 && present && removed_ok && gone);
+    rep->filters_added = added;
+    rep->filters_removed = r2.filters_removed;
+    rep_add(rep, "added=%d present=%d removed=%d cleanup=%s => %s",
+            added, present, r2.filters_removed, gone ? "clean" : "LEFTOVER",
+            rep->ok ? "WFP-ENGINE-OK" : "WFP-ENGINE-FAIL");
+    return rep->ok ? 0 : -1;
 }
 
 /* --------------------------------------------------------------------------- */

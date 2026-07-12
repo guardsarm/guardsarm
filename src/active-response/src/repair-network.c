@@ -33,6 +33,7 @@
 #endif
 #include <windows.h>
 #include <stdio.h>
+#include <stdlib.h>   /* atoi, _atoi64 — without this _atoi64 is assumed int -> epoch truncates */
 #include <string.h>
 #include <time.h>
 #include "helpers/wfp_isolation.h"
@@ -173,7 +174,7 @@ static int remove_watchdog(const char *root) {
 
 int main(int argc, char **argv) {
     int mode_auto = 0, mode_force = 0, mode_status = 0, reset_winsock = 0;
-    int mode_install_wd = 0, mode_remove_wd = 0;
+    int mode_install_wd = 0, mode_remove_wd = 0, mode_selftest = 0;
     for (int i = 1; i < argc; i++) {
         if      (!strcmp(argv[i], "--auto"))             mode_auto = 1;
         else if (!strcmp(argv[i], "--force"))            mode_force = 1;
@@ -181,8 +182,9 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--reset-winsock"))    reset_winsock = 1;
         else if (!strcmp(argv[i], "--install-watchdog")) mode_install_wd = 1;
         else if (!strcmp(argv[i], "--remove-watchdog"))  mode_remove_wd = 1;
+        else if (!strcmp(argv[i], "--selftest"))         mode_selftest = 1;
     }
-    if (!mode_auto && !mode_force && !mode_status && !mode_install_wd && !mode_remove_wd)
+    if (!mode_auto && !mode_force && !mode_status && !mode_install_wd && !mode_remove_wd && !mode_selftest)
         mode_force = 1;  /* default: repair */
 
     /* Watchdog task management (invoked by the MSI install/uninstall CustomActions). */
@@ -194,6 +196,17 @@ int main(int argc, char **argv) {
         if (mode_remove_wd)  rc |= remove_watchdog(root2);
         if (mode_install_wd) rc |= install_watchdog(root2, self);
         return rc;
+    }
+
+    /* Non-destructive WFP engine self-test (safe on any host — permit-only). */
+    if (mode_selftest) {
+        char root2[MAX_PATH];
+        if (install_root(root2, sizeof(root2)) != 0) strcpy(root2, ".");
+        wfp_report rep;
+        int r = wfp_selftest(&rep);
+        logline(root2, rep.detail);
+        logline(root2, r == 0 ? "selftest: WFP engine round-trip OK" : "selftest: WFP engine FAILED");
+        return r == 0 ? 0 : 1;
     }
 
     char root[MAX_PATH];
