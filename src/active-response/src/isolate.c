@@ -72,39 +72,64 @@ static size_t cfg_from_json(cJSON *root, wfp_isolation_cfg *cfg, unsigned *timeo
     return cfg->allow_count;
 }
 
-/* Fallback allow-list source when the manager did not inject one: read the agent's
- * own manager address(es) from the local config and resolve to IP(s). Best-effort;
- * tries the known config filenames + root element names across rebrand states. */
+/* True if an allow entry equal to *e is already present (dedup for the union below). */
+static bool allow_present(const wfp_isolation_cfg *cfg, const wfp_allow_entry *e) {
+    for (size_t i = 0; i < cfg->allow_count; i++) {
+        if (cfg->allow[i].family == e->family && cfg->allow[i].prefix == e->prefix &&
+            memcmp(cfg->allow[i].addr, e->addr, sizeof(e->addr)) == 0)
+            return true;
+    }
+    return false;
+}
+static void allow_add(wfp_isolation_cfg *cfg, const wfp_allow_entry *e) {
+    if (cfg->allow_count < WFP_ISO_MAX_ALLOW && !allow_present(cfg, e))
+        cfg->allow[cfg->allow_count++] = *e;
+}
+static void port_add(wfp_isolation_cfg *cfg, int port) {
+    if (port <= 0 || port > 65535) return;
+    for (size_t i = 0; i < cfg->port_count; i++) if (cfg->ports[i] == port) return;
+    if (cfg->port_count < WFP_ISO_MAX_PORTS) cfg->ports[cfg->port_count++] = port;
+}
+
+/* Merge the agent's OWN manager endpoint (address + port) from local config into the
+ * allow-list. Called UNCONDITIONALLY (not just when the AR message omits an allow-list):
+ * the agent is the authority on its own manager, so isolation must never sever the live
+ * agent<->manager channel — regardless of what ports/addresses the manager injected (the
+ * AR default of 1514/1515 is wrong on deployments that remap the manager ports). Reads
+ * <client><server><address> and <client><server><port>; tries the known config filenames
+ * + root element names across rebrand states. Best-effort. */
 static void cfg_from_config(wfp_isolation_cfg *cfg) {
     const char *files[] = { "etc/gsmsec.conf", "gsmsec.conf", "etc/ossec.conf", "ossec.conf", NULL };
     const char *roots[] = { "guardsarm_config", "ossec_config", NULL };
-    for (int fi = 0; files[fi] && cfg->allow_count == 0; fi++) {
+    for (int fi = 0; files[fi]; fi++) {
         OS_XML xml;
         if (OS_ReadXML(files[fi], &xml) < 0) continue;
+        int matched = 0;
         for (int ri = 0; roots[ri] && cfg->allow_count < WFP_ISO_MAX_ALLOW; ri++) {
             const char *path[] = { roots[ri], "client", "server", "address", NULL };
             char **vals = OS_GetContents(&xml, (const char **)path);   /* <address> contents */
             if (!vals) continue;
+            matched = 1;
             for (int i = 0; vals[i] && cfg->allow_count < WFP_ISO_MAX_ALLOW; i++) {
+                wfp_allow_entry e;
                 /* literal IP? add directly; else resolve the hostname */
-                if (wfp_parse_allow(vals[i], &cfg->allow[cfg->allow_count]) == 0) {
-                    cfg->allow_count++;
+                if (wfp_parse_allow(vals[i], &e) == 0) {
+                    allow_add(cfg, &e);
                 } else {
                     struct addrinfo hints, *res = NULL;
                     memset(&hints, 0, sizeof(hints));
                     hints.ai_family = AF_UNSPEC;
                     if (getaddrinfo(vals[i], NULL, &hints, &res) == 0) {
                         for (struct addrinfo *p = res; p && cfg->allow_count < WFP_ISO_MAX_ALLOW; p = p->ai_next) {
-                            wfp_allow_entry *e = &cfg->allow[cfg->allow_count];
-                            memset(e, 0, sizeof(*e));
+                            memset(&e, 0, sizeof(e));
                             if (p->ai_family == AF_INET) {
-                                e->family = AF_INET; e->prefix = 32;
-                                memcpy(e->addr, &((struct sockaddr_in *)p->ai_addr)->sin_addr, 4);
-                                cfg->allow_count++;
+                                e.family = AF_INET; e.prefix = 32;
+                                memcpy(e.addr, &((struct sockaddr_in *)p->ai_addr)->sin_addr, 4);
+                                allow_add(cfg, &e);
                             } else if (p->ai_family == AF_INET6) {
-                                e->family = AF_INET6; e->prefix = 128;
-                                memcpy(e->addr, &((struct sockaddr_in6 *)p->ai_addr)->sin6_addr, 16);
-                                cfg->allow_count++;
+                                e.family = AF_INET6; e.prefix = 128;
+                                memcpy(e.addr, &((struct sockaddr_in6 *)p->ai_addr)->sin6_addr, 16);
+                                allow_add(cfg, &e);
                             }
                         }
                         if (res) freeaddrinfo(res);
@@ -113,8 +138,18 @@ static void cfg_from_config(wfp_isolation_cfg *cfg) {
             }
             for (int i = 0; vals[i]; i++) os_free(vals[i]);
             os_free(vals);
+
+            /* Always permit the agent's actual manager port so the live channel
+             * survives isolation even when the AR message carried the wrong ports. */
+            const char *pp[] = { roots[ri], "client", "server", "port", NULL };
+            char **pv = OS_GetContents(&xml, (const char **)pp);
+            if (pv) {
+                for (int i = 0; pv[i]; i++) { port_add(cfg, atoi(pv[i])); os_free(pv[i]); }
+                os_free(pv);
+            }
         }
         OS_ClearXML(&xml);
+        if (matched) break;   /* found the live config; don't also parse stale filenames */
     }
 }
 
@@ -162,14 +197,12 @@ int main(int argc, char **argv) {
         wfp_isolation_cfg cfg;
         unsigned timeout = ISO_DEFAULT_TIMEOUT;
 
-        /* 1) manager-injected allow-list (authoritative) */
+        /* 1) manager-injected allow-list (enrichment: cloud gateways / failover / CIDRs) */
         cfg_from_json(input_json, &cfg, &timeout);
-        /* 2) fallback: derive the manager IP(s) from local config */
-        if (cfg.allow_count == 0) {
-            write_debug_file(argv[0], "no allow-list in AR message; deriving manager address from local config");
-            cfg_from_config(&cfg);
-        }
-        /* 3) default manager ports if none specified */
+        /* 2) ALWAYS union the agent's own manager address+port from local config, so a
+         *    wrong/missing port in the AR message can never sever the live channel. */
+        cfg_from_config(&cfg);
+        /* 3) last-resort default ports only if config yielded none */
         if (cfg.port_count == 0) {
             cfg.ports[0] = 1514; cfg.ports[1] = 1515; cfg.ports[2] = 443; cfg.port_count = 3;
         }
