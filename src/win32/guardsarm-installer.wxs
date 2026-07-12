@@ -130,6 +130,16 @@
         <CustomAction Id="CloseGUI" BinaryKey="InstallerScripts" VBScriptCall="KillGUITask" Return="check" Execute="deferred" Impersonate="no"/>
 
         <CustomAction Id="CreateDumpRegistryKey" BinaryKey="InstallerScripts" VBScriptCall="CreateDumpRegistryKey" Return="check" Execute="deferred" Impersonate="yes" />
+
+        <!-- Endpoint-isolation fail-open recovery watchdog. Registering it FROM the MSI
+             means a plain double-click install arms the safety net (no PowerShell needed):
+             repair-network.exe registers a SYSTEM scheduled task that restores networking
+             if isolation is ever orphaned/expired/agent-gone. On uninstall we restore the
+             network and remove the task BEFORE the files are deleted. Return=ignore so a
+             watchdog hiccup never blocks install/uninstall. -->
+        <CustomAction Id="RegisterRecoveryWatchdog" FileKey="REPAIR_NETWORK.EXE" ExeCommand="--install-watchdog" Execute="deferred" Impersonate="no" Return="ignore" />
+        <CustomAction Id="RepairNetworkOnUninstall" FileKey="REPAIR_NETWORK.EXE" ExeCommand="--force" Execute="deferred" Impersonate="no" Return="ignore" />
+        <CustomAction Id="RemoveRecoveryWatchdog" FileKey="REPAIR_NETWORK.EXE" ExeCommand="--remove-watchdog" Execute="deferred" Impersonate="no" Return="ignore" />
         <UI>
             <UIRef Id="WixUI_Advanced" />
             <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="CustomCheckDialog" Order="4"><![CDATA[WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1"]]></Publish>
@@ -190,6 +200,12 @@
 
             <!-- Start services if necessary -->
             <Custom Action="StartGuardSarmSvc" After="InstallFinalize">(NOT Installed AND NOT WIX_UPGRADE_DETECTED) OR (((WIX_UPGRADE_DETECTED) OR (PATCH)) AND ((OSSECRUNNING = "Running") OR (GUARDSARMRUNNING = "Running")))</Custom>
+
+            <!-- Isolation recovery watchdog: arm on install/upgrade (files present), tear
+                 down + restore networking on true uninstall (files still present). -->
+            <Custom Action="RegisterRecoveryWatchdog" After="InstallFiles">NOT (REMOVE="ALL")</Custom>
+            <Custom Action="RepairNetworkOnUninstall" Before="RemoveFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="RemoveRecoveryWatchdog" After="RepairNetworkOnUninstall">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
 
             <!-- Stop the service as soon as possible on uninstall, and only on uninstall, in order to unlock the files and folders that must be deleted. -->
 			<Custom Action="SetRemoveAllDataValue" Before="InstallFinalize">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>

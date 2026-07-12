@@ -111,15 +111,90 @@ static void clear_state(const char *root) {
     if (fp) { fprintf(fp, "{\"active\":false,\"epoch\":%lld}\n", (long long)time(NULL)); fclose(fp); }
 }
 
+#define WATCHDOG_TASK "GuardSarm Network Recovery"
+
+/* Run a command line (no cmd.exe shell) and return its exit code, -1 on spawn fail. */
+static int run_cmd(const char *cmdline) {
+    STARTUPINFOA si; PROCESS_INFORMATION pi;
+    memset(&si, 0, sizeof(si)); si.cb = sizeof(si);
+    si.dwFlags = STARTF_USESHOWWINDOW; si.wShowWindow = SW_HIDE;
+    char buf[2048]; strncpy(buf, cmdline, sizeof(buf) - 1); buf[sizeof(buf) - 1] = '\0';
+    if (!CreateProcessA(NULL, buf, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) return -1;
+    WaitForSingleObject(pi.hProcess, 30000);
+    DWORD code = 1; GetExitCodeProcess(pi.hProcess, &code);
+    CloseHandle(pi.hProcess); CloseHandle(pi.hThread);
+    return (int)code;
+}
+
+/* Write the recovery task definition as UTF-16LE (schtasks /XML wants Unicode). The
+ * task runs THIS exe with --auto as SYSTEM at boot, at logon, and every 5 minutes. */
+static int write_task_xml(const char *xmlpath, const char *self_exe) {
+    char xml[3072];
+    snprintf(xml, sizeof(xml),
+        "<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n"
+        "<Task version=\"1.2\" xmlns=\"http://schemas.microsoft.com/windows/2004/02/mit/task\">\n"
+        "  <RegistrationInfo><Description>GuardSarm fail-open network recovery watchdog. Restores networking if endpoint isolation is orphaned, expired, or the agent is gone.</Description></RegistrationInfo>\n"
+        "  <Triggers>\n"
+        "    <BootTrigger><Enabled>true</Enabled></BootTrigger>\n"
+        "    <LogonTrigger><Enabled>true</Enabled></LogonTrigger>\n"
+        "    <TimeTrigger><StartBoundary>2020-01-01T00:00:00</StartBoundary><Enabled>true</Enabled><Repetition><Interval>PT5M</Interval><StopAtDurationEnd>false</StopAtDurationEnd></Repetition></TimeTrigger>\n"
+        "  </Triggers>\n"
+        "  <Principals><Principal id=\"Author\"><UserId>S-1-5-18</UserId><RunLevel>HighestAvailable</RunLevel></Principal></Principals>\n"
+        "  <Settings><MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy><DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries><StopIfGoingOnBatteries>false</StopIfGoingOnBatteries><StartWhenAvailable>true</StartWhenAvailable><ExecutionTimeLimit>PT5M</ExecutionTimeLimit><Enabled>true</Enabled></Settings>\n"
+        "  <Actions Context=\"Author\"><Exec><Command>%s</Command><Arguments>--auto</Arguments></Exec></Actions>\n"
+        "</Task>\n", self_exe);
+    FILE *fp = fopen(xmlpath, "wb");
+    if (!fp) return -1;
+    unsigned char bom[2] = { 0xFF, 0xFE }; fwrite(bom, 1, 2, fp);   /* UTF-16LE BOM */
+    for (const char *p = xml; *p; p++) { fputc((unsigned char)*p, fp); fputc(0x00, fp); }
+    fclose(fp);
+    return 0;
+}
+
+/* Register the recovery watchdog scheduled task (self-contained; no PowerShell). */
+static int install_watchdog(const char *root, const char *self_exe) {
+    char xmlpath[MAX_PATH], cmd[MAX_PATH + 256];
+    snprintf(xmlpath, sizeof(xmlpath), "%s\\active-response\\gsm-recovery-task.xml", root);
+    if (write_task_xml(xmlpath, self_exe) != 0) { logline(root, "install-watchdog: cannot write task XML"); return 1; }
+    snprintf(cmd, sizeof(cmd), "schtasks /Create /TN \"%s\" /XML \"%s\" /F", WATCHDOG_TASK, xmlpath);
+    int rc = run_cmd(cmd);
+    DeleteFileA(xmlpath);
+    logline(root, rc == 0 ? "install-watchdog: registered '" WATCHDOG_TASK "' (boot+logon+5min, SYSTEM)"
+                          : "install-watchdog: schtasks /Create failed");
+    return rc == 0 ? 0 : 1;
+}
+
+/* Remove the recovery watchdog scheduled task. */
+static int remove_watchdog(const char *root) {
+    int rc = run_cmd("schtasks /Delete /TN \"" WATCHDOG_TASK "\" /F");
+    logline(root, "remove-watchdog: task removed (or absent)");
+    return rc == 0 ? 0 : 0;   /* absent is fine */
+}
+
 int main(int argc, char **argv) {
     int mode_auto = 0, mode_force = 0, mode_status = 0, reset_winsock = 0;
+    int mode_install_wd = 0, mode_remove_wd = 0;
     for (int i = 1; i < argc; i++) {
-        if      (!strcmp(argv[i], "--auto"))          mode_auto = 1;
-        else if (!strcmp(argv[i], "--force"))         mode_force = 1;
-        else if (!strcmp(argv[i], "--status"))        mode_status = 1;
-        else if (!strcmp(argv[i], "--reset-winsock")) reset_winsock = 1;
+        if      (!strcmp(argv[i], "--auto"))             mode_auto = 1;
+        else if (!strcmp(argv[i], "--force"))            mode_force = 1;
+        else if (!strcmp(argv[i], "--status"))           mode_status = 1;
+        else if (!strcmp(argv[i], "--reset-winsock"))    reset_winsock = 1;
+        else if (!strcmp(argv[i], "--install-watchdog")) mode_install_wd = 1;
+        else if (!strcmp(argv[i], "--remove-watchdog"))  mode_remove_wd = 1;
     }
-    if (!mode_auto && !mode_force && !mode_status) mode_force = 1;  /* default: repair */
+    if (!mode_auto && !mode_force && !mode_status && !mode_install_wd && !mode_remove_wd)
+        mode_force = 1;  /* default: repair */
+
+    /* Watchdog task management (invoked by the MSI install/uninstall CustomActions). */
+    if (mode_install_wd || mode_remove_wd) {
+        char root2[MAX_PATH], self[MAX_PATH];
+        if (install_root(root2, sizeof(root2)) != 0) strcpy(root2, ".");
+        GetModuleFileNameA(NULL, self, MAX_PATH);
+        int rc = 0;
+        if (mode_remove_wd)  rc |= remove_watchdog(root2);
+        if (mode_install_wd) rc |= install_watchdog(root2, self);
+        return rc;
+    }
 
     char root[MAX_PATH];
     if (install_root(root, sizeof(root)) != 0) strcpy(root, ".");
