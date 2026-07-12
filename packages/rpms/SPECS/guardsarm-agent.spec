@@ -300,13 +300,13 @@ if [ $1 = 1 ]; then
 
   . %{_localstatedir}/packages_files/agent_installation_scripts/src/init/dist-detect.sh
 
-  # Generating ossec.conf file
-  %{_localstatedir}/packages_files/agent_installation_scripts/src/init/gen_guardsarm.sh conf agent ${DIST_NAME} ${DIST_VER}.${DIST_SUBVER} %{_localstatedir} > %{_localstatedir}/etc/ossec.conf
-  chown root:guardsarm %{_localstatedir}/etc/ossec.conf
-  chmod 640 %{_localstatedir}/etc/ossec.conf
+  # Generating gsmsec.conf file
+  %{_localstatedir}/packages_files/agent_installation_scripts/src/init/gen_guardsarm.sh conf agent ${DIST_NAME} ${DIST_VER}.${DIST_SUBVER} %{_localstatedir} > %{_localstatedir}/etc/gsmsec.conf
+  chown root:guardsarm %{_localstatedir}/etc/gsmsec.conf
+  chmod 640 %{_localstatedir}/etc/gsmsec.conf
 
-  # Add default local_files to ossec.conf
-  %{_localstatedir}/packages_files/agent_installation_scripts/src/init/add_localfiles.sh %{_localstatedir} >> %{_localstatedir}/etc/ossec.conf
+  # Add default local_files to gsmsec.conf
+  %{_localstatedir}/packages_files/agent_installation_scripts/src/init/add_localfiles.sh %{_localstatedir} >> %{_localstatedir}/etc/gsmsec.conf
 
   # Register and configure agent if GuardSarm environment variables are defined
   %{_localstatedir}/packages_files/agent_installation_scripts/src/init/register_configure_agent.sh %{_localstatedir} > /dev/null || :
@@ -439,8 +439,8 @@ else
   fi
 fi
 
-# Restore ossec.conf permissions after upgrading
-chmod 0640 %{_localstatedir}/etc/ossec.conf
+# Restore gsmsec.conf permissions after upgrading
+chmod 0640 %{_localstatedir}/etc/gsmsec.conf
 
 # Remove old ossec user and group if exists and change ownwership of files
 
@@ -469,7 +469,7 @@ if [ $1 = 0 ]; then
   # Path to the primary configuration file
   AGENT_CONF_PATH="%{_localstatedir}/etc/shared/agent.conf"
   # Path to the fallback configuration file
-  OSSEC_CONF_PATH="%{_localstatedir}/etc/ossec.conf"
+  OSSEC_CONF_PATH="%{_localstatedir}/etc/gsmsec.conf"
   # Initialize uninstallation permission variable
   UNINSTALL_VALIDATION_NEEDED=""
 
@@ -490,8 +490,8 @@ if [ $1 = 0 ]; then
       uninstall_validation_needed=$(get_package_uninstallation_value "$config_file")
     fi
 
-    if [ -z "$uninstall_validation_needed" ] && [ -f "%{_localstatedir}/etc/ossec.conf" ]; then
-      config_file="%{_localstatedir}/etc/ossec.conf"
+    if [ -z "$uninstall_validation_needed" ] && [ -f "%{_localstatedir}/etc/gsmsec.conf" ]; then
+      config_file="%{_localstatedir}/etc/gsmsec.conf"
       uninstall_validation_needed=$(get_package_uninstallation_value "$config_file")
     fi
 
@@ -689,7 +689,7 @@ rm -fr %{buildroot}
 %attr(640, root, guardsarm) %{_localstatedir}/etc/internal_options*
 %attr(640, root, guardsarm) %{_localstatedir}/etc/localtime
 %attr(640, root, guardsarm) %config(noreplace) %{_localstatedir}/etc/local_internal_options.conf
-%attr(640, root, guardsarm) %ghost %{_localstatedir}/etc/ossec.conf
+%attr(640, root, guardsarm) %ghost %{_localstatedir}/etc/gsmsec.conf
 %attr(640, root, guardsarm) %{_localstatedir}/etc/wpk_root.pem
 %dir %attr(770, root, guardsarm) %{_localstatedir}/etc/shared
 %dir %attr(750, root, guardsarm) %{_localstatedir}/lib

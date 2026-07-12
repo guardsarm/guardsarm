@@ -38,12 +38,12 @@ case "$1" in
 
     if [ -z "$2" ] || [ -f ${GUARDSARM_TMP_DIR}/create_conf ] ; then
 
-        ${SCRIPTS_DIR}/src/init/gen_guardsarm.sh conf agent ${OS} ${VER} ${DIR} > ${DIR}/etc/ossec.conf
-        ${SCRIPTS_DIR}/src/init/add_localfiles.sh ${DIR} >> ${DIR}/etc/ossec.conf
-        chmod 640 ${DIR}/etc/ossec.conf
+        ${SCRIPTS_DIR}/src/init/gen_guardsarm.sh conf agent ${OS} ${VER} ${DIR} > ${DIR}/etc/gsmsec.conf
+        ${SCRIPTS_DIR}/src/init/add_localfiles.sh ${DIR} >> ${DIR}/etc/gsmsec.conf
+        chmod 640 ${DIR}/etc/gsmsec.conf
     else
-        ${SCRIPTS_DIR}/src/init/gen_guardsarm.sh conf agent ${OS} ${VER} ${DIR} > ${DIR}/etc/ossec.conf.new
-        chmod 640 ${DIR}/etc/ossec.conf.new
+        ${SCRIPTS_DIR}/src/init/gen_guardsarm.sh conf agent ${OS} ${VER} ${DIR} > ${DIR}/etc/gsmsec.conf.new
+        chmod 640 ${DIR}/etc/gsmsec.conf.new
     fi
 
     # For the etc dir
@@ -62,10 +62,10 @@ case "$1" in
     if [ -f ${GUARDSARM_TMP_DIR}/client.keys ]; then
         cp ${GUARDSARM_TMP_DIR}/client.keys ${DIR}/etc/client.keys
     fi
-    # Restore ossec.conf configuration
-    if [ -f ${GUARDSARM_TMP_DIR}/ossec.conf ]; then
-        mv ${GUARDSARM_TMP_DIR}/ossec.conf ${DIR}/etc/ossec.conf
-        chmod 640 ${DIR}/etc/ossec.conf
+    # Restore gsmsec.conf configuration
+    if [ -f ${GUARDSARM_TMP_DIR}/gsmsec.conf ]; then
+        mv ${GUARDSARM_TMP_DIR}/gsmsec.conf ${DIR}/etc/gsmsec.conf
+        chmod 640 ${DIR}/etc/gsmsec.conf
     fi
     # Restore internal options configuration
     if [ -f ${GUARDSARM_TMP_DIR}/local_internal_options.conf ]; then

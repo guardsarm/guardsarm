@@ -31,8 +31,8 @@ check_anti_tampering() {
     uninstall_validation_needed=$(get_package_uninstallation_value "$config_file")
   fi
 
-  if [ -z "$uninstall_validation_needed" ] && [ -f "${DIR}/etc/ossec.conf" ]; then
-    config_file="${DIR}/etc/ossec.conf"
+  if [ -z "$uninstall_validation_needed" ] && [ -f "${DIR}/etc/gsmsec.conf" ]; then
+    config_file="${DIR}/etc/gsmsec.conf"
     uninstall_validation_needed=$(get_package_uninstallation_value "$config_file")
   fi
 
@@ -122,9 +122,9 @@ case "$1" in
       if [ -f ${DIR}/etc/local_internal_options.conf ]; then
         cp -p ${DIR}/etc/local_internal_options.conf ${DIR}/tmp/conffiles
       fi
-      # Save the ossec.conf
-      if [ -f ${DIR}/etc/ossec.conf ]; then
-        cp -p ${DIR}/etc/ossec.conf ${DIR}/tmp/conffiles
+      # Save the gsmsec.conf
+      if [ -f ${DIR}/etc/gsmsec.conf ]; then
+        cp -p ${DIR}/etc/gsmsec.conf ${DIR}/tmp/conffiles
       fi
 
     ;;

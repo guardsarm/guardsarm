@@ -39,7 +39,7 @@ ENV LD_LIBRARY_PATH=/var/ossec/lib
 
 # Enroll to the manager (authd on host 1517) and connect (remoted on host 1516), then run.
 CMD bash -c '\
-  CONF=/var/ossec/etc/ossec.conf; \
+  CONF=/var/ossec/etc/gsmsec.conf; \
   sed -i "s#<address>[^<]*</address>#<address>host.docker.internal</address>#" "$CONF"; \
   sed -i "0,/<port>1514</s//<port>1516</" "$CONF"; \
   ( /var/ossec/bin/guardsarm-agent-auth -m host.docker.internal -p 1517 -A guardsarm-agent-01 2>&1 || true ); \

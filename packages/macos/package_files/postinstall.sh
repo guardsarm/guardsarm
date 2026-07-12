@@ -137,8 +137,8 @@ if [ -z "${upgrade}" ]; then
 fi
 
 # Remove backup file created in register_configure_agent step
-if [ -e ${DIR}/etc/ossec.confre ]; then
-    rm -f ${DIR}/etc/ossec.confre || true
+if [ -e ${DIR}/etc/gsmsec.confre ]; then
+    rm -f ${DIR}/etc/gsmsec.confre || true
 fi
 
 # Install the service

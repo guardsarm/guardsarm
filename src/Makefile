@@ -357,7 +357,7 @@ endif
 .PHONY: winagent
 winagent: ${GUARDSARM_LIB_OUTPUT_PATH}${LIBGCC_S_NAME} ${GUARDSARM_LIB_OUTPUT_PATH}${LIBSTDCPP_NAME}
 	${MAKE} ${BUILD_CMAKE_PROJECTS}
-	cd win32/ && ./unix2dos.pl ossec.conf > default-ossec.conf
+	cd win32/ && ./unix2dos.pl gsmsec.conf > default-gsmsec.conf
 	cd win32/ && ./unix2dos.pl help.txt > help_win.txt
 	cd win32/ && ./unix2dos.pl ../../etc/internal_options.conf > internal_options.conf
 	cd win32/ && ./unix2dos.pl ../../etc/local_internal_options-win.conf > default-local_internal_options.conf
@@ -878,7 +878,7 @@ clean-windows:
 	rm -f win32/help_win.txt
 	rm -f win32/internal_options.conf
 	rm -f win32/default-local_internal_options.conf
-	rm -f win32/default-ossec.conf
+	rm -f win32/default-gsmsec.conf
 	rm -f win32/VERSION.json
 
 clean-config:
