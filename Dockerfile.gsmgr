@@ -11,12 +11,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY . /build/guardsarm
 WORKDIR /build/guardsarm/src
 
-# A fork uses upstream build artifacts until it hosts its own mirrors.
-RUN sed -i \
-      -e 's#https://packages.guardsarmsiem.com/deps/#https://packages.wazuh.com/deps/#g' \
-      -e 's#github.com/guardsarm/guardsarm-http-request#github.com/wazuh/wazuh-http-request#g' \
-      -e 's#guardsarm/guardsarm-indexer-plugins#wazuh/wazuh-indexer-plugins#g' \
-      Makefile
+# Build dependencies resolve from GuardSarm-hosted infrastructure (the Makefile
+# defaults): the C build libraries from packages.guardsarmsiem.com/deps and the
+# http-request / indexer-plugins modules from github.com/guardsarm. Populate that
+# infra from deps-to-host/ (see deps-to-host/README.md) before building — no
+# upstream rewrite.
 
 RUN make deps TARGET=server INDEXER_PLUGINS_REFS=main -j"$(nproc)"
 RUN make TARGET=server INDEXER_PLUGINS_REFS=main -j"$(nproc)"
