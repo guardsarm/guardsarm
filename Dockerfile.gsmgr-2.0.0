@@ -4,9 +4,9 @@
 FROM guardsarm-manager:2.0.0-rootfs
 
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
-    LD_LIBRARY_PATH=/var/gsmsec/lib:/var/gsmsec/framework/python/lib
+    LD_LIBRARY_PATH=/var/guardsarm-manager/lib:/var/guardsarm-manager/framework/python/lib
 
 WORKDIR /build/guardsarm
 EXPOSE 1514/tcp 1515/tcp 1516/tcp 55000/tcp
 
-CMD ["/bin/sh","-c","bash -c '  ( /var/gsmsec/bin/guardsarm-manager-control start || /var/gsmsec/bin/guardsarm-control start || true );   sleep 8;   echo \"=== GuardSarm daemons ===\"; /var/gsmsec/bin/guardsarm-manager-control status 2>/dev/null || /var/gsmsec/bin/guardsarm-control status 2>/dev/null || ps -e;   touch /var/gsmsec/logs/ossec.log; tail -f /var/gsmsec/logs/ossec.log'"]
+CMD ["/bin/sh","-c","bash -c '  ( /var/guardsarm-manager/bin/guardsarm-manager-control start || /var/guardsarm-manager/bin/guardsarm-control start || true );   sleep 8;   echo \"=== GuardSarm daemons ===\"; /var/guardsarm-manager/bin/guardsarm-manager-control status 2>/dev/null || /var/guardsarm-manager/bin/guardsarm-control status 2>/dev/null || ps -e;   touch /var/guardsarm-manager/logs/ossec.log; tail -f /var/guardsarm-manager/logs/ossec.log'"]
