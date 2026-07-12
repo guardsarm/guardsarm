@@ -47,11 +47,14 @@
 #define PRODUCT_SITE "http://www.guardsarmsiem.com"
 #endif
 
-/* Display-only product version. When branding.json defines no product_version,
- * this falls back to the frozen __guardsarm_version banner value from defs.h. This
- * macro is for BANNERS/HELP output only -- never for on-wire version reporting. */
+/* Display-only product/release version (CLI banners, help, PE resources). This is the
+ * customer-facing version and is DECOUPLED from the frozen __guardsarm_version wire
+ * token in defs.h: that token stays fixed so the agent/manager handshake keeps working,
+ * while this bumps every release. NEVER use __guardsarm_version for display, and NEVER
+ * use PRODUCT_VERSION for on-wire version reporting. Bump on each product release
+ * (bump-version.sh keeps this in lockstep with VERSION.json / branding.json). */
 #ifndef PRODUCT_VERSION
-#define PRODUCT_VERSION __guardsarm_version
+#define PRODUCT_VERSION "v2.4.0"
 #endif
 
 #endif /* GUARDSARM_BRANDING_H */
