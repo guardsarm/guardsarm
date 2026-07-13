@@ -4,6 +4,7 @@
 *.a
 *.dSYM
 .DS_Store
+*.wazuh-bak
 *.pyc
 *.dll
 *.exe
