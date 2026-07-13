@@ -9,3 +9,12 @@ install.sh text eol=lf
 *.pl    text eol=lf
 Makefile text eol=lf
 *.mk    text eol=lf
+
+# Package-generation manifests + templates the agent postinst reads at install time.
+# A CRLF here gets baked into the built .deb/.rpm and corrupts SCA policy filenames
+# (mv "cis_*.yml"$'\r' fails) and generated config — a ship-blocker found in E2E testing.
+sca.files    text eol=lf
+*.template   text eol=lf
+*.files      text eol=lf
+etc/templates/** text eol=lf
+src/init/**  text eol=lf
