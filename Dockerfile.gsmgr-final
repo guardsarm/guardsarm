@@ -15,7 +15,10 @@
 # traffic and default credentials. For a real deployment use the hardened path
 # (guardsarm-deploy/ — TLS, externally-managed secrets, non-root, healthchecks).
 # =============================================================================
-FROM guardsarm-mgr-base:dbg
+# Base image built by the engine/manager compile stage. Overridable so the build is
+# reproducible against whatever base tag is present (default = the current 2.0.0-gm base).
+ARG MGR_BASE=guardsarm-mgr-base:2.0.0-gm
+FROM ${MGR_BASE}
 
 # Compat shim (GuardSarm dependency-mirror workaround): the full Wazuh->GuardSarm
 # rename produced libguardsarmext.so, but the upstream precompiled CPython that
@@ -142,16 +145,11 @@ COPY activate_routes.py /var/guardsarm-manager/bin/activate_routes.py
 # ruleset-provision/ is a build-only, gitignored dir.
 COPY ruleset-provision/ /var/guardsarm-manager/bin/ruleset/
 
-CMD bash -c '\
-  ( /var/guardsarm-manager/bin/guardsarm-manager-control start || true ); \
-  for i in $(seq 1 40); do [ -S /var/guardsarm-manager/queue/sockets/analysis ] && break; sleep 2; done; \
-  sleep 5; \
-  if [ "$(ls /var/guardsarm-manager/data/ruleset/standard/decoders 2>/dev/null | grep -c guardsarm-windows-)" = "0" ]; then \
-    echo "[self-heal] decoder library absent -> provisioning full ruleset from source"; \
-    bash /var/guardsarm-manager/bin/ruleset/provision_incontainer.sh 2>&1 | tail -12; \
-  elif ! curl -s --unix-socket /var/guardsarm-manager/queue/sockets/analysis -H "Content-Type: text/plain" -X POST -d "{}" http://localhost/_internal/router/table/get 2>/dev/null | grep -q "\"name\""; then \
-    echo "[self-heal] no active route -> activating local default route"; \
-    python3 /var/guardsarm-manager/bin/activate_routes.py 2>&1 | tail -3; \
-  else echo "[self-heal] decoder library + route already active"; fi; \
-  echo "=== GuardSarm daemons ==="; /var/guardsarm-manager/bin/guardsarm-manager-control status 2>/dev/null || ps -e; \
-  touch /var/guardsarm-manager/logs/ossec.log; tail -f /var/guardsarm-manager/logs/ossec.log'
+# Startup logic lives in a baked script (staged from cti/) so the shell isn't mangled by
+# Dockerfile line-continuation + nested quoting. It self-heals the ruleset: a fresh image
+# provisions the full library from source; an already-provisioned one only re-activates the
+# route if needed.
+# Reset the inherited ENTRYPOINT (the base image sets ENTRYPOINT ["sh"], which would
+# prepend `sh` to our CMD and try to run "bash" as a script file) so CMD runs directly.
+ENTRYPOINT []
+CMD ["bash", "/var/guardsarm-manager/bin/ruleset/gsmgr_entrypoint.sh"]
