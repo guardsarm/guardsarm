@@ -17,7 +17,7 @@
 # =============================================================================
 # Base image built by the engine/manager compile stage. Overridable so the build is
 # reproducible against whatever base tag is present (default = the current 2.0.0-gm base).
-ARG MGR_BASE=guardsarm-mgr-base:2.0.0-gm
+ARG MGR_BASE=guardsarm-mgr-base:2.4.0
 FROM ${MGR_BASE}
 
 # Compat shim (GuardSarm dependency-mirror workaround): the full Wazuh->GuardSarm
