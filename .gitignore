@@ -177,3 +177,6 @@ src/result-*.txt
 
 # Tool files
 tools/repository_bumper_*
+
+# Build-staged ruleset generators (canonical source: guardsarm-infra/cti; staged by build-gsmgr-image.sh)
+ruleset-provision/

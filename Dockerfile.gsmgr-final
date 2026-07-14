@@ -135,13 +135,23 @@ ENV LD_LIBRARY_PATH=/var/guardsarm-manager/lib:/var/guardsarm-manager/framework/
 # lets startup re-create it automatically (idempotent — only when the router table is empty).
 COPY activate_routes.py /var/guardsarm-manager/bin/activate_routes.py
 
+# Bake the FROM-SOURCE ruleset provisioner so a fresh image self-provisions the whole
+# decoder library (base sshd/sudo/web/db/EDR + sysmon + auditd + Windows event-log, all with
+# rich ECS field extraction) instead of relying on a docker-committed layer. These generators
+# are staged from guardsarm-infra/cti by build-gsmgr-image.sh (cti/ stays the single source);
+# ruleset-provision/ is a build-only, gitignored dir.
+COPY ruleset-provision/ /var/guardsarm-manager/bin/ruleset/
+
 CMD bash -c '\
   ( /var/guardsarm-manager/bin/guardsarm-manager-control start || true ); \
   for i in $(seq 1 40); do [ -S /var/guardsarm-manager/queue/sockets/analysis ] && break; sleep 2; done; \
   sleep 5; \
-  if ! curl -s --unix-socket /var/guardsarm-manager/queue/sockets/analysis -H "Content-Type: text/plain" -X POST -d "{}" http://localhost/_internal/router/table/get 2>/dev/null | grep -q "\"name\""; then \
+  if [ "$(ls /var/guardsarm-manager/data/ruleset/standard/decoders 2>/dev/null | grep -c guardsarm-windows-)" = "0" ]; then \
+    echo "[self-heal] decoder library absent -> provisioning full ruleset from source"; \
+    bash /var/guardsarm-manager/bin/ruleset/provision_incontainer.sh 2>&1 | tail -12; \
+  elif ! curl -s --unix-socket /var/guardsarm-manager/queue/sockets/analysis -H "Content-Type: text/plain" -X POST -d "{}" http://localhost/_internal/router/table/get 2>/dev/null | grep -q "\"name\""; then \
     echo "[self-heal] no active route -> activating local default route"; \
     python3 /var/guardsarm-manager/bin/activate_routes.py 2>&1 | tail -3; \
-  else echo "[self-heal] route already active"; fi; \
+  else echo "[self-heal] decoder library + route already active"; fi; \
   echo "=== GuardSarm daemons ==="; /var/guardsarm-manager/bin/guardsarm-manager-control status 2>/dev/null || ps -e; \
   touch /var/guardsarm-manager/logs/ossec.log; tail -f /var/guardsarm-manager/logs/ossec.log'
