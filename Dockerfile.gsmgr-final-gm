@@ -1,7 +1,7 @@
 # Final GuardSarm manager image, built FROM the already-compiled debug base
 # (guardsarm-mgr-base:dbg) so there is zero recompile — just the dependency-alias
 # shim + full install + runtime entrypoint.
-FROM guardsarm-mgr-base:2.0.0-gm
+FROM guardsarm-mgr-base:2.4.0
 
 # Compat shim (GuardSarm dependency-mirror workaround): the full Wazuh->GuardSarm
 # rename produced libguardsarmext.so, but the upstream precompiled CPython that

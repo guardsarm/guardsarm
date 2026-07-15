@@ -5,9 +5,9 @@
 # The agent-only external deps (libdb/popt/lua/rpm/dbus/libbpf-bootstrap) can no
 # longer be fetched (the RESOURCES_URL mirror is gone), but the prior native agent
 # image already has them built — so we copy them in and skip `make deps`.
-FROM guardsarm-agent:2.0.0-native AS agentdeps
+FROM guardsarm-agent:2.4.0 AS agentdeps
 
-FROM guardsarm-mgr-base:2.0.0-gm
+FROM guardsarm-mgr-base:2.4.0
 
 # Bring in the pre-built agent external deps that the manager base never fetched.
 COPY --from=agentdeps /build/guardsarm/src/external/popt            /build/guardsarm/src/external/popt
