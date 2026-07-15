@@ -117,6 +117,24 @@ WriteSyscollector()
 }
 
 ##########
+# WriteEdr()
+##########
+# Endpoint detection & response telemetry (native EDR wmodule: process + network
+# activity from /proc). It is a first-class GuardSarm feature and does not depend
+# on any OS log file, so — unlike the log localfiles — it is always emitted for
+# agents. Kept minimal + safe (short interval, process + network on).
+WriteEdr()
+{
+    echo "  <wodle name=\"edr\">" >> $NEWCONFIG
+    echo "    <disabled>no</disabled>" >> $NEWCONFIG
+    echo "    <interval>5</interval>" >> $NEWCONFIG
+    echo "    <processes>yes</processes>" >> $NEWCONFIG
+    echo "    <network>yes</network>" >> $NEWCONFIG
+    echo "  </wodle>" >> $NEWCONFIG
+    echo "" >> $NEWCONFIG
+}
+
+##########
 # WriteConfigurationAssessment()
 ##########
 WriteConfigurationAssessment()
@@ -355,6 +373,9 @@ WriteAgent()
 
     # Syscollector configuration
     WriteSyscollector "agent"
+
+    # EDR telemetry (native process/network wmodule) — always on for agents
+    WriteEdr
 
     # Configuration assessment configuration
     WriteConfigurationAssessment

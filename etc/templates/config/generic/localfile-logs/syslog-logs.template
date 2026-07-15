@@ -1,7 +1,7 @@
 [!journald] syslog:/var/log/messages
 syslog:/var/log/authlog
-[!journald] syslog:/var/log/auth.log
-[!journald] syslog:/var/log/secure
+skip_check_exist:[!journald] syslog:/var/log/auth.log
+skip_check_exist:[!journald] syslog:/var/log/secure
 syslog:/var/log/secure.log
 syslog:/var/log/system.log
 [!journald] syslog:/var/log/syslog
