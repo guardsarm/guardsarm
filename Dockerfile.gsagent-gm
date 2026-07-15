@@ -41,6 +41,12 @@ WORKDIR /build/guardsarm/src
 # Deps already present (copied above) — compile the agent target directly.
 RUN make TARGET=agent INDEXER_PLUGINS_REFS=main -j"$(nproc)" 2>&1 | tail -5
 
+# Overlay the current committed SCA ruleset over the base image's baked copy so
+# install.sh stages the up-to-date policies (rebranded copyright headers, and any
+# newly added CIS policies). The base image's ruleset predates those source edits.
+# Placed AFTER the compile so it doesn't invalidate the (cached) make layer.
+COPY ruleset/sca/ /build/guardsarm/ruleset/sca/
+
 WORKDIR /build/guardsarm
 # Install to the REBRANDED agent home /var/gsmsec (install.sh already defaults the
 # agent here; the old Dockerfile wrongly forced /var/gsmsec). Paths below match.
