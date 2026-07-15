@@ -164,7 +164,12 @@ InstallSecurityConfigurationAssessmentFiles()
         rm -f ${INSTALLDIR}/ruleset/sca/*
 
         echo "Installing SCA policies..."
-        CONFIGURATION_ASSESSMENT_FILES=$(cat .$CONFIGURATION_ASSESSMENT_FILES_PATH)
+        # Strip CR: the sca.files templates can carry CRLF line endings (e.g. when the
+        # source tree is checked out on Windows / with core.autocrlf), which would make
+        # $FILE = "policy.yml\r" so the `-f` test never matches and NO policy is staged
+        # (silent empty ruleset/sca -> no SCA telemetry). The .deb postinst already does
+        # this with `tr -d '\r'`; mirror it here so install.sh-based installs match.
+        CONFIGURATION_ASSESSMENT_FILES=$(tr -d '\r' < ".$CONFIGURATION_ASSESSMENT_FILES_PATH")
         for FILE in $CONFIGURATION_ASSESSMENT_FILES; do
             if [ -f "../ruleset/sca/$FILE" ]; then
                 ${INSTALL} -m 0640 -o root -g ${GUARDSARM_GROUP} ../ruleset/sca/$FILE ${INSTALLDIR}/ruleset/sca
