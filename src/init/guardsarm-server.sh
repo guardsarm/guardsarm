@@ -26,7 +26,7 @@ if [ $? = 0 ]; then
 . ${PLIST};
 fi
 
-AUTHOR="Wazuh Inc."
+AUTHOR="GuardSarm, Inc."
 USE_JSON=false
 DAEMONS="guardsarm-manager-clusterd guardsarm-manager-modulesd guardsarm-manager-monitord guardsarm-manager-remoted guardsarm-manager-analysisd guardsarm-manager-db guardsarm-manager-authd guardsarm-manager-apid"
 

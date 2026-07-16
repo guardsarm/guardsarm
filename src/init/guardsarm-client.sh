@@ -16,7 +16,7 @@ REVISION="alpha0"
 TYPE="agent"
 
 ###  Do not modify below here ###
-AUTHOR="Wazuh Inc."
+AUTHOR="GuardSarm, Inc."
 DAEMONS="guardsarm-modulesd guardsarm-logcollector guardsarm-syscheckd guardsarm-agentd guardsarm-execd"
 
 # GuardSarm branding layer (display only). Falls back to "GuardSarm" if branding.sh

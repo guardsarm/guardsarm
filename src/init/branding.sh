@@ -18,7 +18,7 @@
 # --- Fallbacks (original GuardSarm branding) ---
 PRODUCT_NAME="GuardSarm"
 PRODUCT_SHORT_NAME="GuardSarm"
-PRODUCT_AUTHOR="Wazuh Inc."
+PRODUCT_AUTHOR="GuardSarm, Inc."
 PRODUCT_SITE="https://guardsarmsiem.com"
 PRODUCT_DISPLAY_VERSION=""
 
