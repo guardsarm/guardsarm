@@ -23,7 +23,7 @@
 
     // Redefine guardsarm_version
     #undef __guardsarm_version
-    #define __guardsarm_version "v2.0.0"
+    #define __guardsarm_version "v2.4.0"
 #else
     #define STATIC static
 #endif

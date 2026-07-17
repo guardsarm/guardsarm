@@ -17,7 +17,7 @@
 
     // Redefine guardsarm_version
     #undef __guardsarm_version
-    #define __guardsarm_version "v2.0.0"
+    #define __guardsarm_version "v2.4.0"
 
     /* Replace assert with mock_assert */
     extern void mock_assert(const int result, const char* const expression,

@@ -73,10 +73,17 @@
  *   - guardsarmdb_queries_op.c : builds the agent `version` DB field "<name> <ver>"
  *   - file_op.c      : composes stored OS/version metadata strings
  *   - executionContext.hpp : builds the content-server HTTP User-Agent from __guardsarm_version
- *   - enrollment/upgrade    : on-wire version (locally #undef'd to "v5.0.0" in protocol files)
- * User-visible branding lives in the PRODUCT_* macros (branding.h), NOT here. */
+ *   - enrollment/upgrade    : on-wire version
+ * User-visible branding lives in the PRODUCT_* macros (branding.h), NOT here.
+ *
+ * __guardsarm_version is the on-wire PROTOCOL/DB version and is tracked to the product
+ * version. It is #define'd IDENTICALLY in several protocol files (auth.c, manager.c,
+ * enrollment_op.c, wm_agent_upgrade_validate.c, client-agent/start_agent.c). If you bump
+ * it, bump ALL of them together AND rebuild+redeploy the manager and the agents in
+ * lockstep: remoted (manager.c) flags any agent NEWER than the manager as a version error
+ * unless <remoted><allow_higher_versions>. Do NOT route it through the branding layer. */
 #define __guardsarm_name    "GuardSarm"       /* FROZEN: wire/DB/metadata literal -- see note above */
-#define __guardsarm_version "v2.0.0"      /* FROZEN: version compat literal -- see note above */
+#define __guardsarm_version "v2.4.0"          /* on-wire/DB version -- keep in lockstep, see note */
 #define __author        "GuardSarm, Inc."
 #define __contact       "info@guardsarmsiem.com"
 #define __site          "http://www.guardsarmsiem.com"

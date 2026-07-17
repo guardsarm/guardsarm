@@ -13,7 +13,7 @@
 #ifdef GUARDSARM_UNIT_TESTING
 // Redefine guardsarm_version
 #undef __guardsarm_version
-#define __guardsarm_version "v2.0.0"
+#define __guardsarm_version "v2.4.0"
 #endif
 
 // Mutex needed to download a WPK file
