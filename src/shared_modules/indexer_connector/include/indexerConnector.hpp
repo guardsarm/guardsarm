@@ -124,18 +124,21 @@ public:
     void deleteByQuery(const std::string& index, const std::string& agentId);
 
     /**
-     * @brief Queue a version-scoped "sweep" delete for a full module resync.
+     * @brief Queue an id-set reconciliation delete for a full module resync.
      *
-     * Deletes only the agent's STALE docs (state.document_version < globalVersion),
-     * leaving the current generation intact. Used by Mode_ModuleFull so a full
-     * resync overwrites current docs instead of delete-then-reinsert (which could
-     * 409 the reinsert and silently empty a module).
+     * Deletes the agent's docs in @p index whose _id is NOT in @p keepIds (orphans
+     * the agent no longer reports), leaving the current docs (excluded by id) to be
+     * overwritten by the bulk upsert — so a full resync never empties a live module
+     * (unlike delete-then-reinsert, which could 409 the reinsert and empty it). An
+     * empty keepIds removes all of the agent's docs for the index.
      *
      * @param index Index name.
-     * @param agentId Agent ID whose stale docs should be swept.
-     * @param globalVersion Resync generation; docs strictly below it are deleted.
+     * @param agentId Agent ID whose orphan docs should be removed.
+     * @param keepIds The _ids sent in this full sync; everything else is deleted.
      */
-    void deleteByQueryStale(const std::string& index, const std::string& agentId, uint64_t globalVersion);
+    void deleteByQueryExceptIds(const std::string& index,
+                                const std::string& agentId,
+                                const std::vector<std::string>& keepIds);
 
     /**
      * @brief Execute an update by query operation on OpenSearch/Elasticsearch.

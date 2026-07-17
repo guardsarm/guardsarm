@@ -30,9 +30,11 @@ public:
         m_impl.deleteByQuery(index, agentId);
     }
 
-    void deleteByQueryStale(const std::string& index, const std::string& agentId, uint64_t globalVersion)
+    void deleteByQueryExceptIds(const std::string& index,
+                                const std::string& agentId,
+                                const std::vector<std::string>& keepIds)
     {
-        m_impl.deleteByQueryStale(index, agentId, globalVersion);
+        m_impl.deleteByQueryExceptIds(index, agentId, keepIds);
     }
 
     void executeUpdateByQuery(const std::vector<std::string>& indices, const nlohmann::json& updateQuery)
@@ -132,11 +134,11 @@ void IndexerConnectorSync::deleteByQuery(const std::string& index, const std::st
     m_impl->deleteByQuery(index, agentId);
 }
 
-void IndexerConnectorSync::deleteByQueryStale(const std::string& index,
-                                              const std::string& agentId,
-                                              uint64_t globalVersion)
+void IndexerConnectorSync::deleteByQueryExceptIds(const std::string& index,
+                                                  const std::string& agentId,
+                                                  const std::vector<std::string>& keepIds)
 {
-    m_impl->deleteByQueryStale(index, agentId, globalVersion);
+    m_impl->deleteByQueryExceptIds(index, agentId, keepIds);
 }
 
 void IndexerConnectorSync::executeUpdateByQuery(const std::vector<std::string>& indices,

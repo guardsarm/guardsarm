@@ -33,6 +33,7 @@
 #include <rocksdb/slice.h>
 #include <shared_mutex>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 
@@ -1065,43 +1066,25 @@ public:
                             }
                         }
 
-                        // Full module resync: sweep only the STALE docs (version <
-                        // globalVersion) instead of deleting every doc for the agent.
-                        // A blanket deleteByQuery here deleted the current docs too,
-                        // bumping their version to a tombstone; the same-version
-                        // reinsert that follows then 409'd (external_gte) and was
-                        // dropped as an "acceptable version conflict", silently leaving
-                        // the module EMPTY (e.g. hardware -> 0). Version-scoped sweep
-                        // leaves the current generation untouched (it is overwritten by
-                        // the bulk upsert below), so a resync can no longer empty a
-                        // module; genuinely removed docs (older version) are still swept.
-                        if (res.context->mode == GuardSarm::SyncSchema::Mode_ModuleFull)
-                        {
-                            logDebug2(LOGGER_DEFAULT_TAG,
-                                      "InventorySyncFacade::start: Sweeping stale docs (version < %llu) for %zu "
-                                      "indices...",
-                                      res.context->globalVersion,
-                                      res.context->indices.size());
-                            // Sweep stale docs from all indices specified in the Start message
-                            for (const auto& index : res.context->indices)
-                            {
-                                try
-                                {
-                                    m_indexerConnector->deleteByQueryStale(
-                                        index, res.context->agentId, res.context->globalVersion);
-                                    hasDeleteByQueryEnqueued = true;
-                                }
-                                catch (const std::exception& e)
-                                {
-                                    logWarn(LOGGER_DEFAULT_TAG,
-                                            "InventorySyncFacade::start: deleteByQueryStale rejected for index '%s' "
-                                            "(session %llu): %s",
-                                            index.c_str(),
-                                            res.context->sessionId,
-                                            e.what());
-                                }
-                            }
-                        }
+                        // Full module resync reconciliation (id-set mark-and-sweep):
+                        // a ModuleFull carries the agent's COMPLETE current doc set for
+                        // each index. We collect the _ids actually sent (in the bulk loop
+                        // below) and, AFTER the bulk upsert, delete the agent's docs whose
+                        // _id was NOT sent — i.e. orphans the agent no longer has. This is
+                        // deliberately NOT a delete-then-reinsert of the whole agent: a
+                        // blanket deleteByQuery here used to delete the current docs too,
+                        // bumping their version to a tombstone so the same-version reinsert
+                        // 409'd (external_gte) and was dropped as an "acceptable version
+                        // conflict", silently emptying the module (e.g. hardware -> 0). By
+                        // excluding the sent ids from the delete, current docs are simply
+                        // overwritten by the upsert and can never be emptied; only genuine
+                        // orphans are swept. (A version threshold cannot do this: doc
+                        // versions are per-row, not a uniform generation, so a range sweep
+                        // would over-delete current docs.)
+                        const bool isModuleFull =
+                            res.context->mode == GuardSarm::SyncSchema::Mode_ModuleFull;
+                        // Per-index set of _ids sent in this full sync (kept; rest are swept).
+                        std::unordered_map<std::string, std::vector<std::string>> fullSyncKeepIds;
 
                         const auto prefix = std::format("{}_", res.context->sessionId);
 
@@ -1250,6 +1233,13 @@ public:
                                     {
                                         m_indexerConnector->bulkIndex(elementId, rawIndex, dataString);
                                     }
+
+                                    // Remember this _id so the post-loop reconciliation keeps
+                                    // it (a ModuleFull sends the full current set as upserts).
+                                    if (isModuleFull)
+                                    {
+                                        fullSyncKeepIds[std::string(rawIndex)].emplace_back(elementId);
+                                    }
                                 }
                                 else
                                 {
@@ -1260,6 +1250,38 @@ public:
                             else
                             {
                                 throw InventorySyncException("Invalid message type");
+                            }
+                        }
+
+                        // ModuleFull reconciliation: in each index of this full sync, delete
+                        // the agent's docs whose _id was NOT sent (orphans). The just-upserted
+                        // current docs are excluded by _id, so a full resync can never empty a
+                        // live module. An index that received no docs (agent has none) yields
+                        // an empty keep-set -> all of the agent's docs there are removed, which
+                        // is the correct reconciliation for an emptied module.
+                        if (isModuleFull)
+                        {
+                            for (const auto& index : res.context->indices)
+                            {
+                                try
+                                {
+                                    auto it = fullSyncKeepIds.find(index);
+                                    m_indexerConnector->deleteByQueryExceptIds(
+                                        index,
+                                        res.context->agentId,
+                                        it != fullSyncKeepIds.end() ? it->second
+                                                                    : std::vector<std::string> {});
+                                    hasDeleteByQueryEnqueued = true;
+                                }
+                                catch (const std::exception& e)
+                                {
+                                    logWarn(LOGGER_DEFAULT_TAG,
+                                            "InventorySyncFacade::start: deleteByQueryExceptIds rejected for index "
+                                            "'%s' (session %llu): %s",
+                                            index.c_str(),
+                                            res.context->sessionId,
+                                            e.what());
+                                }
                             }
                         }
 

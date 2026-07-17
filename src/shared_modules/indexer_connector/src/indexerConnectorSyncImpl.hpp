@@ -275,14 +275,14 @@ class IndexerConnectorSyncImpl final
     THttpRequest* m_httpRequest;
     std::string m_bulkData;
     std::map<std::string, nlohmann::json, std::less<>> m_deleteByQuery;
-    // Per-agent, version-scoped "sweep" deletes used by a full module resync
-    // (Mode_ModuleFull). Unlike m_deleteByQuery (delete ALL of an agent's docs in
-    // an index), each entry here deletes only the agent's STALE docs — those whose
-    // state.document_version is below the resync's globalVersion — so the current
-    // generation of docs is never deleted (and therefore never tombstone-version-
-    // bumped, which is what made same-version reinserts 409 and silently emptied a
-    // module). Kept as a separate list because each entry carries its own agent +
-    // globalVersion and cannot be merged into the shared per-index terms query.
+    // Per-agent id-set reconciliation deletes used by a full module resync
+    // (Mode_ModuleFull). Unlike m_deleteByQuery (delete ALL of an agent's docs in an
+    // index), each entry here deletes only the agent's ORPHAN docs — those whose _id
+    // was NOT sent in the full sync — via a must_not ids clause. The current docs are
+    // excluded by id, so they are never deleted (and never tombstone-version-bumped,
+    // which is what made same-version reinserts 409 and silently emptied a module).
+    // Kept as a separate list because each entry carries its own agent + id-set and
+    // cannot be merged into the shared per-index terms query.
     std::vector<std::pair<std::string, nlohmann::json>> m_staleDeleteByQuery;
     std::vector<std::function<void()>> m_notify;
     std::chrono::steady_clock::time_point m_lastBulkTime;
@@ -355,10 +355,10 @@ class IndexerConnectorSyncImpl final
                 {});
         }
 
-        // Version-scoped "sweep" deletes for full module resyncs: delete only the
-        // agent's stale docs (state.document_version < globalVersion). The current
-        // generation of docs is excluded, so it is never deleted/version-bumped and
-        // the reinsert that follows cannot 409 into an empty module.
+        // Id-set reconciliation deletes for full module resyncs: delete only the
+        // agent's orphan docs (whose _id was not sent). The current docs are excluded
+        // by id, so they are never deleted/version-bumped and the upsert that follows
+        // cannot 409 into an empty module.
         for (const auto& [index, query] : m_staleDeleteByQuery)
         {
             std::string url;
@@ -366,7 +366,7 @@ class IndexerConnectorSyncImpl final
             url += "/";
             url += index;
             url += "/_delete_by_query";
-            logDebug2(m_logTag.c_str(), "Deleting stale (version-scoped) by query: %s", url.c_str());
+            logDebug2(m_logTag.c_str(), "Reconciliation delete (except sent ids): %s", url.c_str());
             m_httpRequest->post(
                 RequestParameters {
                     .url = HttpURL(url), .data = query.dump(), .secureCommunication = m_secureCommunication},
@@ -774,27 +774,33 @@ public:
         it->second["query"]["bool"]["filter"]["terms"]["guardsarm.agent.id"].push_back(agentId);
     }
 
-    /// @brief Queue a version-scoped "sweep" delete for a full module resync.
-    /// @details Deletes ONLY the agent's stale docs — those whose
-    ///          state.document_version is strictly below @p globalVersion (the
-    ///          resync's generation). Docs of the current generation (>= globalVersion,
-    ///          and docs with no state.document_version, which a range query never
-    ///          matches) are left untouched, so a full resync no longer deletes-then-
-    ///          fails-to-reinsert the current docs (which silently emptied a module).
-    ///          Executed at flush time, before the bulk upserts, like deleteByQuery.
-    void deleteByQueryStale(const std::string& index, const std::string& agentId, uint64_t globalVersion)
+    /// @brief Queue an id-set reconciliation delete for a full module resync.
+    /// @details Deletes the agent's docs in @p index whose _id is NOT in @p keepIds
+    ///          (orphans the agent no longer reports). Current docs — their ids are in
+    ///          keepIds — are excluded, so a full resync overwrites them in place and can
+    ///          never empty a live module (unlike a blanket delete-then-reinsert, which
+    ///          409'd the same-version reinsert and emptied the module). An empty keepIds
+    ///          means the agent has no docs for the index, so ALL of its docs there are
+    ///          removed — the correct reconciliation for a genuinely emptied module.
+    ///          Executed at flush time, before the bulk upserts (order-independent:
+    ///          current docs are excluded by id either way).
+    void deleteByQueryExceptIds(const std::string& index,
+                                const std::string& agentId,
+                                const std::vector<std::string>& keepIds)
     {
         if (!isSafeIndexName(index))
         {
             logWarn(m_logTag.c_str(),
-                    "Refusing deleteByQueryStale for unsafe index name '%s' (empty or contains characters outside "
-                    "[a-zA-Z0-9._*-]).",
+                    "Refusing deleteByQueryExceptIds for unsafe index name '%s' (empty or contains characters "
+                    "outside [a-zA-Z0-9._*-]).",
                     index.c_str());
             throw IndexerConnectorException("Unsafe index name");
         }
         nlohmann::json query;
         query["query"]["bool"]["filter"][0]["term"]["guardsarm.agent.id"] = agentId;
-        query["query"]["bool"]["filter"][1]["range"]["state.document_version"]["lt"] = globalVersion;
+        // must_not ids -> delete every doc for the agent EXCEPT the ids just sent. An
+        // empty ids list matches no documents, so must_not(nothing) deletes them all.
+        query["query"]["bool"]["must_not"][0]["ids"]["values"] = keepIds;
         m_staleDeleteByQuery.emplace_back(index, std::move(query));
     }
 
