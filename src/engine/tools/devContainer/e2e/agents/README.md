@@ -36,7 +36,7 @@ Both services:
 - build their image from `rpm/<version>`
 - add `host.docker.internal` pointing to the host gateway
 - configure environment variables for agent registration
-- mount a persistent volume at `/var/ossec`
+- mount a persistent volume at `/var/gsmsec`
 - restart with the `unless-stopped` policy
 
 The persistent volumes are:
@@ -97,20 +97,20 @@ If the expected agent version changes, the pattern in `rpm/5.x/Dockerfile` must 
 Both entrypoints implement the same flow:
 
 1. read environment variables for connection and registration
-2. update the manager address inside `/var/ossec/etc/ossec.conf`
-3. run `agent-auth` to register the agent against `authd`
+2. update the manager address inside `/var/gsmsec/etc/gsmsec.conf`
+3. run `guardsarm-agent-auth` to register the agent against `authd`
 4. start the agent with `guardsarm-control start`
-5. keep the container alive by following `/var/ossec/logs/ossec.log`
+5. keep the container alive by following `/var/gsmsec/logs/gsmsec.log`
 
 Supported variables:
 
 - `MANAGER_HOST`: manager host, default `host.docker.internal`
 - `MANAGER_PORT`: manager connection port, default `1514`
-- `AUTHD_PORT`: `agent-auth` registration port, default `1515`
+- `AUTHD_PORT`: `guardsarm-agent-auth` registration port, default `1515`
 - `AGENT_NAME`: name used to register the agent
 - `AUTHD_PASSWORD`: optional password for authenticated registration
 
-The scripts tolerate `agent-auth` failures with `|| true`. That prevents the container from exiting immediately, but it also means a container in `running` state does not guarantee that the agent was registered successfully. The real verification should be done by checking the logs.
+The scripts tolerate `guardsarm-agent-auth` failures with `|| true`. That prevents the container from exiting immediately, but it also means a container in `running` state does not guarantee that the agent was registered successfully. The real verification should be done by checking the logs.
 
 ## How to use it
 
@@ -168,7 +168,7 @@ docker compose up -d agent_50_rocky8
 
 ### Start from scratch
 
-To remove the persistent `/var/ossec` state as well:
+To remove the persistent `/var/gsmsec` state as well:
 
 ```bash
 docker compose down -v
@@ -179,10 +179,10 @@ docker compose down -v
 When the container starts:
 
 1. the agent is installed or already present in the image
-2. the entrypoint rewrites `ossec.conf` with the manager address
-3. the agent attempts to authenticate with `agent-auth`
+2. the entrypoint rewrites `gsmsec.conf` with the manager address
+3. the agent attempts to authenticate with `guardsarm-agent-auth`
 4. the agent service is started
-5. the container remains alive by following `ossec.log`
+5. the container remains alive by following `gsmsec.log`
 
 This makes it possible to quickly test:
 
@@ -194,7 +194,7 @@ This makes it possible to quickly test:
 ## Operational considerations
 
 - The `5.x` service depends on a local artifact. The Dockerfile alone is not enough; the RPM must be copied into the folder before building.
-- Because `/var/ossec` is mounted on a volume, an already registered agent can reuse previous state across restarts.
+- Because `/var/gsmsec` is mounted on a volume, an already registered agent can reuse previous state across restarts.
 - If you need to test a clean enrollment, use `docker compose down -v`.
 - If the manager is not running on the host or does not expose `1514/1515`, the container will start but registration and connection will not complete.
 - If your deployment uses an `authd` password, define `AUTHD_PASSWORD` in the compose file or when launching the service.

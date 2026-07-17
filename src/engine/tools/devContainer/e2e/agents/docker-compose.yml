@@ -21,7 +21,7 @@ services:
       AUTHD_PORT: "1515"
       AGENT_NAME: "agent-4x-centos"
     volumes:
-      - agent_4x_centos_var:/var/ossec
+      - agent_4x_centos_var:/var/gsmsec
 
   agent_4x_ubuntu:
     <<: *agent_defaults
@@ -37,7 +37,7 @@ services:
       AUTHD_PORT: "1515"
       AGENT_NAME: "agent-4x-ubuntu"
     volumes:
-      - agent_4x_ubuntu_var:/var/ossec
+      - agent_4x_ubuntu_var:/var/gsmsec
 
   agent_5x_centos:
     <<: *agent_defaults
@@ -53,7 +53,7 @@ services:
       AUTHD_PORT: "1515"
       AGENT_NAME: "agent-5x-centos"
     volumes:
-      - agent_5x_centos_var:/var/ossec
+      - agent_5x_centos_var:/var/gsmsec
 
   agent_5x_ubuntu:
     <<: *agent_defaults
@@ -69,7 +69,7 @@ services:
       AUTHD_PORT: "1515"
       AGENT_NAME: "agent-5x-ubuntu"
     volumes:
-      - agent_5x_ubuntu_var:/var/ossec
+      - agent_5x_ubuntu_var:/var/gsmsec
 
 volumes:
   agent_4x_centos_var:
