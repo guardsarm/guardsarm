@@ -218,7 +218,7 @@ do_prep() {
             || echo "[$vm] stop returned non-zero (probably agent not installed yet)"
         if [[ "$DO_WIPE" == true ]]; then
             echo "[$vm] wiping syscollector local DB..."
-            ssh_run "$vm" "${SP}rm -f /var/ossec/queue/syscollector/db/local.db*" \
+            ssh_run "$vm" "${SP}rm -f /var/gsmsec/queue/syscollector/db/local.db*" \
                 || echo "[$vm] wipe failed (DB path missing?)"
         fi
         if (( rc == 0 )); then
@@ -379,9 +379,9 @@ do_resync() {
         # Wipe DBSync local cache + both sync_protocol persistent queues
         # (syscollector and syscollector_vd). All three live under the same
         # queue/syscollector/db directory.
-        ssh_run "$vm" "${SP}rm -f /var/ossec/queue/syscollector/db/local.db* \
-                                  /var/ossec/queue/syscollector/db/syscollector_sync.db* \
-                                  /var/ossec/queue/syscollector/db/syscollector_vd_sync.db*" \
+        ssh_run "$vm" "${SP}rm -f /var/gsmsec/queue/syscollector/db/local.db* \
+                                  /var/gsmsec/queue/syscollector/db/syscollector_sync.db* \
+                                  /var/gsmsec/queue/syscollector/db/syscollector_vd_sync.db*" \
             || echo "[$vm] wipe failed (DB path missing? agent maybe not installed)"
 
         if [[ "$WIPE_INDEXER" == true ]]; then

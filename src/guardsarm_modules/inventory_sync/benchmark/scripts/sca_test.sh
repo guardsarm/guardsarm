@@ -168,7 +168,7 @@ agent_sh() {
 stop_agent_processes() {
   if container_running; then
     log "Stopping GuardSarm inside ${AGENT_CONTAINER}..."
-    docker exec "$AGENT_CONTAINER" /var/ossec/bin/guardsarm-control stop || true
+    docker exec "$AGENT_CONTAINER" /var/gsmsec/bin/guardsarm-control stop || true
   else
     log "${AGENT_CONTAINER} is stopped; local volume will be cleaned without running the agent entrypoint."
   fi
@@ -178,19 +178,19 @@ clean_local_agent_state() {
   log "Cleaning local agent first-run state and setting SCA sync interval=${SCA_SYNC_INTERVAL}..."
   agent_sh "
 set -e
-rm -f /var/ossec/etc/client.keys
-rm -f /var/ossec/var/run/*.pid 2>/dev/null || true
-mkdir -p /var/ossec/queue/rids
-mkdir -p /var/ossec/queue/sca/db
-mkdir -p /var/ossec/queue/syscollector/db
-rm -f /var/ossec/queue/rids/* 2>/dev/null || true
-rm -f /var/ossec/queue/sca/db/*.db* 2>/dev/null || true
-rm -f /var/ossec/queue/syscollector/db/*.db* 2>/dev/null || true
-rm -f /var/ossec/var/db/global.db* 2>/dev/null || true
-rm -f /var/ossec/var/db/agents.db* 2>/dev/null || true
-perl -0pi -e 's#(<sca>.*?<synchronization>.*?<interval>)[^<]*(</interval>)#\${1}${SCA_SYNC_INTERVAL}\${2}#s' /var/ossec/etc/ossec.conf
-chown root:guardsarm /var/ossec/etc/ossec.conf 2>/dev/null || chown root:root /var/ossec/etc/ossec.conf
-chmod 640 /var/ossec/etc/ossec.conf
+rm -f /var/gsmsec/etc/client.keys
+rm -f /var/gsmsec/var/run/*.pid 2>/dev/null || true
+mkdir -p /var/gsmsec/queue/rids
+mkdir -p /var/gsmsec/queue/sca/db
+mkdir -p /var/gsmsec/queue/syscollector/db
+rm -f /var/gsmsec/queue/rids/* 2>/dev/null || true
+rm -f /var/gsmsec/queue/sca/db/*.db* 2>/dev/null || true
+rm -f /var/gsmsec/queue/syscollector/db/*.db* 2>/dev/null || true
+rm -f /var/gsmsec/var/db/global.db* 2>/dev/null || true
+rm -f /var/gsmsec/var/db/agents.db* 2>/dev/null || true
+perl -0pi -e 's#(<sca>.*?<synchronization>.*?<interval>)[^<]*(</interval>)#\${1}${SCA_SYNC_INTERVAL}\${2}#s' /var/gsmsec/etc/gsmsec.conf
+chown root:guardsarm /var/gsmsec/etc/gsmsec.conf 2>/dev/null || chown root:root /var/gsmsec/etc/gsmsec.conf
+chmod 640 /var/gsmsec/etc/gsmsec.conf
 "
 }
 
@@ -304,7 +304,7 @@ start_agent_container() {
 show_agent_key() {
   if container_running; then
     log "Current agent key:"
-    docker exec "$AGENT_CONTAINER" sh -lc 'cat /var/ossec/etc/client.keys 2>/dev/null || true'
+    docker exec "$AGENT_CONTAINER" sh -lc 'cat /var/gsmsec/etc/client.keys 2>/dev/null || true'
   fi
 }
 
