@@ -592,3 +592,42 @@ int set_ossec_key(char *key, HWND hwnd)
 
     return (1);
 }
+
+/* Set the enrollment (registration) password. The default gsmsec.conf enables
+ * auto-enrollment (<enrollment>) with authorization_pass_path=authd.pass, so writing
+ * the one-time password here is all the UI needs to register with the manager on the
+ * next (re)start. Written atomically via a temp file + rename, like the key import. */
+int set_enroll_pass(char *pass, HWND hwnd)
+{
+    FILE *fp;
+    const char pass_file[] = "authd.pass";
+    char tmp_path[strlen(TMP_DIR) + 1 + sizeof(pass_file) + 6 + 1];
+
+    snprintf(tmp_path, sizeof(tmp_path), "%s/%sXXXXXX", TMP_DIR, pass_file);
+
+    if (mkstemp_ex(tmp_path) == -1) {
+        MessageBox(hwnd, "Could not create temporary file.",
+                   "Error -- Failure Setting Enrollment Password", MB_OK);
+        return (0);
+    }
+
+    fp = wfopen(tmp_path, "w");
+    if (fp) {
+        fprintf(fp, "%s", pass);
+        fclose(fp);
+    } else {
+        MessageBox(hwnd, "Could not open temporary file for write.",
+                   "Error -- Failure Setting Enrollment Password", MB_OK);
+        unlink(tmp_path);
+        return (0);
+    }
+
+    if (rename_ex(tmp_path, pass_file)) {
+        MessageBox(hwnd, "Unable to rename temporary file.",
+                   "Error -- Failure Renaming Temporary File", MB_OK);
+        unlink(tmp_path);
+        return (0);
+    }
+
+    return (1);
+}

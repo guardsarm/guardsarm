@@ -81,6 +81,7 @@ extern HWND hStatus;
 #define UI_SERVER_MSG       1503
 #define UI_SERVER_TOP       1504
 #define UI_SERVER_INFO      1505
+#define UI_ENROLL_PASS      1506
 #define UI_ID_CLOSE         1510
 
 /* Menu values */
@@ -100,6 +101,7 @@ extern HWND hStatus;
 #define IDC_ADD                 1702
 #define IDC_CANCEL              1703
 #define IDD_ABOUT               1704
+#define IDC_ENROLL              1705
 #define IDC_STATIC -1
 
 /** Prototypes **/
@@ -125,6 +127,9 @@ int set_ossec_server(char *ip, HWND hwnd);
 
 /* Set OSSEC Auth Key */
 int set_ossec_key(char *key, HWND hwnd);
+
+/* Set the enrollment (registration) password -> writes authd.pass */
+int set_enroll_pass(char *pass, HWND hwnd);
 
 /* Get OSSEC Server IP */
 int get_ossec_server();

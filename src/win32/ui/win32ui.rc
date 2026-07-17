@@ -17,7 +17,7 @@ IDI_OSSECICON ICON "favicon.ico"
 IDD_ABOUT DIALOG DISCARDABLE  0, 0, 259, 106
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About GuardSarm"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON  "&Close",UI_ID_CLOSE,90,90,50,14
     GROUPBOX       " Copyright (C) 2026, GuardSarm, Inc. ",
@@ -28,20 +28,30 @@ BEGIN
 END
 
 
-IDD_MAIN DIALOG DISCARDABLE  0, 0, 212, 156
+IDD_MAIN DIALOG DISCARDABLE  0, 0, 286, 214
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "GuardSarm Agent"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
-    GROUPBOX  " ~GuardSarm Windows Agent~ ", UI_SERVER_TOP, 7,7, 193, 57
-    LTEXT     " No Information available.", UI_SERVER_INFO, 16, 22, 150, 40
+    /* -- Agent status ------------------------------------------------------ */
+    GROUPBOX      "Agent status", IDC_STATIC, 7, 4, 272, 60
+    LTEXT         "GuardSarm Agent", UI_SERVER_TOP, 15, 16, 258, 9
+    LTEXT         "No information available.", UI_SERVER_INFO, 15, 28, 258, 32
 
-    LTEXT     "Manager IP: ",IDC_STATIC,7,76,62,8
-    EDITTEXT  UI_SERVER_TEXT,75,74,105,12,ES_AUTOHSCROLL
+    /* -- Enroll with the manager (primary flow) ---------------------------- */
+    GROUPBOX      "Enroll with your manager", IDC_STATIC, 7, 68, 272, 84
+    LTEXT         "Manager address:", IDC_STATIC, 15, 83, 78, 9
+    EDITTEXT      UI_SERVER_TEXT, 96, 81, 176, 13, ES_AUTOHSCROLL
+    LTEXT         "Enrollment password:", IDC_STATIC, 15, 101, 78, 9
+    EDITTEXT      UI_ENROLL_PASS, 96, 99, 176, 13, ES_AUTOHSCROLL | ES_PASSWORD
+    LTEXT         "Enter your manager's address and one-time enrollment password, then click Enroll. The agent registers itself automatically.",
+                  IDC_STATIC, 15, 117, 257, 17
+    DEFPUSHBUTTON "&Enroll", IDC_ENROLL, 151, 134, 60, 15
+    PUSHBUTTON    "&Refresh", IDC_CANCEL, 214, 134, 58, 15
 
-    LTEXT     "Authentication key: ",IDC_STATIC,7,92,62,8
-    EDITTEXT  UI_SERVER_AUTH,75,90,105,12,ES_AUTOHSCROLL
-
-    PUSHBUTTON "&Save",IDC_ADD,50,112,50,14
-    PUSHBUTTON "&Refresh",IDC_CANCEL,105,112,50,14
+    /* -- Advanced: manual pre-shared key import ---------------------------- */
+    GROUPBOX      "Advanced - manual key import", IDC_STATIC, 7, 156, 272, 50
+    LTEXT         "Auth key:", IDC_STATIC, 15, 172, 78, 9
+    EDITTEXT      UI_SERVER_AUTH, 96, 170, 176, 13, ES_AUTOHSCROLL
+    PUSHBUTTON    "&Import key", IDC_ADD, 214, 186, 58, 15
 END

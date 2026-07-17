@@ -269,6 +269,81 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT Message, WPARAM wParam,
                 }
                 break;
 
+                /* In case of ENROLL -- auto-register with the manager */
+                case IDC_ENROLL: {
+                    int len_srv, len_pass;
+                    char *srv = NULL, *pass = NULL;
+
+                    if (config_inst.admin_access == 0) {
+                        MessageBox(hwnd, "Unable to enroll. Admin access required.\r\n"
+                                   "Run the GuardSarm Agent as administrator.",
+                                   "Enrollment", MB_OK | MB_ICONWARNING);
+                        break;
+                    }
+
+                    len_srv  = GetWindowTextLength(GetDlgItem(hwnd, UI_SERVER_TEXT));
+                    len_pass = GetWindowTextLength(GetDlgItem(hwnd, UI_ENROLL_PASS));
+                    if (len_srv <= 0 || len_pass <= 0) {
+                        MessageBox(hwnd, "Enter both the manager address and the enrollment "
+                                   "password before clicking Enroll.",
+                                   "Enrollment", MB_OK | MB_ICONWARNING);
+                        break;
+                    }
+
+                    srv  = (char *)GlobalAlloc(GPTR, len_srv + 1);
+                    pass = (char *)GlobalAlloc(GPTR, len_pass + 1);
+                    if (!srv || !pass) {
+                        exit(-1);
+                    }
+                    GetDlgItemText(hwnd, UI_SERVER_TEXT, srv, len_srv + 1);
+                    GetDlgItemText(hwnd, UI_ENROLL_PASS, pass, len_pass + 1);
+
+                    {
+                        char msg[512];
+                        snprintf(msg, sizeof(msg),
+                                 "Enroll this agent with manager:\r\n\r\n    %s\r\n\r\n"
+                                 "The agent will register automatically and restart. Continue?",
+                                 srv);
+                        if (MessageBox(hwnd, msg, "Confirm Enrollment",
+                                       MB_OKCANCEL | MB_ICONQUESTION) != IDOK) {
+                            GlobalFree(srv);
+                            GlobalFree(pass);
+                            break;
+                        }
+                    }
+
+                    /* Apply the manager address + one-time enrollment password */
+                    if (!set_ossec_server(srv, hwnd) || !set_enroll_pass(pass, hwnd)) {
+                        GlobalFree(srv);
+                        GlobalFree(pass);
+                        break;
+                    }
+
+                    /* Never leave the one-time secret on screen */
+                    SetDlgItemText(hwnd, UI_ENROLL_PASS, "");
+
+                    /* Restart so the agent registers with the manager */
+                    os_stop_service();
+                    if (os_start_service() == 0) {
+                        MessageBox(hwnd, "Saved the manager address and enrollment password, but "
+                                   "could not start the agent. Use Manage > Start.",
+                                   "Enrollment", MB_OK | MB_ICONWARNING);
+                    } else {
+                        SendMessage(hStatus, SB_SETTEXT, 0, (LPARAM)"Enrolling with manager...");
+                        MessageBox(hwnd, "Enrollment started. The agent is registering with the "
+                                   "manager and will connect shortly.\r\n\r\n"
+                                   "Click Refresh in a few seconds to see the assigned Agent ID.",
+                                   "Enrollment", MB_OK | MB_ICONINFORMATION);
+                    }
+
+                    config_read(hwnd);
+                    gen_server_info(hwnd);
+
+                    GlobalFree(srv);
+                    GlobalFree(pass);
+                }
+                break;
+
                 case UI_MENU_MANAGE_EXIT:
                     PostMessage(hwnd, WM_CLOSE, 0, 0);
                     break;
