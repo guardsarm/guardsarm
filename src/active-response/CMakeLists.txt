@@ -187,4 +187,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     ${CMAKE_CURRENT_SOURCE_DIR}/src/repair-network.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/helpers/wfp_isolation.c)
   target_link_libraries(repair-network PRIVATE fwpuclnt ws2_32 iphlpapi advapi32)
+
+  # Agent tamper-protection guardian (user-mode resilience tier). Independent SYSTEM
+  # watchdog: service resilience + binary/config self-heal + fail-open uninstall.
+  # advapi32 provides the SCM + CryptoAPI (SHA-256) entry points it uses.
+  add_windows_ar(guardsarm-tamper-guard
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/tamper-guard.c)
+  target_link_libraries(guardsarm-tamper-guard PRIVATE advapi32)
 endif()

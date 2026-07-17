@@ -140,6 +140,16 @@
         <CustomAction Id="RegisterRecoveryWatchdog" FileKey="REPAIR_NETWORK.EXE" ExeCommand="--install-watchdog" Execute="deferred" Impersonate="no" Return="ignore" />
         <CustomAction Id="RepairNetworkOnUninstall" FileKey="REPAIR_NETWORK.EXE" ExeCommand="--force" Execute="deferred" Impersonate="no" Return="ignore" />
         <CustomAction Id="RemoveRecoveryWatchdog" FileKey="REPAIR_NETWORK.EXE" ExeCommand="--remove-watchdog" Execute="deferred" Impersonate="no" Return="ignore" />
+
+        <!-- Agent tamper-protection guardian (user-mode resilience tier). ARM on
+             install/upgrade: snapshot the critical binaries/config, write the integrity
+             manifest, apply SCM failure actions, and register the SYSTEM guardian task.
+             DISARM first on uninstall: drop the disarm marker + remove the task BEFORE
+             files are removed, so a departing customer always uninstalls cleanly (the
+             guardian also stands down on its own while _MSIExecute is held). Return=ignore
+             so a guardian hiccup never blocks install/uninstall. -->
+        <CustomAction Id="ArmTamperGuard" FileKey="GUARDSARM_TAMPER_GUARD.EXE" ExeCommand="--arm" Execute="deferred" Impersonate="no" Return="ignore" />
+        <CustomAction Id="DisarmTamperGuard" FileKey="GUARDSARM_TAMPER_GUARD.EXE" ExeCommand="--disarm" Execute="deferred" Impersonate="no" Return="ignore" />
         <UI>
             <UIRef Id="WixUI_Advanced" />
             <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="CustomCheckDialog" Order="4"><![CDATA[WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1"]]></Publish>
@@ -206,6 +216,11 @@
             <Custom Action="RegisterRecoveryWatchdog" After="InstallFiles">NOT (REMOVE="ALL")</Custom>
             <Custom Action="RepairNetworkOnUninstall" Before="RemoveFiles">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
             <Custom Action="RemoveRecoveryWatchdog" After="RepairNetworkOnUninstall">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+
+            <!-- Tamper guardian: arm on install/upgrade (after files are laid down),
+                 disarm BEFORE files are removed on a true uninstall. -->
+            <Custom Action="ArmTamperGuard" After="RegisterRecoveryWatchdog">NOT (REMOVE="ALL")</Custom>
+            <Custom Action="DisarmTamperGuard" Before="RepairNetworkOnUninstall">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
 
             <!-- Stop the service as soon as possible on uninstall, and only on uninstall, in order to unlock the files and folders that must be deleted. -->
 			<Custom Action="SetRemoveAllDataValue" Before="InstallFinalize">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
@@ -400,6 +415,9 @@
                             </Component>
                             <Component Id="REPAIR_NETWORK.EXE" DiskId="1" Guid="7A9E1C40-1008-4B21-9C3D-3FED24990008">
                                 <File Id="REPAIR_NETWORK.EXE" Name="repair-network.exe" Source="..\build\bin\repair-network.exe" />
+                            </Component>
+                            <Component Id="GUARDSARM_TAMPER_GUARD.EXE" DiskId="1" Guid="7A9E1C40-1009-4B21-9C3D-3FED24990009">
+                                <File Id="GUARDSARM_TAMPER_GUARD.EXE" Name="guardsarm-tamper-guard.exe" Source="..\build\bin\guardsarm-tamper-guard.exe" />
                             </Component>
                             <Component Id="REMOVE_OLD_AR" Guid="E1915364-2E49-4B74-8DF9-5D6CC3B27DF0">
                                 <RemoveFile Id="AR_RESTART_OSSEC_CMD" Name="restart-ossec.cmd" On="install" />
@@ -680,6 +698,7 @@
             <ComponentRef Id="REMOVE_PERSISTENCE.EXE" />
             <ComponentRef Id="COLLECT_FORENSIC.EXE" />
             <ComponentRef Id="REPAIR_NETWORK.EXE" />
+            <ComponentRef Id="GUARDSARM_TAMPER_GUARD.EXE" />
             <ComponentRef Id="ACTIVE_RESPONSES.LOG" />
             <ComponentRef Id="StartMenuShortcuts" />
             <ComponentRef Id="WIN32UI.EXE" />
