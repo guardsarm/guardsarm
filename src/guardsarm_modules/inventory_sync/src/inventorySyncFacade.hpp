@@ -1065,24 +1065,36 @@ public:
                             }
                         }
 
-                        // Send delete by query to indexer if mode is full.
+                        // Full module resync: sweep only the STALE docs (version <
+                        // globalVersion) instead of deleting every doc for the agent.
+                        // A blanket deleteByQuery here deleted the current docs too,
+                        // bumping their version to a tombstone; the same-version
+                        // reinsert that follows then 409'd (external_gte) and was
+                        // dropped as an "acceptable version conflict", silently leaving
+                        // the module EMPTY (e.g. hardware -> 0). Version-scoped sweep
+                        // leaves the current generation untouched (it is overwritten by
+                        // the bulk upsert below), so a resync can no longer empty a
+                        // module; genuinely removed docs (older version) are still swept.
                         if (res.context->mode == GuardSarm::SyncSchema::Mode_ModuleFull)
                         {
                             logDebug2(LOGGER_DEFAULT_TAG,
-                                      "InventorySyncFacade::start: Deleting by query for %zu indices...",
+                                      "InventorySyncFacade::start: Sweeping stale docs (version < %llu) for %zu "
+                                      "indices...",
+                                      res.context->globalVersion,
                                       res.context->indices.size());
-                            // Delete from all indices specified in the Start message
+                            // Sweep stale docs from all indices specified in the Start message
                             for (const auto& index : res.context->indices)
                             {
                                 try
                                 {
-                                    m_indexerConnector->deleteByQuery(index, res.context->agentId);
+                                    m_indexerConnector->deleteByQueryStale(
+                                        index, res.context->agentId, res.context->globalVersion);
                                     hasDeleteByQueryEnqueued = true;
                                 }
                                 catch (const std::exception& e)
                                 {
                                     logWarn(LOGGER_DEFAULT_TAG,
-                                            "InventorySyncFacade::start: deleteByQuery rejected for index '%s' "
+                                            "InventorySyncFacade::start: deleteByQueryStale rejected for index '%s' "
                                             "(session %llu): %s",
                                             index.c_str(),
                                             res.context->sessionId,

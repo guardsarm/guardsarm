@@ -124,6 +124,20 @@ public:
     void deleteByQuery(const std::string& index, const std::string& agentId);
 
     /**
+     * @brief Queue a version-scoped "sweep" delete for a full module resync.
+     *
+     * Deletes only the agent's STALE docs (state.document_version < globalVersion),
+     * leaving the current generation intact. Used by Mode_ModuleFull so a full
+     * resync overwrites current docs instead of delete-then-reinsert (which could
+     * 409 the reinsert and silently empty a module).
+     *
+     * @param index Index name.
+     * @param agentId Agent ID whose stale docs should be swept.
+     * @param globalVersion Resync generation; docs strictly below it are deleted.
+     */
+    void deleteByQueryStale(const std::string& index, const std::string& agentId, uint64_t globalVersion);
+
+    /**
      * @brief Execute an update by query operation on OpenSearch/Elasticsearch.
      *
      * This is a generic method that allows callers to execute arbitrary update_by_query

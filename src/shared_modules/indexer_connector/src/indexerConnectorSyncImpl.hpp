@@ -275,6 +275,15 @@ class IndexerConnectorSyncImpl final
     THttpRequest* m_httpRequest;
     std::string m_bulkData;
     std::map<std::string, nlohmann::json, std::less<>> m_deleteByQuery;
+    // Per-agent, version-scoped "sweep" deletes used by a full module resync
+    // (Mode_ModuleFull). Unlike m_deleteByQuery (delete ALL of an agent's docs in
+    // an index), each entry here deletes only the agent's STALE docs — those whose
+    // state.document_version is below the resync's globalVersion — so the current
+    // generation of docs is never deleted (and therefore never tombstone-version-
+    // bumped, which is what made same-version reinserts 409 and silently emptied a
+    // module). Kept as a separate list because each entry carries its own agent +
+    // globalVersion and cannot be merged into the shared per-index terms query.
+    std::vector<std::pair<std::string, nlohmann::json>> m_staleDeleteByQuery;
     std::vector<std::function<void()>> m_notify;
     std::chrono::steady_clock::time_point m_lastBulkTime;
     std::condition_variable m_cv;
@@ -287,7 +296,7 @@ class IndexerConnectorSyncImpl final
     void processBulk()
     {
         bool needToRetry = false;
-        if (m_bulkData.empty() && m_deleteByQuery.empty())
+        if (m_bulkData.empty() && m_deleteByQuery.empty() && m_staleDeleteByQuery.empty())
         {
             throw IndexerConnectorException("No data to process");
         }
@@ -329,7 +338,7 @@ class IndexerConnectorSyncImpl final
         };
 
         // Track if we have pending deleteByQuery operations that need notification
-        const bool hasDeleteByQuery = !m_deleteByQuery.empty();
+        const bool hasDeleteByQuery = !m_deleteByQuery.empty() || !m_staleDeleteByQuery.empty();
 
         for (const auto& [index, query] : m_deleteByQuery)
         {
@@ -339,6 +348,25 @@ class IndexerConnectorSyncImpl final
             url += index;
             url += "/_delete_by_query";
             logDebug2(m_logTag.c_str(), "Deleting by query: %s", url.c_str());
+            m_httpRequest->post(
+                RequestParameters {
+                    .url = HttpURL(url), .data = query.dump(), .secureCommunication = m_secureCommunication},
+                PostRequestParameters {.onSuccess = onSuccessDeleteByQuery, .onError = onErrorDeleteByQuery},
+                {});
+        }
+
+        // Version-scoped "sweep" deletes for full module resyncs: delete only the
+        // agent's stale docs (state.document_version < globalVersion). The current
+        // generation of docs is excluded, so it is never deleted/version-bumped and
+        // the reinsert that follows cannot 409 into an empty module.
+        for (const auto& [index, query] : m_staleDeleteByQuery)
+        {
+            std::string url;
+            url += serverUrl;
+            url += "/";
+            url += index;
+            url += "/_delete_by_query";
+            logDebug2(m_logTag.c_str(), "Deleting stale (version-scoped) by query: %s", url.c_str());
             m_httpRequest->post(
                 RequestParameters {
                     .url = HttpURL(url), .data = query.dump(), .secureCommunication = m_secureCommunication},
@@ -447,6 +475,7 @@ class IndexerConnectorSyncImpl final
         m_bulkData.clear();
         m_boundaries.clear();
         m_deleteByQuery.clear();
+        m_staleDeleteByQuery.clear();
         m_lastBulkTime = std::chrono::steady_clock::now();
     }
 
@@ -691,7 +720,7 @@ public:
                         timeoutLock, std::chrono::seconds(FlushInterval), [this] { return m_stopping.load(); });
 
                     // Process bulk data or deleteByQuery if there's data to process
-                    if (!m_bulkData.empty() || !m_deleteByQuery.empty())
+                    if (!m_bulkData.empty() || !m_deleteByQuery.empty() || !m_staleDeleteByQuery.empty())
                     {
                         try
                         {
@@ -743,6 +772,30 @@ public:
         }
         auto [it, success] = m_deleteByQuery.try_emplace(index, nlohmann::json::object());
         it->second["query"]["bool"]["filter"]["terms"]["guardsarm.agent.id"].push_back(agentId);
+    }
+
+    /// @brief Queue a version-scoped "sweep" delete for a full module resync.
+    /// @details Deletes ONLY the agent's stale docs — those whose
+    ///          state.document_version is strictly below @p globalVersion (the
+    ///          resync's generation). Docs of the current generation (>= globalVersion,
+    ///          and docs with no state.document_version, which a range query never
+    ///          matches) are left untouched, so a full resync no longer deletes-then-
+    ///          fails-to-reinsert the current docs (which silently emptied a module).
+    ///          Executed at flush time, before the bulk upserts, like deleteByQuery.
+    void deleteByQueryStale(const std::string& index, const std::string& agentId, uint64_t globalVersion)
+    {
+        if (!isSafeIndexName(index))
+        {
+            logWarn(m_logTag.c_str(),
+                    "Refusing deleteByQueryStale for unsafe index name '%s' (empty or contains characters outside "
+                    "[a-zA-Z0-9._*-]).",
+                    index.c_str());
+            throw IndexerConnectorException("Unsafe index name");
+        }
+        nlohmann::json query;
+        query["query"]["bool"]["filter"][0]["term"]["guardsarm.agent.id"] = agentId;
+        query["query"]["bool"]["filter"][1]["range"]["state.document_version"]["lt"] = globalVersion;
+        m_staleDeleteByQuery.emplace_back(index, std::move(query));
     }
 
     void executeUpdateByQuery(const std::vector<std::string>& indices, const nlohmann::json& updateQuery)
@@ -1332,7 +1385,7 @@ public:
             std::lock_guard lock(m_mutex);
             m_shouldNotifyAfterBulk = false;
 
-            if (!m_bulkData.empty() || !m_deleteByQuery.empty())
+            if (!m_bulkData.empty() || !m_deleteByQuery.empty() || !m_staleDeleteByQuery.empty())
             {
                 processBulk();
             }
