@@ -330,33 +330,68 @@ void Syscollector::processEvent(ReturnTypeCallback result, const nlohmann::json&
 
         auto changedFields = addPreviousFields(newData, oldData);
 
-        // Suppress no-op process deltas. A running process's utime/stime (CPU-time
-        // counters) advance on every scan, so dbsync flags EVERY process as
-        // "modified" each cycle. When those volatile CPU-time fields are the ONLY
-        // thing that changed, the delta carries no inventory or security signal and
-        // just floods the event pipeline (tens of thousands of unclassified events
-        // per host). The stateful record was already persisted above (utime/stime
-        // stay current in inventory); we skip only the noisy stateless notification.
-        // Real changes — a new process (INSERTED), or a modified command_line / name
-        // / args / parent — still have non-volatile changed fields and are reported.
-        if (result == MODIFIED && table == PROCESSES_TABLE && !changedFields.empty())
+        // Suppress no-op inventory deltas driven purely by volatile counters. Several
+        // collectors carry fields that advance on EVERY scan even when nothing of
+        // interest changed: a running process's CPU time (utime/stime), a NIC's
+        // byte/packet counters, and free/used memory. dbsync then flags the row
+        // "modified" each cycle and we would emit a stateless delta whose only
+        // changed fields are those counters — no inventory or security signal, just
+        // a flood of unclassified events (tens of thousands per host). When every
+        // changed field is volatile, skip the stateless notification. The STATEFUL
+        // record was already persisted above, so the counters stay current in the
+        // inventory state; and a new row (INSERTED) or a real change (command_line,
+        // interface state, hardware swap, …) keeps a non-volatile changed field and
+        // is still reported.
+        if (result == MODIFIED && !changedFields.empty())
         {
-            bool onlyVolatile = true;
-
-            for (const auto& field : changedFields)
+            static const std::set<std::string> PROCESS_VOLATILE
             {
-                const auto name = field.get<std::string>();
+                "process.utime", "process.stime"
+            };
+            static const std::set<std::string> IFACE_VOLATILE
+            {
+                "host.network.ingress.bytes", "host.network.ingress.packets",
+                "host.network.ingress.drops",  "host.network.ingress.errors",
+                "host.network.egress.bytes",   "host.network.egress.packets",
+                "host.network.egress.drops",   "host.network.egress.errors"
+            };
+            static const std::set<std::string> HW_VOLATILE
+            {
+                "host.memory.free", "host.memory.used", "host.memory.usage"
+            };
 
-                if (name != "process.utime" && name != "process.stime")
-                {
-                    onlyVolatile = false;
-                    break;
-                }
+            const std::set<std::string>* volatileFields = nullptr;
+
+            if (table == PROCESSES_TABLE)
+            {
+                volatileFields = &PROCESS_VOLATILE;
+            }
+            else if (table == NET_IFACE_TABLE)
+            {
+                volatileFields = &IFACE_VOLATILE;
+            }
+            else if (table == HW_TABLE)
+            {
+                volatileFields = &HW_VOLATILE;
             }
 
-            if (onlyVolatile)
+            if (volatileFields)
             {
-                return;
+                bool onlyVolatile = true;
+
+                for (const auto& field : changedFields)
+                {
+                    if (volatileFields->find(field.get<std::string>()) == volatileFields->end())
+                    {
+                        onlyVolatile = false;
+                        break;
+                    }
+                }
+
+                if (onlyVolatile)
+                {
+                    return;
+                }
             }
         }
 
