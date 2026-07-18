@@ -5,8 +5,23 @@
 # Author: Daniel B. Cid <daniel.cid@gmail.com>
 
 ### Setting up variables
-VERSION="v$(awk -F'"' '/"version"[ \t]*:/ {print $4}' VERSION.json)"
-REVISION=$(awk -F'"' '/"stage"[ \t]*:/ {print $4}' VERSION.json)
+# VERSION.json lives at the source/install root, but shared.sh is sourced from
+# varying CWDs -- the source build runs from src/.. (VERSION.json present) while a
+# .deb/.rpm postinst runs with CWD=/ (dpkg), where a bare "VERSION.json" is not
+# found. That spammed "awk: cannot open VERSION.json" during install and left
+# VERSION/REVISION empty. Resolve it from a few known locations instead of the CWD.
+_GS_VERSION_JSON=""
+for _cand in "VERSION.json" "./VERSION.json" "../VERSION.json" \
+             "/var/gsmsec/VERSION.json" "/var/guardsarm-manager/VERSION.json"; do
+    if [ -f "${_cand}" ]; then _GS_VERSION_JSON="${_cand}"; break; fi
+done
+if [ -n "${_GS_VERSION_JSON}" ]; then
+    VERSION="v$(awk -F'"' '/"version"[ \t]*:/ {print $4}' "${_GS_VERSION_JSON}")"
+    REVISION=$(awk -F'"' '/"stage"[ \t]*:/ {print $4}' "${_GS_VERSION_JSON}")
+else
+    VERSION=""
+    REVISION=""
+fi
 UNAME=`uname -snr`
 NUNAME=`uname`
 VUNAME=`uname -r`
