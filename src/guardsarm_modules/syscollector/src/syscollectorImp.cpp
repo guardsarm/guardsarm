@@ -330,6 +330,36 @@ void Syscollector::processEvent(ReturnTypeCallback result, const nlohmann::json&
 
         auto changedFields = addPreviousFields(newData, oldData);
 
+        // Suppress no-op process deltas. A running process's utime/stime (CPU-time
+        // counters) advance on every scan, so dbsync flags EVERY process as
+        // "modified" each cycle. When those volatile CPU-time fields are the ONLY
+        // thing that changed, the delta carries no inventory or security signal and
+        // just floods the event pipeline (tens of thousands of unclassified events
+        // per host). The stateful record was already persisted above (utime/stime
+        // stay current in inventory); we skip only the noisy stateless notification.
+        // Real changes — a new process (INSERTED), or a modified command_line / name
+        // / args / parent — still have non-volatile changed fields and are reported.
+        if (result == MODIFIED && table == PROCESSES_TABLE && !changedFields.empty())
+        {
+            bool onlyVolatile = true;
+
+            for (const auto& field : changedFields)
+            {
+                const auto name = field.get<std::string>();
+
+                if (name != "process.utime" && name != "process.stime")
+                {
+                    onlyVolatile = false;
+                    break;
+                }
+            }
+
+            if (onlyVolatile)
+            {
+                return;
+            }
+        }
+
         stateless["data"] = newData;
         stateless["data"]["event"]["changed_fields"] = changedFields;
         stateless["data"]["event"]["created"] = Utils::getCurrentISO8601();
