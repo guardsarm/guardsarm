@@ -37,6 +37,12 @@ COPY src/active-response/CMakeLists.txt /build/guardsarm/src/active-response/CMa
 COPY src/init/inst-functions.sh /build/guardsarm/src/init/inst-functions.sh
 RUN sed -i 's/\r$//' /build/guardsarm/src/init/inst-functions.sh
 
+# Overlay the current committed syscollector source over the base image's baked
+# copy so the compile picks up the no-op process-delta suppression (utime/stime-only
+# "modified" churn that flooded guardsarm-events-v5-unclassified). The base image's
+# tree predates that fix. Placed before the compile so make rebuilds libsyscollector.so.
+COPY src/guardsarm_modules/syscollector/src/syscollectorImp.cpp /build/guardsarm/src/guardsarm_modules/syscollector/src/syscollectorImp.cpp
+
 WORKDIR /build/guardsarm/src
 # Deps already present (copied above) — compile the agent target directly.
 RUN make TARGET=agent INDEXER_PLUGINS_REFS=main -j"$(nproc)" 2>&1 | tail -5
