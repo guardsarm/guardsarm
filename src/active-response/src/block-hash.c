@@ -67,7 +67,13 @@ int main(int argc, char **argv) {
             fputs(line, wf);
         }
         fclose(rf); fclose(wf);
-        rename(tmp, BLOCKLIST);
+        // Honor the rename result: if the denylist couldn't be replaced the hash was NOT
+        // removed -- report failure rather than a false "removed" (matches block-domain).
+        if (rename(tmp, BLOCKLIST) != 0) {
+            write_debug_file(argv[0], "Failed to update the hash denylist (rename)");
+            cJSON_Delete(input_json);
+            return OS_INVALID;
+        }
         memset(log_msg, '\0', OS_MAXSTR);
         snprintf(log_msg, OS_MAXSTR - 1, "Removed hash '%s' from the denylist", hash);
         write_debug_file(argv[0], log_msg);
