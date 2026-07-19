@@ -6,6 +6,7 @@
 
 #include "active_responses.h"
 #include "helpers/firewall_helpers.h"
+#include <sys/wait.h>   // WEXITSTATUS — honor the real firewall command exit code
 
 #ifndef WIN32
 
@@ -258,7 +259,19 @@ firewall_result_t try_iptables(const char *srcip, int action, int ip_version, co
             }
         } else {
             flag = false;
-            wpclose(wfd);
+            // Honor the real iptables exit code — not just "did it spawn". On ENABLE
+            // (block, -I) a non-zero exit means the rule was NOT applied (e.g. EPERM /
+            // missing NET_ADMIN, exit 4), so report failure instead of a false success:
+            // this lets the AR method chain fall through to another firewall and keeps
+            // the console/audit honest about whether the IP is actually blocked. On
+            // DISABLE (-D) a non-zero exit usually just means the rule was already gone.
+            int wstatus = WEXITSTATUS(wpclose(wfd));
+            if (wstatus != 0 && action == ENABLE_COMMAND) {
+                memset(log_msg, '\0', OS_MAXSTR);
+                snprintf(log_msg, OS_MAXSTR - 1, "%s exited %d on INPUT chain — rule NOT applied", iptables_name, wstatus);
+                write_debug_file(argv0, log_msg);
+                final_result = FIREWALL_EXECUTION_FAILED;
+            }
         }
     }
 
@@ -282,7 +295,15 @@ firewall_result_t try_iptables(const char *srcip, int action, int ip_version, co
             }
         } else {
             flag = false;
-            wpclose(wfd);
+            // FORWARD is best-effort (an endpoint often has no FORWARD policy); INPUT is
+            // authoritative for "is inbound traffic from this IP blocked?". Log a non-zero
+            // ENABLE exit but do not by itself flip a successful INPUT block into a failure.
+            int wstatus = WEXITSTATUS(wpclose(wfd));
+            if (wstatus != 0 && action == ENABLE_COMMAND) {
+                memset(log_msg, '\0', OS_MAXSTR);
+                snprintf(log_msg, OS_MAXSTR - 1, "%s exited %d on FORWARD chain (best-effort)", iptables_name, wstatus);
+                write_debug_file(argv0, log_msg);
+            }
         }
     }
 
