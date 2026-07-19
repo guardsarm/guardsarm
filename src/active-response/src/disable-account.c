@@ -5,6 +5,7 @@
  */
 
 #include "active_responses.h"
+#include <sys/wait.h>   // WEXITSTATUS — honor the passwd/usermod exit code
 
 int main (int argc, char **argv) {
     (void)argc;
@@ -101,7 +102,19 @@ int main (int argc, char **argv) {
         os_free(cmd_path);
         return OS_INVALID;
     }
-    wpclose(wfd);
+    // Honor the passwd/usermod exit status: on ENABLE (lock) a non-zero exit means the
+    // account was NOT locked (unknown user, PAM error, EPERM, ...) -- report failure so
+    // an analyst isn't told an account is disabled when it isn't. DISABLE (unlock)
+    // tolerates a non-zero (already-unlocked) exit.
+    int rc = WEXITSTATUS(wpclose(wfd));
+    if (rc != 0 && action == ENABLE_COMMAND) {
+        memset(log_msg, '\0', OS_MAXSTR);
+        snprintf(log_msg, OS_MAXSTR - 1, "'%s' exited %d -- account was NOT disabled", cmd_path, rc);
+        write_debug_file(argv[0], log_msg);
+        cJSON_Delete(input_json);
+        os_free(cmd_path);
+        return OS_INVALID;
+    }
 
     write_debug_file(argv[0], "Ended");
 

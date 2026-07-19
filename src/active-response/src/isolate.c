@@ -15,6 +15,7 @@
  *            reboot auto-clears the runtime filters (fail-open by construction). */
 
 #include "active_responses.h"
+#include <sys/wait.h>   // WEXITSTATUS — honor the iptables exit code (real containment)
 
 #ifdef WIN32
 #include "helpers/wfp_isolation.h"
@@ -173,12 +174,13 @@ static void write_state(const wfp_isolation_cfg *cfg, unsigned timeout, int acti
 #endif /* WIN32 */
 
 #ifndef WIN32
-// Run iptables with the given NULL-terminated args; returns 0 on spawn success.
+// Run iptables with the given NULL-terminated args; returns the command's EXIT STATUS
+// (0 = success, non-zero = the rule was not applied, -1 = couldn't even be spawned) so
+// callers can tell whether isolation actually took effect — not just that iptables ran.
 static int ipt(const char *bin, char *const args[]) {
     wfd_t *wfd = wpopenv(bin, (char **)args, W_BIND_STDERR);
     if (!wfd) return -1;
-    wpclose(wfd);
-    return 0;
+    return WEXITSTATUS(wpclose(wfd));
 }
 #endif
 
@@ -256,11 +258,21 @@ int main(int argc, char **argv) {
         char *out_lo[] = { bin, "-A", "GS_ISOLATE_OUT", "-o", "lo", "-j", "ACCEPT", NULL }; ipt(bin, out_lo);
         char *in_est[]  = { bin, "-A", "GS_ISOLATE_IN", "-m", "conntrack", "--ctstate", "ESTABLISHED,RELATED", "-j", "ACCEPT", NULL }; ipt(bin, in_est);
         char *out_est[] = { bin, "-A", "GS_ISOLATE_OUT", "-m", "conntrack", "--ctstate", "ESTABLISHED,RELATED", "-j", "ACCEPT", NULL }; ipt(bin, out_est);
-        char *in_drop[]  = { bin, "-A", "GS_ISOLATE_IN", "-j", "DROP", NULL };  ipt(bin, in_drop);
-        char *out_drop[] = { bin, "-A", "GS_ISOLATE_OUT", "-j", "DROP", NULL }; ipt(bin, out_drop);
+        char *in_drop[]  = { bin, "-A", "GS_ISOLATE_IN", "-j", "DROP", NULL };  int r_in_drop = ipt(bin, in_drop);
+        char *out_drop[] = { bin, "-A", "GS_ISOLATE_OUT", "-j", "DROP", NULL }; int r_out_drop = ipt(bin, out_drop);
         // Jump INPUT/OUTPUT into our chains (first).
-        char *j_in[]  = { bin, "-I", "INPUT", "1", "-j", "GS_ISOLATE_IN", NULL };  ipt(bin, j_in);
-        char *j_out[] = { bin, "-I", "OUTPUT", "1", "-j", "GS_ISOLATE_OUT", NULL }; ipt(bin, j_out);
+        char *j_in[]  = { bin, "-I", "INPUT", "1", "-j", "GS_ISOLATE_IN", NULL };  int r_j_in = ipt(bin, j_in);
+        char *j_out[] = { bin, "-I", "OUTPUT", "1", "-j", "GS_ISOLATE_OUT", NULL }; int r_j_out = ipt(bin, j_out);
+        // The DROP rules + the INPUT/OUTPUT jumps are what actually contain the host. If
+        // iptables couldn't apply them (e.g. EPERM / missing NET_ADMIN, or a rule error)
+        // the endpoint is NOT isolated -- report failure instead of a false "contained"
+        // so an analyst is never misled about a compromised host still being on the wire.
+        if (r_in_drop != 0 || r_out_drop != 0 || r_j_in != 0 || r_j_out != 0) {
+            write_debug_file(argv[0], "ISOLATION FAILED: iptables could not apply containment rules -- endpoint is NOT isolated");
+            os_free(bin);
+            cJSON_Delete(input_json);
+            return OS_INVALID;
+        }
         write_debug_file(argv[0], "Isolated endpoint (loopback + established preserved)");
     } else {
         // Remove the jumps and tear down the chains.
