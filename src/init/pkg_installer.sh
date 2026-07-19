@@ -27,8 +27,8 @@ echo "$(date +"%Y/%m/%d %H:%M:%S") - Checking execution path." >> ./logs/upgrade
 
 
 if [[ "$OS" == "Darwin" ]]; then
-    if [ "${GUARDSARM_HOME}" != "/Library/Ossec" ]; then
-        echo "$(date +"%Y/%m/%d %H:%M:%S") - Execution path is wrong (it should be /Library/Ossec), interrupting upgrade." >> ./logs/upgrade.log
+    if [ "${GUARDSARM_HOME}" != "/Library/gsmsec" ]; then
+        echo "$(date +"%Y/%m/%d %H:%M:%S") - Execution path is wrong (it should be /Library/gsmsec), interrupting upgrade." >> ./logs/upgrade.log
         echo -ne "2" > ./var/upgrade/upgrade_result
         rm -f $LOCK
         exit 1
