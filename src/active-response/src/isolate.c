@@ -15,7 +15,6 @@
  *            reboot auto-clears the runtime filters (fail-open by construction). */
 
 #include "active_responses.h"
-#include <sys/wait.h>   // WEXITSTATUS — honor the iptables exit code (real containment)
 
 #ifdef WIN32
 #include "helpers/wfp_isolation.h"
@@ -174,6 +173,7 @@ static void write_state(const wfp_isolation_cfg *cfg, unsigned timeout, int acti
 #endif /* WIN32 */
 
 #ifndef WIN32
+#include <sys/wait.h>   // WEXITSTATUS — POSIX only (absent in the mingw cross-build)
 // Run iptables with the given NULL-terminated args; returns the command's EXIT STATUS
 // (0 = success, non-zero = the rule was not applied, -1 = couldn't even be spawned) so
 // callers can tell whether isolation actually took effect — not just that iptables ran.
