@@ -180,7 +180,11 @@ static void write_state(const wfp_isolation_cfg *cfg, unsigned timeout, int acti
 static int ipt(const char *bin, char *const args[]) {
     wfd_t *wfd = wpopenv(bin, (char **)args, W_BIND_STDERR);
     if (!wfd) return -1;
-    return WEXITSTATUS(wpclose(wfd));
+    // NOTE: store the status in an lvalue first — on macOS WEXITSTATUS takes the
+    // address of its argument, so passing the wpclose() call directly is a hard
+    // error ("cannot take the address of an rvalue"). glibc happens to allow it.
+    int status = wpclose(wfd);
+    return WEXITSTATUS(status);
 }
 #endif
 

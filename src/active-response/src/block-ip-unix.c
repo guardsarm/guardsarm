@@ -265,7 +265,9 @@ firewall_result_t try_iptables(const char *srcip, int action, int ip_version, co
             // this lets the AR method chain fall through to another firewall and keeps
             // the console/audit honest about whether the IP is actually blocked. On
             // DISABLE (-D) a non-zero exit usually just means the rule was already gone.
-            int wstatus = WEXITSTATUS(wpclose(wfd));
+            // lvalue first: on macOS WEXITSTATUS takes the address of its argument
+            int wstat = wpclose(wfd);
+            int wstatus = WEXITSTATUS(wstat);
             if (wstatus != 0 && action == ENABLE_COMMAND) {
                 memset(log_msg, '\0', OS_MAXSTR);
                 snprintf(log_msg, OS_MAXSTR - 1, "%s exited %d on INPUT chain — rule NOT applied", iptables_name, wstatus);
@@ -298,7 +300,9 @@ firewall_result_t try_iptables(const char *srcip, int action, int ip_version, co
             // FORWARD is best-effort (an endpoint often has no FORWARD policy); INPUT is
             // authoritative for "is inbound traffic from this IP blocked?". Log a non-zero
             // ENABLE exit but do not by itself flip a successful INPUT block into a failure.
-            int wstatus = WEXITSTATUS(wpclose(wfd));
+            // lvalue first: on macOS WEXITSTATUS takes the address of its argument
+            int wstat = wpclose(wfd);
+            int wstatus = WEXITSTATUS(wstat);
             if (wstatus != 0 && action == ENABLE_COMMAND) {
                 memset(log_msg, '\0', OS_MAXSTR);
                 snprintf(log_msg, OS_MAXSTR - 1, "%s exited %d on FORWARD chain (best-effort)", iptables_name, wstatus);

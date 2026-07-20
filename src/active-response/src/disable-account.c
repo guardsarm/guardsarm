@@ -106,7 +106,10 @@ int main (int argc, char **argv) {
     // account was NOT locked (unknown user, PAM error, EPERM, ...) -- report failure so
     // an analyst isn't told an account is disabled when it isn't. DISABLE (unlock)
     // tolerates a non-zero (already-unlocked) exit.
-    int rc = WEXITSTATUS(wpclose(wfd));
+    // Store the status in an lvalue first — on macOS WEXITSTATUS takes the address of
+    // its argument, so passing the wpclose() call directly is a hard compile error.
+    int wstat = wpclose(wfd);
+    int rc = WEXITSTATUS(wstat);
     if (rc != 0 && action == ENABLE_COMMAND) {
         memset(log_msg, '\0', OS_MAXSTR);
         snprintf(log_msg, OS_MAXSTR - 1, "'%s' exited %d -- account was NOT disabled", cmd_path, rc);
