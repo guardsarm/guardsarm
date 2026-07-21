@@ -15,11 +15,10 @@ NOT superseded by the GuardSarm branding:
   https://wazuh.com
 
   OSSEC HIDS
-  Copyright (C) 2009 Trend Micro Inc.
   Originally created by Daniel B. Cid.
 
 All source files retain their original copyright headers ("Copyright (C) 2015,
-Wazuh Inc." and, where applicable, "Copyright (C) 2009 Trend Micro Inc.").
+Wazuh Inc.").
 GuardSarm does not claim authorship of upstream code.
 
 Third-party components bundled with or depended upon by this product retain
