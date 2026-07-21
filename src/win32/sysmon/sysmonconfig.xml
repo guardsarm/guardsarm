@@ -1,0 +1,103 @@
+<!--
+  GuardsArm recommended Sysmon configuration.
+  Balanced coverage for EDR: process/network/image/registry/DNS with sensible
+  noise exclusions so the Microsoft-Windows-Sysmon/Operational channel stays
+  high-signal. Applied by install-sysmon.ps1. Schema 4.90 (Sysmon 14+).
+  Copyright (C) 2026, GuardSarm.
+-->
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>SHA256</HashAlgorithms>
+  <CheckRevocation>false</CheckRevocation>
+  <EventFiltering>
+
+    <!-- EventID 1: process creation (keep all; the console builds process trees from this) -->
+    <RuleGroup name="proc-create" groupRelation="or">
+      <ProcessCreate onmatch="exclude">
+        <!-- exclude very high-volume benign updater churn -->
+        <Image condition="is">C:\Windows\System32\CompatTelRunner.exe</Image>
+        <Image condition="is">C:\Windows\System32\wermgr.exe</Image>
+      </ProcessCreate>
+    </RuleGroup>
+
+    <!-- EventID 3: network connections — include suspicious ports/procs, drop browser/OS noise -->
+    <RuleGroup name="net-connect" groupRelation="or">
+      <NetworkConnect onmatch="exclude">
+        <Image condition="end with">svchost.exe</Image>
+        <DestinationPort condition="is">443</DestinationPort>
+        <DestinationIp condition="begin with">127.</DestinationIp>
+        <DestinationIp condition="begin with">169.254.</DestinationIp>
+      </NetworkConnect>
+      <!-- always capture connections from LOLBins / shells regardless of the excludes above -->
+      <NetworkConnect onmatch="include">
+        <Image condition="end with">powershell.exe</Image>
+        <Image condition="end with">cmd.exe</Image>
+        <Image condition="end with">wscript.exe</Image>
+        <Image condition="end with">cscript.exe</Image>
+        <Image condition="end with">mshta.exe</Image>
+        <Image condition="end with">rundll32.exe</Image>
+        <Image condition="end with">regsvr32.exe</Image>
+      </NetworkConnect>
+    </RuleGroup>
+
+    <!-- EventID 7: image/DLL loads — only unsigned or from writable/temp locations -->
+    <RuleGroup name="image-load" groupRelation="or">
+      <ImageLoad onmatch="include">
+        <Signed condition="is">false</Signed>
+        <ImageLoaded condition="contains">\Temp\</ImageLoaded>
+        <ImageLoaded condition="contains">\Users\Public\</ImageLoaded>
+      </ImageLoad>
+    </RuleGroup>
+
+    <!-- EventID 8/10: injection primitives — keep all (high value, low volume) -->
+    <RuleGroup name="remote-thread" groupRelation="or">
+      <CreateRemoteThread onmatch="exclude" />
+    </RuleGroup>
+    <RuleGroup name="process-access" groupRelation="or">
+      <ProcessAccess onmatch="include">
+        <TargetImage condition="end with">lsass.exe</TargetImage>
+      </ProcessAccess>
+    </RuleGroup>
+
+    <!-- EventID 11: file creation in autostart / temp / office-spawn locations -->
+    <RuleGroup name="file-create" groupRelation="or">
+      <FileCreate onmatch="include">
+        <TargetFilename condition="contains">\Startup\</TargetFilename>
+        <TargetFilename condition="contains">\Start Menu\</TargetFilename>
+        <TargetFilename condition="end with">.ps1</TargetFilename>
+        <TargetFilename condition="end with">.bat</TargetFilename>
+        <TargetFilename condition="end with">.hta</TargetFilename>
+        <TargetFilename condition="end with">.scr</TargetFilename>
+      </FileCreate>
+    </RuleGroup>
+
+    <!-- EventID 12/13/14: registry persistence + defense evasion keys -->
+    <RuleGroup name="registry" groupRelation="or">
+      <RegistryEvent onmatch="include">
+        <TargetObject condition="contains">\CurrentVersion\Run</TargetObject>
+        <TargetObject condition="contains">\CurrentVersion\RunOnce</TargetObject>
+        <TargetObject condition="contains">\Services\</TargetObject>
+        <TargetObject condition="contains">\Winlogon\</TargetObject>
+        <TargetObject condition="contains">\Image File Execution Options\</TargetObject>
+        <TargetObject condition="contains">\Policies\System\</TargetObject>
+      </RegistryEvent>
+    </RuleGroup>
+
+    <!-- EventID 22: DNS queries from scripting/LOLBin hosts (C2 beaconing signal) -->
+    <RuleGroup name="dns" groupRelation="or">
+      <DnsQuery onmatch="include">
+        <Image condition="end with">powershell.exe</Image>
+        <Image condition="end with">rundll32.exe</Image>
+        <Image condition="end with">regsvr32.exe</Image>
+        <Image condition="end with">mshta.exe</Image>
+        <Image condition="end with">wscript.exe</Image>
+        <Image condition="end with">cscript.exe</Image>
+      </DnsQuery>
+    </RuleGroup>
+
+    <!-- EventID 23/25: file delete (self-cleanup) + process tampering (hollowing) — keep all -->
+    <RuleGroup name="tamper" groupRelation="or">
+      <ProcessTampering onmatch="exclude" />
+    </RuleGroup>
+
+  </EventFiltering>
+</Sysmon>
