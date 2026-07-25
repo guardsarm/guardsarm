@@ -6,8 +6,8 @@
     <frequency>43200</frequency>
 
     <!-- Directories to check  (perform all possible verifications) -->
-    <directories>/etc,/usr/bin,/usr/sbin</directories>
-    <directories>/bin,/sbin</directories>
+    <directories realtime="yes">/etc,/usr/bin,/usr/sbin</directories>
+    <directories realtime="yes">/bin,/sbin</directories>
 
     <!-- Files/directories to ignore -->
     <ignore>/etc/mtab</ignore>
