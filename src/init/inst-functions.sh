@@ -863,6 +863,13 @@ InstallCommon()
 
 
   ${INSTALL} -d -m 0770 -o root -g ${GUARDSARM_GROUP} ${INSTALLDIR}/etc/shared
+  # Rootcheck signature databases (rootkit/trojan/system-audit) -> etc/shared, so
+  # the <rootkit_files>/<rootkit_trojans>/<system_audit> config directives resolve.
+  for _rc in rootkit_files rootkit_trojans system_audit_rcl system_audit_ssh; do
+    if [ -f ../etc/rootcheck/${_rc}.txt ]; then
+      ${INSTALL} -m 0640 -o root -g ${GUARDSARM_GROUP} ../etc/rootcheck/${_rc}.txt ${INSTALLDIR}/etc/shared/
+    fi
+  done
   if [ "X${INSTYPE}" = "Xagent" ]; then
     # Active response scripts and helpers are agent runtime assets.
     ${INSTALL} -d -m 0750 -o root -g ${GUARDSARM_GROUP} ${INSTALLDIR}/active-response
