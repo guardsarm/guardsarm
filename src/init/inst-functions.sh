@@ -26,6 +26,9 @@ CLUSTER_TEMPLATE="./etc/templates/config/generic/cluster.template"
 VULN_TEMPLATE="./etc/templates/config/generic/wodle-vulnerability-detection.manager.template"
 INDEXER_TEMPLATE="./etc/templates/config/generic/wodle-indexer.manager.template"
 OFFICE365_TEMPLATE="./etc/templates/config/generic/wodle-office365.manager.template"
+AWS_TEMPLATE="./etc/templates/config/generic/wodle-aws.manager.template"
+AZURE_TEMPLATE="./etc/templates/config/generic/wodle-azure.manager.template"
+GCP_TEMPLATE="./etc/templates/config/generic/wodle-gcp.manager.template"
 
 SECURITY_CONFIGURATION_ASSESSMENT_TEMPLATE="./etc/templates/config/generic/sca.template"
 
@@ -473,6 +476,14 @@ WriteManager()
 
     # Office 365 (Unified Audit Log) -- disabled by default; fill api_auth + enable
     cat ${OFFICE365_TEMPLATE} >> $NEWCONFIG
+    echo "" >> $NEWCONFIG
+
+    # Cloud audit wodles (AWS/Azure/GCP) -- disabled by default; fill creds + enable
+    cat ${AWS_TEMPLATE} >> $NEWCONFIG
+    echo "" >> $NEWCONFIG
+    cat ${AZURE_TEMPLATE} >> $NEWCONFIG
+    echo "" >> $NEWCONFIG
+    cat ${GCP_TEMPLATE} >> $NEWCONFIG
     echo "" >> $NEWCONFIG
 
     # Indexer

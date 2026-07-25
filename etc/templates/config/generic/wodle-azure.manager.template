@@ -1,0 +1,27 @@
+  <!-- Azure Active Directory (Entra) / Monitor log collection (wm_azure,
+       name="azure-logs"). DISABLED by default. To enable:
+         1) Register an Entra app with Microsoft Graph "AuditLog.Read.All" +
+            "Directory.Read.All" and create a client secret.
+         2) Fill <application_id> / <application_key> / <tenantdomain> below (or
+            use <auth_path> to read id:key from a file).
+         3) Set <disabled>no</disabled> and restart the manager.
+       Collected events are classified by the guardsarm-azure engine decoders
+       (interactive sign-in, directory role change) with user.name / source.ip /
+       cloud.provider=azure extraction, then graded to findings. The <graph>
+       <request> query below pulls Azure AD sign-in logs; add more <request>
+       blocks (e.g. auditLogs/directoryAudits) as needed. -->
+  <wodle name="azure-logs">
+    <disabled>yes</disabled>
+    <interval>10m</interval>
+    <run_on_start>no</run_on_start>
+    <graph>
+      <application_id>REPLACE_WITH_APP_ID</application_id>
+      <application_key>REPLACE_WITH_APP_KEY</application_key>
+      <tenantdomain>REPLACE_WITH_TENANT_DOMAIN</tenantdomain>
+      <request>
+        <tag>azure-ad-signins</tag>
+        <query>auditLogs/signIns</query>
+        <time_offset>1d</time_offset>
+      </request>
+    </graph>
+  </wodle>

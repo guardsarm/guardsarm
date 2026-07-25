@@ -1,0 +1,20 @@
+  <!-- Google Cloud Pub/Sub log collection (wm_gcp, name="gcp-pubsub").
+       DISABLED by default. To enable:
+         1) In GCP, route the audit logs you want into a Pub/Sub topic and create
+            a pull subscription for it.
+         2) Create a service-account key (JSON) with "Pub/Sub Subscriber" and copy
+            it onto the manager host; point <credentials_file> at its path.
+         3) Fill <project_id> / <subscription_name>, set <enabled>yes</enabled>
+            and restart the manager.
+       Collected events are classified by the guardsarm-gcp engine decoders
+       (IAM policy change) with user.name / cloud.provider=gcp extraction, then
+       graded to findings. -->
+  <wodle name="gcp-pubsub">
+    <enabled>no</enabled>
+    <project_id>REPLACE_WITH_PROJECT_ID</project_id>
+    <subscription_name>REPLACE_WITH_SUBSCRIPTION</subscription_name>
+    <credentials_file>REPLACE_WITH_CREDENTIALS_JSON_PATH</credentials_file>
+    <max_messages>100</max_messages>
+    <pull_on_start>no</pull_on_start>
+    <logging>info</logging>
+  </wodle>

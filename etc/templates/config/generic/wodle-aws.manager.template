@@ -1,0 +1,25 @@
+  <!-- AWS CloudTrail / security-log collection (wm_aws, name="aws-s3").
+       DISABLED by default. To enable:
+         1) Create/identify the S3 bucket receiving CloudTrail (and optionally
+            GuardDuty/VPCFlow/Macie) logs.
+         2) Provide credentials: either fill <access_key>/<secret_key> below, or
+            (preferred) remove them and use an <aws_profile> / IAM role on the host.
+         3) Set the bucket <name> + <regions>, then <disabled>no</disabled> and
+            restart the manager.
+       Collected events are classified by the guardsarm-aws engine decoders
+       (console login, IAM change, root activity, S3 public-exposure) with
+       user.name / source.ip / cloud.provider=aws extraction, then graded to
+       findings (cloud_login / iam_change / root_activity / s3_policy_change). -->
+  <wodle name="aws-s3">
+    <disabled>yes</disabled>
+    <interval>10m</interval>
+    <run_on_start>no</run_on_start>
+    <skip_on_error>yes</skip_on_error>
+    <bucket type="cloudtrail">
+      <name>REPLACE_WITH_CLOUDTRAIL_BUCKET</name>
+      <aws_profile>default</aws_profile>
+      <regions>us-east-1</regions>
+      <!-- <access_key>REPLACE_WITH_ACCESS_KEY</access_key>
+           <secret_key>REPLACE_WITH_SECRET_KEY</secret_key> -->
+    </bucket>
+  </wodle>
