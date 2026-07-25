@@ -25,6 +25,7 @@ CLUSTER_TEMPLATE="./etc/templates/config/generic/cluster.template"
 
 VULN_TEMPLATE="./etc/templates/config/generic/wodle-vulnerability-detection.manager.template"
 INDEXER_TEMPLATE="./etc/templates/config/generic/wodle-indexer.manager.template"
+OFFICE365_TEMPLATE="./etc/templates/config/generic/wodle-office365.manager.template"
 
 SECURITY_CONFIGURATION_ASSESSMENT_TEMPLATE="./etc/templates/config/generic/sca.template"
 
@@ -468,6 +469,10 @@ WriteManager()
 
     # Vulnerability Detector
     cat ${VULN_TEMPLATE} >> $NEWCONFIG
+    echo "" >> $NEWCONFIG
+
+    # Office 365 (Unified Audit Log) -- disabled by default; fill api_auth + enable
+    cat ${OFFICE365_TEMPLATE} >> $NEWCONFIG
     echo "" >> $NEWCONFIG
 
     # Indexer

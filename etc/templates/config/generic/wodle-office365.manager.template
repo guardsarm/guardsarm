@@ -1,0 +1,31 @@
+  <!-- Microsoft 365 (Office 365) Unified Audit Log collection.
+       DISABLED by default. To enable:
+         1) Register an Entra (Azure AD) app with the "Office 365 Management APIs"
+            permission (ActivityFeed.Read) + a client secret.
+         2) Fill tenant_id / client_id / client_secret below (or use
+            <client_secret_path> to read the secret from a file).
+         3) Set <enabled>yes</enabled> and restart the manager.
+       Collected events are classified by the guardsarm-o365 engine decoders
+       (login success/failure, inbox-rule/forwarding, mailbox delegation, role
+       change, external sharing, audit-config tamper, MFA change) with user.name /
+       source.ip / cloud.provider extraction. This is the template for the rest of
+       the cloud stack (aws/azure/gcp/ms-graph/github wodles ship the same way). -->
+  <wodle name="office365">
+    <enabled>no</enabled>
+    <interval>10m</interval>
+    <curl_max_size>5M</curl_max_size>
+    <only_future_events>yes</only_future_events>
+    <api_auth>
+      <tenant_id>REPLACE_WITH_TENANT_ID</tenant_id>
+      <client_id>REPLACE_WITH_CLIENT_ID</client_id>
+      <client_secret>REPLACE_WITH_CLIENT_SECRET</client_secret>
+      <api_type>commercial</api_type>
+    </api_auth>
+    <subscriptions>
+      <subscription>Audit.AzureActiveDirectory</subscription>
+      <subscription>Audit.Exchange</subscription>
+      <subscription>Audit.SharePoint</subscription>
+      <subscription>Audit.General</subscription>
+      <subscription>DLP.All</subscription>
+    </subscriptions>
+  </wodle>
