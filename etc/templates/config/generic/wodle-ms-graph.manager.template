@@ -1,0 +1,33 @@
+  <!-- Microsoft Graph security API collection (wm_ms-graph, name="ms-graph").
+       DISABLED by default. Pulls Microsoft 365 Defender alerts + Entra ID
+       Protection risk data. To enable:
+         1) Register an Entra app with Microsoft Graph application permissions
+            "SecurityAlert.Read.All", "SecurityEvents.Read.All" and
+            "IdentityRiskyUser.Read.All" / "IdentityRiskEvent.Read.All"; grant
+            admin consent + create a client secret.
+         2) Fill <tenant_id> / <client_id> / <secret_value> below.
+         3) Set <enabled>yes</enabled> and restart the manager.
+       Collected events are classified by the guardsarm-ms-graph engine decoders
+       (Defender security alert, risky user / risk detection, risky sign-in) with
+       userPrincipalName -> user.name, ipAddress -> source.ip, cloud.provider=
+       ms-graph, then graded to findings. -->
+  <wodle name="ms-graph">
+    <enabled>no</enabled>
+    <interval>5m</interval>
+    <curl_max_size>10M</curl_max_size>
+    <only_future_events>yes</only_future_events>
+    <api_auth>
+      <tenant_id>REPLACE_WITH_TENANT_ID</tenant_id>
+      <client_id>REPLACE_WITH_CLIENT_ID</client_id>
+      <secret_value>REPLACE_WITH_CLIENT_SECRET</secret_value>
+      <api_type>global</api_type>
+    </api_auth>
+    <resource>
+      <name>security</name>
+      <relationship>alerts_v2</relationship>
+    </resource>
+    <resource>
+      <name>identityProtection</name>
+      <relationship>riskDetections</relationship>
+    </resource>
+  </wodle>

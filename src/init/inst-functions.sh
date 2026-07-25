@@ -29,6 +29,8 @@ OFFICE365_TEMPLATE="./etc/templates/config/generic/wodle-office365.manager.templ
 AWS_TEMPLATE="./etc/templates/config/generic/wodle-aws.manager.template"
 AZURE_TEMPLATE="./etc/templates/config/generic/wodle-azure.manager.template"
 GCP_TEMPLATE="./etc/templates/config/generic/wodle-gcp.manager.template"
+GITHUB_TEMPLATE="./etc/templates/config/generic/wodle-github.manager.template"
+MSGRAPH_TEMPLATE="./etc/templates/config/generic/wodle-ms-graph.manager.template"
 
 SECURITY_CONFIGURATION_ASSESSMENT_TEMPLATE="./etc/templates/config/generic/sca.template"
 
@@ -484,6 +486,12 @@ WriteManager()
     cat ${AZURE_TEMPLATE} >> $NEWCONFIG
     echo "" >> $NEWCONFIG
     cat ${GCP_TEMPLATE} >> $NEWCONFIG
+    echo "" >> $NEWCONFIG
+
+    # SaaS/identity audit wodles (GitHub audit log, Microsoft Graph security) -- disabled by default
+    cat ${GITHUB_TEMPLATE} >> $NEWCONFIG
+    echo "" >> $NEWCONFIG
+    cat ${MSGRAPH_TEMPLATE} >> $NEWCONFIG
     echo "" >> $NEWCONFIG
 
     # Indexer

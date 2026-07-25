@@ -1,0 +1,25 @@
+  <!-- GitHub organization audit-log collection (wm_github, name="github").
+       DISABLED by default. To enable:
+         1) In the GitHub org, create a PAT (classic) with the "read:audit_log"
+            scope (or a GitHub App with the equivalent permission).
+         2) Fill <org_name> + <api_token> below.
+         3) Set <enabled>yes</enabled> and restart the manager.
+       Collected events are classified by the guardsarm-github engine decoders
+       (failed sign-in, 2FA/SAML weakening, branch-protection removal, repo
+       delete, visibility change, OAuth-app / PAT creation, membership change,
+       webhook creation) with actor -> user.name, actor_ip -> source.ip,
+       cloud.provider=github, then graded to findings with compliance tags. -->
+  <wodle name="github">
+    <enabled>no</enabled>
+    <interval>10m</interval>
+    <time_delay>1s</time_delay>
+    <curl_max_size>1M</curl_max_size>
+    <only_future_events>yes</only_future_events>
+    <api_auth>
+      <org_name>REPLACE_WITH_ORG_NAME</org_name>
+      <api_token>REPLACE_WITH_AUDIT_LOG_PAT</api_token>
+    </api_auth>
+    <api_parameters>
+      <event_type>all</event_type>
+    </api_parameters>
+  </wodle>
