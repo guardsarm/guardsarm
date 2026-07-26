@@ -6,7 +6,8 @@
     <frequency>43200</frequency>
 
     <!-- Directories to check  (perform all possible verifications) -->
-    <directories realtime="yes">/etc,/usr/bin,/usr/sbin</directories>
+    <directories realtime="yes" report_changes="yes">/etc</directories>
+    <directories realtime="yes">/usr/bin,/usr/sbin</directories>
     <directories realtime="yes">/bin,/sbin,/boot</directories>
 
     <!-- Files/directories to ignore -->

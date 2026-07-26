@@ -31,6 +31,7 @@ AZURE_TEMPLATE="./etc/templates/config/generic/wodle-azure.manager.template"
 GCP_TEMPLATE="./etc/templates/config/generic/wodle-gcp.manager.template"
 GITHUB_TEMPLATE="./etc/templates/config/generic/wodle-github.manager.template"
 MSGRAPH_TEMPLATE="./etc/templates/config/generic/wodle-ms-graph.manager.template"
+DOCKER_TEMPLATE="./etc/templates/config/generic/wodle-docker.manager.template"
 
 SECURITY_CONFIGURATION_ASSESSMENT_TEMPLATE="./etc/templates/config/generic/sca.template"
 
@@ -492,6 +493,10 @@ WriteManager()
     cat ${GITHUB_TEMPLATE} >> $NEWCONFIG
     echo "" >> $NEWCONFIG
     cat ${MSGRAPH_TEMPLATE} >> $NEWCONFIG
+    echo "" >> $NEWCONFIG
+
+    # Docker container-events listener -- disabled by default; enable where Docker runs
+    cat ${DOCKER_TEMPLATE} >> $NEWCONFIG
     echo "" >> $NEWCONFIG
 
     # Indexer

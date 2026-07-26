@@ -1,0 +1,17 @@
+  <!-- Docker container-events collection (wm_docker, name="docker-listener").
+       DISABLED by default. Monitors the local Docker daemon event stream (container
+       create/start/stop/die, image pull, network/volume changes) via the bundled
+       wodles/docker/DockerListener helper, classified by the guardsarm-docker engine
+       decoders. To enable:
+         1) Ensure the host runs Docker and the agent/manager user can read the
+            Docker socket (docker group), and the Python 'docker' SDK is present.
+         2) Set <disabled>no</disabled> and restart.
+       NOTE: container telemetry is most useful ON THE ENDPOINTS running Docker, so
+       this same block can be pushed to a group of agents via agent.conf (group
+       configuration) instead of (or in addition to) the manager. Linux/macOS only. -->
+  <wodle name="docker-listener">
+    <disabled>yes</disabled>
+    <interval>1m</interval>
+    <attempts>5</attempts>
+    <run_on_start>yes</run_on_start>
+  </wodle>
