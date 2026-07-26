@@ -33,8 +33,11 @@ def get_daemons_stats_agents(daemons_list: list = None, agent_list: list = None)
         Dictionary with daemon's statistical information of the specified agents.
     """
     agent_list = agent_list or ["all"]
-    daemon_socket_mapping = {'guardsarm-manager-remoted': common.REMOTED_SOCKET,
-                             'guardsarm-manager-analysisd': common.ANALYSISD_SOCKET}
+    # NOTE: the fork's analysisd is the GuardSarm engine, whose analysis socket speaks
+    # the namespace/import API — not the classic 'getagentsstats' command. Querying it
+    # always fails (error 1014) and marks the whole result partial. Only remoted exposes
+    # usable per-agent statistics, so it is the sole daemon queried here.
+    daemon_socket_mapping = {'guardsarm-manager-remoted': common.REMOTED_SOCKET}
     result = AffectedItemsGuardSarmResult(all_msg='Statistical information for each daemon was successfully read',
                                       some_msg='Could not read statistical information for some daemons',
                                       none_msg='Could not read statistical information for any daemon',
@@ -133,8 +136,9 @@ def get_daemons_stats(daemons_list: list = None) -> AffectedItemsGuardSarmResult
     AffectedItemsGuardSarmResult
         Dictionary with the stats of the input file.
     """
+    # analysisd (the engine) has no classic stats socket — see get_daemons_stats_agents;
+    # query only the daemons that actually implement 'getstats'.
     daemon_socket_mapping = {'guardsarm-manager-remoted': common.REMOTED_SOCKET,
-                             'guardsarm-manager-analysisd': common.ANALYSISD_SOCKET,
                              'guardsarm-manager-db': common.WDB_SOCKET}
     result = AffectedItemsGuardSarmResult(all_msg='Statistical information for each daemon was successfully read',
                                       some_msg='Could not read statistical information for some daemons',
