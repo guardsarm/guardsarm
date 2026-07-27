@@ -106,6 +106,19 @@ int Read_WModule(const OS_XML *xml, xml_node *node, void *d1, void *d2)
         mwarn("The '%s' module only works for the Linux agent", node->values[0]);
     }
 #endif
+#if defined(CLIENT)
+    else if (!strcmp(node->values[0], GM_AIDR_CONTEXT.name)) {
+        if (gm_aidr_read(xml, children, cur_wmodule) < 0) {
+            OS_ClearNode(children);
+            return OS_INVALID;
+        }
+    }
+#elif !defined(WIN32)
+    // The native AIDR module (wm_aidr.c) is agent-only; the manager just warns.
+    else if (!strcmp(node->values[0], GM_AIDR_CONTEXT.name)) {
+        mwarn("The '%s' module only works for the agent", node->values[0]);
+    }
+#endif
 #ifdef CLIENT
     else if (!strcmp(node->values[0], GM_COMMAND_CONTEXT.name)) {
         if (gm_command_read(children, cur_wmodule, agent_cfg) < 0) {
