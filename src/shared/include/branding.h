@@ -54,7 +54,7 @@
  * use PRODUCT_VERSION for on-wire version reporting. Bump on each product release
  * (bump-version.sh keeps this in lockstep with VERSION.json / branding.json). */
 #ifndef PRODUCT_VERSION
-#define PRODUCT_VERSION "v2.4.0"
+#define PRODUCT_VERSION "v2.5.0"
 #endif
 
 #endif /* GUARDSARM_BRANDING_H */
