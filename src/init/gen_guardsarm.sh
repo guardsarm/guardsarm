@@ -42,8 +42,10 @@ if [ "$1" = "conf" ] && [ "$#" -ge "4" ]; then
     INSTALLDIR="$5"
   fi
 
-  # Default values definition
-  SERVER_IP="MANAGER_IP"
+  # Default values definition. The manager address may be supplied at install time
+  # via the GUARDSARM_MANAGER environment variable (parity with the Windows MSI's
+  # GUARDSARM_MANAGER property); otherwise the MANAGER_IP placeholder is kept.
+  SERVER_IP="${GUARDSARM_MANAGER:-MANAGER_IP}"
   NEWCONFIG="./guardsarm.conf.temp"
   SYSCHECK="yes"
   ROOTCHECK="yes"

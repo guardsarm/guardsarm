@@ -46,6 +46,16 @@ case "$1" in
         chmod 640 ${DIR}/etc/gsmsec.conf.new
     fi
 
+    # Enrollment password from the install-time environment -> the default
+    # authorization_pass_path (etc/authd.pass), so password-gated authd enrollment
+    # works straight from the install one-liner (parity with the Windows MSI's
+    # GUARDSARM_REGISTRATION_PASSWORD property).
+    if [ -n "${GUARDSARM_REGISTRATION_PASSWORD}" ]; then
+        printf '%s' "${GUARDSARM_REGISTRATION_PASSWORD}" > ${DIR}/etc/authd.pass
+        chmod 640 ${DIR}/etc/authd.pass
+        chown root:${GROUP} ${DIR}/etc/authd.pass 2>/dev/null || true
+    fi
+
     # For the etc dir
     if [ -f /etc/localtime ]; then
         cp -pL /etc/localtime ${DIR}/etc/;
