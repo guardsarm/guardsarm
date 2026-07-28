@@ -355,7 +355,7 @@ WriteAgent()
     else
       echo "      <address>$HNAME</address>" >> $NEWCONFIG
     fi
-    echo "      <port>${GUARDSARM_MANAGER_PORT:-1514}</port>" >> $NEWCONFIG
+    echo "      <port>1514</port>" >> $NEWCONFIG
     echo "    </manager>" >> $NEWCONFIG
     if [ "X${USER_AGENT_CONFIG_PROFILE}" != "X" ]; then
          PROFILE=${USER_AGENT_CONFIG_PROFILE}
@@ -374,25 +374,6 @@ WriteAgent()
     echo "    <notify_time>20</notify_time>" >> $NEWCONFIG
     echo "    <time-reconnect>60</time-reconnect>" >> $NEWCONFIG
     echo "    <auto_restart>yes</auto_restart>" >> $NEWCONFIG
-    # Auto-enrollment from install-time environment variables (parity with the Windows
-    # MSI properties, e.g. GUARDSARM_MANAGER / GUARDSARM_REGISTRATION_SERVER). Emitted
-    # ONLY when a manager/registration server is provided in the environment, so a plain
-    # install keeps the MANAGER_IP placeholder and no auto-enrollment (unchanged default).
-    # The registration password (GUARDSARM_REGISTRATION_PASSWORD) is written by the
-    # package post-install to etc/authd.pass (the default authorization_pass_path).
-    if [ "X${GUARDSARM_REGISTRATION_SERVER}${GUARDSARM_MANAGER}" != "X" ]; then
-      echo "    <enrollment>" >> $NEWCONFIG
-      echo "      <enabled>yes</enabled>" >> $NEWCONFIG
-      echo "      <manager_address>${GUARDSARM_REGISTRATION_SERVER:-$SERVER_IP}</manager_address>" >> $NEWCONFIG
-      echo "      <port>${GUARDSARM_REGISTRATION_PORT:-1515}</port>" >> $NEWCONFIG
-      if [ "X${GUARDSARM_AGENT_GROUP}" != "X" ]; then
-        echo "      <groups>${GUARDSARM_AGENT_GROUP}</groups>" >> $NEWCONFIG
-      fi
-      if [ "X${GUARDSARM_AGENT_NAME}" != "X" ]; then
-        echo "      <agent_name>${GUARDSARM_AGENT_NAME}</agent_name>" >> $NEWCONFIG
-      fi
-      echo "    </enrollment>" >> $NEWCONFIG
-    fi
     echo "  </client>" >> $NEWCONFIG
     echo "" >> $NEWCONFIG
 

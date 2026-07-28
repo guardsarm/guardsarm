@@ -46,14 +46,13 @@ case "$1" in
         chmod 640 ${DIR}/etc/gsmsec.conf.new
     fi
 
-    # Enrollment password from the install-time environment -> the default
-    # authorization_pass_path (etc/authd.pass), so password-gated authd enrollment
-    # works straight from the install one-liner (parity with the Windows MSI's
-    # GUARDSARM_REGISTRATION_PASSWORD property).
-    if [ -n "${GUARDSARM_REGISTRATION_PASSWORD}" ]; then
-        printf '%s' "${GUARDSARM_REGISTRATION_PASSWORD}" > ${DIR}/etc/authd.pass
-        chmod 640 ${DIR}/etc/authd.pass
-        chown root:${GROUP} ${DIR}/etc/authd.pass 2>/dev/null || true
+    # Register + configure the agent from the install-time environment variables
+    # (GUARDSARM_MANAGER / GUARDSARM_REGISTRATION_SERVER / _PORT / _PASSWORD /
+    # GUARDSARM_AGENT_GROUP ...) using the same shared script the RPM %post uses.
+    # It rewrites the manager address, adds the <enrollment> block and writes
+    # etc/authd.pass. No-op when none of those variables are set (plain install).
+    if [ -f ${SCRIPTS_DIR}/src/init/register_configure_agent.sh ]; then
+        ${SCRIPTS_DIR}/src/init/register_configure_agent.sh ${DIR} > /dev/null 2>&1 || :
     fi
 
     # For the etc dir
