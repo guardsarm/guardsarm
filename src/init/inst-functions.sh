@@ -220,10 +220,15 @@ WriteLogs()
   HAS_JOURNALD=`command -v journalctl`
 
   # If journald is available, add it to the generated configuration.
+  # A native <filter> excludes noisy application identifiers (their stdout/stderr,
+  # e.g. multi-line stack traces) that are not security-relevant and otherwise flood
+  # the unclassified pipeline; security-relevant units (sshd/sudo/systemd/cron/kernel)
+  # and any entry without SYSLOG_IDENTIFIER are still collected.
   if [ "X$HAS_JOURNALD" != "X" ] && [ "$MODE" = "add" ]; then
     echo "  <localfile>" >> $NEWCONFIG
     echo "    <log_format>journald</log_format>" >> $NEWCONFIG
     echo "    <location>journald</location>" >> $NEWCONFIG
+    echo '    <filter field="SYSLOG_IDENTIFIER" ignore_if_missing="yes">^(?!(opensearch|python3?|ollama|node|start-dashboard.sh|snapd)$).*</filter>' >> $NEWCONFIG
     echo "  </localfile>" >> $NEWCONFIG
     echo "" >> $NEWCONFIG
   fi
