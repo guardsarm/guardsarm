@@ -637,6 +637,14 @@ if [ -f %{_sysconfdir}/systemd/system/guardsarm-agent.service ]; then
   systemctl daemon-reload > /dev/null 2>&1
 fi
 
+# Enable the agent so it starts automatically on boot (idempotent — install +
+# upgrade). Without this the unit ships disabled and a node reboot leaves the
+# agent offline until someone starts it by hand.
+if command -v systemctl > /dev/null 2>&1 && systemctl > /dev/null 2>&1; then
+  systemctl daemon-reload > /dev/null 2>&1 || true
+  systemctl enable guardsarm-agent.service > /dev/null 2>&1 || true
+fi
+
 if [ -f %{_localstatedir}/tmp/guardsarm.restart ]; then
   rm -f %{_localstatedir}/tmp/guardsarm.restart
   if command -v systemctl > /dev/null 2>&1 && systemctl > /dev/null 2>&1 ; then

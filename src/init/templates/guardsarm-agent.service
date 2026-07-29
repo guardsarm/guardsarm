@@ -12,6 +12,13 @@ ExecStop=/usr/bin/env GUARDSARM_HOME_TMP/bin/guardsarm-control stop
 ExecReload=/usr/bin/env GUARDSARM_HOME_TMP/bin/guardsarm-control reload
 
 KillMode=process
+# guardsarm-control forks the daemons and returns, so with a plain Type=forking
+# (no single PIDFile to track) systemd would mark the unit dead the moment the
+# control script exits and tear down its cgroup — killing every agent daemon and
+# turning a `systemctl restart` into a stop. RemainAfterExit keeps the unit
+# active after the forking start returns; KillMode=process (above) means stop
+# only signals the control script, never the whole cgroup.
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target

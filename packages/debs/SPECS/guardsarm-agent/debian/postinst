@@ -190,6 +190,14 @@ case "$1" in
         fi
     fi
 
+    # Enable the agent so it starts automatically on boot (idempotent — runs on
+    # both fresh install and upgrade). Without this the unit ships disabled and a
+    # node reboot leaves the agent offline until someone starts it by hand.
+    if command -v systemctl > /dev/null 2>&1 && systemctl > /dev/null 2>&1; then
+        systemctl daemon-reload > /dev/null 2>&1 || true
+        systemctl enable guardsarm-agent.service > /dev/null 2>&1 || true
+    fi
+
     # Delete installation scripts
     if [ -d ${SCRIPTS_DIR} ]; then
         rm -rf ${SCRIPTS_DIR}
