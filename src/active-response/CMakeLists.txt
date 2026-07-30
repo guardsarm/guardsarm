@@ -161,7 +161,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
   # GuardSarm Response 2.0 active responses (Windows).
   function(add_windows_ar name source)
-    add_executable(${name} ${source} ${ARGN} $<TARGET_OBJECTS:win32_stubs> ${RESOURCE_OBJ_APP})
+    # icofile.rc gives the binary the GuardSarm icon (RESOURCE_OBJ_APP = version.rc is
+    # version-info only). Without it, persistent AR services (tamper-guard, repair-network)
+    # show a blank/generic icon in Task Manager instead of the GuardSarm logo.
+    add_executable(${name} ${source} ${ARGN} $<TARGET_OBJECTS:win32_stubs> ${RESOURCE_OBJ_APP} ${SRC_FOLDER}/win32/icofile.rc)
     target_compile_definitions(${name} PRIVATE ARGV0="${name}" PLATFORM_WINDOWS=1)
     target_include_directories(${name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     set_target_properties(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SRC_FOLDER}/build/bin

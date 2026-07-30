@@ -40,11 +40,11 @@
 #endif
 
 #ifndef PRODUCT_CONTACT
-#define PRODUCT_CONTACT "info@guardsarmsiem.com"
+#define PRODUCT_CONTACT "info@guardsarm.com"
 #endif
 
 #ifndef PRODUCT_SITE
-#define PRODUCT_SITE "http://www.guardsarmsiem.com"
+#define PRODUCT_SITE "http://www.guardsarm.com"
 #endif
 
 /* Display-only product/release version (CLI banners, help, PE resources). This is the

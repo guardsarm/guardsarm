@@ -46,7 +46,7 @@ static void gm_clean_request(gm_azure_request_t * request);
 static void gm_clean_storage(gm_azure_storage_t * storage);
 static void gm_clean_container(gm_azure_container_t * container);
 
-static const char *AUTHENTICATION_OPTIONS_URL = "https://documentation.guardsarmsiem.com/current/azure/activity-services/prerequisites/credentials.html";
+static const char *AUTHENTICATION_OPTIONS_URL = "https://documentation.guardsarm.com/current/azure/activity-services/prerequisites/credentials.html";
 
 // Parse XML
 

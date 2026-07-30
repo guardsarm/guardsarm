@@ -46,7 +46,7 @@ BEGIN
 		VALUE "LegalCopyright",     "Copyright (C) 2026 GuardSarm, Inc."
 		VALUE "ProductName",        "GuardSarm Windows Agent"
 		VALUE "ProductVersion",     QUOTE(VER_PRODUCTVERSION_STR)
-         VALUE "Info",               "https://guardsarmsiem.com"
+         VALUE "Info",               "https://guardsarm.com"
          VALUE "License",            "GPLv2"
         END
 	END

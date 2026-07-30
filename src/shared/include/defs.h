@@ -84,8 +84,8 @@
 #define __guardsarm_name    "GuardSarm"       /* FROZEN: wire/DB/metadata literal -- see note above */
 #define __guardsarm_version "v2.4.0"          /* on-wire/DB version -- keep in lockstep, see note */
 #define __author        "GuardSarm, Inc."
-#define __contact       "info@guardsarmsiem.com"
-#define __site          "http://www.guardsarmsiem.com"
+#define __contact       "info@guardsarm.com"
+#define __site          "http://www.guardsarm.com"
 #define __license                                                                                                      \
     "\
 This software is proprietary and confidential. Unauthorized copying,\n\

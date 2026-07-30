@@ -406,17 +406,16 @@ static void set_disarm(const char *root, int on) {
 static int ensure_guardian_service(const char *root, const char *self) {
     int st = svc_state(GUARD_SVC_NAME);
     if (st == -1) {                                  /* attacker ran `sc delete` on us */
-        /* Use the 8.3 short path so the binPath has no spaces -- sc create's quoting of a
-         * "C:\Program Files (x86)\..." path plus an argument is famously fragile; a short
-         * path sidesteps it entirely. Fall back to the long path if 8.3 is unavailable. */
-        char shortself[MAX_PATH];
-        if (GetShortPathNameA(self, shortself, MAX_PATH) == 0) {
-            strncpy(shortself, self, MAX_PATH - 1); shortself[MAX_PATH - 1] = '\0';
-        }
+        /* Register with the FULL long path (inner-quoted) so Windows shows the real
+         * binary name (guardsarm-tamper-guard.exe) in Task Manager / the services list
+         * instead of the 8.3 short name (GUARDS~1.EXE). run_cmd spawns sc.exe directly
+         * via CreateProcessA (no cmd.exe shell), so the only quoting sc needs is the exe
+         * path quoted WITHIN the binPath value when it has spaces plus an argument:
+         *   binPath= "\"<exe>\" --service"  */
         char cmd[MAX_PATH + 220];
         snprintf(cmd, sizeof(cmd),
-                 "sc create %s binPath= \"%s --service\" start= auto DisplayName= \"GuardSarm Integrity Service\"",
-                 GUARD_SVC_NAME, shortself);
+                 "sc create %s binPath= \"\\\"%s\\\" --service\" start= auto DisplayName= \"GuardSarm Integrity Service\"",
+                 GUARD_SVC_NAME, self);
         run_cmd(cmd);
         run_cmd("sc failure " GUARD_SVC_NAME " reset= 86400 actions= restart/5000/restart/5000/restart/60000");
         run_cmd("sc start " GUARD_SVC_NAME);

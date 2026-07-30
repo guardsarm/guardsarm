@@ -13,8 +13,8 @@
 
 #define GM_AGENT_UPGRADE_LOGTAG ARGV0 ":" AGENT_UPGRADE_WM_NAME
 
-#define GM_UPGRADE_WPK_REPO_URL_3_X "packages.guardsarmsiem.com/wpk/"
-#define GM_UPGRADE_WPK_REPO_URL "packages.guardsarmsiem.com/%d.x/wpk/"
+#define GM_UPGRADE_WPK_REPO_URL_3_X "packages.guardsarm.com/wpk/"
+#define GM_UPGRADE_WPK_REPO_URL "packages.guardsarm.com/%d.x/wpk/"
 #define GM_UPGRADE_CHUNK_SIZE 32768
 #define GM_UPGRADE_CHUNK_SIZE_MIN 64
 #define GM_UPGRADE_CHUNK_SIZE_MAX 60000

@@ -96,7 +96,7 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT Message, WPARAM wParam,
             SendMessage(hStatus, SB_SETPARTS,
                         sizeof(statwidths) / sizeof(int),
                         (LPARAM)statwidths);
-            SendMessage(hStatus, SB_SETTEXT, 0, (LPARAM)"https://guardsarmsiem.com");
+            SendMessage(hStatus, SB_SETTEXT, 0, (LPARAM)"https://guardsarm.com");
 
 
             /* Initializing config */
