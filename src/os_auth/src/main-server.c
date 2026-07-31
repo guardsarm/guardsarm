@@ -677,6 +677,34 @@ void delete_client(uint32_t index) {
     }
 }
 
+/* GuardSarm: read the CURRENT enrollment password from AUTHD_PASS fresh, so that
+ * provisioning / rotating / sweeping authd.pass takes effect WITHOUT restarting
+ * authd — this is what makes expiring, revocable enrollment tokens work. Stock
+ * authd read the password once at startup into the static `authpass`, so a
+ * provisioned token was never honored until a manager restart.
+ *   ret 1  -> file present & non-empty  (buf holds the value, CR/LF stripped)
+ *   ret 0  -> file absent or empty      (enrollment must be REJECTED)
+ *   ret -1 -> transient read error      (caller keeps its startup fallback)
+ */
+static int gs_read_authpass(char *buf, size_t size) {
+    FILE *fp = wfopen(AUTHD_PASS, "r");
+    if (!fp) {
+        return (errno == ENOENT) ? 0 : -1;
+    }
+    buf[0] = '\0';
+    char *ret = fgets(buf, (int)size - 1, fp);
+    fclose(fp);
+    if (!ret) {
+        buf[0] = '\0';
+        return 0;
+    }
+    size_t n = strlen(buf);
+    while (n > 0 && (buf[n - 1] == '\n' || buf[n - 1] == '\r')) {
+        buf[--n] = '\0';
+    }
+    return (n > 0) ? 1 : 0;
+}
+
 static void process_message(struct client *client) {
     char response[2048] = {0};
     client->enrollment_ok = FALSE;
@@ -685,7 +713,25 @@ static void process_message(struct client *client) {
 
     mdebug2("Request received: <%s>", client->read_buffer);
 
-    if (OS_SUCCESS == w_auth_parse_data(client->read_buffer, response, authpass, client->ip, &client->agentname, &client->centralized_group, &key_hash)) {
+    /* GuardSarm: re-read authd.pass fresh for THIS connection (see gs_read_authpass)
+     * so provisioned/rotated tokens are honored live and swept ones are rejected,
+     * all without an authd restart. When use_password is on but the file is
+     * absent/empty (swept/expired), reject every enrollment via an unguessable
+     * sentinel — never fall through to the NULL "no password required" path. */
+    const char *expected = authpass;
+    char freshpass[4097];
+    static const char GS_ENROLL_DISABLED[] = "\x01gs-enrollment-disabled-no-authd-pass\x01";
+    if (config.flags.use_password) {
+        int rc = gs_read_authpass(freshpass, sizeof(freshpass));
+        if (rc == 1) {
+            expected = freshpass;               /* live authd.pass content */
+        } else if (rc == 0) {
+            expected = GS_ENROLL_DISABLED;      /* swept/empty → reject all enrollment */
+        }
+        /* rc < 0 (transient error) → keep the startup `authpass` fallback */
+    }
+
+    if (OS_SUCCESS == w_auth_parse_data(client->read_buffer, response, expected, client->ip, &client->agentname, &client->centralized_group, &key_hash)) {
         if (config.worker_node) {
             minfo("Dispatching request to master node");
             // The force registration settings are ignored for workers. The master decides.
