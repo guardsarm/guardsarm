@@ -1107,7 +1107,7 @@ sudo systemctl restart guardsarm-agent
 Restart-Service -Name guardsarm
 
 # macOS
-/Library/Ossec/bin/guardsarm-control restart
+/Library/gsmsec/bin/guardsarm-control restart
 ```
 
 ### Step 3 – Wait for Syscollector to complete its first sync

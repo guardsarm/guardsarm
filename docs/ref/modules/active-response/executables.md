@@ -487,7 +487,7 @@ import platform
 if os.name == 'nt':
     LOG_FILE = "C:\\Program Files (x86)\\ossec-agent\\active-response\\active-responses.log"
 elif platform.system() == 'Darwin':
-    LOG_FILE = "/Library/Ossec/logs/active-responses.log"
+    LOG_FILE = "/Library/gsmsec/logs/active-responses.log"
 else:
     LOG_FILE = "/var/gsmsec/logs/active-responses.log"
 

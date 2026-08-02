@@ -385,7 +385,7 @@ sudo installer -pkg guardsarm-agent-*.pkg -target /
 Verify the agent is running:
 
 ```bash
-sudo /Library/Ossec/bin/guardsarm-control status
+sudo /Library/gsmsec/bin/guardsarm-control status
 ```
 
 ### Windows

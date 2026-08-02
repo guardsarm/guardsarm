@@ -4,7 +4,7 @@ description: "Installs the GuardSarm agent using the interactive installer with 
 inputs:
   install_dir:
     required: false
-    description: "Installation directory (e.g. /var/gsmsec for Linux, /Library/Ossec for macOS)"
+    description: "Installation directory (e.g. /var/gsmsec for Linux, /Library/gsmsec for macOS)"
     default: "/var/gsmsec"
   disable_sca_syscollector:
     required: false

@@ -169,7 +169,7 @@ runs:
         echo "Testing daemons with -t flag..."
         for daemon in $DAEMONS; do
           echo "Testing ${daemon}..."
-          if ! sudo /Library/Ossec/bin/${daemon} -t; then
+          if ! sudo /Library/gsmsec/bin/${daemon} -t; then
             echo "ERROR: ${daemon} -t failed with exit code $?"
             exit 1
           fi
@@ -179,7 +179,7 @@ runs:
     - name: Start macOS agent
       if: inputs.platform == 'macos'
       shell: bash
-      run: sudo /Library/Ossec/bin/guardsarm-control start
+      run: sudo /Library/gsmsec/bin/guardsarm-control start
 
     - name: Wait for macOS agent to initialize
       if: inputs.platform == 'macos'
@@ -190,7 +190,7 @@ runs:
       if: inputs.platform == 'macos'
       shell: bash
       run: |
-        if ! sudo /Library/Ossec/bin/guardsarm-control status; then
+        if ! sudo /Library/gsmsec/bin/guardsarm-control status; then
           echo "ERROR: Agent status check failed"
           exit 1
         fi
@@ -200,5 +200,5 @@ runs:
       if: inputs.platform == 'macos'
       shell: bash
       run: |
-        sudo /Library/Ossec/bin/guardsarm-control stop
+        sudo /Library/gsmsec/bin/guardsarm-control stop
         echo "Agent stopped successfully"

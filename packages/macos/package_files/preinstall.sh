@@ -8,7 +8,7 @@
 # $1 is the message
 # $2 is the error code
 
-DIR="/Library/Ossec"
+DIR="/Library/gsmsec"
 ARCH="PACKAGE_ARCH"
 
 function check_errm

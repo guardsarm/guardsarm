@@ -10,7 +10,7 @@
 #  so the the list GroupMembership works properly
 GROUP="guardsarm"
 USER="guardsarm"
-DIR="/Library/Ossec"
+DIR="/Library/gsmsec"
 INSTALLATION_SCRIPTS_DIR="${DIR}/packages_files/agent_installation_scripts"
 SCA_BASE_DIR="${INSTALLATION_SCRIPTS_DIR}/sca"
 UPGRADE_FILE_FLAG="${DIR}/GUARDSARM_PKG_UPGRADE"

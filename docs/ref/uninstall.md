@@ -71,7 +71,7 @@ sudo launchctl bootout system /Library/LaunchDaemons/com.guardsarm.agent.plist
 Remove the package:
 
 ```bash
-sudo rm -rf /Library/Ossec
+sudo rm -rf /Library/gsmsec
 sudo rm -f /Library/LaunchDaemons/com.guardsarm.agent.plist
 sudo rm -rf /Library/StartupItems/GUARDSARM
 ```

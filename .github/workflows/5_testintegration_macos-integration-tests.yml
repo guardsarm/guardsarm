@@ -123,28 +123,28 @@ jobs:
             /<\/rootcheck>/ && in_block { in_block=0; print "    <disabled>yes</disabled>"; print; next }
             in_block { next }
             { print }
-          ' /Library/Ossec/etc/ossec.conf > /tmp/ossec.conf.fixed && sudo mv /tmp/ossec.conf.fixed /Library/Ossec/etc/ossec.conf
+          ' /Library/gsmsec/etc/ossec.conf > /tmp/ossec.conf.fixed && sudo mv /tmp/ossec.conf.fixed /Library/gsmsec/etc/ossec.conf
 
           sudo awk '
             /<syscheck>/ { in_block=1; print; next }
             /<\/syscheck>/ && in_block { in_block=0; print "    <disabled>yes</disabled>"; print; next }
             in_block { next }
             { print }
-          ' /Library/Ossec/etc/ossec.conf > /tmp/ossec.conf.fixed && sudo mv /tmp/ossec.conf.fixed /Library/Ossec/etc/ossec.conf
+          ' /Library/gsmsec/etc/ossec.conf > /tmp/ossec.conf.fixed && sudo mv /tmp/ossec.conf.fixed /Library/gsmsec/etc/ossec.conf
 
           sudo awk '
             /<sca>/ { in_block=1; next }
             /<\/sca>/ && in_block { in_block=0; next }
             in_block { next }
             { print }
-          ' /Library/Ossec/etc/ossec.conf > /tmp/ossec.conf.fixed && sudo mv /tmp/ossec.conf.fixed /Library/Ossec/etc/ossec.conf
+          ' /Library/gsmsec/etc/ossec.conf > /tmp/ossec.conf.fixed && sudo mv /tmp/ossec.conf.fixed /Library/gsmsec/etc/ossec.conf
 
           sudo awk '
             /<wodle name="syscollector">/ { in_block=1; print; next }
             /<\/wodle>/ && in_block { in_block=0; print "    <disabled>yes</disabled>"; print; next }
             in_block { next }
             { print }
-          ' /Library/Ossec/etc/ossec.conf > /tmp/ossec.conf.fixed && sudo mv /tmp/ossec.conf.fixed /Library/Ossec/etc/ossec.conf
+          ' /Library/gsmsec/etc/ossec.conf > /tmp/ossec.conf.fixed && sudo mv /tmp/ossec.conf.fixed /Library/gsmsec/etc/ossec.conf
 
       - name: Download and install integration tests framework
         uses: ./.github/actions/install_qa_framework
@@ -174,8 +174,8 @@ jobs:
       - name: Dump guardsarm-agent logs on failure
         if: failure()
         run: |
-          sudo /Library/Ossec/bin/guardsarm-control status || true
-          sudo tail -n 200 /Library/Ossec/logs/ossec.log || true
+          sudo /Library/gsmsec/bin/guardsarm-control status || true
+          sudo tail -n 200 /Library/gsmsec/logs/ossec.log || true
 
       - name: Upload failed test results
         if: failure()

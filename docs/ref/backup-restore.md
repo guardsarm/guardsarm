@@ -419,10 +419,10 @@ BACKUP_DIR="/backup/guardsarm-agent-$(date +%Y%m%d-%H%M%S)"
 sudo mkdir -p $BACKUP_DIR
 
 # Backup configuration and agent key
-sudo tar -czf $BACKUP_DIR/guardsarm-agent-etc.tar.gz -C /Library/Ossec etc/
+sudo tar -czf $BACKUP_DIR/guardsarm-agent-etc.tar.gz -C /Library/gsmsec etc/
 
 # Optional: Backup local databases
-sudo tar -czf $BACKUP_DIR/guardsarm-agent-db.tar.gz -C /Library/Ossec queue/fim/db/ queue/syscollector/db/ queue/sca/ 2>/dev/null || true
+sudo tar -czf $BACKUP_DIR/guardsarm-agent-db.tar.gz -C /Library/gsmsec queue/fim/db/ queue/syscollector/db/ queue/sca/ 2>/dev/null || true
 ```
 
 #### Creating Selective Agent Backups
@@ -501,23 +501,23 @@ Get-Service -Name guardsarm
 
 ```bash
 # Stop the agent
-sudo /Library/Ossec/bin/guardsarm-control stop
+sudo /Library/gsmsec/bin/guardsarm-control stop
 
 # Restore from backup
-sudo tar -xzf $BACKUP_DIR/guardsarm-agent-etc.tar.gz -C /Library/Ossec
+sudo tar -xzf $BACKUP_DIR/guardsarm-agent-etc.tar.gz -C /Library/gsmsec
 
 # Optional: Restore databases
-sudo tar -xzf $BACKUP_DIR/guardsarm-agent-db.tar.gz -C /Library/Ossec 2>/dev/null || true
+sudo tar -xzf $BACKUP_DIR/guardsarm-agent-db.tar.gz -C /Library/gsmsec 2>/dev/null || true
 
 # Set proper permissions
-sudo chown -R root:guardsarm /Library/Ossec/etc
-sudo chmod 640 /Library/Ossec/etc/client.keys
+sudo chown -R root:guardsarm /Library/gsmsec/etc
+sudo chmod 640 /Library/gsmsec/etc/client.keys
 
 # Start the agent
-sudo /Library/Ossec/bin/guardsarm-control start
+sudo /Library/gsmsec/bin/guardsarm-control start
 
 # Verify agent status
-sudo /Library/Ossec/bin/guardsarm-control status
+sudo /Library/gsmsec/bin/guardsarm-control status
 ```
 
 ---

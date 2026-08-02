@@ -278,7 +278,7 @@ sudo launchctl bootstrap system /Library/LaunchDaemons/com.guardsarm.agent.plist
 Verify the agent is running:
 
 ```bash
-sudo /Library/Ossec/bin/guardsarm-control status
+sudo /Library/gsmsec/bin/guardsarm-control status
 ```
 
 ### Windows

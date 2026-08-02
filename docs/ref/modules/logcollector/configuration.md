@@ -14,7 +14,7 @@ The `gsmsec.conf` file is the main configuration file on the GuardSarm agent. Th
 |------------------|----------|
 | Windows | `C:\Program Files (x86)\ossec-agent\gsmsec.conf` |
 | Linux / Unix | `/var/gsmsec/etc/gsmsec.conf` |
-| macOS | `/Library/Ossec/etc/gsmsec.conf` |
+| macOS | `/Library/gsmsec/etc/gsmsec.conf` |
 
 !!! note
     The `agent.conf` file on the GuardSarm server allows centralized distribution of configuration settings to multiple monitored endpoints. Configuration values defined in `agent.conf` take precedence over `gsmsec.conf`.
@@ -48,7 +48,7 @@ Restart the GuardSarm agent to apply the configuration:
 
 - **macOS**
   ```bash
-  /Library/Ossec/bin/guardsarm-control restart
+  /Library/gsmsec/bin/guardsarm-control restart
   ```
 
 ---
@@ -292,7 +292,7 @@ To monitor authentication events on macOS:
 Restart the GuardSarm agent to apply the configuration:
 
 ```bash
-/Library/Ossec/bin/guardsarm-control restart
+/Library/gsmsec/bin/guardsarm-control restart
 ```
 
 ---

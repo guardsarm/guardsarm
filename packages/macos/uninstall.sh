@@ -1,8 +1,8 @@
 #!/bin/sh
 
 ## Stop and remove application
-sudo /Library/Ossec/bin/guardsarm-control stop
-sudo /bin/rm -r /Library/Ossec*
+sudo /Library/gsmsec/bin/guardsarm-control stop
+sudo /bin/rm -r /Library/gsmsec*
 
 # remove launchdaemons
 /bin/rm -f /Library/LaunchDaemons/com.guardsarm.agent.plist

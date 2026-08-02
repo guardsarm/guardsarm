@@ -15,7 +15,7 @@ old_package_url=$1
 upgrade_version=$2
 new_pkg=$3
 
-ossec_path="/Library/Ossec"
+ossec_path="/Library/gsmsec"
 guardsarm_control="$ossec_path/bin/guardsarm-control"
 
 log_info() {
@@ -111,7 +111,7 @@ main(){
         log_error "Upgrade version $version_installed does not match expected $upgrade_version"
     fi
 
-    if [ "$(/Library/Ossec/bin/guardsarm-control status|grep "is running" -c)" -ne "5" ]; then
+    if [ "$(/Library/gsmsec/bin/guardsarm-control status|grep "is running" -c)" -ne "5" ]; then
         log_error "The service is not running for guardsarm version $version_installed"
     fi
 

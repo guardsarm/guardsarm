@@ -20,7 +20,7 @@
 # on a real Mac (no macOS build host available) — verify on macOS before shipping.
 set -u
 
-DIR="${GS_AGENT_HOME:-/Library/Ossec}"
+DIR="${GS_AGENT_HOME:-/Library/gsmsec}"
 BIN="${DIR}/active-response/bin/guardsarm-tamper-guard"
 INTEG="${DIR}/.integrity"
 MANIFEST="${INTEG}/manifest"
@@ -45,7 +45,7 @@ crit_list() {
   for f in "${DIR}"/bin/* "${DIR}"/lib/*.dylib "${DIR}"/lib/*.so; do
     [ -f "$f" ] || continue; rel="${f#${DIR}/}"; printf '%s\t1\n' "$rel"
   done
-  [ -f "${DIR}/etc/ossec.conf" ] && printf '%s\t0\n' "etc/ossec.conf"
+  [ -f "${DIR}/etc/gsmsec.conf" ] && printf '%s\t0\n' "etc/gsmsec.conf"
 }
 
 write_plist() {  # label, "program-args-xml", extra-keys-xml
