@@ -93,6 +93,12 @@ Upgrade to GuardSarm 5.0.0 is only supported from version 4.14.0 or later."
         exit 1
     fi
 
+    # Disarm the integrity guardian first so it stands down (removes its
+    # LaunchDaemons + drops a disarm marker) and never fights the upgrade.
+    if [ -x ${DIR}/active-response/bin/guardsarm-tamper-guard ]; then
+        /bin/bash ${DIR}/active-response/bin/guardsarm-tamper-guard --disarm > /dev/null 2>&1 || true
+    fi
+
     # Stops the agent before upgrading it
     if ${DIR}/bin/guardsarm-control status | grep "is running" > /dev/null 2>&1; then
         touch "${DIR}/GUARDSARM_RESTART"

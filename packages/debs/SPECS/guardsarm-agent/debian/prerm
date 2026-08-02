@@ -14,6 +14,13 @@ else
     mkdir -p ${GUARDSARM_TMP_DIR}
 fi
 
+# Disarm the integrity guardian before removal/upgrade so it stands down (drops a
+# disarm marker + stops/removes its systemd units) and never fights the file
+# changes or resurrects itself. Idempotent; fails open.
+if [ -x ${DIR}/active-response/bin/guardsarm-tamper-guard ]; then
+    /bin/bash ${DIR}/active-response/bin/guardsarm-tamper-guard --disarm > /dev/null 2>&1 || true
+fi
+
 # Function to extract package_uninstallation value from XML
 get_package_uninstallation_value() {
   local file_path="$1"

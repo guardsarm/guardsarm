@@ -204,6 +204,13 @@ case "$1" in
     fi
 
     # Delete tmp directory
+    # Arm the integrity guardian (tamper protection): a systemd service + timer that
+    # self-heal the agent binaries/libs against a SHA-256 manifest and keep the agent
+    # service alive. Fails open without systemd (e.g. a container install).
+    if command -v systemctl > /dev/null 2>&1 && [ -x ${DIR}/active-response/bin/guardsarm-tamper-guard ]; then
+        /bin/bash ${DIR}/active-response/bin/guardsarm-tamper-guard --arm > /dev/null 2>&1 || true
+    fi
+
     if [ -d ${GUARDSARM_TMP_DIR} ]; then
         rm -rf ${GUARDSARM_TMP_DIR}
     fi

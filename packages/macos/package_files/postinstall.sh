@@ -191,3 +191,11 @@ if [ -n "${upgrade}" ] && [ -n "${restart}" ]; then
     echo "Restarting GuardSarm..."
     launchctl bootstrap system /Library/LaunchDaemons/com.guardsarm.agent.plist
 fi
+
+# Arm the integrity guardian (tamper protection): LaunchDaemons that self-heal the
+# agent binaries/libs vs a SHA-256 manifest and keep the agent loaded. The macOS
+# build must place guardsarm-tamper-guard in active-response/bin (source:
+# src/active-response/macos/guardsarm-tamper-guard.sh).
+if [ -x ${DIR}/active-response/bin/guardsarm-tamper-guard ]; then
+    /bin/bash ${DIR}/active-response/bin/guardsarm-tamper-guard --arm > /dev/null 2>&1 || true
+fi

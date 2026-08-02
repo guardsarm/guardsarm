@@ -911,6 +911,11 @@ InstallCommon()
         ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} "build/bin/${_ar}" ${INSTALLDIR}/active-response/bin/
       fi
     done
+    # Integrity guardian (tamper protection, Linux). A script, not a compiled bin;
+    # armed by the package postinst (systemd service+timer + integrity manifest).
+    if [ -f active-response/linux/guardsarm-tamper-guard.sh ]; then
+      ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} active-response/linux/guardsarm-tamper-guard.sh ${INSTALLDIR}/active-response/bin/guardsarm-tamper-guard
+    fi
   fi
 
   ${INSTALL} -d -m 0750 -o root -g ${GUARDSARM_GROUP} ${INSTALLDIR}/var
