@@ -71,14 +71,57 @@
 #define BINPATH_REL     "\\.integrity\\svc-binpath.txt"
 
 /* Critical files (relative to install root). restore_on_modify=1 => binaries that
- * must match the manifest hash; 0 => restore only if the file is missing. */
-typedef struct { const char *rel; int restore_on_modify; } critfile;
-static critfile CRIT[] = {
-    { AGENT_EXE,                                       1 },
-    { "active-response\\bin\\guardsarm-tamper-guard.exe", 1 },
-    { "gsmsec.conf",                                   0 },
-};
-static const int CRIT_N = (int)(sizeof(CRIT) / sizeof(CRIT[0]));
+ * must match the manifest hash; 0 => restore only if the file is missing.
+ *
+ * The set is built at RUNTIME (build_critlist) rather than hardcoded: it protects
+ * the 3 explicit control files PLUS every DLL/EXE that constitutes the agent's
+ * trusted code. Previously only guardsarm-agent.exe + the guardian + gsmsec.conf
+ * were guarded, so a swapped module (agent_info.dll, sca.dll, syscollector.dll,
+ * schema_validator.dll, a response tool, ...) would load and run as SYSTEM
+ * unnoticed — a real tamper gap. Enumerating each run means new modules are
+ * auto-covered (a static list rots and silently reopens the gap). */
+typedef struct { char rel[192]; int restore_on_modify; } critfile;
+static critfile CRIT[256];
+static int CRIT_N = 0;
+
+static void crit_add(const char *rel, int mode) {
+    if (CRIT_N >= (int)(sizeof(CRIT) / sizeof(CRIT[0]))) return;
+    for (int i = 0; i < CRIT_N; i++)
+        if (_stricmp(CRIT[i].rel, rel) == 0) return;   /* dedup (explicit vs globbed) */
+    strncpy(CRIT[CRIT_N].rel, rel, sizeof(CRIT[0].rel) - 1);
+    CRIT[CRIT_N].rel[sizeof(CRIT[0].rel) - 1] = '\0';
+    CRIT[CRIT_N].restore_on_modify = mode;
+    CRIT_N++;
+}
+
+/* Add every file matching <root>\[subdir\]pattern (subdir "" = install root). */
+static void crit_add_glob(const char *root, const char *subdir, const char *pattern, int mode) {
+    char globp[MAX_PATH], rel[192];
+    if (subdir && *subdir) snprintf(globp, sizeof(globp), "%s\\%s\\%s", root, subdir, pattern);
+    else                   snprintf(globp, sizeof(globp), "%s\\%s", root, pattern);
+    WIN32_FIND_DATAA fd;
+    HANDLE h = FindFirstFileA(globp, &fd);
+    if (h == INVALID_HANDLE_VALUE) return;
+    do {
+        if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) continue;
+        if (subdir && *subdir) snprintf(rel, sizeof(rel), "%s\\%s", subdir, fd.cFileName);
+        else                   snprintf(rel, sizeof(rel), "%s", fd.cFileName);
+        crit_add(rel, mode);
+    } while (FindNextFileA(h, &fd));
+    FindClose(h);
+}
+
+/* Rebuild the protected-file set from the live install tree. Cheap (a few globs);
+ * called at the start of every backup/verify pass so coverage never goes stale. */
+static void build_critlist(const char *root) {
+    CRIT_N = 0;
+    crit_add(AGENT_EXE, 1);                                          /* main agent binary */
+    crit_add("active-response\\bin\\guardsarm-tamper-guard.exe", 1); /* the guardian itself */
+    crit_add("gsmsec.conf", 0);                                     /* config: alert-only on edit */
+    crit_add_glob(root, "", "*.dll", 1);                            /* every module loaded into the agent */
+    crit_add_glob(root, "", "*.exe", 1);                            /* agent + tooling exes in root */
+    crit_add_glob(root, "active-response\\bin", "*.exe", 1);        /* SYSTEM-run response tools */
+}
 
 /* Resolve install root from this exe's path:
  *   <root>\active-response\bin\guardsarm-tamper-guard.exe -> <root>  */
@@ -192,6 +235,7 @@ static int manifest_hash(const char *root, const char *rel, char *hex) {
 
 /* ---- install-time: snapshot critical files + write the manifest -------------- */
 static int do_backup(const char *root) {
+    build_critlist(root);                 /* protect every current agent module/tool */
     char integ[MAX_PATH];
     snprintf(integ, sizeof(integ), "%s%s", root, INTEG_REL);
     CreateDirectoryA(integ, NULL);
@@ -438,6 +482,7 @@ static void remove_guardian_service(void) {
  * guardian service. The task and the service therefore re-arm each other. */
 static int guardian_tick(const char *root, const char *self) {
     int fixes = 0;
+    build_critlist(root);                 /* refresh coverage: all current modules/tools */
     fixes += ensure_service(root);
     fixes += ensure_integrity(root);
     if (!task_exists()) {
