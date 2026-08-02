@@ -19,7 +19,7 @@
 
 // Redefine guardsarm_version
 #undef __guardsarm_version
-#define __guardsarm_version "v2.4.0"
+#define __guardsarm_version "v2.5.0"
 #endif
 
 keystore keys;
