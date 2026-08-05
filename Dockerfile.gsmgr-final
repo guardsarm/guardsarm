@@ -138,6 +138,13 @@ ENV LD_LIBRARY_PATH=/var/guardsarm-manager/lib:/var/guardsarm-manager/framework/
 # lets startup re-create it automatically (idempotent — only when the router table is empty).
 COPY activate_routes.py /var/guardsarm-manager/bin/activate_routes.py
 
+# Refresh the version metadata from source on EVERY assembly. Incremental rebuilds
+# recompile the framework (advancing the reported version) but don't re-run the installer's
+# VERSION.json copy (inst-functions.sh), so the file was left stale (2.0.0) while the code
+# advanced to 2.5.0. Baking it here from the repo VERSION.json keeps the deployed file honest.
+COPY VERSION.json /var/guardsarm-manager/VERSION.json
+RUN chown root:guardsarm-manager /var/guardsarm-manager/VERSION.json && chmod 440 /var/guardsarm-manager/VERSION.json
+
 # Bake the FROM-SOURCE ruleset provisioner so a fresh image self-provisions the whole
 # decoder library (base sshd/sudo/web/db/EDR + sysmon + auditd + Windows event-log, all with
 # rich ECS field extraction) instead of relying on a docker-committed layer. These generators
