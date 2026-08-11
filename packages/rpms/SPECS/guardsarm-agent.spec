@@ -24,7 +24,10 @@ Requires(postun): /usr/sbin/groupdel /usr/sbin/userdel
 Conflicts:   ossec-hids ossec-hids-agent guardsarm-local
 AutoReqProv: no
 
-Requires: coreutils
+Requires: coreutils, python3
+# On-agent YARA file scanner: yara needs EPEL on RHEL, so a weak dep keeps the
+# install robust (pulled by default on dnf; scanner degrades gracefully if absent).
+Recommends: yara
 BuildRequires: coreutils glibc-devel automake autoconf libtool policycoreutils-python perl
 
 ExclusiveOS: linux
