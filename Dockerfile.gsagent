@@ -7,15 +7,6 @@ RUN find /build/guardsarm -name '*.sh' -exec sed -i 's/\r$//' {} + \
  && sed -i 's/\r$//' /build/guardsarm/install.sh
 RUN cp /build/guardsarm/src/build/lib/libguardsarmext.so /build/guardsarm/src/build/lib/libwazuhext.so 2>/dev/null || true
 
-# Runtime deps for the on-agent YARA file scanner (guardsarm-yara-scan): it shells
-# out to the `yara` CLI and is a python3 script. Bundle both so agents built from
-# this image are scan-ready without a runtime apt install (the scanner + rule pack
-# + the guardsarm_command.remote_commands opt-in are provisioned via the manager /
-# agent-ar/deploy-response2.sh). Kept as an early, cacheable layer.
-RUN apt-get update \
- && apt-get install -y --no-install-recommends python3 yara \
- && rm -rf /var/lib/apt/lists/*
-
 # --- RUNTIME FIX: rebrand the indexer-plugin schema JSONs BEFORE the agent build.
 # CMake embeds these JSONs into libschema_validator.so. The agent validates every
 # stateful message locally against those embedded schemas BEFORE transmission; the
@@ -43,6 +34,16 @@ RUN USER_LANGUAGE=en USER_NO_STOP=y USER_INSTALL_TYPE=agent USER_DIR=/var/gsmsec
 
 RUN ln -sf libguardsarmext.so /var/gsmsec/lib/libwazuhext.so 2>/dev/null || true; \
     cp -a /build/guardsarm/src/external/jemalloc/lib/libjemalloc.so.2 /var/gsmsec/lib/ 2>/dev/null || true
+
+# Runtime deps for the on-agent YARA file scanner (guardsarm-yara-scan): it shells
+# out to the `yara` CLI and is a python3 script. Bundle both so agents built from
+# this image are scan-ready without a runtime apt install (the scanner + rule pack
+# + the guardsarm_command.remote_commands opt-in are provisioned via the manager /
+# agent-ar/deploy-response2.sh). Placed after the agent build so a rebuild reuses
+# the cached compile layers.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends python3 yara \
+ && rm -rf /var/lib/apt/lists/*
 
 ENV LD_LIBRARY_PATH=/var/gsmsec/lib
 
