@@ -25,10 +25,22 @@ RUN cp /build/guardsarm/src/build/lib/libguardsarmext.so /build/guardsarm/src/bu
 RUN sed -i 's/wazuh/guardsarm/g' /build/guardsarm/src/external/indexer-plugins/*.json \
  && ! grep -l wazuh /build/guardsarm/src/external/indexer-plugins/*.json
 
+# Agent-target build deps not in the shared manager base: libdbus-1-dev (systemd
+# "services" extended source -> #include <dbus/dbus.h>, found via pkg-config dbus-1)
+# and libaudit-dev (auditd module; see the agent debian/control Build-Depends).
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends libdbus-1-dev libaudit-dev libdb-dev \
+ && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /build/guardsarm/src
 # The base image only fetched server deps; the agent target additionally needs libdb.
 RUN make deps TARGET=agent INDEXER_PLUGINS_REFS=main RESOURCES_URL="$GS_RESOURCES_URL" -j"$(nproc)"
-RUN make TARGET=agent INDEXER_PLUGINS_REFS=main RESOURCES_URL="$GS_RESOURCES_URL" -j"$(nproc)"
+# CPATH puts the system dbus headers (libdbus-1-dev; dbus.h lives under
+# /usr/include/dbus-1.0, arch-deps under the lib dir) on every compile's include
+# path, so the "services"/systemd extended source resolves <dbus/dbus.h> without
+# racing the in-tree dbus_external target under -j.
+RUN CPATH=/usr/include/dbus-1.0:/usr/lib/x86_64-linux-gnu/dbus-1.0/include \
+    make TARGET=agent INDEXER_PLUGINS_REFS=main RESOURCES_URL="$GS_RESOURCES_URL" -j"$(nproc)"
 
 WORKDIR /build/guardsarm
 ENV LD_LIBRARY_PATH=/build/guardsarm/src/build/lib:/build/guardsarm/src/external/jemalloc/lib:/var/gsmsec/lib
