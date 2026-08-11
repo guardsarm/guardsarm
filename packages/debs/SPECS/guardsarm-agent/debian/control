@@ -8,7 +8,8 @@ Homepage: https://guardsarmsiem.com
 
 Package: guardsarm-agent
 Architecture: any
-Depends: ${shlibs:Depends}, libc6 (>= 2.7), procps
+Depends: ${shlibs:Depends}, libc6 (>= 2.7), procps, python3
+Recommends: yara
 Conflicts: ossec-hids-agent, ossec-hids, guardsarm-api
 Breaks: ossec-hids-agent, ossec-hids
 Description: GuardSarm agent
