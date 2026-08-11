@@ -2,6 +2,12 @@
 # an agent, and enroll to the manager at startup.
 FROM guardsarm-mgr-base:dbg
 
+# Dependency source mirror for `make deps`. Defaults to the canonical
+# packages.guardsarm.com mirror; override for offline / local-mirror builds, e.g.
+# serve guardsarm-infra/packages/deps and pass:
+#   --build-arg GS_RESOURCES_URL=http://host.docker.internal:8899/99-29734
+ARG GS_RESOURCES_URL=https://packages.guardsarm.com/deps/99-29734
+
 # Same fixes as the manager: LF line endings + libwazuhext soname alias.
 RUN find /build/guardsarm -name '*.sh' -exec sed -i 's/\r$//' {} + \
  && sed -i 's/\r$//' /build/guardsarm/install.sh
@@ -21,8 +27,8 @@ RUN sed -i 's/wazuh/guardsarm/g' /build/guardsarm/src/external/indexer-plugins/*
 
 WORKDIR /build/guardsarm/src
 # The base image only fetched server deps; the agent target additionally needs libdb.
-RUN make deps TARGET=agent INDEXER_PLUGINS_REFS=main -j"$(nproc)"
-RUN make TARGET=agent INDEXER_PLUGINS_REFS=main -j"$(nproc)"
+RUN make deps TARGET=agent INDEXER_PLUGINS_REFS=main RESOURCES_URL="$GS_RESOURCES_URL" -j"$(nproc)"
+RUN make TARGET=agent INDEXER_PLUGINS_REFS=main RESOURCES_URL="$GS_RESOURCES_URL" -j"$(nproc)"
 
 WORKDIR /build/guardsarm
 ENV LD_LIBRARY_PATH=/build/guardsarm/src/build/lib:/build/guardsarm/src/external/jemalloc/lib:/var/gsmsec/lib
