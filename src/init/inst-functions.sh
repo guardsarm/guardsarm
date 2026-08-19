@@ -916,6 +916,22 @@ InstallCommon()
     if [ -f active-response/linux/guardsarm-tamper-guard.sh ]; then
       ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} active-response/linux/guardsarm-tamper-guard.sh ${INSTALLDIR}/active-response/bin/guardsarm-tamper-guard
     fi
+    # Ransomware defense (agent-ar/ransom-guard): the canary-tripwire PREVENTION guard
+    # + the snapshot-restore RECOVERY action. Python (the guard self-detects macOS);
+    # scheduled + configured via the manager shared agent.conf. Baked here so EVERY
+    # agent package (deb/rpm/pkg) ships with ransomware defense out of the box.
+    for _rgos in linux macos; do
+      if [ -f active-response/${_rgos}/guardsarm-ransom-guard.py ]; then
+        ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} active-response/${_rgos}/guardsarm-ransom-guard.py ${INSTALLDIR}/active-response/bin/guardsarm-ransom-guard
+        ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} active-response/${_rgos}/guardsarm-restore-snapshot.py ${INSTALLDIR}/active-response/bin/restore-snapshot
+        break
+      fi
+    done
+    # opt in to shared-config commands so the scheduled guard wodle runs on new installs
+    if [ -f ${INSTALLDIR}/etc/local_internal_options.conf ]; then
+      grep -q '^guardsarm_command.remote_commands=1' ${INSTALLDIR}/etc/local_internal_options.conf 2>/dev/null \
+        || echo 'guardsarm_command.remote_commands=1' >> ${INSTALLDIR}/etc/local_internal_options.conf
+    fi
   fi
 
   ${INSTALL} -d -m 0750 -o root -g ${GUARDSARM_GROUP} ${INSTALLDIR}/var
