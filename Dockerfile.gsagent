@@ -66,6 +66,22 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends python3 yara auditd iptables \
  && rm -rf /var/lib/apt/lists/*
 
+# Bake the ransomware-defense on-agent scripts into the image so agents built from it
+# ship WITH the canary guard + snapshot-restore in active-response/bin (no runtime
+# provisioning needed). Staged into the build context by build-gsagent-image.sh; the
+# guard is scheduled + configured via the manager's shared agent.conf. Also load the
+# auditd exec rules (event-driven execve capture) and opt in to shared-config commands.
+COPY ransom-guard/guardsarm-ransom-guard.py /var/gsmsec/active-response/bin/guardsarm-ransom-guard
+COPY ransom-guard/guardsarm-restore-snapshot.py /var/gsmsec/active-response/bin/restore-snapshot
+COPY ransom-guard/auditd-exec.rules /etc/audit/rules.d/gs-exec.rules
+RUN chmod 750 /var/gsmsec/active-response/bin/guardsarm-ransom-guard \
+              /var/gsmsec/active-response/bin/restore-snapshot \
+ && sed -i 's/\r$//' /var/gsmsec/active-response/bin/guardsarm-ransom-guard \
+                     /var/gsmsec/active-response/bin/restore-snapshot \
+ && touch /var/gsmsec/etc/local_internal_options.conf \
+ && grep -q '^guardsarm_command.remote_commands=1' /var/gsmsec/etc/local_internal_options.conf \
+    || echo 'guardsarm_command.remote_commands=1' >> /var/gsmsec/etc/local_internal_options.conf
+
 ENV LD_LIBRARY_PATH=/var/gsmsec/lib
 
 # Enroll to the manager (authd on host 1517) and connect (remoted on host 1516), then run.
