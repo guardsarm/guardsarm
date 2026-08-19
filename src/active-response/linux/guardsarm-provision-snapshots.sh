@@ -34,6 +34,10 @@ INTERVAL="${GS_SNAPSHOT_INTERVAL:-hourly}"
 REPO="${GS_SNAPSHOT_REPO:-${GS_ROOT}/snapshots/restic}"
 PASSFILE="${GS_SNAPSHOT_PASSFILE:-${GS_ROOT}/snapshots/.restic-pass}"
 KEEP="${GS_SNAPSHOT_KEEP:---keep-hourly 24 --keep-daily 7 --keep-weekly 4}"
+# Exclude regenerable junk (build artifacts, caches, VCS, package caches) so snapshots
+# capture real user data, not gigabytes of node_modules. Mirrors the ransomware FIM
+# ignore set. restic matches these names anywhere in the tree. Override via env.
+EXCLUDES="${GS_SNAPSHOT_EXCLUDES:---exclude-caches --exclude=node_modules --exclude=.git --exclude=.svn --exclude=.cache --exclude=cache --exclude=__pycache__ --exclude=site-packages --exclude=.npm --exclude=.cargo --exclude=.gradle --exclude=.m2 --exclude=build --exclude=dist --exclude=target --exclude=venv --exclude=.venv --exclude=_toolchain --exclude=/var/lib/docker --exclude=/var/lib/containerd}"
 TAG="guardsarm-ransomware-recovery"
 LOG="${GS_ROOT}/logs/snapshot-provision.log"
 
@@ -62,12 +66,16 @@ detect() {
 ensure_restic() {
   if ! has restic; then
     log "restic not installed; attempting package install"
-    if   has apt-get; then apt-get update -qq && apt-get install -y -qq restic
-    elif has dnf;     then dnf install -y -q restic
-    elif has yum;     then yum install -y -q restic
-    elif has zypper;  then zypper -q install -y restic
-    elif has apk;     then apk add --no-cache restic
+    # Cap each step so a node without a reachable mirror fails fast instead of hanging
+    # the wodle on apt-get update. `_to` = timeout if available, else run bare.
+    _to() { if has timeout; then timeout "$@"; else shift; "$@"; fi; }
+    if   has apt-get; then _to 90 apt-get update -qq; _to 180 apt-get install -y -qq restic
+    elif has dnf;     then _to 180 dnf install -y -q restic
+    elif has yum;     then _to 180 yum install -y -q restic
+    elif has zypper;  then _to 180 zypper -q install -y restic
+    elif has apk;     then _to 120 apk add --no-cache restic
     else log "no package manager for restic; install it manually"; return 1; fi
+    has restic || { log "restic still unavailable (no mirror?); skipping restic snapshots"; return 1; }
   fi
   mkdir -p "$(dirname "$REPO")" "$(dirname "$PASSFILE")"
   chmod 700 "$(dirname "$REPO")" 2>/dev/null || true
@@ -93,7 +101,7 @@ snapshot_now() {
       export RESTIC_PASSWORD_FILE="$PASSFILE" RESTIC_REPOSITORY="$REPO"
       log "restic backup: $_paths"
       # shellcheck disable=SC2086
-      restic backup --tag "$TAG" $_paths >>"$LOG" 2>&1 || { log "restic backup failed"; return 1; }
+      restic backup --tag "$TAG" $EXCLUDES $_paths >>"$LOG" 2>&1 || { log "restic backup failed"; return 1; }
       # shellcheck disable=SC2086
       restic forget --tag "$TAG" $KEEP --prune >>"$LOG" 2>&1 || true
       ;;
