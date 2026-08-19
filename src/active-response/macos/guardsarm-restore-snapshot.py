@@ -26,13 +26,41 @@ import sys
 
 IS_MAC = platform.system() == "Darwin"
 
+# Recovery repo defaults — MUST match guardsarm-provision-snapshots (the provisioner
+# stores the restic repo + password at these fixed paths). restore-snapshot is invoked
+# as an AR action without the provisioner's environment, so resolve them here rather
+# than relying on ambient RESTIC_REPOSITORY.
+GS_ROOT = os.environ.get("GS_ROOT") or ("/var/gsmsec" if os.path.isdir("/var/gsmsec") else "/var/ossec")
+DEF_RESTIC_REPO = os.environ.get("GS_SNAPSHOT_REPO", f"{GS_ROOT}/snapshots/restic")
+DEF_RESTIC_PASS = os.environ.get("GS_SNAPSHOT_PASSFILE", f"{GS_ROOT}/snapshots/.restic-pass")
 
-def _run(cmd, check=False):
-    return subprocess.run(cmd, capture_output=True, text=True, timeout=120, check=check)
+
+def _run(cmd, check=False, env=None):
+    return subprocess.run(cmd, capture_output=True, text=True, timeout=120, check=check, env=env)
 
 
 def _has(binname):
     return shutil.which(binname) is not None
+
+
+def _restic_env():
+    """Environment for restic: honour an explicit RESTIC_REPOSITORY/password, else
+    fall back to the provisioner's fixed repo + password-file locations."""
+    env = dict(os.environ)
+    env.setdefault("RESTIC_REPOSITORY", DEF_RESTIC_REPO)
+    if "RESTIC_PASSWORD" not in env and "RESTIC_PASSWORD_FILE" not in env and os.path.exists(DEF_RESTIC_PASS):
+        env["RESTIC_PASSWORD_FILE"] = DEF_RESTIC_PASS
+    return env
+
+
+def _restic_available():
+    """restic is usable if the binary exists AND a repo is reachable — either an
+    explicit RESTIC_REPOSITORY or the provisioner's default repo on disk."""
+    if not _has("restic"):
+        return False
+    if os.environ.get("RESTIC_REPOSITORY"):
+        return True
+    return os.path.isdir(DEF_RESTIC_REPO) or os.path.exists(os.path.join(DEF_RESTIC_REPO, "config"))
 
 
 def detect_mechanism():
@@ -48,7 +76,7 @@ def detect_mechanism():
         return "zfs"
     if _has("timeshift"):
         return "timeshift"
-    if _has("restic") and os.environ.get("RESTIC_REPOSITORY"):
+    if _restic_available():
         return "restic"
     if _has("borg") and os.environ.get("BORG_REPO"):
         return "borg"
@@ -66,7 +94,7 @@ def list_snapshots(mech):
     if mech == "timeshift":
         return _run(["timeshift", "--list"]).stdout.strip().splitlines()
     if mech == "restic":
-        return _run(["restic", "snapshots", "--json"]).stdout.strip().splitlines()
+        return _run(["restic", "snapshots", "--json"], env=_restic_env()).stdout.strip().splitlines()
     if mech == "borg":
         return _run(["borg", "list"]).stdout.strip().splitlines()
     return []
@@ -95,7 +123,7 @@ def restore(mech, target, apply):
             # copy files back from the newest read-only snapshot (non-destructive)
             r = _run(["sh", "-c", f"echo 'btrfs restore requires snapshot mount; see runbook for {target}'"])
         elif mech == "restic":
-            r = _run(["restic", "restore", "latest", "--target", "/", "--include", target])
+            r = _run(["restic", "restore", "latest", "--target", "/", "--include", target], env=_restic_env())
         elif mech == "borg":
             repo = os.environ.get("BORG_REPO", "")
             arch = _run(["borg", "list", "--last", "1", "--short", repo]).stdout.strip()

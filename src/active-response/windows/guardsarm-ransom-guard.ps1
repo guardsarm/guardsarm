@@ -122,29 +122,42 @@ function Respond([string]$canary, [string]$action) {
 }
 
 $dirs = Get-CanaryDirs
-$paths = Plant-Canaries $dirs
-Write-Host "ransom-guard: planted $($paths.Count) canaries across $($dirs.Count) dirs (kill=$Kill, once=$Once)"
+# State file of previously-planted canary paths — lets the periodic (-Once) scan tell
+# "deleted by ransomware" from "never planted" without false-positiving on first run.
+$StateFile = Join-Path (Split-Path $EdrLog -Parent) 'ransom-canary-state.txt'
 
-if ($Once) {
-    foreach ($p in $paths) {
-        if (-not (Test-Path $p) -or ((Get-Content $p -Raw -ErrorAction SilentlyContinue) -ne $CanaryBody)) { Respond $p 'modified' }
+# One integrity scan: detect tampering on EXISTING canaries BEFORE (re)planting —
+# planting first would heal an encrypted/renamed canary and mask the attack (that
+# ordering silently defeated detection). Kills the offending process (unless kill=off)
+# via Respond, emits the canary detection, and re-plants. Returns the planted paths.
+function Invoke-CanaryScan($scanDirs) {
+    $prev = @(); if (Test-Path $StateFile) { $prev = @(Get-Content $StateFile -ErrorAction SilentlyContinue) }
+    foreach ($d in $scanDirs) {
+        foreach ($p in (Get-CanaryPaths $d)) {
+            if (Test-Path $p) {
+                if ((Get-Content $p -Raw -ErrorAction SilentlyContinue) -ne $CanaryBody) { Respond $p 'modified' }
+            } elseif ($prev -contains $p) {
+                Respond $p 'deleted'      # was planted on a prior run, now gone
+            }
+        }
     }
-    return
+    $planted = Plant-Canaries $scanDirs
+    try { Set-Content -Path $StateFile -Value $planted -Encoding UTF8 -ErrorAction SilentlyContinue } catch {}
+    return $planted
 }
 
-# Event-driven watch on each canary directory.
-$watchers = @()
-foreach ($d in $dirs) {
-    $w = New-Object System.IO.FileSystemWatcher $d
-    $w.Filter = "*$Token*"
-    $w.IncludeSubdirectories = $false
-    $w.NotifyFilter = [System.IO.NotifyFilters]'FileName,LastWrite,Size'
-    $w.EnableRaisingEvents = $true
-    $action = { param($s,$e) Respond $e.FullPath $e.ChangeType.ToString(); Plant-Canaries (Get-CanaryDirs) | Out-Null }
-    Register-ObjectEvent $w Changed -Action $action | Out-Null
-    Register-ObjectEvent $w Deleted -Action $action | Out-Null
-    Register-ObjectEvent $w Renamed -Action $action | Out-Null
-    $watchers += $w
+$paths = Invoke-CanaryScan $dirs
+Write-Host "ransom-guard: planted $($paths.Count) canaries across $($dirs.Count) dirs (kill=$Kill, once=$Once)"
+if ($Once) { return }
+
+# Continuous mode: fast integrity polling in the MAIN scope. A FileSystemWatcher's
+# Register-ObjectEvent -Action block runs in a SEPARATE runspace that cannot see
+# Respond/Plant-Canaries, so it silently detects nothing — a poll is both simpler and
+# reliable. Canaries are named to sort first/last ("!!!_0000" / "zzzz_9999") so
+# alphabetical ransomware trips one within the first files; ~2s latency + kill contains it.
+Write-Host "ransom-guard: polling $($dirs.Count) canary dirs every 2s (Ctrl+C to stop)"
+while ($true) {
+    Start-Sleep -Seconds 2
+    $dirs = Get-CanaryDirs                 # pick up newly-created user profiles / shares
+    Invoke-CanaryScan $dirs | Out-Null
 }
-Write-Host "ransom-guard: watching $($watchers.Count) directories (Ctrl+C to stop)"
-while ($true) { Start-Sleep -Seconds 5; Plant-Canaries $dirs | Out-Null }

@@ -924,6 +924,11 @@ InstallCommon()
       if [ -f active-response/${_rgos}/guardsarm-ransom-guard.py ]; then
         ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} active-response/${_rgos}/guardsarm-ransom-guard.py ${INSTALLDIR}/active-response/bin/guardsarm-ransom-guard
         ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} active-response/${_rgos}/guardsarm-restore-snapshot.py ${INSTALLDIR}/active-response/bin/restore-snapshot
+        # Recovery provisioner: sets up periodic btrfs/zfs/restic/tmutil snapshots of
+        # user data so restore-snapshot has a real point-in-time to roll back to.
+        if [ -f active-response/${_rgos}/guardsarm-provision-snapshots.sh ]; then
+          ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} active-response/${_rgos}/guardsarm-provision-snapshots.sh ${INSTALLDIR}/active-response/bin/guardsarm-provision-snapshots
+        fi
         break
       fi
     done
