@@ -80,10 +80,96 @@ CANARY_BODY = (b"GuardsArm ransomware canary. This decoy file is monitored by th
                b"Do not encrypt, rename or delete.\n") * 40
 CANARY_HASH = _sha(CANARY_BODY)
 
+# --- #2 canary spread: scatter canaries THROUGH the tree, not just at the top ------
+# Ransomware that dives into deep subfolders must still hit a decoy quickly, so plant
+# one canary set per directory, walking a few levels down (capped to bound cost).
+CANARY_DEPTH = int(os.environ.get("GS_RANSOM_CANARY_DEPTH", "3"))
+MAX_CANARY_DIRS = int(os.environ.get("GS_RANSOM_MAX_CANARY_DIRS", "400"))
+_SKIP_DIR = ("/proc", "/sys", "/dev", "node_modules", ".git", "/.cache", "/cache",
+             "__pycache__", "/build", "/dist", "site-packages", "/.snapshots")
 
-def plant():
+
+def _canary_dirs():
+    """Every directory to seed a canary in: each watched root + its subdirs down to
+    CANARY_DEPTH, capped at MAX_CANARY_DIRS, skipping churn/system dirs."""
+    out, seen = [], set()
+    for root in DIRS:
+        base_depth = root.rstrip(os.sep).count(os.sep)
+        for cur, subdirs, _files in os.walk(root):
+            low = cur.replace("\\", "/").lower()
+            if any(s in low for s in _SKIP_DIR):
+                subdirs[:] = []
+                continue
+            if cur not in seen:
+                seen.add(cur); out.append(cur)
+            if cur.rstrip(os.sep).count(os.sep) - base_depth >= CANARY_DEPTH:
+                subdirs[:] = []  # stop descending past the depth limit
+            if len(out) >= MAX_CANARY_DIRS:
+                return out
+    return out
+
+
+# --- #1 in-place / no-rename ransomware detection ---------------------------------
+# Ransomware that encrypts files IN PLACE (same name + extension, no ransom note) is
+# invisible to the rename/note signals. We catch it on content: an encrypted file no
+# longer matches its type — a .docx that isn't a ZIP, a .txt that is high-entropy
+# random. A burst of such "type-destroyed" files in user data is active encryption.
+INPLACE_MIN = int(os.environ.get("GS_RANSOM_INPLACE_MIN", "6"))     # encrypted files to fire
+INPLACE_WINDOW = int(os.environ.get("GS_RANSOM_INPLACE_WINDOW", "90"))  # recent-mtime window (s)
+INPLACE_MAX_SCAN = int(os.environ.get("GS_RANSOM_INPLACE_MAX_SCAN", "3000"))  # files/cycle cap
+# extension -> expected leading magic bytes (encryption destroys these headers)
+_MAGIC = {
+    "docx": b"PK\x03\x04", "xlsx": b"PK\x03\x04", "pptx": b"PK\x03\x04", "zip": b"PK\x03\x04",
+    "jar": b"PK\x03\x04", "odt": b"PK\x03\x04", "ods": b"PK\x03\x04", "odp": b"PK\x03\x04",
+    "pdf": b"%PDF", "jpg": b"\xff\xd8\xff", "jpeg": b"\xff\xd8\xff", "png": b"\x89PNG",
+    "gif": b"GIF8", "bmp": b"BM", "doc": b"\xd0\xcf\x11\xe0", "xls": b"\xd0\xcf\x11\xe0",
+    "ppt": b"\xd0\xcf\x11\xe0", "rtf": b"{\\rtf", "gz": b"\x1f\x8b", "7z": b"7z\xbc\xaf",
+    "rar": b"Rar!", "mp3": b"ID3", "sqlite": b"SQLite", "psd": b"8BPS",
+}
+# text-ish types that should be mostly-printable/low-entropy; encryption makes them random
+_TEXT_EXT = {"txt", "csv", "tsv", "log", "sql", "json", "xml", "html", "htm", "md",
+             "py", "js", "ts", "c", "cpp", "h", "java", "go", "rb", "php", "sh",
+             "conf", "ini", "cfg", "yaml", "yml", "tex", "srt", "vcf", "ics"}
+
+
+def _shannon(data):
+    if not data:
+        return 0.0
+    from math import log2
+    counts = [0] * 256
+    for b in data:
+        counts[b] += 1
+    n = len(data)
+    return -sum((c / n) * log2(c / n) for c in counts if c)
+
+
+def _looks_encrypted(path):
+    """True if the file's CONTENT no longer matches its extension (encrypted in place).
+    None if the type can't be judged (don't guess)."""
+    ext = path.rsplit(".", 1)[-1].lower() if "." in os.path.basename(path) else ""
+    try:
+        with open(path, "rb") as f:
+            head = f.read(1024)
+    except OSError:
+        return None
+    if not head:
+        return None
+    if ext in _MAGIC:
+        return not head.startswith(_MAGIC[ext])   # header gone -> encrypted
+    if ext in _TEXT_EXT:
+        # normal text ~4-5.5 bits/byte and almost all printable; encrypted ~7.99 with
+        # ~60% non-printable bytes. Require BOTH so a normal doc never trips.
+        printable = sum(1 for b in head if b in (9, 10, 13) or 32 <= b <= 126)
+        nonprint_frac = 1.0 - printable / len(head)
+        return _shannon(head) > 7.3 and nonprint_frac > 0.30
+    return None
+
+
+def plant(dirs=None):
+    if dirs is None:
+        dirs = _canary_dirs()
     planted = []
-    for d in DIRS:
+    for d in dirs:
         for p in _canary_paths(d):
             try:
                 if not os.path.exists(p) or open(p, "rb").read() != CANARY_BODY:
@@ -97,6 +183,41 @@ def plant():
             except OSError:
                 continue
     return planted
+
+
+def scan_inplace(dirs):
+    """#1 — detect IN-PLACE encryption: files recently modified whose CONTENT no longer
+    matches their extension. Returns (encrypted_count, sample_dir) if a burst is found
+    (>= INPLACE_MIN), else (0, None). Cheap: mtime-gated, header-only reads, capped."""
+    cutoff = time.time() - INPLACE_WINDOW
+    hits, checked, sample_dir = [], 0, None
+    for d in dirs:
+        try:
+            entries = os.listdir(d)
+        except OSError:
+            continue
+        for name in entries:
+            if CANARY_TOKEN in name:
+                continue
+            p = os.path.join(d, name)
+            try:
+                st = os.stat(p)
+            except OSError:
+                continue
+            if not (st.st_mode & 0o170000 == 0o100000):  # regular files only
+                continue
+            if st.st_mtime < cutoff:
+                continue
+            checked += 1
+            if checked > INPLACE_MAX_SCAN:
+                break
+            enc = _looks_encrypted(p)
+            if enc:
+                hits.append(p)
+                sample_dir = sample_dir or d
+        if checked > INPLACE_MAX_SCAN or len(hits) >= INPLACE_MIN:
+            break
+    return (len(hits), sample_dir) if len(hits) >= INPLACE_MIN else (0, None)
 
 
 def _tripped(paths):
@@ -177,9 +298,10 @@ def emit(canary, action, proc, pid):
         sys.stderr.write(f"ransom-guard: emit failed: {e}\n")
 
 
-def respond(canary, action):
-    d = os.path.dirname(canary)
-    culprits = _culprits(d)
+def respond(target_dir, action, marker):
+    """Kill the process(es) sweeping `target_dir` and emit the ransomware signal.
+    `marker` is what gets recorded as the offending file/event."""
+    culprits = _culprits(target_dir)
     killed = []
     for pid, name in culprits.items():
         base = (name or "").rsplit("/", 1)[-1].lower()
@@ -193,35 +315,49 @@ def respond(canary, action):
                 pass
     proc = killed[0] if killed else (next(iter(culprits.values()), "unknown"))
     pid = next(iter(culprits), None)
-    emit(canary, action, proc, pid)
-    print(f"ransom-guard: CANARY {action} {canary} — killed {killed or '[none identified]'}",
+    emit(marker, action, proc, pid)
+    print(f"ransom-guard: {action} in {target_dir} — killed {killed or '[none identified]'}",
           flush=True)
     return killed
 
 
-def sweep_check(paths):
-    tripped = _tripped(paths)
-    for canary, action in tripped:
-        respond(canary, action)
-    if tripped:
-        plant()  # re-seed for continued protection
-    return len(tripped)
+def sweep_check(paths, dirs):
+    n = 0
+    # canary trip (rename/delete/modify of a decoy)
+    for canary, action in _tripped(paths):
+        respond(os.path.dirname(canary), f"CANARY {action}", canary)
+        n += 1
+    # #1 — in-place encryption burst (files whose content no longer matches their type)
+    enc_count, sample_dir = scan_inplace(dirs)
+    if sample_dir:
+        respond(sample_dir, f"in-place encryption ({enc_count} files, content!=type)",
+                f"{sample_dir}/<in-place ransomware>")
+        n += 1
+    if n:
+        plant(dirs)  # re-seed for continued protection
+    return n
 
 
 def main():
     once = "--once" in sys.argv
-    paths = plant()
-    print(f"ransom-guard: planted {len(paths)} canaries in {DIRS} "
-          f"(kill={'on' if KILL else 'off'}, once={once})", flush=True)
+    dirs = _canary_dirs()
+    paths = plant(dirs)
+    print(f"ransom-guard: planted {len(paths)} canaries across {len(dirs)} dirs "
+          f"(depth {CANARY_DEPTH}, kill={'on' if KILL else 'off'}, once={once})", flush=True)
     if once:
-        n = sweep_check(paths)
-        print(f"ransom-guard: {n} canary trip(s)")
+        n = sweep_check(paths, dirs)
+        print(f"ransom-guard: {n} trigger(s)")
         return
+    ticks = 0
     while True:
         try:
-            sweep_check(paths)
+            sweep_check(paths, dirs)
         except Exception as e:
             sys.stderr.write(f"ransom-guard loop error: {e}\n")
+        ticks += 1
+        if ticks % 300 == 0:  # periodically re-walk the tree to seed new/renamed dirs
+            dirs = _canary_dirs()
+            paths = plant(dirs)
         time.sleep(INTERVAL)
 
 
