@@ -338,8 +338,34 @@ def sweep_check(paths, dirs):
     return n
 
 
+def _already_running():
+    """#6 supervision: the guard is (re)launched by the manager command wodle on a
+    short interval so a crash recovers within minutes. This makes the relaunch a
+    no-op when a healthy instance is already running, so the wodle never stacks
+    duplicate guards. Linux/macOS via a pidfile + liveness check."""
+    pidfile = os.path.join(AGENT, "var", "ransom-guard.pid")
+    try:
+        os.makedirs(os.path.dirname(pidfile), exist_ok=True)
+        if os.path.exists(pidfile):
+            old = int(open(pidfile).read().strip() or "0")
+            if old and old != os.getpid():
+                try:
+                    os.kill(old, 0)  # alive?
+                    return True      # a healthy guard already runs -> stand down
+                except OSError:
+                    pass             # stale pid -> take over
+        with open(pidfile, "w") as f:
+            f.write(str(os.getpid()))
+    except OSError:
+        pass
+    return False
+
+
 def main():
     once = "--once" in sys.argv
+    if not once and _already_running():
+        print("ransom-guard: another instance is already running — standing down", flush=True)
+        return
     dirs = _canary_dirs()
     paths = plant(dirs)
     print(f"ransom-guard: planted {len(paths)} canaries across {len(dirs)} dirs "
