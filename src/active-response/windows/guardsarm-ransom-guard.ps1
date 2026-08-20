@@ -14,11 +14,20 @@
   Run continuously from the agent command wodle (see install notes). Only ever touches
   its own canary files. Copyright (C) 2026, GuardsArm.
 #>
+# Modes: (default) supervisor — launched by the agent command wodle; ensures a detached
+# resident guard is running, then exits fast so it never blocks the command module.
+# -Resident: the long-lived continuous polling loop (single-instance via a global mutex).
+# -Once: a one-shot scan (periodic use / testing).
 [CmdletBinding()]
-param([switch]$Once)
+param([switch]$Once, [switch]$Resident)
 
 $ErrorActionPreference = 'Continue'
-$AgentHome = if ($env:GS_AGENT_HOME) { $env:GS_AGENT_HOME } else { 'C:\Program Files (x86)\ossec-agent' }
+$AgentHome = if ($env:GS_AGENT_HOME) { $env:GS_AGENT_HOME }
+             elseif (Test-Path 'C:\Program Files (x86)\gsmsec-agent') { 'C:\Program Files (x86)\gsmsec-agent' }
+             else { 'C:\Program Files (x86)\ossec-agent' }
+# Session-scoped single-instance lock. The guard runs as SYSTEM in session 0, so a
+# Local\ mutex is shared across all its invocations there (and needs no global privilege).
+$MutexName = 'Local\GuardsArm_RansomGuard_Resident'
 $EdrLog    = if ($env:GS_EDR_LOG) { $env:GS_EDR_LOG } else { Join-Path $AgentHome 'logs\edr-telemetry.log' }
 $Kill      = $env:GS_RANSOM_GUARD_KILL -notin @('0','false','no')
 $Token     = 'GuardsArm_DO_NOT_REMOVE_canary'
@@ -146,18 +155,43 @@ function Invoke-CanaryScan($scanDirs) {
     return $planted
 }
 
+# Always plant/scan once up front so canaries exist immediately, whatever the mode.
 $paths = Invoke-CanaryScan $dirs
-Write-Host "ransom-guard: planted $($paths.Count) canaries across $($dirs.Count) dirs (kill=$Kill, once=$Once)"
+Write-Host "ransom-guard: planted $($paths.Count) canaries across $($dirs.Count) dirs (kill=$Kill)"
 if ($Once) { return }
 
-# Continuous mode: fast integrity polling in the MAIN scope. A FileSystemWatcher's
-# Register-ObjectEvent -Action block runs in a SEPARATE runspace that cannot see
-# Respond/Plant-Canaries, so it silently detects nothing — a poll is both simpler and
-# reliable. Canaries are named to sort first/last ("!!!_0000" / "zzzz_9999") so
-# alphabetical ransomware trips one within the first files; ~2s latency + kill contains it.
-Write-Host "ransom-guard: polling $($dirs.Count) canary dirs every 2s (Ctrl+C to stop)"
-while ($true) {
-    Start-Sleep -Seconds 2
-    $dirs = Get-CanaryDirs                 # pick up newly-created user profiles / shares
-    Invoke-CanaryScan $dirs | Out-Null
+function Test-ResidentRunning {
+    $m = $null
+    if ([System.Threading.Mutex]::TryOpenExisting($MutexName, [ref]$m)) { $m.Dispose(); return $true }
+    return $false
 }
+
+if (-not $Resident) {
+    # SUPERVISOR (what the command wodle runs). Do NOT block here — the module's command
+    # process must return promptly. If no resident guard is alive, spawn a DETACHED one
+    # that survives this process exiting (Start-Process → its own process tree), then exit.
+    # Re-runs every wodle interval, so a resident that ever dies is relaunched within it.
+    if (Test-ResidentRunning) { Write-Host 'ransom-guard: resident already running'; return }
+    $self = $PSCommandPath
+    $args = @('-NonInteractive','-WindowStyle','Hidden','-ExecutionPolicy','Bypass','-File',"`"$self`"",'-Resident')
+    Start-Process powershell.exe -WindowStyle Hidden -ArgumentList $args | Out-Null
+    Write-Host 'ransom-guard: launched detached resident guard'
+    return
+}
+
+# RESIDENT: hold the single-instance mutex and poll continuously. Named to sort first/last
+# ("!!!_0000"/"zzzz_9999") so alphabetical ransomware trips a canary within the first files;
+# ~2s detection latency + kill contains it. Every scan is wrapped so a transient error
+# (e.g. a locked file or a Restart-Manager hiccup) can never terminate the loop — that was
+# why the guard previously exited moments after the wodle launched it.
+$createdNew = $false
+$mutex = New-Object System.Threading.Mutex($true, $MutexName, [ref]$createdNew)
+if (-not $createdNew) { Write-Host 'ransom-guard: another resident holds the mutex; exiting'; return }
+Write-Host "ransom-guard: RESIDENT polling every 2s (kill=$Kill)"
+try {
+    while ($true) {
+        Start-Sleep -Seconds 2
+        try { $dirs = Get-CanaryDirs; Invoke-CanaryScan $dirs | Out-Null }
+        catch { Write-Host "ransom-guard: scan error (continuing): $($_.Exception.Message)" }
+    }
+} finally { try { $mutex.ReleaseMutex() } catch {}; $mutex.Dispose() }
