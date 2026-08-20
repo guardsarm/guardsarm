@@ -168,14 +168,25 @@ function Test-ResidentRunning {
 
 if (-not $Resident) {
     # SUPERVISOR (what the command wodle runs). Do NOT block here — the module's command
-    # process must return promptly. If no resident guard is alive, spawn a DETACHED one
-    # that survives this process exiting (Start-Process → its own process tree), then exit.
+    # process must return promptly. If no resident guard is alive, spawn one and exit.
     # Re-runs every wodle interval, so a resident that ever dies is relaunched within it.
     if (Test-ResidentRunning) { Write-Host 'ransom-guard: resident already running'; return }
     $self = $PSCommandPath
-    $args = @('-NonInteractive','-WindowStyle','Hidden','-ExecutionPolicy','Bypass','-File',"`"$self`"",'-Resident')
-    Start-Process powershell.exe -WindowStyle Hidden -ArgumentList $args | Out-Null
-    Write-Host 'ransom-guard: launched detached resident guard'
+    # Launch via WMI Win32_Process.Create, NOT Start-Process: a WMI-created process is
+    # parented to WmiPrvSE, so it is OUTSIDE this command-module process tree. The module
+    # tears down its command's child tree when this supervisor returns, which would kill a
+    # Start-Process child; the WMI child survives. Env (esp. kill mode) is baked into the
+    # launch command since a WMI-created process does not inherit our environment block.
+    $killVal = if ($Kill) { '1' } else { '0' }
+    $setEnv = "`$env:GS_RANSOM_GUARD_KILL='$killVal';"
+    foreach ($v in 'GS_EDR_LOG','GS_RANSOM_CANARY_DIRS','GS_AGENT_HOME') {
+        $val = [Environment]::GetEnvironmentVariable($v)
+        if ($val) { $setEnv += " `$env:$v='$val';" }
+    }
+    $inner = "$setEnv & '$self' -Resident"
+    $cmdLine = 'powershell.exe -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -Command "' + $inner + '"'
+    $rc = (Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $cmdLine } -ErrorAction SilentlyContinue).ReturnValue
+    Write-Host "ransom-guard: launched detached resident guard (WMI rc=$rc)"
     return
 }
 
