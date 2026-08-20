@@ -167,26 +167,34 @@ function Test-ResidentRunning {
 }
 
 if (-not $Resident) {
-    # SUPERVISOR (what the command wodle runs). Do NOT block here — the module's command
-    # process must return promptly. If no resident guard is alive, spawn one and exit.
-    # Re-runs every wodle interval, so a resident that ever dies is relaunched within it.
-    if (Test-ResidentRunning) { Write-Host 'ransom-guard: resident already running'; return }
+    # SUPERVISOR (what the command wodle runs). The wm_command module on Windows does NOT
+    # keep a long-lived command child (nor a Start-Process/WMI grandchild) alive under its
+    # SYSTEM/session-0 lifecycle — the resident is torn down as soon as this supervisor
+    # returns. So host the resident under TASK SCHEDULER, which is built for long-running
+    # processes and is fully independent of the command module. This supervisor just
+    # ensures the task exists and is running (self-healing); AtStartup makes it survive
+    # reboot, RestartCount makes Task Scheduler relaunch it if it ever dies. Idempotent:
+    # re-runs harmlessly every wodle interval.
+    $taskName = 'GuardsArm Ransomware Guard'
     $self = $PSCommandPath
-    # Launch via WMI Win32_Process.Create, NOT Start-Process: a WMI-created process is
-    # parented to WmiPrvSE, so it is OUTSIDE this command-module process tree. The module
-    # tears down its command's child tree when this supervisor returns, which would kill a
-    # Start-Process child; the WMI child survives. Env (esp. kill mode) is baked into the
-    # launch command since a WMI-created process does not inherit our environment block.
     $killVal = if ($Kill) { '1' } else { '0' }
-    $setEnv = "`$env:GS_RANSOM_GUARD_KILL='$killVal';"
-    foreach ($v in 'GS_EDR_LOG','GS_RANSOM_CANARY_DIRS','GS_AGENT_HOME') {
-        $val = [Environment]::GetEnvironmentVariable($v)
-        if ($val) { $setEnv += " `$env:$v='$val';" }
+    if (-not (Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue)) {
+        try {
+            $arg = "-NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -Command `"`$env:GS_RANSOM_GUARD_KILL='$killVal'; & '$self' -Resident`""
+            $action    = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument $arg
+            $trigger   = New-ScheduledTaskTrigger -AtStartup
+            $principal = New-ScheduledTaskPrincipal -UserId 'SYSTEM' -LogonType ServiceAccount -RunLevel Highest
+            $set       = New-ScheduledTaskSettingsSet -StartWhenAvailable -DontStopOnIdleEnd `
+                          -RestartInterval (New-TimeSpan -Minutes 1) -RestartCount 999 `
+                          -ExecutionTimeLimit ([TimeSpan]::Zero) -MultipleInstances IgnoreNew
+            Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Principal $principal -Settings $set -Force | Out-Null
+            Write-Host 'ransom-guard: registered resident task'
+        } catch { Write-Host "ransom-guard: task register failed: $($_.Exception.Message)" }
     }
-    $inner = "$setEnv & '$self' -Resident"
-    $cmdLine = 'powershell.exe -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -Command "' + $inner + '"'
-    $rc = (Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $cmdLine } -ErrorAction SilentlyContinue).ReturnValue
-    Write-Host "ransom-guard: launched detached resident guard (WMI rc=$rc)"
+    $state = (Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue).State
+    if ($state -ne 'Running') {
+        try { Start-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue; Write-Host 'ransom-guard: started resident task' } catch {}
+    } else { Write-Host 'ransom-guard: resident task already running' }
     return
 }
 
