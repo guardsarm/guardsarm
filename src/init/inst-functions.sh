@@ -929,9 +929,21 @@ InstallCommon()
         if [ -f active-response/${_rgos}/guardsarm-provision-snapshots.sh ]; then
           ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} active-response/${_rgos}/guardsarm-provision-snapshots.sh ${INSTALLDIR}/active-response/bin/guardsarm-provision-snapshots
         fi
+        # On-agent YARA file scanner (real libyara via the `yara` CLI). Shells out to
+        # `yara`, emits edr_malware to EDR telemetry; scheduled by the manager shared
+        # agent.conf (2h scan wodle). Baked here so every deb/rpm/pkg ships it instead
+        # of an out-of-band installer that agent rebuilds silently drop.
+        if [ -f active-response/${_rgos}/guardsarm-yara-scan.py ]; then
+          ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} active-response/${_rgos}/guardsarm-yara-scan.py ${INSTALLDIR}/active-response/bin/guardsarm-yara-scan
+        fi
         break
       fi
     done
+    # YARA rule pack (OS-agnostic) -> etc/yara/, read by the scanner each run.
+    if [ -f active-response/yara/guardsarm-rules.yar ]; then
+      ${INSTALL} -d -m 0750 -o root -g ${GUARDSARM_GROUP} ${INSTALLDIR}/etc/yara
+      ${INSTALL} -m 0640 -o root -g ${GUARDSARM_GROUP} active-response/yara/guardsarm-rules.yar ${INSTALLDIR}/etc/yara/guardsarm-rules.yar
+    fi
     # opt in to shared-config commands so the scheduled guard wodle runs on new installs
     if [ -f ${INSTALLDIR}/etc/local_internal_options.conf ]; then
       grep -q '^guardsarm_command.remote_commands=1' ${INSTALLDIR}/etc/local_internal_options.conf 2>/dev/null \

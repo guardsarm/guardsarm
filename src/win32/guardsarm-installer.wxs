@@ -441,6 +441,19 @@
                             <Component Id="GUARDSARM_PROVISION_SNAPSHOTS.PS1" DiskId="1" Guid="7A9E1C40-100C-4B21-9C3D-3FED2499000C">
                                 <File Id="GUARDSARM_PROVISION_SNAPSHOTS.PS1" Name="guardsarm-provision-snapshots.ps1" Source="..\active-response\windows\guardsarm-provision-snapshots.ps1" />
                             </Component>
+                            <!-- On-agent YARA file scanner (Windows). Windows ships no python/yara, so the
+                                 scanner drives the bundled statically-linked yara64.exe against the rule
+                                 pack and emits edr_malware to EDR telemetry. Scheduled by the shared
+                                 agent.conf guardsarm-yara-scan command wodle. -->
+                            <Component Id="GUARDSARM_YARA_SCAN.PS1" DiskId="1" Guid="7A9E1C40-100D-4B21-9C3D-3FED2499000D">
+                                <File Id="GUARDSARM_YARA_SCAN.PS1" Name="guardsarm-yara-scan.ps1" Source="..\active-response\windows\guardsarm-yara-scan.ps1" />
+                            </Component>
+                            <Component Id="YARA64.EXE" DiskId="1" Guid="7A9E1C40-100E-4B21-9C3D-3FED2499000E">
+                                <File Id="YARA64.EXE" Name="yara64.exe" Source="..\active-response\windows\yara64.exe" />
+                            </Component>
+                            <Component Id="GUARDSARM_RULES.YAR" DiskId="1" Guid="7A9E1C40-100F-4B21-9C3D-3FED2499000F">
+                                <File Id="GUARDSARM_RULES.YAR" Name="guardsarm-rules.yar" Source="..\active-response\yara\guardsarm-rules.yar" />
+                            </Component>
                             <Component Id="REMOVE_OLD_AR" Guid="E1915364-2E49-4B74-8DF9-5D6CC3B27DF0">
                                 <RemoveFile Id="AR_RESTART_OSSEC_CMD" Name="restart-ossec.cmd" On="install" />
                                 <RemoveFile Id="AR_RESTART_GUARDSARM_EXE" Name="restart-guardsarm.exe" On="install" />
@@ -735,6 +748,9 @@
             <ComponentRef Id="GUARDSARM_RANSOM_GUARD.PS1" />
             <ComponentRef Id="GUARDSARM_RESTORE_SNAPSHOT.PS1" />
             <ComponentRef Id="GUARDSARM_PROVISION_SNAPSHOTS.PS1" />
+            <ComponentRef Id="GUARDSARM_YARA_SCAN.PS1" />
+            <ComponentRef Id="YARA64.EXE" />
+            <ComponentRef Id="GUARDSARM_RULES.YAR" />
             <ComponentRef Id="ACTIVE_RESPONSES.LOG" />
             <ComponentRef Id="StartMenuShortcuts" />
             <ComponentRef Id="WIN32UI.EXE" />
