@@ -58,6 +58,7 @@ TIMEOUT = 30
 ALLOWED_PREFIXES = (
     "etc/yara/", "etc/decoders/", "etc/rules/", "etc/lists/", "etc/shared/",
     "active-response/bin/", "ruleset/", "etc/guardsarm-content-update.pub",
+    "etc/wpk_root.pem",  # WPK remote-upgrade trust anchor (re-anchor fleet w/o reinstall)
 )
 
 

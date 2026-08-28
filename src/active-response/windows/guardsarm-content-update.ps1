@@ -26,7 +26,8 @@ $PubXml  = if ($env:GS_CONTENT_PUBKEY) { $env:GS_CONTENT_PUBKEY }
 $State   = Join-Path $AgentHome 'var\content-update.state'
 $Log     = Join-Path $AgentHome 'logs\content-update.log'
 $AllowedPrefixes = @('etc/yara/', 'etc/decoders/', 'etc/rules/', 'etc/lists/',
-                     'active-response/bin/', 'ruleset/', 'etc/guardsarm-content-update.pub.xml')
+                     'active-response/bin/', 'ruleset/', 'etc/guardsarm-content-update.pub.xml',
+                     'etc/wpk_root.pem')   # WPK remote-upgrade trust anchor (no reinstall)
 
 function Write-Log([string]$m) {
     $line = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ') + ' ' + $m
