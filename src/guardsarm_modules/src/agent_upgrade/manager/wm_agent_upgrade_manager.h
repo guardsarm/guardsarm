@@ -12,12 +12,17 @@
 #include "wm_agent_upgrade.h"
 #include "wm_task_general.h"
 
-#define GM_UPGRADE_MINIMAL_VERSION_SUPPORT "v3.0.0"
-#define GM_UPGRADE_NEW_LINUX_VERSION_REPOSITORY "v3.4.0"
+/* GuardSarm product versions are rebaselined to 2.x while the agent CODE is derived
+ * from the modern (4.x/5.x) upstream. These thresholds decide whether an agent is
+ * "modern" enough for remote upgrade; left at the inherited v3/v4 values they gate
+ * every 2.x agent out (error 1821) and would pick the OLD wire format. Lower the ones
+ * that govern our 2.x fleet so rebranded agents are correctly treated as modern. */
+#define GM_UPGRADE_MINIMAL_VERSION_SUPPORT "v2.0.0"
+#define GM_UPGRADE_NEW_LINUX_VERSION_REPOSITORY "v2.0.0"
 #define GM_UPGRADE_5X_MINIMUM_VERSION "v5.0.0"
 #define GM_UPGRADE_REQUIRED_INTERMEDIATE_VERSION "v4.14.0"
-#define GM_UPGRADE_NEW_VERSION_STRUCTURE_REPOSITORY "v4.9.0"
-#define GM_UPGRADE_NEW_UPGRADE_MECHANISM "v4.1.0"
+#define GM_UPGRADE_NEW_VERSION_STRUCTURE_REPOSITORY "v2.0.0"
+#define GM_UPGRADE_NEW_UPGRADE_MECHANISM "v2.0.0"
 #define GM_UPGRADE_WPK_DEFAULT_PATH "var/upgrade/"
 #define GM_UPGRADE_WPK_DOWNLOAD_TIMEOUT 60000
 #define GM_UPGRADE_WPK_DOWNLOAD_ATTEMPTS 5
