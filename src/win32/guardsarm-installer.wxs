@@ -454,6 +454,14 @@
                             <Component Id="GUARDSARM_RULES.YAR" DiskId="1" Guid="7A9E1C40-100F-4B21-9C3D-3FED2499000F">
                                 <File Id="GUARDSARM_RULES.YAR" Name="guardsarm-rules.yar" Source="..\active-response\yara\guardsarm-rules.yar" />
                             </Component>
+                            <!-- Content pull-updater (self-updates rules/scripts from the signed content
+                                 channel, no MSI reinstall) + its pinned verification public key (.NET XML). -->
+                            <Component Id="GUARDSARM_CONTENT_UPDATE.PS1" DiskId="1" Guid="7A9E1C40-1010-4B21-9C3D-3FED24990010">
+                                <File Id="GUARDSARM_CONTENT_UPDATE.PS1" Name="guardsarm-content-update.ps1" Source="..\active-response\windows\guardsarm-content-update.ps1" />
+                            </Component>
+                            <Component Id="GUARDSARM_CONTENT_UPDATE.PUB" DiskId="1" Guid="7A9E1C40-1011-4B21-9C3D-3FED24990011">
+                                <File Id="GUARDSARM_CONTENT_UPDATE.PUB" Name="guardsarm-content-update.pub.xml" Source="..\active-response\etc\guardsarm-content-update.pub.xml" />
+                            </Component>
                             <Component Id="REMOVE_OLD_AR" Guid="E1915364-2E49-4B74-8DF9-5D6CC3B27DF0">
                                 <RemoveFile Id="AR_RESTART_OSSEC_CMD" Name="restart-ossec.cmd" On="install" />
                                 <RemoveFile Id="AR_RESTART_GUARDSARM_EXE" Name="restart-guardsarm.exe" On="install" />
@@ -751,6 +759,8 @@
             <ComponentRef Id="GUARDSARM_YARA_SCAN.PS1" />
             <ComponentRef Id="YARA64.EXE" />
             <ComponentRef Id="GUARDSARM_RULES.YAR" />
+            <ComponentRef Id="GUARDSARM_CONTENT_UPDATE.PS1" />
+            <ComponentRef Id="GUARDSARM_CONTENT_UPDATE.PUB" />
             <ComponentRef Id="ACTIVE_RESPONSES.LOG" />
             <ComponentRef Id="StartMenuShortcuts" />
             <ComponentRef Id="WIN32UI.EXE" />

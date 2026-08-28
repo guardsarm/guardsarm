@@ -936,6 +936,13 @@ InstallCommon()
         if [ -f active-response/${_rgos}/guardsarm-yara-scan.py ]; then
           ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} active-response/${_rgos}/guardsarm-yara-scan.py ${INSTALLDIR}/active-response/bin/guardsarm-yara-scan
         fi
+        # Content pull-updater: keeps rules/scripts current by pulling a SIGNED bundle
+        # from the content channel (packages.guardsarm.com/content) and applying it in
+        # place — no reinstall. This is the mechanism that stops "repackage + reinstall
+        # on every content change"; the updater can even update itself.
+        if [ -f active-response/linux/guardsarm-content-update.py ]; then
+          ${INSTALL} -m 0750 -o root -g ${GUARDSARM_GROUP} active-response/linux/guardsarm-content-update.py ${INSTALLDIR}/active-response/bin/guardsarm-content-update
+        fi
         break
       fi
     done
@@ -943,6 +950,11 @@ InstallCommon()
     if [ -f active-response/yara/guardsarm-rules.yar ]; then
       ${INSTALL} -d -m 0750 -o root -g ${GUARDSARM_GROUP} ${INSTALLDIR}/etc/yara
       ${INSTALL} -m 0640 -o root -g ${GUARDSARM_GROUP} active-response/yara/guardsarm-rules.yar ${INSTALLDIR}/etc/yara/guardsarm-rules.yar
+    fi
+    # Pinned PUBLIC key for content-update signature verification (baked in at install;
+    # the private key never leaves the signing host). PEM for Linux/macOS openssl verify.
+    if [ -f active-response/etc/guardsarm-content-update.pub ]; then
+      ${INSTALL} -m 0640 -o root -g ${GUARDSARM_GROUP} active-response/etc/guardsarm-content-update.pub ${INSTALLDIR}/etc/guardsarm-content-update.pub
     fi
     # opt in to shared-config commands so the scheduled guard wodle runs on new installs
     if [ -f ${INSTALLDIR}/etc/local_internal_options.conf ]; then
