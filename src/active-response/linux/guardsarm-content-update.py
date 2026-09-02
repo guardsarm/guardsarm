@@ -92,8 +92,68 @@ def _sha256(path):
     return h.hexdigest()
 
 
+# DigestInfo prefix for SHA-256 (RFC 8017 EMSA-PKCS1-v1_5).
+_SHA256_DIGESTINFO = bytes.fromhex("3031300d060960864801650304020105000420")
+
+
+def _der_len(buf, i):
+    """Return (length, content_start_index) for a DER TLV whose length octets start at buf[i]."""
+    n = buf[i]
+    i += 1
+    if n < 0x80:
+        return n, i
+    k = n & 0x7f
+    return int.from_bytes(buf[i:i + k], "big"), i + k
+
+
+def _rsa_pubkey_from_pem(path):
+    """Extract (n, e) from a PEM SubjectPublicKeyInfo RSA key using the stdlib only.
+    SPKI = SEQ { SEQ { OID, NULL }, BIT STRING { SEQ { INT n, INT e } } }."""
+    import base64
+    pem = open(path, "rb").read()
+    der = base64.b64decode(b"".join(l for l in pem.splitlines() if b"-----" not in l))
+    assert der[0] == 0x30, "SPKI: not a SEQUENCE"
+    _, i = _der_len(der, 1)                       # outer SEQUENCE contents
+    assert der[i] == 0x30, "SPKI: no AlgorithmIdentifier"
+    alg_len, j = _der_len(der, i + 1)             # skip AlgorithmIdentifier
+    i = j + alg_len
+    assert der[i] == 0x03, "SPKI: expected BIT STRING"
+    bs_len, j = _der_len(der, i + 1)
+    rsa = der[j + 1: j + bs_len]                  # drop the unused-bits byte
+    assert rsa[0] == 0x30, "RSAPublicKey: not a SEQUENCE"
+    _, k = _der_len(rsa, 1)
+    assert rsa[k] == 0x02, "RSAPublicKey: modulus not INTEGER"
+    n_len, m = _der_len(rsa, k + 1)
+    n = int.from_bytes(rsa[m:m + n_len], "big")
+    p = m + n_len
+    assert rsa[p] == 0x02, "RSAPublicKey: exponent not INTEGER"
+    e_len, q = _der_len(rsa, p + 1)
+    e = int.from_bytes(rsa[q:q + e_len], "big")
+    return n, e
+
+
+def _verify_sig_stdlib(manifest, sig):
+    """Pure-stdlib RSA-SHA256 PKCS#1 v1.5 verify (no openssl) for lean agents."""
+    import hashlib
+    import hmac
+    n, e = _rsa_pubkey_from_pem(PUBKEY)
+    s = int.from_bytes(open(sig, "rb").read(), "big")
+    k = (n.bit_length() + 7) // 8
+    if s >= n:
+        return False
+    em = pow(s, e, n).to_bytes(k, "big")
+    h = hashlib.sha256(open(manifest, "rb").read()).digest()
+    pad = k - 3 - len(_SHA256_DIGESTINFO) - len(h)
+    if pad < 8:
+        return False
+    expected = b"\x00\x01" + b"\xff" * pad + b"\x00" + _SHA256_DIGESTINFO + h
+    return hmac.compare_digest(em, expected)
+
+
 def _verify_sig(manifest, sig):
-    """RSA-SHA256 verify via the bundled openssl (always present with the agent)."""
+    """RSA-SHA256 verify. Prefer the openssl CLI (fast); if it is not installed
+    fall back to a stdlib-only implementation so lean Linux agents without openssl
+    still verify. Either way an invalid/absent signature returns False (fail closed)."""
     if not os.path.isfile(PUBKEY):
         log(f"ERROR: content public key missing ({PUBKEY}) — refusing to apply")
         return False
@@ -102,8 +162,17 @@ def _verify_sig(manifest, sig):
                             "-signature", sig, manifest],
                            capture_output=True, text=True, timeout=15)
         return r.returncode == 0 and "Verified OK" in (r.stdout + r.stderr)
+    except FileNotFoundError:
+        pass  # openssl CLI absent — use the stdlib path
     except Exception as e:
-        log(f"ERROR: signature verify failed to run: {e}")
+        log(f"WARN: openssl verify errored ({e}); trying stdlib verify")
+    try:
+        ok = _verify_sig_stdlib(manifest, sig)
+        if ok:
+            log("signature verified via stdlib RSA path (openssl CLI not available)")
+        return ok
+    except Exception as e:
+        log(f"ERROR: stdlib signature verify failed: {e}")
         return False
 
 
